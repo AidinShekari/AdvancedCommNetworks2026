@@ -1,0 +1,210 @@
+\Needspace{20\baselineskip}
+
+\CNsection{}{اطلاعات درس}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4375}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5625}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنوان} & \CNth{جزییات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{عنوان درس} & شبکه‌های ارتباطی پیشرفته \\
+\textbf{تعداد واحد} & 3 \\
+\textbf{کل ساعات تماس} & 48 ساعت \\
+\textbf{مدت} & 16 هفته \ensuremath{\times} 3 ساعت در هفته \\
+\textbf{قالب} & سخنرانی + آزمایشگاه + پروژه \\
+\textbf{دانشجویان هدف} & دانشجویان سال آخر کارشناسی /\allowbreak{} تحصیلات تکمیلی مهندسی برق، مهندسی مخابرات \\
+\end{longtable}
+}
+
+\CNsection{}{اهداف درس}
+
+در پایان این درس، دانشجویان قادر خواهند بود:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  سیر کامل تحول شبکه‌های موبایل را از \lr{\mbox{GSM (2G)}} تا \lr{UMTS (3G)}، \lr{\mbox{LTE (4G)}}، \lr{5G NR/\allowbreak{}SA} و تا مفاهیم نوظهور \lr{\mbox{6G}} دنبال کنند.
+\item
+  توضیح دهند چرا هر نسل توسعه یافت، چه مشکلی را حل کرد و چگونه ترافیک از طریق هر معماری جریان می‌یابد.
+\item
+  معماری‌های شبکه هسته را تحلیل کنند: سوییچینگ مداری، سوییچینگ بسته‌ای، \lr{\mbox{EPC}} تمام-\lr{\mbox{IP}} و هسته خدمات‌محور \lr{\mbox{5G}}.
+\item
+  مدیریت تحرک، سازوکارهای تحویل \lr{\mbox{(handover)}} و تحول آن‌ها در نسل‌های مختلف را توصیف کنند.
+\item
+  شبکه‌بندی \lr{(network slicing)}، چارچوب‌های \lr{\mbox{QoS}}، \lr{\mbox{SDN}} و \lr{\mbox{NFV}} را در شبکه‌های مدرن درک کنند.
+\item
+  رویه‌های هسته \lr{\mbox{5G}} (ثبت‌نام، احراز هویت، نشست \lr{\mbox{PDU}}) را در سطح سیگنالینگ توضیح دهند.
+\item
+  جهت‌های پژوهشی \lr{\mbox{6G}} (\lr{\mbox{ISAC}}، \lr{\mbox{RIS}}، بومی-هوش مصنوعی، \lr{\mbox{MIMO}} بدون سلول، \lr{\mbox{sub-THz}}) را به‌صورت انتقادی ارزیابی کنند.
+\end{enumerate}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{فهرست ماژول‌ها (26 ماژول)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\#}} & \CNth{عنوان ماژول} & \CNth{فایل} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{GSM}}، \lr{\mbox{GPRS}} و \lr{\mbox{EDGE}} & \lr{\CNcode{01\_}\allowbreak{}\CNcode{gsm\_}\allowbreak{}\CNcode{gprs\_}\allowbreak{}\CNcode{edge.}\allowbreak{}\CNcode{md}} \\
+2 & سوییچینگ مداری \lr{\mbox{2G}} & \lr{\CNcode{02\_}\allowbreak{}\CNcode{circuit\_}\allowbreak{}\CNcode{switching.}\allowbreak{}\CNcode{md}} \\
+3 & شبکه‌های هسته \lr{2G/\allowbreak{}3G} & \lr{\CNcode{03\_2g\_3g\_core.md}} \\
+4 & تحرک و تحویل & \lr{\CNcode{04\_}\allowbreak{}\CNcode{mobility\_}\allowbreak{}\CNcode{handover.}\allowbreak{}\CNcode{md}} \\
+5 & معماری \lr{\mbox{4G LTE}} & \lr{\mbox{\CNcode{05\_4g\_lte.md}}} \\
+6 & \lr{\mbox{E-UTRAN}} (دسترسی رادیویی \lr{\mbox{LTE}}) & \lr{\mbox{\CNcode{06\_eutran.md}}} \\
+7 & زمان‌بندی \lr{\mbox{LTE}} & \lr{\CNcode{07\_}\allowbreak{}\CNcode{lte\_}\allowbreak{}\CNcode{scheduling.}\allowbreak{}\CNcode{md}} \\
+8 & کانال دسترسی تصادفی \lr{\mbox{(RACH)}} & \lr{\CNcode{08\_}\allowbreak{}\CNcode{random\_}\allowbreak{}\CNcode{access.}\allowbreak{}\CNcode{md}} \\
+9 & هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}} & \lr{\mbox{\CNcode{09\_epc.md}}} \\
+10 & پروتکل \lr{\mbox{Diameter}} & \lr{\CNcode{10\_diameter.md}} \\
+11 & سرور مشترک خانگی \lr{\mbox{(HSS)}} & \lr{\mbox{\CNcode{11\_hss.md}}} \\
+12 & موجودیت مدیریت تحرک \lr{\mbox{(MME)}} & \lr{\mbox{\CNcode{12\_mme.md}}} \\
+13 & \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} & \lr{\CNcode{13\_sgw\_pgw.md}} \\
+14 & مقدمه‌ای بر شبکه‌های \lr{\mbox{5G}} & \lr{\CNcode{14\_5g\_networks.md}} \\
+15 & شبکه‌سازی نرم‌افزارمحور \lr{\mbox{(SDN)}} & \lr{\mbox{\CNcode{15\_sdn.md}}} \\
+16 & مجازی‌سازی توابع شبکه \lr{\mbox{(NFV)}} & \lr{\mbox{\CNcode{16\_nfv.md}}} \\
+17 & استانداردسازی \lr{\mbox{3GPP}} & \lr{\mbox{\CNcode{17\_3gpp.md}}} \\
+18 & معماری خدمات‌محور \lr{\mbox{5G (SBA)}} & \lr{\mbox{\CNcode{18\_sba.md}}} \\
+19 & معماری هسته \lr{\mbox{5G}} & \lr{\CNcode{19\_5g\_core.md}} \\
+20 & رویه‌های \lr{\mbox{5G}} & \lr{\CNcode{20\_}\allowbreak{}\CNcode{5g\_}\allowbreak{}\CNcode{procedures.}\allowbreak{}\CNcode{md}} \\
+21 & شبکه‌بندی & \lr{\CNcode{21\_}\allowbreak{}\CNcode{network\_}\allowbreak{}\CNcode{slicing.}\allowbreak{}\CNcode{md}} \\
+22 & کیفیت خدمات \lr{\mbox{(QoS)}} & \lr{\mbox{\CNcode{22\_qos.md}}} \\
+23 & صفحه کاربر & \lr{\CNcode{23\_user\_plane.md}} \\
+24 & صفحه کنترل & \lr{\CNcode{24\_}\allowbreak{}\CNcode{control\_}\allowbreak{}\CNcode{plane.}\allowbreak{}\CNcode{md}} \\
+25 & تحول شبکه \lr{—} ترکیب جامع & \lr{\CNcode{25\_}\allowbreak{}\CNcode{network\_}\allowbreak{}\CNcode{evolution.}\allowbreak{}\CNcode{md}} \\
+26 & فناوری‌های آینده \lr{\mbox{6G}} & \lr{\CNcode{26\_future\_6g.md}} \\
+\end{longtable}
+}
+
+\textbf{فایل‌های پشتیبان:} \lr{\CNcode{00\_}\allowbreak{}\CNcode{prerequisites.}\allowbreak{}\CNcode{md}} (مرور پیش‌نیازها)، \lr{\CNcode{00\_syllabus.md}} (همین فایل)
+
+\Needspace{15\baselineskip}
+
+\CNsection{}{تفکیک نمره‌دهی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مؤلفه} & \CNth{وزن} & \CNth{جزییات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{آزمون‌ها} & 50\% & میان‌ترم (20\%) + پایان‌ترم (30\%) \\
+\textbf{آزمایشگاه‌ها} & 30\% & 6 تمرین آزمایشگاهی (هر کدام 5\%) \\
+\textbf{پروژه} & 20\% & طرح پیشنهادی (5\%) + گزارش و دمو (15\%) \\
+\end{longtable}
+}
+
+\CNsection{}{کتاب‌های درسی پیشنهادی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\textbf{\lr{Sesia, S., Toufik, I., \& Baker, M.}} — \emph{\lr{LTE – The UMTS Long Term Evolution: From Theory to Practice}}, 2nd Ed., Wiley.}
+\item
+  \lr{\textbf{\lr{Dahlman, E., Parkvall, S., \& Sköld, J.}} — \emph{\lr{5G NR: The Next Generation Wireless Access Technology}}, Academic Press.}
+\item
+  \lr{\textbf{\lr{Holma, H. \& Toskala, A.}} — \emph{\lr{LTE for UMTS}}, Wiley.}
+\item
+  \lr{\textbf{\lr{3GPP Specifications}} — TS 23.501 (5GS)}، \lr{TS 23.502 (procedures)}، \lr{TS 24.501 (NAS)}، \lr{TS 38.300 (NR)} \lr{—} در \lr{\href{https://www.3gpp.org}{\lr{\mbox{3gpp.org}}}}.
+\item
+  \lr{\textbf{\lr{Rappaport, T. S.}} — \emph{\lr{Wireless Communications: Principles and Practice}}, 2nd Ed., Prentice Hall.}
+\end{enumerate}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{برنامه هفته‌به‌هفته}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3214}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4643}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{هفته} & \CNth{ماژول‌ها} & \CNth{تمرکز موضوعی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{1–2}} & معماری \lr{\mbox{GSM}}، \lr{GPRS/\allowbreak{}EDGE}، مبانی سوییچینگ مداری \\
+2 & 3 & شبکه‌های هسته \lr{2G/\allowbreak{}3G}، معماری \lr{\mbox{UMTS}}، دامنه‌های \lr{CS/\allowbreak{}PS} \\
+3 & 4 & مدیریت تحرک، انواع تحویل (تحول \lr{\mbox{2G\ensuremath{\to}5G}}) \\
+4 & \lr{\mbox{5–6}} & معماری \lr{\mbox{LTE}}، \lr{\mbox{E-UTRAN}}، پشته پروتکل؛ \textbf{تمرین آزمایشگاهی 1 تعیین شد} \\
+5 & \lr{\mbox{7–8}} & زمان‌بندی \lr{\mbox{LTE}}، رویه \lr{\mbox{RACH}} \\
+6 & 9 & هسته بسته تکامل‌یافته (بررسی عمیق)؛ \textbf{تمرین آزمایشگاهی 2 تعیین شد} \\
+7 & \lr{\mbox{10–11}} & پروتکل \lr{\mbox{Diameter}}، \lr{\mbox{HSS}}، احراز هویت \\
+8 & \lr{\mbox{12–13}} & رویه‌های \lr{\mbox{MME}}، \lr{S-GW/\allowbreak{}P-GW}، \lr{\mbox{GTP}}؛ \textbf{مرور میان‌ترم} \\
+9 & \lr{\mbox{—}} & \textbf{آزمون میان‌ترم} \\
+10 & 14 & مقدمه \lr{\mbox{5G}}، \lr{\mbox{NR}}، \lr{\mbox{NSA}} در برابر \lr{\mbox{SA}}؛ \textbf{تمرین آزمایشگاهی 3 تعیین شد} \\
+11 & \lr{\mbox{15–16}} & \lr{\mbox{SDN}}، \lr{\mbox{NFV}}، شبکه‌های بومی-ابر \\
+12 & \lr{\mbox{17–18}} & استانداردسازی \lr{\mbox{3GPP}}، معماری خدمات‌محور؛ \textbf{تمرین آزمایشگاهی 4 تعیین شد} \\
+13 & \lr{\mbox{19–20}} & معماری هسته \lr{\mbox{5G}}، رویه‌های \lr{\mbox{5G}} (ثبت‌نام، نشست \lr{\mbox{PDU}}) \\
+14 & \lr{\mbox{21–22}} & شبکه‌بندی، تحول \lr{QoS (QCI\ensuremath{\to}5QI)}؛ \textbf{تمرین آزمایشگاهی 5 تعیین شد} \\
+15 & \lr{\mbox{23–25}} & صفحه کاربر، صفحه کنترل، ترکیب جامع تحول شبکه؛ \textbf{تمرین آزمایشگاهی 6 تعیین شد} \\
+16 & 26 & فناوری‌های آینده \lr{\mbox{6G}}، \textbf{ارایه پروژه‌ها و مرور نهایی} \\
+17 & \lr{\mbox{—}} & \textbf{آزمون پایان‌ترم} \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsection{}{تمرین‌های آزمایشگاهی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{آزمایشگاه} & \CNth{هفته} & \CNth{موضوع} & \CNth{ماژول‌های مرتبط} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & 4 & بودجه لینک \lr{\mbox{LTE}} و افت مسیر & 5، 6 \\
+2 & 6 & سیگنالینگ \lr{\mbox{EPC}} (ردیابی \lr{Attach/\allowbreak{}Detach}) & 9، 12 \\
+3 & 10 & زمان‌بندی و تخصیص منابع \lr{\mbox{5G NR}} & 7، 14 \\
+4 & 12 & کشف سرویس \lr{\mbox{SBA}} هسته \lr{\mbox{5G}} & 18، 19 \\
+5 & 14 & پیکربندی شبکه‌بندی & 21، 22 \\
+6 & 15 & ردیابی جریان ترافیک (صفحه کاربر) & 23، 24 \\
+\end{longtable}
+}
+
+\CNsection{}{پروژه}
+
+دانشجویان به‌صورت انفرادی یا دو نفره (حداکثر 2 نفر) روی یک پروژه نیم‌سالانه کار می‌کنند. موضوعات می‌تواند شامل موارد زیر باشد:
+
+\begin{itemize}
+\tightlist
+\item
+  تحلیل مقایسه‌ای \lr{\mbox{LTE}} در برابر \lr{\mbox{5G}} برای یک مورد کاربری مشخص
+\item
+  طراحی شبکه‌بندی برای یک سناریوی سازمانی
+\item
+  پیاده‌سازی یک الگوریتم زمان‌بندی (با استفاده از شبیه‌ساز \lr{wireless\_\allowbreak{}lab})
+\item
+  مرور موضوعات پژوهشی \lr{\mbox{6G}} و تحلیل امکان‌سنجی
+\item
+  تحلیل سیگنالینگ با استفاده از فایل‌های ضبط بسته واقعی
+\end{itemize}
+
+\textbf{تحویل‌دادنی‌ها:} طرح پیشنهادی (هفته 13)، گزارش نهایی + دمو/\allowbreak{}ارایه (هفته 16)
+
+\CNsection{}{صداقت علمی}
+
+تمام کارهای تحویل‌داده‌شده باید اصیل باشند. همکاری در آزمایشگاه‌ها برای بحث تشویق می‌شود، اما هر دانشجو به‌صورت انفرادی تحویل می‌دهد. سرقت علمی منجر به نمره صفر برای تمرین و ارجاع به هییت صداقت علمی خواهد شد.
+
+\emph{آخرین به‌روزرسانی: اوت 2026}

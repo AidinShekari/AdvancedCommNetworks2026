@@ -1,0 +1,14 @@
+% Module 6 — LTE user-plane protocol stack (UE, eNodeB, S-GW)
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle] at (0,0.75) {UE}; \node[CNtitle] at (5.2,0.75) {eNodeB}; \node[CNtitle] at (10.4,0.75) {S-GW};
+\CNstack{u}{0}{0}{1.7cm}{App/CNphyL, IP/CNupL, PDCP/{}, RLC/{}, MAC/{}, PHY/CNphyL}
+\CNstack{e}{4.3}{-1.32}{1.7cm}{PDCP/{}, RLC/{}, MAC/{}, PHY/CNphyL}
+\CNstack{s}{6.1}{-1.32}{1.7cm}{GTP-U/CNupL, UDP/{}, IP/{}, L2/CNphyL}
+\CNstack{g}{10.4}{-0.66}{1.7cm}{IP/CNupL, GTP-U/CNupL, UDP/{}, IP/{}, L2/CNphyL}
+\draw[CNdata, <->] (u-2.east) -- (g-1.west);
+\foreach \i/\j in {3/1, 4/2, 5/3}{\draw[CNlink, <->, CNinkL!70] (u-\i.east) -- (e-\j.west);}
+\draw[CNdata, <->] (u-6.east) -- node[CNelab, below=2pt, fill=none] {Uu (\CNL{air}{هوا})} (e-4.west);
+\draw[CNdata, <->] (s-1.east) -- node[CNelab, above=1pt, fill=none] {GTP-U} (g-2.west);
+\draw[CNlink, <->, CNinkL!70] (s-2.east) -- (g-3.west);
+\draw[CNlink, CNinkL!70] (s-4.east) -- node[CNelab, below=2pt, fill=none] {S1-U} (g-5.west);
+\end{tikzpicture}

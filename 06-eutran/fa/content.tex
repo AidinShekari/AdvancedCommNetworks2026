@@ -1,0 +1,1108 @@
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{6.1}{معماری \lr{\mbox{E-UTRAN}}}
+
+\CNchained\CNsubsection{}{چرا بدون \lr{\mbox{RNC}}؟ تصمیم معماری مسطح}
+
+در \lr{UMTS (3G)}، کنترلر شبکه رادیویی \lr{\mbox{(RNC)}} بین \lr{\mbox{NodeB}}ها و شبکه هسته قرار می‌گرفت و مدیریت منابع رادیویی، تصمیمات تحویل و پایان‌دهی پروتکل را متمرکز می‌کرد. \lr{\mbox{LTE}} \textbf{\lr{\mbox{RNC}} را کاملاً حذف کرد} و یک شبکه دسترسی رادیویی مسطح و تک-گره‌ای ایجاد کرد.
+
+\textbf{دلایل حذف \lr{\mbox{RNC}}:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4667}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{دغدغه} & \CNth{\lr{\mbox{3G}} (با \lr{\mbox{RNC}})} & \CNth{\lr{\mbox{LTE}} (مسطح، بدون \lr{\mbox{RNC}})} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+تأخیر & گام اضافه از \lr{\mbox{RNC}} حدود \lr{\mbox{5–10~ms}} اضافه می‌کند & مسیر مستقیم \lr{\mbox{eNB\ensuremath{\leftrightarrow}EPC}}، تأخیر صفحه کاربر زیر \lr{\mbox{5~ms}} \\
+نقطه شکست واحد & شکست \lr{\mbox{RNC}} بر تمام \lr{\mbox{NodeB}}های متصل تأثیر می‌گذارد & هر \lr{\mbox{eNB}} مستقل است \\
+مقیاس‌پذیری & ظرفیت \lr{\mbox{RNC}} تعداد \lr{\mbox{NodeB}}ها را محدود می‌کند & بدون گلوگاه؛ \lr{\mbox{eNB}}ها مستقل مقیاس می‌یابند \\
+پیچیدگی & \lr{\mbox{RAN}} سه-گره‌ای \lr{(NodeB\ensuremath{\to}RNC\ensuremath{\to}CN)} & \lr{\mbox{RAN}} دو-گره‌ای \lr{(eNB\ensuremath{\to}EPC)} \\
+هزینه & سخت‌افزار \lr{\mbox{RNC}} گران و اختصاصی & هوش توزیع‌شده \lr{\mbox{CAPEX}} را کاهش می‌دهد \\
+سرعت تحویل & با واسطه \lr{\mbox{RNC}} = کندتر & مستقیم \lr{\mbox{eNB}}-به-\lr{\mbox{eNB}} از طریق \lr{\mbox{X2}} = سریع‌تر \\
+\end{longtable}
+}
+
+\CNkeepfig{m06-enb-epc}{2}
+
+\textbf{اصل معماری کلیدی:} تمام هوش مرتبط با رادیو به \lr{\textbf{\lr{eNodeB (eNB)}}} منتقل می‌شود، که به‌طور مستقیم با هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}} از طریق واسط \lr{\mbox{S1}} و با \lr{\mbox{eNB}}های همسایه از طریق واسط \lr{\mbox{X2}} ارتباط برقرار می‌کند.
+
+\CNfigure{m06-enb-epc}{هر \lr{\mbox{eNB}} از طریق \lr{\mbox{S1-MME}} به \lr{\mbox{MME}} و از طریق \lr{\mbox{S1-U}} به \lr{\mbox{S-GW}} متصل است}
+
+\CNsection{6.2}{توابع \lr{\mbox{eNodeB}}}
+
+\lr{\mbox{eNodeB}} \textbf{تنها گره} در \lr{\mbox{E-UTRAN}} است. تمام توابعی را که قبلاً بین \lr{\mbox{NodeB}} و \lr{\mbox{RNC}} تقسیم شده بود انجام می‌دهد:
+
+\CNsubsection{}{مدیریت منابع رادیویی \lr{\mbox{(RRM)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{کنترل حامل رادیویی:} برقراری، نگهداری و آزادسازی حامل‌های رادیویی
+\item
+  \textbf{کنترل پذیرش رادیویی \lr{\mbox{(RAC)}}:} پذیرش/\allowbreak{}رد درخواست‌های حامل رادیویی جدید بر اساس تداخل و بار
+\item
+  \textbf{کنترل تحرک اتصال:} تصمیمات تحویل بر اساس اندازه‌گیری‌های \lr{\mbox{UE}}
+\item
+  \textbf{تخصیص پویا منابع (زمان‌بندی):} بلوک‌های منبع را به \lr{\mbox{UE}}ها در هر \lr{TTI (1~ms)} تخصیص می‌دهد
+\end{itemize}
+
+\CNsubsection{}{زمان‌بندی}
+
+\begin{itemize}
+\tightlist
+\item
+  در هر \lr{\mbox{\textbf{\lr{\mbox{TTI 1~ms}}}}} (فاصله زمانی انتقال) عمل می‌کند
+\item
+  زمان‌بندی در دامنه فرکانس و دامنه زمان
+\item
+  الگوریتم‌ها: \lr{Round Robin}، \lr{Proportional Fair}، \lr{Max Throughput}
+\item
+  از گزارش‌های \lr{\mbox{\textbf{\lr{\mbox{CQI}}}}} (نشانگر کیفیت کانال) از \lr{\mbox{UE}}ها استفاده می‌کند
+\item
+  تخصیص منابع \lr{\mbox{DL}} و \lr{\mbox{UL}} را کنترل می‌کند
+\end{itemize}
+
+\CNsubsection{}{\lr{\mbox{HARQ}} (درخواست تکرار خودکار ترکیبی)}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{HARQ}} توقف-و-انتظار با \textbf{8 فرآیند موازی}
+\item
+  همگام در \lr{\mbox{UL}}، ناهمگام در \lr{\mbox{DL}}
+\item
+  ترکیب نرم: \lr{Chase Combining} یا افزونگی افزایشی
+\item
+  زمان رفت-و-برگشت: \lr{\mbox{8~ms}} (\lr{\mbox{4~ms}} در هر جهت)
+\end{itemize}
+
+\CNsubsection{}{کدگذاری کانال}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{کدگذاری توربو} (نرخ \lr{1/\allowbreak{}3}) برای کانال‌های داده
+\item
+  \textbf{کدگذاری کانولوشنی} برای کانال‌های کنترل
+\item
+  تطبیق نرخ و مدیریت بافر \lr{\mbox{HARQ}}
+\item
+  الصاق \lr{\mbox{CRC}} برای تشخیص خطا
+\end{itemize}
+
+\CNsubsection{}{سایر توابع}
+
+\begin{itemize}
+\tightlist
+\item
+  فشرده‌سازی سرآیند \lr{IP (ROHC)}
+\item
+  رمزگذاری و حفاظت یکپارچگی
+\item
+  توزیع پیام صفحه‌بندی
+\item
+  اطلاعات پخش (\lr{\mbox{SIB}}ها، \lr{\mbox{MIB}}ها)
+\item
+  پیکربندی و گزارش‌دهی اندازه‌گیری
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m06-protocol-stack}{8}
+
+\CNsection{6.3}{پشته پروتکل \lr{\mbox{LTE}}}
+
+\CNchained\CNsubsection{}{نمودار پشته پروتکل}
+
+\CNfigure{m06-protocol-stack}{پشته‌های پروتکل \lr{\mbox{LTE}} در \lr{\mbox{UE}}، \lr{\mbox{eNodeB}} و \lr{\mbox{EPC}}}
+
+\CNkeepfig{m06-cp-stack}{3}
+
+\CNsubsection{}{پشته صفحه کنترل}
+
+\CNfigure{m06-cp-stack}{پشته پروتکل صفحه کنترل \lr{\mbox{LTE}}}
+
+\CNkeepfig{m06-up-stack}{3}
+
+\CNsubsection{}{پشته صفحه کاربر}
+
+\CNfigure{m06-up-stack}{پشته پروتکل صفحه کاربر \lr{\mbox{LTE}}}
+
+\Needspace{16\baselineskip}
+
+\CNsection{6.4}{لایه‌های پروتکل به‌تفصیل}
+
+\CNchained\CNsubsection{6.4.1}{لایه فیزیکی \lr{\mbox{(PHY)}}}
+
+\CNchained\CNsubsubsection{پیوند پایین‌سو: \lr{\mbox{OFDMA}} (دسترسی چندگانه تقسیم فرکانس متعامد)}
+
+\begin{itemize}
+\tightlist
+\item
+  پهنای باند را به بسیاری \textbf{زیرحامل} باریک تقسیم می‌کند (فاصله \lr{\mbox{15~kHz}})
+\item
+  هر زیرحامل متعامد است \ensuremath{\leftarrow} بدون تداخل بین-حامل
+\item
+  مقاوم در برابر محو شدن چندمسیری (پیشوند چرخه‌ای گسترش تأخیر را جذب می‌کند)
+\item
+  زمان‌بندی انعطاف‌پذیر در دامنه فرکانس را ممکن می‌سازد
+\end{itemize}
+
+\textbf{شبکه منابع:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{عنصر منبع \lr{\mbox{(RE)}}:} 1 زیرحامل \ensuremath{\times} 1 نماد \lr{\mbox{OFDM}} = کوچک‌ترین واحد قابل تخصیص
+\item
+  \textbf{بلوک منبع \lr{\mbox{(RB)}}:} 12 زیرحامل \ensuremath{\times} 7 نماد \lr{\mbox{OFDM}} (1 شکاف = \lr{\mbox{0.5~ms}}) = \lr{\mbox{\textbf{\lr{\mbox{84 RE}}}}}
+\item
+  \textbf{جفت بلوک منبع:} \lr{\mbox{2 RB = 1}} زیرفریم \lr{(TTI 1~ms)}
+\end{itemize}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پهنای باند} & \CNth{تعداد \lr{\mbox{RB}}} & \CNth{زیرحامل‌ها} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{1.4~MHz}} & 6 & 72 \\
+\lr{\mbox{3~MHz}} & 15 & 180 \\
+\lr{\mbox{5~MHz}} & 25 & 300 \\
+\lr{\mbox{10~MHz}} & 50 & 600 \\
+\lr{\mbox{15~MHz}} & 75 & 900 \\
+\lr{\mbox{20~MHz}} & 100 & 1200 \\
+\end{longtable}
+}
+
+\textbf{ساختار فریم \lr{\mbox{(FDD)}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  1 فریم رادیویی = \lr{10~ms = 10} زیرفریم
+\item
+  1 زیرفریم = \lr{\mbox{1~ms = 2}} شکاف
+\item
+  1 شکاف = \lr{0.5~ms = 7} نماد \lr{\mbox{OFDM}} (\lr{\mbox{CP}} معمولی)
+\end{itemize}
+
+\CNsubsubsection{پیوند بالاسو: \lr{\mbox{SC-FDMA}} (\lr{\mbox{FDMA}} تک-حامله)}
+
+\begin{itemize}
+\tightlist
+\item
+  همچنین \lr{\mbox{OFDM}} با گسترش \lr{\mbox{DFT}} نامیده می‌شود \lr{(DFT-s-OFDM)}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{PAPR}}}}} پایین‌تر (نسبت توان اوج به میانگین) نسبت به \lr{\mbox{OFDMA}} \ensuremath{\leftarrow} بهتر برای \lr{\mbox{UE}}های باتری‌دار
+\item
+  خاصیت تک-حامله با پیش‌کدگذاری \lr{\mbox{DFT}} پیش از \lr{\mbox{IFFT}} به دست می‌آید
+\item
+  همان ساختار شبکه منابع \lr{\mbox{DL}} (12 زیرحامل در هر \lr{\mbox{RB}})
+\item
+  \textbf{محدودیت:} تخصیص \lr{\mbox{UL}} باید در فرکانس پیوسته باشد
+\end{itemize}
+
+\CNsubsubsection{رویه‌های کلیدی \lr{\mbox{PHY}}}
+
+\begin{itemize}
+\tightlist
+\item
+  جستجوی سلول (همگام‌سازی \lr{PSS/\allowbreak{}SSS})
+\item
+  تخمین کانال (سیگنال‌های مرجع: \lr{\mbox{CRS}}، \lr{\mbox{DM-RS}}، \lr{\mbox{SRS}})
+\item
+  \lr{\mbox{MIMO}}: تا \lr{\mbox{4\ensuremath{\times}4}} در \lr{\mbox{DL}}، \lr{\mbox{1\ensuremath{\times}2}} یا \lr{\mbox{2\ensuremath{\times}2}} در \lr{UL (Rel-8/\allowbreak{}10)}
+\item
+  تطبیق پیوند از طریق بازخورد \lr{CQI/\allowbreak{}PMI/\allowbreak{}RI}
+\item
+  کنترل توان (حلقه باز و حلقه بسته)
+\end{itemize}
+
+\CNsubsection{6.4.2}{لایه \lr{\mbox{MAC}} (کنترل دسترسی رسانه)}
+
+لایه \lr{\mbox{MAC}} بین \lr{\mbox{RLC}} و \lr{\mbox{PHY}} قرار دارد و مسیول \textbf{زمان‌بندی بلادرنگ} و چندگانه‌سازی داده است.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{زمان‌بندی (\lr{\mbox{DL}} و \lr{\mbox{UL}})}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    در هر \lr{\mbox{TTI 1~ms}} عمل می‌کند
+  \item
+    \lr{\mbox{RB}}ها را بر اساس \lr{\mbox{CQI}}، وضعیت بافر، اولویت \lr{\mbox{QoS}}، انصاف تخصیص می‌دهد
+  \item
+    \lr{\mbox{DL}}: \lr{\mbox{eNB}} تصمیم می‌گیرد؛ \lr{\mbox{UL}}: \lr{\mbox{eNB}} منابع را به \lr{\mbox{UE}}ها اعطا می‌کند
+  \end{itemize}
+\item
+  \textbf{چندگانه‌سازی/\allowbreak{}چندگانه‌گشایی}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    داده از چندین کانال منطقی را در یک بلوک انتقال چندگانه می‌کند
+  \item
+    از اولویت‌بندی کانال منطقی \lr{\mbox{(LCP)}} در \lr{\mbox{UL}} استفاده می‌کند
+  \end{itemize}
+\item
+  \textbf{موجودیت \lr{\mbox{HARQ}}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    8 فرآیند توقف-و-انتظار موازی
+  \item
+    \lr{\mbox{DL}}: \lr{\mbox{HARQ}} تطبیقی ناهمگام
+  \item
+    \lr{\mbox{UL}}: \lr{\mbox{HARQ}} همگام (زمان‌بندی ثابت)
+  \item
+    تولید \lr{ACK/\allowbreak{}NACK}؛ ترکیب نرم در گیرنده
+  \end{itemize}
+\item
+  \textbf{رویه دسترسی تصادفی}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    مبتنی بر رقابت (4-گام) یا بدون رقابت (2-گام)
+  \item
+    برای دسترسی اولیه، تحویل، بازیابی همگام‌سازی \lr{\mbox{UL}} استفاده می‌شود
+  \end{itemize}
+\item
+  \textbf{\lr{\mbox{BSR}} (گزارش وضعیت بافر)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{UE}} به \lr{\mbox{eNB}} درباره داده \lr{\mbox{UL}} در انتظار اطلاع می‌دهد
+  \item
+    اعطاهای زمان‌بندی \lr{\mbox{UL}} را فعال می‌کند
+  \end{itemize}
+\item
+  \textbf{\lr{\mbox{PHR}} (گزارش حاشیه توان)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{UE}} حاشیه توان باقیمانده را گزارش می‌دهد
+  \item
+    به \lr{\mbox{eNB}} در تصمیمات زمان‌بندی \lr{\mbox{UL}} کمک می‌کند
+  \end{itemize}
+\end{enumerate}
+
+\CNkeepfig{m06-channel-levels}{2}
+
+\CNsubsubsection{نگاشت کانال در \lr{\mbox{MAC}}}
+
+\CNfigure{m06-channel-levels}{سه سطح کانال‌های \lr{\mbox{LTE}}}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{6.4.3}{لایه \lr{\mbox{RLC}} (کنترل پیوند رادیویی)}
+
+\lr{\mbox{RLC}} قطعه‌بندی، بازمونتاژ و (به‌صورت اختیاری) \lr{\mbox{ARQ}} را فراهم می‌کند.
+
+\CNsubsubsection{سه حالت}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1304}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2391}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1087}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.3043}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2174}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{حالت} & \CNth{نام کامل} & \CNth{\lr{\mbox{ARQ}}} & \CNth{قطعه‌بندی} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{TM}}}}} & حالت شفاف & ندارد & ندارد & \lr{\mbox{BCCH}}، \lr{\mbox{PCCH}}، \lr{\mbox{CCCH}} (پیام‌های کوچک، اندازه ثابت) \\
+\lr{\mbox{\textbf{\lr{\mbox{UM}}}}} & حالت بدون تأیید & ندارد & دارد & \lr{\mbox{VoIP}}، ویدیوی بلادرنگ (حساس به تأخیر) \\
+\lr{\mbox{\textbf{\lr{\mbox{AM}}}}} & حالت تأییدشده & دارد & دارد & ترافیک \lr{\mbox{TCP}}، سیگنالینگ (نیازمند قابلیت اطمینان) \\
+\end{longtable}
+}
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{قطعه‌بندی و بازمونتاژ:} \lr{\mbox{PDU}}های \lr{\mbox{PDCP}} را به قطعات اندازه \lr{\mbox{RLC}} متناسب با اندازه بلوک انتقال تقسیم می‌کند
+\item
+  \textbf{الحاق:} چندین \lr{\mbox{SDU}} کوچک را در یک \lr{\mbox{PDU}} جمع می‌کند
+\item
+  \textbf{\lr{\mbox{ARQ}} (فقط \lr{\mbox{AM}}):} \lr{\mbox{PDU}}های \lr{\mbox{RLC}} گمشده را بر اساس گزارش‌های \lr{\mbox{STATUS}} دوباره ارسال می‌کند
+
+  \begin{itemize}
+  \tightlist
+  \item
+    سازوکار نظرسنجی: فرستنده \lr{\mbox{RLC}} از گیرنده \lr{\mbox{STATUS}} درخواست می‌کند
+  \item
+    مستقل از \lr{\mbox{HARQ}} عمل می‌کند (\lr{\mbox{ARQ}} در \lr{\mbox{RLC}} آنچه \lr{\mbox{HARQ}} از دست می‌دهد را می‌گیرد)
+  \end{itemize}
+\item
+  \textbf{بازترتیبی \lr{(UM/\allowbreak{}AM)}:} \lr{\mbox{SDU}}ها را به‌ترتیب به لایه‌های بالاتر تحویل می‌دهد
+\item
+  \textbf{تشخیص تکراری \lr{\mbox{(AM)}}:} \lr{\mbox{PDU}}های تکراری را دور می‌ریزد
+\end{itemize}
+
+\CNsubsubsection{\lr{\mbox{RLC}} در برابر \lr{\mbox{HARQ}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{HARQ}}: سریع \lr{(RTT 8 ms)}، تعداد ارسال مجدد محدود (معمولاً 4)
+\item
+  \lr{\mbox{ARQ}} در \lr{\mbox{RLC}}: کندتر، اما خطاهای باقیمانده پس از اتمام \lr{\mbox{HARQ}} را می‌گیرد
+\item
+  ترکیبی: رسیدن به \lr{\mbox{BLER}} هدف \lr{\mbox{10\textsuperscript{-6}}} برای حامل‌های \lr{\mbox{AM}}
+\end{itemize}
+
+\CNsubsection{6.4.4}{لایه \lr{\mbox{PDCP}} (پروتکل همگرایی داده بسته)}
+
+\lr{\mbox{PDCP}} بالای \lr{\mbox{RLC}} قرار دارد و توابع امنیت و کارایی را فراهم می‌کند.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{فشرده‌سازی سرآیند (فقط صفحه کاربر)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    از \lr{\mbox{\textbf{\lr{\mbox{ROHC}}}}} (فشرده‌سازی مقاوم سرآیند، \lr{RFC 3095/\allowbreak{}4995}) استفاده می‌کند
+  \item
+    سرآیندهای \lr{IP/\allowbreak{}UDP/\allowbreak{}RTP} را از حدود \lr{\mbox{40–60}} بایت \ensuremath{\leftarrow} \lr{\mbox{1–4}} بایت فشرده می‌کند
+  \item
+    حیاتی برای \lr{\mbox{VoIP}}: سرآیند 40 بایتی روی بار 32 بایتی \ensuremath{\leftarrow} حدود 56\% سربار بدون \lr{\mbox{ROHC}}
+  \item
+    پروفایل‌های متعدد \lr{\mbox{ROHC}} برای پشته‌های پروتکل مختلف
+  \end{itemize}
+\item
+  \textbf{رمزگذاری (صفحه کاربر + صفحه کنترل)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    تمام داده کاربر و سیگنالینگ را رمزنگاری می‌کند
+  \item
+    الگوریتم‌ها: \lr{\mbox{EEA0}} (تهی)، \lr{128-EEA1 (SNOW 3G)}، \lr{128-EEA2 (AES-CTR)}، \lr{128-EEA3 (ZUC)}
+  \item
+    از \lr{\mbox{COUNT}} (شماره ترتیب + \lr{\mbox{HFN}}) + \lr{BEARER + DIRECTION} به‌عنوان ورودی استفاده می‌کند
+  \end{itemize}
+\item
+  \textbf{حفاظت یکپارچگی (فقط صفحه کنترل)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    سیگنالینگ \lr{\mbox{RRC}} را از دستکاری محافظت می‌کند
+  \item
+    الگوریتم‌ها: \lr{EIA1 (SNOW 3G)}، \lr{EIA2 (AES-CMAC)}، \lr{EIA3 (ZUC)}
+  \item
+    \lr{\mbox{MAC-I 32}} بیتی تولید می‌کند که به هر پیام \lr{\mbox{RRC}} الصاق می‌شود
+  \item
+    \textbf{در \lr{\mbox{LTE}} به صفحه کاربر اعمال نمی‌شود} (در \lr{\mbox{5G NR}} برای صفحه کاربر اضافه شد)
+  \end{itemize}
+\item
+  \textbf{شماره‌گذاری ترتیب و بازترتیبی}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    به هر \lr{\mbox{SDU}} یک \lr{\mbox{PDCP SN}} تخصیص می‌دهد
+  \item
+    \lr{\mbox{PDU}}های خارج از ترتیب را بازمرتب می‌کند (مهم در حین تحویل)
+  \item
+    موارد تکراری را تشخیص می‌دهد
+  \end{itemize}
+\item
+  \textbf{پشتیبانی تحویل}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    تحویل به‌ترتیب و حذف تکراری در حین تحویل
+  \item
+    گزارش‌دهی وضعیت: به \lr{\mbox{eNB}} مبدأ می‌گوید کدام \lr{\mbox{PDU}}ها با موفقیت تحویل داده شدند
+  \item
+    تحویل بدون اتلاف را برای حامل‌های \lr{\mbox{AM}} ممکن می‌سازد
+  \end{itemize}
+\end{enumerate}
+
+\CNkeepfig{m06-pdcp-pdu}{2}
+
+\CNsubsubsection{قالب \lr{\mbox{PDU}} در \lr{\mbox{PDCP}}}
+
+\CNfigure{m06-pdcp-pdu}{قالب \lr{\mbox{PDU}} در \lr{\mbox{PDCP}}}
+
+\CNsubsection{6.4.5}{لایه \lr{\mbox{RRC}} (کنترل منابع رادیویی)}
+
+\lr{\mbox{RRC}} \textbf{پروتکل صفحه کنترل} بین \lr{\mbox{UE}} و \lr{\mbox{eNodeB}} است که اتصال رادیویی را مدیریت می‌کند.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{مدیریت اتصال}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    برقراری /\allowbreak{} پیکربندی مجدد /\allowbreak{} آزادسازی اتصال \lr{\mbox{RRC}}
+  \item
+    فعال‌سازی امنیت (رمزگذاری + یکپارچگی)
+  \item
+    برقراری \lr{\mbox{SRB}} (حامل رادیویی سیگنالینگ)
+  \end{itemize}
+\item
+  \textbf{پیکربندی و گزارش‌دهی اندازه‌گیری}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{UE}} را برای اندازه‌گیری سلول خدمات‌دهنده و همسایه پیکربندی می‌کند
+  \item
+    رویدادها: \lr{\mbox{A1–A6}} (درون/\allowbreak{}بین-فرکانسی)، \lr{\mbox{B1–B2}} (بین-\lr{\mbox{RAT}})
+  \item
+    گزارش‌دهی: دوره‌ای یا محرک-رویداد
+  \item
+    کمیت‌ها: \lr{\mbox{RSRP}}، \lr{\mbox{RSRQ}}، \lr{\mbox{SINR}}
+  \end{itemize}
+\item
+  \textbf{کنترل تحویل}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{eNB}} بر اساس گزارش‌های اندازه‌گیری تصمیم تحویل می‌گیرد
+  \item
+    پیام \lr{\CNcode{RRCConnectionReconfiguration}} را با اطلاعات کنترل تحرک می‌فرستد
+  \item
+    \lr{\mbox{UE}} تحویل را انجام می‌دهد، پیام \lr{\CNcode{RRCConnectionReconfigurationComplete}} را می‌فرستد
+  \end{itemize}
+\item
+  \textbf{پخش اطلاعات سیستم}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{\textbf{\lr{\mbox{MIB:}}}}} روی \lr{\mbox{PBCH}} هر \lr{\mbox{40~ms}} ارسال می‌شود (پهنای باند، \lr{\mbox{SFN}}، پیکربندی \lr{\mbox{PHICH}})
+  \item
+    \lr{\mbox{\textbf{\lr{\mbox{SIB1:}}}}} اطلاعات دسترسی سلول، زمان‌بندی سایر \lr{\mbox{SIB}}ها (دوره \lr{\mbox{80~ms}})
+  \item
+    \lr{\mbox{\textbf{\lr{\mbox{SIB2:}}}}} پیکربندی کانال مشترک (\lr{\mbox{RACH}}، صفحه‌بندی، کنترل توان \lr{\mbox{UL}})
+  \item
+    \lr{\mbox{\textbf{\lr{\mbox{SIB3–SIB8:}}}}} انتخاب مجدد سلول، اطلاعات بین-فرکانسی/\allowbreak{}بین-\lr{\mbox{RAT}}
+  \item
+    \lr{\mbox{\textbf{\lr{\mbox{SIB9–SIB19:}}}}} اطلاعات اضافی (\lr{\mbox{eNB}} خانگی، \lr{\mbox{MBMS}} و غیره)
+  \end{itemize}
+\item
+  \textbf{صفحه‌بندی}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{UE}}های در حالت \lr{\mbox{IDLE}} را از تماس/\allowbreak{}داده ورودی مطلع می‌کند
+  \item
+    مبتنی بر \lr{\mbox{DRX}}: \lr{\mbox{UE}} در فرصت‌های صفحه‌بندی مشخص بیدار می‌شود
+  \end{itemize}
+\item
+  \textbf{انتقال پیام \lr{\mbox{NAS}}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    پیام‌های \lr{\mbox{NAS}} را به‌صورت شفاف بین \lr{\mbox{UE}} و \lr{\mbox{MME}} حمل می‌کند
+  \end{itemize}
+\end{enumerate}
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{حامل‌های رادیویی سیگنالینگ \lr{\mbox{(SRB)}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{SRB}}} & \CNth{هدف} & \CNth{حالت \lr{\mbox{RLC}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{SRB0}} & پیام‌های \lr{\mbox{RRC}} روی \lr{\mbox{CCCH}} (پیش از امنیت) & \lr{\mbox{TM}} \\
+\lr{\mbox{SRB1}} & پیام‌های \lr{RRC + NAS} حمل‌شده (پس از برقراری) & \lr{\mbox{AM}} \\
+\lr{\mbox{SRB2}} & پیام‌های \lr{\mbox{NAS}} (اولویت پایین‌تر از \lr{\mbox{SRB1}}) & \lr{\mbox{AM}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{6.5}{ساختار کانال \lr{\mbox{LTE}}}
+
+\CNchained\CNsubsection{}{مرور انواع کانال}
+
+\lr{\mbox{LTE}} سه دسته کانال تعریف می‌کند که هر یک در لایه انتزاعی متفاوتی قرار دارد:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2128}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1489}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2340}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.4043}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{دسته} & \CNth{لایه} & \CNth{تعریف‌شده توسط} & \CNth{پرسشی که پاسخ می‌دهد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+کانال‌های منطقی & \lr{\mbox{MAC}} (بالا) & \textbf{چه} نوع داده & چه چیزی منتقل می‌شود؟ \\
+کانال‌های انتقال & \lr{\mbox{MAC}} (پایین) & \textbf{چگونه} داده منتقل می‌شود & چگونه مشخص می‌شود؟ \\
+کانال‌های فیزیکی & \lr{\mbox{PHY}} & \textbf{کجا} در شبکه منابع & بیت‌ها کجا قرار می‌گیرند؟ \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{}{کانال‌های منطقی}
+
+\CNchained\CNsubsubsection{کانال‌های کنترل}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کانال} & \CNth{نام} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{BCCH}}}}} & کانال کنترل پخش & \lr{\mbox{DL}} & اطلاعات سیستم (\lr{\mbox{MIB}}، \lr{\mbox{SIB}}ها) \\
+\lr{\mbox{\textbf{\lr{\mbox{PCCH}}}}} & کانال کنترل صفحه‌بندی & \lr{\mbox{DL}} & پیام‌های صفحه‌بندی برای \lr{\mbox{UE}}های \lr{\mbox{IDLE}} \\
+\lr{\mbox{\textbf{\lr{\mbox{CCCH}}}}} & کانال کنترل مشترک & \lr{DL/\allowbreak{}UL} & پیام‌ها پیش از اتصال \lr{RRC (Msg3/\allowbreak{}Msg4)} \\
+\lr{\mbox{\textbf{\lr{\mbox{DCCH}}}}} & کانال کنترل اختصاصی & \lr{DL/\allowbreak{}UL} & سیگنالینگ اختصاصی (\lr{\mbox{RRC}} پس از اتصال) \\
+\lr{\mbox{\textbf{\lr{\mbox{MCCH}}}}} & کانال کنترل چندپخشی & \lr{\mbox{DL}} & اطلاعات کنترل \lr{\mbox{MBMS}} \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsubsection{کانال‌های ترافیک}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کانال} & \CNth{نام} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{DTCH}}}}} & کانال ترافیک اختصاصی & \lr{DL/\allowbreak{}UL} & داده کاربر (بسته‌های \lr{\mbox{IP}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{MTCH}}}}} & کانال ترافیک چندپخشی & \lr{\mbox{DL}} & داده کاربر \lr{\mbox{MBMS}} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{کانال‌های انتقال}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کانال} & \CNth{نام} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{BCH}}}}} & کانال پخش & \lr{\mbox{DL}} & \lr{\mbox{MIB}} را حمل می‌کند؛ قالب ثابت، دوره \lr{\mbox{40~ms}} \\
+\lr{\mbox{\textbf{\lr{\mbox{PCH}}}}} & کانال صفحه‌بندی & \lr{\mbox{DL}} & صفحه‌بندی را حمل می‌کند؛ از \lr{\mbox{DRX}} پشتیبانی می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{DL-SCH}}}}} & کانال مشترک پیوند پایین‌سو & \lr{\mbox{DL}} & داده اصلی \lr{\mbox{DL}}؛ از \lr{\mbox{HARQ}} و زمان‌بندی پویا پشتیبانی می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{UL-SCH}}}}} & کانال مشترک پیوند بالاسو & \lr{\mbox{UL}} & داده اصلی \lr{\mbox{UL}}؛ از \lr{\mbox{HARQ}} و زمان‌بندی پویا پشتیبانی می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{RACH}}}}} & کانال دسترسی تصادفی & \lr{\mbox{UL}} & پیشوندهای دسترسی تصادفی \\
+\lr{\mbox{\textbf{\lr{\mbox{MCH}}}}} & کانال چندپخشی & \lr{\mbox{DL}} & داده \lr{\mbox{MBMS}}؛ زمان‌بندی ثابت \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{کانال‌های فیزیکی}
+
+\CNchained\CNsubsubsection{کانال‌های فیزیکی پیوند پایین‌سو}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3750}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کانال} & \CNth{نام} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{PDSCH}}}}} & کانال مشترک فیزیکی \lr{\mbox{DL}} & داده کاربر + اطلاعات سیستم (\lr{\mbox{SIB}}ها، صفحه‌بندی) \\
+\lr{\mbox{\textbf{\lr{\mbox{PDCCH}}}}} & کانال کنترل فیزیکی \lr{\mbox{DL}} & \lr{\mbox{DCI}} (اعطاهای زمان‌بندی، کنترل توان) \\
+\lr{\mbox{\textbf{\lr{\mbox{PBCH}}}}} & کانال پخش فیزیکی & ارسال \lr{\mbox{MIB}} \\
+\lr{\mbox{\textbf{\lr{\mbox{PMCH}}}}} & کانال چندپخشی فیزیکی & داده \lr{\mbox{MBMS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{PCFICH}}}}} & کانال \lr{\mbox{CFI}} فیزیکی & تعداد نمادهای \lr{\mbox{OFDM}} برای \lr{\mbox{PDCCH}} را نشان می‌دهد \\
+\lr{\mbox{\textbf{\lr{\mbox{PHICH}}}}} & کانال نشانگر \lr{\mbox{HARQ}} فیزیکی & \lr{ACK/\allowbreak{}NACK} در \lr{\mbox{HARQ UL}} \\
+\end{longtable}
+}
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{کانال‌های فیزیکی پیوند بالاسو}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کانال} & \CNth{نام} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{PUSCH}}}}} & کانال مشترک فیزیکی \lr{\mbox{UL}} & داده کاربر \lr{\mbox{UL}} + اطلاعات کنترل \\
+\lr{\mbox{\textbf{\lr{\mbox{PUCCH}}}}} & کانال کنترل فیزیکی \lr{\mbox{UL}} & \lr{\mbox{CQI}}، \lr{ACK/\allowbreak{}NACK} در \lr{\mbox{HARQ}}، \lr{\mbox{SR}} \\
+\lr{\mbox{\textbf{\lr{\mbox{PRACH}}}}} & کانال دسترسی تصادفی فیزیکی & پیشوندهای دسترسی تصادفی \\
+\end{longtable}
+}
+
+\CNkeepfig{m06-channel-mapping}{3}
+
+\CNsubsection{}{نگاشت کانال}
+
+\CNfigure{m06-channel-mapping}{نگاشت کانال‌های منطقی، انتقال و فیزیکی}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{جدول کامل نگاشت کانال}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کانال منطقی} & \CNth{کانال انتقال} & \CNth{کانال فیزیکی} & \CNth{جهت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{BCCH (MIB)} & \lr{\mbox{BCH}} & \lr{\mbox{PBCH}} & \lr{\mbox{DL}} \\
+\lr{BCCH (SIBs)} & \lr{\mbox{DL-SCH}} & \lr{\mbox{PDSCH}} & \lr{\mbox{DL}} \\
+\lr{\mbox{PCCH}} & \lr{\mbox{PCH}} & \lr{\mbox{PDSCH}} & \lr{\mbox{DL}} \\
+\lr{\mbox{CCCH}} & \lr{\mbox{DL-SCH}} & \lr{\mbox{PDSCH}} & \lr{\mbox{DL}} \\
+\lr{\mbox{CCCH}} & \lr{\mbox{UL-SCH}} & \lr{\mbox{PUSCH}} & \lr{\mbox{UL}} \\
+\lr{\mbox{DCCH}} & \lr{\mbox{DL-SCH}} & \lr{\mbox{PDSCH}} & \lr{\mbox{DL}} \\
+\lr{\mbox{DCCH}} & \lr{\mbox{UL-SCH}} & \lr{\mbox{PUSCH}} & \lr{\mbox{UL}} \\
+\lr{\mbox{DTCH}} & \lr{\mbox{DL-SCH}} & \lr{\mbox{PDSCH}} & \lr{\mbox{DL}} \\
+\lr{\mbox{DTCH}} & \lr{\mbox{UL-SCH}} & \lr{\mbox{PUSCH}} & \lr{\mbox{UL}} \\
+\lr{—} (بازخورد \lr{\mbox{HARQ}}) & \lr{\mbox{—}} & \lr{\mbox{PHICH}} & \lr{\mbox{DL}} \\
+\lr{—} (\lr{\mbox{DCI}}/\allowbreak{}اعطاها) & \lr{\mbox{—}} & \lr{\mbox{PDCCH}} & \lr{\mbox{DL}} \\
+\lr{\mbox{— (CFI)}} & \lr{\mbox{—}} & \lr{\mbox{PCFICH}} & \lr{\mbox{DL}} \\
+\lr{— (CQI/\allowbreak{}SR/\allowbreak{}ACK)} & \lr{\mbox{—}} & \lr{\mbox{PUCCH}} & \lr{\mbox{UL}} \\
+\lr{—} (پیشوند \lr{\mbox{RA}}) & \lr{\mbox{RACH}} & \lr{\mbox{PRACH}} & \lr{\mbox{UL}} \\
+\end{longtable}
+}
+
+\CNsection{6.6}{واسط \lr{\mbox{S1}}}
+
+واسط \lr{S1 eNodeB} را به \lr{\mbox{EPC}} متصل می‌کند. به دو بخش تقسیم می‌شود:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{S1-MME (S1-C):}}} صفحه کنترل \ensuremath{\leftarrow} \lr{eNB \ensuremath{\leftrightarrow} MME}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{S1-U:}}}}} صفحه کاربر \ensuremath{\leftarrow} \lr{eNB \ensuremath{\leftrightarrow} S-GW}
+\end{itemize}
+
+\CNkeepfig{m06-s1mme-stack}{3}
+
+\CNsubsection{}{پشته پروتکل \lr{\mbox{S1-MME}}}
+
+\CNfigure{m06-s1mme-stack}{پشته پروتکل \lr{\mbox{S1-MME}}}
+
+\textbf{چرا \lr{\mbox{SCTP}} (نه \lr{\mbox{TCP}})؟}
+
+\begin{itemize}
+\tightlist
+\item
+  چند-جریانی: از مسدودسازی سر-خط جلوگیری می‌کند
+\item
+  چند-میزبانی: تغییر مسیر بین آدرس‌های \lr{\mbox{IP}}
+\item
+  پیام-گرا (مرزها را حفظ می‌کند)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{رویه‌های \lr{\mbox{S1AP}}}
+
+\CNchained\CNsubsubsection{رویه‌های مرتبط با \lr{\mbox{UE}} (در هر زمینه \lr{\mbox{UE}})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3548}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3548}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2903}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Initial UE Message} & \lr{eNB \ensuremath{\to} MME} & اولین پیام \lr{\mbox{NAS}} را حمل می‌کند (\lr{\mbox{Attach}}، \lr{Service Request}) \\
+\lr{Downlink NAS Transport} & \lr{MME \ensuremath{\to} eNB} & پیام \lr{\mbox{NAS}} را به \lr{\mbox{UE}} تحویل می‌دهد \\
+\lr{Uplink NAS Transport} & \lr{eNB \ensuremath{\to} MME} & پیام \lr{\mbox{NAS}} را از \lr{\mbox{UE}} ارسال می‌کند \\
+\lr{Initial Context Setup} & \lr{MME \ensuremath{\to} eNB} & زمینه امنیتی + حامل پیش‌فرض را برقرار می‌کند \\
+\lr{UE Context Release} & \lr{MME \ensuremath{\leftrightarrow} eNB} & زمینه \lr{\mbox{UE}} را آزاد می‌کند (درخواست/\allowbreak{}فرمان/\allowbreak{}تکمیل) \\
+\lr{Handover Preparation} & \lr{\mbox{eNB}} مبدأ \ensuremath{\leftarrow} \lr{\mbox{MME}} & تحویل مبتنی بر \lr{\mbox{S1}} وقتی \lr{\mbox{X2}} در دسترس نیست \\
+\lr{Handover Resource Allocation} & \lr{MME \ensuremath{\to} eNB} مقصد & منابع را در مقصد تخصیص می‌دهد \\
+\lr{Path Switch Request} & \lr{\mbox{eNB}} مقصد \ensuremath{\leftarrow} \lr{\mbox{MME}} & مسیر \lr{\mbox{S-GW}} را پس از تحویل \lr{\mbox{X2}} به‌روزرسانی می‌کند \\
+\lr{E-RAB Setup/\allowbreak{}Modify/\allowbreak{}Release} & \lr{MME \ensuremath{\to} eNB} & مدیریت حامل \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{رویه‌های غیرمرتبط با \lr{\mbox{UE}} (سراسری)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{S1 Setup}} & \lr{\mbox{eNB}} با \lr{\mbox{MME}} ثبت‌نام می‌کند (\lr{\mbox{TAC}}، \lr{\mbox{PLMN}}، ظرفیت) \\
+\lr{\mbox{Reset}} & بازیابی خطا (جزیی یا کامل) \\
+\lr{\mbox{Paging}} & \lr{\mbox{MME}} صفحه‌بندی را به \lr{\mbox{eNB}}های ناحیه ردیابی می‌فرستد \\
+\lr{eNB/\allowbreak{}MME Configuration Update} & تغییرات ظرفیت/\allowbreak{}پیکربندی \\
+\lr{Overload Start/\allowbreak{}Stop} & \lr{\mbox{MME}} ازدحام را علامت می‌دهد \\
+\lr{Error Indication} & گزارش خطاهای پروتکل \\
+\end{longtable}
+}
+
+\CNkeepfig{m06-s1u-stack}{3}
+
+\CNsubsection{}{پشته پروتکل \lr{\mbox{S1-U}}}
+
+\CNfigure{m06-s1u-stack}{پشته پروتکل \lr{\mbox{S1-U}}}
+
+\begin{itemize}
+\tightlist
+\item
+  هر \lr{\mbox{E-RAB}} یک \textbf{تونل \lr{\mbox{GTP}}} دارد که با \lr{\mbox{TEID}} (شناسه نقطه انتهایی تونل) شناسایی می‌شود
+\item
+  نگاشت یک-به-یک: حامل \lr{\mbox{EPS}} \ensuremath{\leftrightarrow} تونل \lr{\mbox{GTP}} در \lr{\mbox{S1}} \ensuremath{\leftrightarrow} حامل رادیویی
+\end{itemize}
+
+\CNsection{6.7}{واسط \lr{\mbox{X2}}}
+
+واسط \lr{\mbox{X2}} \textbf{\lr{\mbox{eNodeB}}های همسایه} را به‌طور مستقیم برای موارد زیر به هم متصل می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  تحویل سریع (بدون دخالت \lr{\mbox{MME}} برای تحرک درون-\lr{\mbox{LTE}})
+\item
+  مدیریت بار بین-سلولی
+\item
+  هماهنگی تداخل بین-سلولی \lr{\mbox{(ICIC)}}
+\end{itemize}
+
+\CNkeepfig{m06-x2-stacks}{3}
+
+\CNsubsection{}{پشته پروتکل \lr{\mbox{X2}}}
+
+\CNfigure{m06-x2-stacks}{پشته‌های پروتکل \lr{\mbox{X2}}}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{رویه‌های \lr{\mbox{X2AP}}}
+
+\CNchained\CNsubsubsection{مدیریت تحرک (تحویل)}
+
+\textbf{توالی تحویل \lr{\mbox{X2}}:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\lr{\mbox{eNB}} مبدأ} پیام \lr{\CNcode{Handover Request}} را می‌فرستد \ensuremath{\leftarrow} \lr{\mbox{eNB}} مقصد (شامل زمینه \lr{\mbox{UE}}، اطلاعات حامل)
+\item
+  \textbf{\lr{\mbox{eNB}} مقصد} کنترل پذیرش را انجام می‌دهد \ensuremath{\leftarrow} پیام \lr{\CNcode{Handover Request Acknowledge}} را می‌فرستد
+\item
+  \textbf{\lr{\mbox{eNB}} مبدأ} پیام \lr{\CNcode{RRCConnectionReconfiguration}} را به \lr{\mbox{UE}} می‌فرستد (با اطلاعات سلول مقصد)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}} با سلول مقصد همگام می‌شود، پیام \lr{\CNcode{RRCConnectionReconfigurationComplete}} را می‌فرستد
+\item
+  \textbf{\lr{\mbox{eNB}} مقصد} پیام \lr{\CNcode{Path Switch Request}} را به \lr{\mbox{MME}} می‌فرستد (مسیر شبکه هسته را به‌روزرسانی می‌کند)
+\item
+  \textbf{\lr{\mbox{eNB}} مبدأ} پیام \lr{\CNcode{UE Context Release}} را دریافت می‌کند \ensuremath{\leftarrow} منابع را آزاد می‌کند
+\end{enumerate}
+
+\textbf{در حین تحویل:} داده از طریق تونل \lr{\mbox{GTP}} در \lr{\mbox{X2-U}} از مبدأ به مقصد ارسال می‌شود (از دست رفتن داده را جلوگیری می‌کند).
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{مدیریت بار}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Resource Status Reporting} & درخواست/\allowbreak{}گزارش اطلاعات بار (استفاده \lr{\mbox{PRB}}، بار ترکیبی) \\
+\lr{Load Indication} & اطلاع به همسایه درباره تداخل \lr{\mbox{UL}} (\lr{\mbox{HII}}، \lr{\mbox{OI}}) \\
+\lr{Mobility Change Request} & مذاکره پارامترهای تحویل (تنظیم \lr{\mbox{CIO}}) \\
+\end{longtable}
+}
+
+\CNsubsubsection{هماهنگی تداخل بین-سلولی \lr{\mbox{(ICIC)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{پیام \lr{Load Information}} موارد زیر را حمل می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{\lr{\mbox{HII}} (نشانگر تداخل بالا):} \lr{\mbox{RB}}های \lr{\mbox{UL}} که سلول قصد دارد \lr{\mbox{UE}}های لبه سلول را در آن‌ها زمان‌بندی کند
+  \item
+    \textbf{\lr{\mbox{OI}} (نشانگر اضافه‌بار):} \lr{\mbox{RB}}های \lr{\mbox{UL}} که تداخل بالا را تجربه می‌کنند
+  \item
+    \textbf{\lr{\mbox{RNTP}} (توان ارسال باریک‌باند نسبی):} \lr{\mbox{RB}}های \lr{\mbox{DL}} که سلول از آستانه توان فراتر می‌رود
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{}{راه‌اندازی و پیکربندی \lr{\mbox{X2}}}
+
+\begin{itemize}
+\tightlist
+\item
+  لینک \lr{\mbox{X2}} از طریق \textbf{رویه \lr{\mbox{X2 Setup}}} برقرار می‌شود (یا از طریق \lr{\mbox{MME}} با استفاده از \lr{S1 ENB Configuration Transfer})
+\item
+  رابطه همسایگی خودکار \lr{\mbox{(ANR)}}: \lr{\mbox{eNB}} همسایه‌ها را کشف می‌کند و \lr{\mbox{X2}} را برقرار می‌کند
+\item
+  چندین \lr{\mbox{eNB}} می‌توانند متصل شوند و توپولوژی مَش تشکیل دهند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m06-rrc-states}{8}
+
+\CNsection{6.8}{حالت‌های \lr{\mbox{RRC}} و گذارها}
+
+\CNchained\CNsubsection{}{ماشین حالت \lr{\mbox{RRC}}}
+
+\CNfigure{m06-rrc-states}{ماشین حالت \lr{\mbox{RRC}} در \lr{\mbox{LTE}}}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{حالت \lr{RRC\_\allowbreak{}IDLE}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+زمینه & زمینه \lr{\mbox{eNB}} وجود ندارد؛ فقط با \lr{\mbox{MME}} ثبت‌نام شده است \\
+مکان & در سطح \textbf{ناحیه ردیابی} شناخته‌شده \\
+تحرک & \textbf{انتخاب مجدد سلول} (کنترل‌شده توسط \lr{\mbox{UE}}، بر اساس \lr{\mbox{SIB}}ها) \\
+داده & انتقال داده ممکن نیست \\
+صفحه‌بندی & \lr{\mbox{UE}} کانال صفحه‌بندی را با چرخه \lr{\mbox{DRX}} پایش می‌کند \\
+اطلاعات سیستم & \lr{\mbox{UE MIB}} و \lr{\mbox{SIB}}های مرتبط را کسب می‌کند \\
+توان & مصرف توان پایین (خواب طولانی \lr{\mbox{DRX}}) \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{حالت \lr{RRC\_\allowbreak{}CONNECTED}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+زمینه & زمینه کامل \lr{\mbox{UE}} در \lr{\mbox{eNB}} خدمات‌دهنده \\
+مکان & در سطح \textbf{سلول} شناخته‌شده \\
+تحرک & \textbf{تحویل} (کنترل‌شده توسط شبکه، مبتنی بر اندازه‌گیری) \\
+داده & انتقال داده فعال \lr{(DL + UL)} \\
+اندازه‌گیری‌ها & توسط \lr{\mbox{eNB}} پیکربندی می‌شود (رویدادهای \lr{\mbox{A1–A6}}، \lr{\mbox{B1–B2}}) \\
+\lr{\mbox{DRX}} & \lr{\mbox{DRX}} حالت متصل ممکن است (چرخه‌های کوتاه‌تر) \\
+امنیت & رمزگذاری \lr{\mbox{AS}} + یکپارچگی فعال \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{گذارهای حالت}
+
+\CNchained\CNsubsubsection{\lr{IDLE \ensuremath{\to} CONNECTED} (برقراری اتصال)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE}} پیام \lr{\textbf{\lr{RRC Connection Request}}} را می‌فرستد (روی \lr{\mbox{CCCH}} از طریق \lr{\mbox{SRB0}})
+\item
+  \lr{\mbox{eNB}} با پیام \lr{\textbf{\lr{RRC Connection Setup}}} پاسخ می‌دهد (\lr{\mbox{SRB1}} را پیکربندی می‌کند)
+\item
+  \lr{\mbox{UE}} پیام \lr{\textbf{\lr{RRC Connection Setup Complete}}} را می‌فرستد (پیام \lr{\mbox{NAS}} اولیه را حمل می‌کند)
+\item
+  \lr{\mbox{eNB}} پیام \lr{\mbox{NAS}} را از طریق \lr{S1AP \CNcode{Initial UE Message}} به \lr{\mbox{MME}} ارسال می‌کند
+\item
+  \lr{MME \textbf{\lr{Initial Context Setup}}} را آغاز می‌کند (امنیت + برقراری حامل)
+\end{enumerate}
+
+\CNsubsubsection{\lr{CONNECTED \ensuremath{\to} IDLE} (آزادسازی اتصال)}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{MME}} از طریق \lr{S1AP \CNcode{UE Context Release Command}} فعال می‌کند
+\item
+  \lr{\mbox{eNB}} پیام \lr{\textbf{\lr{RRC Connection Release}}} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \lr{\mbox{UE}} زمینه \lr{\mbox{AS}} را حذف می‌کند، به حالت بیکار بازمی‌گردد
+\item
+  محرک‌ها: تایمر عدم فعالیت، جداسازی صریح \lr{\mbox{NAS}}، شکست بازیابی شکست لینک رادیویی
+\end{itemize}
+
+\CNkeepfig{m06-rrc-inactive}{5}
+
+\CNsubsection{}{افزونه \lr{\mbox{5G}}: حالت \lr{RRC\_\allowbreak{}INACTIVE}}
+
+در \lr{\mbox{5G NR}} (و \lr{\mbox{LTE}} اواخر \lr{\mbox{Rel-15}}+)، حالت سوم معرفی می‌شود:
+
+\CNfigure{m06-rrc-inactive}{حالت‌های \lr{\mbox{RRC}} در \lr{\mbox{5G NR}} به همراه \lr{RRC\_\allowbreak{}INACTIVE}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1719}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1719}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2969}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1562}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2031}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{حالت} & \CNth{زمینه \lr{\mbox{UE}}} & \CNth{دانه‌بندی مکان} & \CNth{تحرک} & \CNth{اتصال \lr{\mbox{CN}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{IDLE}} & هیچ در \lr{\mbox{RAN}} & ناحیه ردیابی & انتخاب مجدد سلول & هیچ \\
+\lr{\mbox{INACTIVE}} & ذخیره‌شده در \lr{\mbox{gNB}} (معلق) & ناحیه اعلان \lr{\mbox{RAN}} & انتخاب مجدد سلول + صفحه‌بندی \lr{\mbox{RAN}} & حفظ‌شده با \lr{\mbox{CN}} \\
+\lr{\mbox{CONNECTED}} & فعال در \lr{\mbox{gNB}} & سطح سلول & تحویل & فعال \\
+\end{longtable}
+}
+
+\textbf{مزایای حالت \lr{\mbox{INACTIVE}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  بازیابی سریع‌تر از \lr{IDLE\ensuremath{\to}CONNECTED} (عبور از رویه‌های \lr{\mbox{NAS}})
+\item
+  صرفه‌جویی در توان (بدون سیگنالینگ حالت متصل)
+\item
+  کاهش بار سیگنالینگ بر شبکه هسته
+\item
+  زمینه \lr{\mbox{AS}} حفظ می‌شود \ensuremath{\leftarrow} بازیابی سریع‌تر با یک پیام \lr{RRC Resume}
+\item
+  ایده‌آل برای دستگاه‌های \lr{\mbox{IoT}} با انتقال داده کوچک و متناوب
+\end{itemize}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{خلاصه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مؤلفه} & \CNth{نکته کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+معماری & مسطح (بدون \lr{\mbox{RNC}})؛ \lr{\mbox{eNB}} تمام توابع \lr{\mbox{RAN}} را مدیریت می‌کند \\
+\lr{\mbox{eNodeB}} & زمان‌بندی، \lr{\mbox{RRM}}، \lr{\mbox{HARQ}}، تصمیمات تحویل، کدگذاری \\
+\lr{\mbox{PHY}} & \lr{OFDMA (DL) /\allowbreak{} SC-FDMA (UL)}؛ بلوک‌های منبع به‌عنوان واحد پایه \\
+\lr{\mbox{MAC}} & زمان‌بندی \lr{\mbox{1 ms}}، \lr{\mbox{HARQ}}، چندگانه‌سازی، دسترسی تصادفی \\
+\lr{\mbox{RLC}} & \lr{TM/\allowbreak{}UM/\allowbreak{}AM}؛ قطعه‌بندی + \lr{\mbox{ARQ}} برای قابلیت اطمینان \\
+\lr{\mbox{PDCP}} & فشرده‌سازی \lr{\mbox{ROHC}}، رمزگذاری، یکپارچگی \lr{\mbox{(CP)}}، بازترتیبی \\
+\lr{\mbox{RRC}} & مدیریت اتصال/\allowbreak{}تحرک، اندازه‌گیری، اطلاعات سیستم \\
+کانال‌ها & نگاشت منطقی\ensuremath{\leftarrow}انتقال\ensuremath{\leftarrow}فیزیکی؛ کانال‌های مشترک غالب هستند \\
+\lr{\mbox{S1}} & \lr{\mbox{eNB\ensuremath{\leftrightarrow}EPC}}؛ \lr{S1AP (SCTP)} برای کنترل، \lr{\mbox{GTP-U}} برای صفحه کاربر \\
+\lr{\mbox{X2}} & \lr{\mbox{eNB\ensuremath{\leftrightarrow}eNB}}؛ تحویل سریع، مدیریت بار، هماهنگی تداخل \\
+حالت‌های \lr{\mbox{RRC}} & \lr{\mbox{IDLE}} (توان پایین) \ensuremath{\leftrightarrow} \lr{\mbox{CONNECTED}} (فعال)؛ \lr{\mbox{INACTIVE}} در \lr{\mbox{5G}} \\
+\end{longtable}
+}
+
+\emph{ماژول \lr{6 — E-UTRAN} (شبکه دسترسی رادیویی \lr{\mbox{LTE}}) \lr{—} شبکه‌های ارتباطی پیشرفته}

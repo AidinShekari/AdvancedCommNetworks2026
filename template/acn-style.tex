@@ -1,0 +1,436 @@
+% ============================================================
+%  AdvancedCommNetworks — shared visual style (colours, headings,
+%  boxes, code, tables, figures, header/footer, cover pages)
+%
+%  Visual language: graphite + signal orange + data cyan.
+%  Orange = signalling / control plane, cyan = data / user plane —
+%  the same code is used in every diagram (template/figures/).
+% ============================================================
+\usetikzlibrary{shapes.symbols}
+
+% ---------- palette ----------
+\definecolor{CNink}{HTML}{18222D}      % graphite: text, dark panels
+\definecolor{CNinkL}{HTML}{3A4A5A}     % lighter graphite
+\definecolor{CNsig}{HTML}{E4572E}      % signal orange (accent, control plane)
+\definecolor{CNcyan}{HTML}{0B8BA0}     % data cyan (user plane)
+\definecolor{CNcyanD}{HTML}{06697A}    % dark cyan (headings)
+\definecolor{CNamber}{HTML}{F2A33A}    % insight / highlight
+\definecolor{CNgreen}{HTML}{2E8B57}
+\definecolor{CNred}{HTML}{C0392B}
+\definecolor{CNviolet}{HTML}{6B4FA0}
+\definecolor{CNmuted}{HTML}{6B7785}    % captions, footers
+\definecolor{CNline}{HTML}{CBD3DC}     % hairlines
+\definecolor{CNpaper}{HTML}{F3F5F7}    % light panels
+\definecolor{CNcode}{HTML}{F6F8FA}
+\definecolor{CNzebra}{HTML}{F1F4F7}
+\color{CNink}
+
+% ---------- bidi-aware helpers ----------
+\ifCNrtl
+  \newcommand{\CNen}[1]{\lr{#1}}
+  \newcommand{\CNfa}[1]{#1}
+  \newenvironment{CNltr}{\begin{latin}}{\end{latin}}
+  \newcommand{\CNfaInLtr}[1]{\rl{#1}}
+  \newcommand{\CNprim}[1]{\rl{#1}}
+  \newcommand{\CNoth}[1]{#1}
+  % dotted numbers (1.2, 0.05) keep left-to-right order with Persian digits
+  \newcommand{\CNnum}[1]{\lr{\persianfont #1}}
+  \def\CNstartside{right}\def\CNendside{left}\def\CNstartdir{east}\def\CNenddir{west}\def\CNstartpos{r}
+\else
+  \newcommand{\CNen}[1]{#1}
+  \newcommand{\CNfa}[1]{\rl{#1}}
+  \newenvironment{CNltr}{}{}
+  \newcommand{\CNfaInLtr}[1]{\rl{#1}}
+  \newcommand{\CNprim}[1]{#1}
+  \newcommand{\CNoth}[1]{\rl{#1}}
+  \newcommand{\CNnum}[1]{#1}
+  \def\CNstartside{left}\def\CNendside{right}\def\CNstartdir{west}\def\CNenddir{east}\def\CNstartpos{l}
+\fi
+\newcommand{\CNsep}{\hspace{0.45em}{\color{CNsig}\rule[0.2em]{0.28em}{0.28em}}\hspace{0.45em}}
+
+\ifCNrtl\newcommand{\CNmtext}[1]{\text{\lr{#1}}}\else\newcommand{\CNmtext}[1]{\text{#1}}\fi
+
+% display equations: indented from the start of the line
+\newcommand{\CNdisplay}[1]{%
+  \par\vspace{0.3em}\noindent\hspace*{1.6em}%
+  \ifCNrtl\lr{$\displaystyle #1$}\else$\displaystyle #1$\fi\par\vspace{0.3em}}
+
+% ---------- glyph fallback ----------
+% IBM Plex has no box-drawing characters: take them from DejaVu Sans Mono
+% (same advance width as Plex Mono, so text sketches stay aligned)
+\usepackage{newunicodechar}
+\newfontfamily\CNboxfont{DejaVuSansMono.ttf}[Scale=0.88]
+\def\CNboxchars{─│┌┐└┘├┤┬┴┼═║╔╗╚╝╠╣╦╩╬▲▼►◄▶◀╭╮╯╰╱╲╳█░▒▓∥⋮⊕‖☐✓✗↕⇒≥≤}
+\ExplSyntaxOn
+\tl_map_inline:Nn \CNboxchars { \newunicodechar{#1}{{\CNboxfont #1}} }
+\ExplSyntaxOff
+
+% ---------- small icons ----------
+% signal bars (header), node ring (lists), hexagonal cell (page numbers)
+\DeclareRobustCommand{\CNbars}[1][CNsig]{\tikz[baseline=0pt]{%
+  \foreach \i in {0,1,2,3}{\fill[#1] (\i*0.19em,0) rectangle ++(0.12em,{0.22em+\i*0.17em});}}}
+\DeclareRobustCommand{\CNnode}{\tikz[baseline=-0.55ex]\draw[CNsig, line width=0.85pt] (0,0) circle (1.55pt);}
+\DeclareRobustCommand{\CNdash}{\tikz[baseline=-0.55ex]\fill[CNcyan] (0,-0.5pt) rectangle (0.5em,0.5pt);}
+\DeclareRobustCommand{\CNyes}{{\color{CNgreen}\ding{51}}}
+\DeclareRobustCommand{\CNno}{{\color{CNred}\ding{55}}}
+\DeclareRobustCommand{\CNwarn}{\tikz[baseline=0pt]{\fill[CNamber,rounded corners=0.4pt] (0,0)--(0.8em,0)--(0.4em,0.72em)--cycle;
+  \node[CNink,font=\bfseries\tiny,inner sep=0pt] at (0.4em,0.27em) {!};}}
+\DeclareRobustCommand{\CNdot}[1]{\tikz[baseline=-0.6ex]\fill[#1] (0,0) circle (0.36em);}
+\DeclareRobustCommand{\CNcheckbox}{\tikz[baseline=-0.1ex]\draw[CNinkL, line width=0.7pt, rounded corners=0.5pt] (0,0) rectangle (0.62em,0.62em);}
+\DeclareRobustCommand{\CNstar}{{\color{CNamber}\ding{72}}}
+
+% PDF bookmarks: plain text for icons and direction helpers
+\pdfstringdefDisableCommands{%
+  \def\CNwarn{}\def\CNyes{}\def\CNno{}\def\CNstar{}\def\CNcheckbox{}\def\CNdot#1{}%
+  \def\CNnum#1{#1}\def\lr#1{#1}\def\rl#1{#1}\def\mbox#1{#1}\def\CNcode#1{#1}%
+  \def\ensuremath#1{}\def\textsubscript#1{#1}\def\textsuperscript#1{#1}}
+
+% ---------- figures (template/figures/*.tex, drawn with TikZ/PGFPlots) ----------
+% \CNL{English}{فارسی}: label text in the document language
+% \CNLP{English}{فارسی}: a whole (multi-line) node paragraph in the document language
+\ifCNrtl
+  \newcommand{\CNL}[2]{\rl{#2}}
+  \newcommand{\CNLP}[2]{\begin{RTL}\setpersianfont #2\end{RTL}}
+\else
+  \newcommand{\CNL}[2]{#1}
+  \newcommand{\CNLP}[2]{#1}
+\fi
+\input{\CNroot/figures/acn-diagram-styles}
+\newcounter{CNfig}
+\newsavebox{\CNfigbox}
+% #1 = figure file, #2 = caption (may be empty)
+\newlength{\CNfigh}
+% the drawing, scaled to the text width when it is wider; drawings use the same
+% line spacing in both languages, so multi-line labels have the height the
+% diagram layout was computed for
+\newcommand{\CNfigmeasure}[1]{%
+  \sbox{\CNfigbox}{\begin{CNltr}\linespread{1.14}\selectfont\input{\CNroot/figures/#1}\end{CNltr}}%
+  \ifdim\wd\CNfigbox>\linewidth
+    \sbox{\CNfigbox}{\resizebox{\linewidth}{!}{\usebox{\CNfigbox}}}\fi
+  \setlength{\CNfigh}{\dimexpr\ht\CNfigbox+\dp\CNfigbox\relax}}
+% keep a heading or lead-in (#2 lines) together with the figure that follows it
+\newcommand{\CNkeepfig}[2]{\par\begingroup\CNfigmeasure{#1}%
+  \Needspace*{\dimexpr\CNfigh+#2\baselineskip+3\baselineskip\relax}\endgroup}
+% #1 = figure file, #2 = caption (may be empty); drawing and caption never split
+\newcommand{\CNfigure}[2]{%
+  \par\CNfigmeasure{#1}%
+  \Needspace*{\dimexpr\CNfigh+3\baselineskip\relax}%
+  \refstepcounter{CNfig}%
+  \vspace{0.6em}\noindent
+  \begin{minipage}{\linewidth}\centering
+  \usebox{\CNfigbox}%
+  \ifx\relax#2\relax\else
+    \par\vspace{0.7em}%
+    {\small\color{CNmuted}{\color{CNsig}\CNheadfont\bfseries \CNlangFigure~\CNnum{\ifx\CNmodnum\empty\else\CNmodnum.\fi\arabic{CNfig}}}%
+     \hspace{0.6em}#2\par}%
+  \fi
+  \end{minipage}\par\vspace{0.9em}%
+  \write-1{CNFIGURE #1 page \thepage}}
+
+% ---------- pandoc compatibility ----------
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\providecommand{\pandocbounded}[1]{#1}
+\def\LTcaptype{none}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlength{\emergencystretch}{4em}
+\tolerance=800 % long technical terms: a looser line instead of an overfull one
+\setlength{\lineskiplimit}{2pt}\setlength{\lineskip}{3pt}
+\thickmuskip=5mu plus 1mu\relax \medmuskip=4mu plus 1mu minus 3mu\relax
+\raggedbottom
+\clubpenalty=10000 \widowpenalty=10000 \displaywidowpenalty=10000
+
+% ---------- lists ----------
+% Persian item labels: الف، ب، ج، د، ه …
+\newcommand{\CNalph}[1]{\ifcase\value{#1}\or الف\or ب\or ج\or د\or ه\or و\or ز\or ح\or ط\or ی\else\arabic{#1}\fi}
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+\setlist[itemize]{label={\CNnode}}
+\setlist[itemize,2]{label={\CNdash}}
+\setlist[itemize,3]{label={\color{CNmuted}\textbullet}}
+\setlist[enumerate,1]{label={\color{CNsig}\bfseries\arabic*.}}
+
+% ---------- inline elements ----------
+\newcommand{\CNcode}[1]{{\ttfamily\color{CNcyanD}#1}}
+\newcommand{\CNth}[1]{{\color{white}\bfseries #1}}
+\newcommand{\CNbr}{\leavevmode\newline}
+\newcommand{\CNsolution}{%
+  {\setlength{\fboxsep}{2pt}\colorbox{CNcyan}{\color{white}\bfseries\small\,\CNlangSolution\,}}\hspace{0.35em}}
+
+% ---------- headings ----------
+\newcounter{CNsec}
+% section number in a "signal" tag pointing along the reading direction
+\newcommand{\CNtag}[1]{\tikz[baseline={([yshift=-0.34em]t.center)}]
+  \node[signal, signal to=\CNenddir, signal pointer angle=110, fill=CNsig, text=white,
+        font=\CNheadfont\bfseries\Large, minimum height=1.75em, inner xsep=0.5em,
+        text height=0.72em, text depth=0pt] (t) {\CNnum{#1}};}
+% a link between two nodes: the rule under every section title
+\newcommand{\CNlinkrule}{\noindent\begin{tikzpicture}[x=\linewidth]
+  \useasboundingbox (0,-2.5pt) rectangle (1,2.5pt);
+  \draw[CNline, line width=0.7pt] (0,0) -- (1,0);
+  \ifCNrtl
+    \draw[CNsig, line width=1.6pt] (0.82,0) -- (1,0); \fill[CNsig] (1,0) circle (2.2pt);
+    \filldraw[fill=white, draw=CNcyan, line width=0.9pt] (0,0) circle (2pt);
+  \else
+    \draw[CNsig, line width=1.6pt] (0,0) -- (0.18,0); \fill[CNsig] (0,0) circle (2.2pt);
+    \filldraw[fill=white, draw=CNcyan, line width=0.9pt] (1,0) circle (2pt);
+  \fi
+  \end{tikzpicture}}
+% a heading that directly follows another one (\CNchained, set by md2tex.lua)
+% stays with it: the chain's space was reserved before its first heading
+\newif\ifCNchain
+\newcommand{\CNchained}{\global\CNchaintrue}
+\newcommand{\CNheadneed}[1]{%
+  \ifCNchain\global\CNchainfalse\nobreak\else\Needspace{#1\baselineskip}\fi}
+\newcommand{\CNsection}[2]{%
+  \par\CNheadneed{9}\vspace{1.5em}%
+  \refstepcounter{CNsec}\label{CNsec:\CNmodkey:\arabic{CNsec}}%
+  \noindent
+  \ifx\relax#1\relax\else\CNtag{#1}\hspace{0.65em}\fi
+  {\color{CNink}\CNheadfont\bfseries\LARGE #2}\par\nobreak
+  \vspace{0.35em}\CNlinkrule\par\nobreak\vspace{0.4em}%
+  \addcontentsline{toc}{section}{\ifx\relax#1\relax\else \protect\CNnum{#1}\quad\fi #2}%
+}
+% a level-2 section typeset as a box (Review Questions, Key Takeaways …):
+% listed in the contents, the box carries the title
+\newcommand{\CNboxsection}[1]{%
+  \par\Needspace{8\baselineskip}\vspace{0.6em}%
+  \refstepcounter{CNsec}\label{CNsec:\CNmodkey:\arabic{CNsec}}%
+  \addcontentsline{toc}{section}{#1}}
+\newcommand{\CNsubsection}[2]{%
+  \par\CNheadneed{6}\vspace{0.9em}%
+  \noindent\ifx\relax#1\relax{\color{CNsig}\rule[0.1em]{0.3em}{0.75em}}\else
+    {\color{CNsig}\CNheadfont\bfseries\large\CNnum{#1}}\fi\hspace{0.55em}%
+  {\color{CNcyanD}\CNheadfont\bfseries\Large #2}\par\nobreak\vspace{0.2em}}
+\newcommand{\CNsubsubsection}[1]{%
+  \par\CNheadneed{4}\vspace{0.5em}%
+  \noindent{\color{CNcyan}\rule[0.15em]{0.45em}{0.45em}}\hspace{0.45em}%
+  {\color{CNink}\CNheadfont\bfseries\large #1}\par\nobreak}
+
+% ---------- contents ----------
+\ifCNrtl\def\CNtocshift{-3.2cm}\else\def\CNtocshift{3.2cm}\fi
+\tcbset{CNtocbase/.style={enhanced, sharp corners, boxrule=0pt, frame hidden,
+  colback=CNpaper, left=5mm, right=5mm, top=3mm, bottom=3mm,
+  overlay={\fill[CNink] (frame.north west) rectangle ([yshift=-1.2mm]frame.north east);
+           \fill[CNsig] ([yshift=-1.2mm]frame.north \CNstartdir) rectangle
+             ([yshift=-2.1mm, xshift=\CNtocshift]frame.north \CNstartdir);}}}
+\newtcolorbox{CNbooktoc}{CNtocbase, breakable, before skip=0pt, after skip=1em,
+  before upper={{\color{CNink}\CNheadfont\bfseries\LARGE\CNlangContents}\par\vspace{0.4em}}}
+\newtcolorbox{CNminitoc}{CNtocbase, unbreakable, before skip=0.4em, after skip=1.4em,
+  before upper={{\color{CNink}\CNheadfont\bfseries\Large\CNlangModuleContents}\par\vspace{0.3em}}}
+\newcommand{\CNtocleaders}{{\color{CNline}\leaders\hbox to 0.55em{\hss.\hss}\hskip 1em plus 1fill}}
+\newcommand{\CNtocitem}[3]{%
+  \par\noindent\hyperref[CNsec:\CNmodkey:#1]{%
+    \ifx\relax#2\relax\else\makebox[2.2em][\CNstartpos]{\color{CNsig}\bfseries\CNnum{#2}}\fi
+    {\color{CNink}#3}}%
+  \CNtocleaders
+  \hyperref[CNsec:\CNmodkey:#1]{{\color{CNcyanD}\bfseries\pageref{CNsec:\CNmodkey:#1}}}\par
+  \vspace{0.12em}}
+\newcommand{\CNtocitemk}[4]{\begingroup\def\CNmodkey{#1}\CNtocitem{#2}{#3}{#4}\endgroup}
+\newcommand{\CNtoctag}[1]{\tikz[baseline=(t.base)]\node[fill=CNink, text=white, font=\CNheadfont\bfseries\small,
+  inner xsep=3pt, inner ysep=1.5pt, minimum width=1.6em] (t) {#1};}
+\newcommand{\CNtocmodule}[3]{% #1 = label key, #2 = tag text, #3 = title
+  \par\vspace{0.75em}\noindent
+  \ifx\relax#2\relax\else\CNtoctag{#2}\hspace{0.5em}\fi
+  \hyperref[#1]{{\color{CNink}\CNheadfont\bfseries\large #3}}%
+  \CNtocleaders
+  \hyperref[#1]{{\color{CNsig}\bfseries\large\pageref{#1}}}\par\vspace{0.25em}}
+
+% ---------- boxes ----------
+% a coloured tab straddles the top edge, a bar marks the start side
+\ifCNrtl\tcbset{CNtab/.style={attach boxed title to top right={xshift=-5mm, yshift*=-\tcboxedtitleheight/2}}}
+\else\tcbset{CNtab/.style={attach boxed title to top left={xshift=5mm, yshift*=-\tcboxedtitleheight/2}}}\fi
+\tcbset{
+  CNbase/.style={enhanced, breakable, sharp corners, boxrule=0pt, frame hidden, CNtab,
+    colback=#1!5, left=4mm, right=4mm, top=4.2mm, bottom=2.4mm,
+    before upper app={\setlength{\lineskiplimit}{2pt}\setlength{\lineskip}{3pt}},
+    fonttitle=\CNheadfont\bfseries\small, coltitle=white,
+    boxed title style={sharp corners, boxrule=0pt, frame hidden, colback=#1,
+      left=2.2mm, right=2.2mm, top=0.7mm, bottom=0.7mm},
+    before skip=1.3em, after skip=0.9em,
+    overlay unbroken and first={\CNboxbar{#1}}, overlay middle and last={\CNboxbar{#1}}},
+  CN@obj/.style={CNbase=CNink, colback=CNpaper},
+  CN@ex/.style={CNbase=CNcyan},
+  CN@insight/.style={CNbase=CNamber, colback=CNamber!9, coltitle=CNink},
+  CN@sum/.style={CNbase=CNgreen},
+  CN@def/.style={CNbase=CNviolet},
+  CN@warn/.style={CNbase=CNred},
+  CN@q/.style={CNbase=CNinkL, colback=CNpaper},
+}
+\newcommand{\CNboxbar}[1]{\ifCNrtl
+    \fill[#1] (frame.north east) rectangle ([xshift=-1.1mm]frame.south east);
+  \else
+    \fill[#1] (frame.north west) rectangle ([xshift=1.1mm]frame.south west);
+  \fi}
+\newenvironment{CNbox}[3][breakable]{%
+  \begin{tcolorbox}[CN@#2, title={#3}, #1]}{\end{tcolorbox}}
+
+% one-paragraph callout ("Key insight: …")
+\newtcolorbox{CNinsight}{enhanced, breakable, sharp corners, boxrule=0pt, frame hidden,
+  colback=CNamber!10, left=4mm, right=4mm, top=1.8mm, bottom=1.8mm,
+  before skip=0.8em, after skip=0.8em,
+  before upper app={\setlength{\lineskiplimit}{2pt}\setlength{\lineskip}{3pt}},
+  overlay={\CNboxbar{CNamber}}}
+
+\newtcolorbox{CNquote}{enhanced, breakable, sharp corners, boxrule=0pt, frame hidden,
+  colback=CNcyan!6, left=4mm, right=4mm, top=1.8mm, bottom=1.8mm,
+  before skip=0.8em, after skip=0.8em,
+  before upper app={\setlength{\lineskiplimit}{2pt}\setlength{\lineskip}{3pt}},
+  overlay={\ifCNrtl
+      \draw[CNcyan, line width=1.2pt, dash pattern=on 3pt off 2pt] ([xshift=-0.6mm]frame.north east) -- ([xshift=-0.6mm]frame.south east);
+    \else
+      \draw[CNcyan, line width=1.2pt, dash pattern=on 3pt off 2pt] ([xshift=0.6mm]frame.north west) -- ([xshift=0.6mm]frame.south west);
+    \fi}}
+
+% ---------- code ----------
+\input{\CNroot/highlighting}
+\fvset{fontsize=\small, baselinestretch=1.08, breaklines=true, breakanywhere=true,
+  breaksymbolleft={\tiny\color{CNmuted}\ensuremath{\hookrightarrow}}}
+\tcbset{CNcodemode/.style={breakable}}
+\def\CNcodelang{}
+% light "terminal" panel: dark strip with three status dots and the language
+\tcbset{CNcodebase/.style={enhanced, CNcodemode, sharp corners, boxrule=0.5pt,
+  colback=CNcode, colframe=CNline, left=3mm, right=3mm, top=6.2mm, bottom=1.6mm,
+  before skip=0.8em, after skip=0.8em,
+  overlay unbroken and first={%
+    \fill[CNink] (frame.north west) rectangle ([yshift=-4.4mm]frame.north east);
+    \foreach \c/\k in {CNsig/0, CNamber/1, CNcyan/2}
+      \fill[\c] ([xshift={3.2mm+\k*3.4mm}, yshift=-2.2mm]frame.north west) circle (0.95mm);
+    \node[anchor=east, inner sep=0pt, font=\scriptsize\ttfamily, text=white!75!CNink]
+      at ([xshift=-3mm, yshift=-2.2mm]frame.north east) {\CNcodelang};}}}
+\newtcolorbox{CNcodebox}{CNcodebase}
+\renewenvironment{Shaded}{\begin{CNcodebox}\begin{CNltr}}{\end{CNltr}\end{CNcodebox}}
+\newenvironment{CNplaincode}{\begin{CNcodebox}\begin{CNltr}\small}{\end{CNltr}\end{CNcodebox}}
+
+% ---------- tables ----------
+\renewcommand{\arraystretch}{1.32}
+\setlength{\tabcolsep}{5pt}
+\arrayrulecolor{CNline}
+\setlength{\heavyrulewidth}{0.9pt}\setlength{\lightrulewidth}{0.5pt}
+\setlength{\aboverulesep}{0pt}\setlength{\belowrulesep}{0pt}
+\newcommand{\CNheadrulesep}{\arrayrulecolor{CNsig}\specialrule{1.4pt}{0pt}{0pt}\arrayrulecolor{CNline}}
+\newcommand{\CNcodesmall}[1]{{\ttfamily\footnotesize\color{CNcyanD}#1}}
+\AtBeginEnvironment{longtable}{\small\rowcolors{2}{white}{CNzebra}\relpenalty=500 \binoppenalty=700 \let\CNcode\CNcodesmall}
+\setlength{\LTpre}{0.9em}\setlength{\LTpost}{0.9em}
+
+% ---------- header / footer ----------
+\def\CNmodnum{}\def\CNmodtitle{}\def\CNmodtitleOther{}
+\def\CNmodkey{x}
+\newcommand{\CNsetmodule}[3]{\gdef\CNmodnum{#1}\gdef\CNmodtitle{#2}\gdef\CNmodtitleOther{#3}%
+  \ifx\relax#1\relax\xdef\CNmodkey{\CNmodkey x}\else\gdef\CNmodkey{#1}\fi
+  \setcounter{CNsec}{0}\setcounter{CNfig}{0}}
+\newcommand{\CNheadmodule}{\ifx\CNmodnum\empty\else{\color{CNsig}\CNlangModule~\CNnum{\CNmodnum}}\CNsep\fi\CNmodtitle}
+% (a picture in a right-to-left header must sit in a left-to-right box, or bidi
+% moves the whole header text towards the middle)
+\newcommand{\CNheadcourse}{\ifCNrtl\lr{\CNbars}\else\CNbars\fi\hspace{0.5em}\CNlangCourse}
+
+\pagestyle{fancy}
+\fancyhf{}
+% the course name gives way when a long module title needs the whole line
+% (those titles already end in "… for Advanced Communication Networks")
+\newsavebox{\CNhdboxA}\newsavebox{\CNhdboxB}
+\newcommand{\CNheadcoursefit}{%
+  \sbox{\CNhdboxA}{\CNheadmodule}\sbox{\CNhdboxB}{\CNheadcourse}%
+  \ifdim\dimexpr\wd\CNhdboxA+\wd\CNhdboxB+2em\relax>\headwidth\else\CNheadcourse\fi}
+\fancyhead[L]{\small\color{CNinkL}\ifCNrtl\CNheadmodule\else\CNheadcoursefit\fi}
+\fancyhead[R]{\small\color{CNinkL}\ifCNrtl\CNheadcoursefit\else\CNheadmodule\fi}
+% page number inside a hexagonal cell
+\fancyfoot[C]{\makebox[0pt][c]{\tikz[baseline={([yshift=-0.3em]p.center)}]
+  \node[regular polygon, regular polygon sides=6, fill=CNink, text=white,
+        font=\small\bfseries, minimum size=2.35em, inner sep=0pt] (p) {\thepage};}}
+\newcommand{\CNfootinstr}{\href{\CNinstructorURL}{\CNlangInstructorLabel\ \CNlangInstructor}}
+\fancyfoot[R]{\scriptsize\color{CNmuted}\ifCNrtl\CNfootinstr\else\CNlangTerm\fi}
+\fancyfoot[L]{\scriptsize\color{CNmuted}\ifCNrtl\CNlangTerm\else\CNfootinstr\fi}
+\renewcommand{\headrule}{\vspace{-3pt}\hbox to\headwidth{%
+  \tikz{\useasboundingbox (0,0) rectangle (\headwidth,0);
+        \draw[CNline, line width=0.5pt] (0,0) -- (\headwidth,0);
+        \ifCNrtl\draw[CNsig, line width=1.6pt] (\headwidth-1.6cm,0) -- (\headwidth,0);
+        \else\draw[CNsig, line width=1.6pt] (0,0) -- (1.6cm,0);\fi}}}
+\renewcommand{\footrulewidth}{0pt}
+
+% ---------- cover pages ----------
+\input{\CNroot/acn-art}
+% faint hexagonal cell grid (radio cells) on the dark panel
+\newcommand{\CNhexgrid}[2]{% #1 = width (cm), #2 = height (cm)
+  \foreach \i in {0,...,14}{\foreach \j in {0,...,10}{
+    \pgfmathsetmacro{\hx}{\i*1.5}\pgfmathsetmacro{\hy}{\j*1.732+mod(\i,2)*0.866}
+    \ifdim\hx pt<#1pt\ifdim\hy pt<#2pt
+      \draw[white, opacity=0.055, line width=0.6pt] (\hx,\hy) +(0:1) -- +(60:1) -- +(120:1) -- +(180:1) -- +(240:1) -- +(300:1) -- cycle;
+    \fi\fi}}}
+% generation timeline: 2G … 6G with the module's generations highlighted
+\newcommand{\CNgenline}{%
+  \foreach \g/\x in {2G/0,3G/1,4G/2,5G/3,6G/4}{
+    \ifcsname CNgen@\CNmodnum @\g\endcsname\def\gc{CNsig}\def\gt{CNink}\else\def\gc{CNline}\def\gt{CNmuted}\fi
+    \fill[\gc] (\x*2.6,0) circle (0.16);
+    \node[font=\CNcond\bfseries\small, text=\gt, anchor=north] at (\x*2.6,-0.25) {\g};}
+  \draw[CNline, line width=0.8pt] (0.2,0) -- (2.4,0) (2.8,0) -- (5,0) (5.4,0) -- (7.6,0) (8,0) -- (10.2,0);}
+
+% #1 = card label (e.g. "Module 1"), #2 = main title, #3 = other-language title
+\newcommand{\CNcoverpage}[3]{%
+  \thispagestyle{empty}%
+  \begin{CNltr}%
+  \begin{tikzpicture}[remember picture, overlay]
+    % dark panel with cell grid and topic art
+    \fill[CNink] (current page.north west) rectangle ([yshift=-17.2cm]current page.north east);
+    \begin{scope}[shift={(current page.north west)}, yshift=-17.2cm]
+      \CNhexgrid{21}{17.2}
+      \begin{scope}[yshift=0.5cm]\CNartdraw\end{scope}
+    \end{scope}
+    \fill[CNsig] ([yshift=-17.2cm]current page.north west) rectangle ([yshift=-17.45cm, xshift=7cm]current page.north west);
+    % top line: university (both languages)
+    \node[text=white!78!CNink, font=\CNcond\small, anchor=west] at ([xshift=1.8cm,yshift=-1.3cm]current page.north west)
+      {\CNbars[CNsig]\hspace{0.6em}FERDOWSI UNIVERSITY OF MASHHAD};
+    \node[text=white!78!CNink, font=\small, anchor=east] at ([xshift=-1.8cm,yshift=-1.3cm]current page.north east)
+      {\CNfaInLtr{دانشگاه فردوسی مشهد}};
+    \draw[white, opacity=0.18] ([xshift=1.8cm,yshift=-1.8cm]current page.north west) -- ([xshift=-1.8cm,yshift=-1.8cm]current page.north east);
+    % course title
+    \node[anchor=north west, text=white, font=\CNcond\bfseries\fontsize{30}{34}\selectfont, align=left]
+      (en) at ([xshift=1.8cm,yshift=-2.6cm]current page.north west) {Advanced\\Communication Networks};
+    \node[anchor=north west, text=CNamber, font=\fontsize{22}{30}\selectfont] (fa) at ([yshift=-0.35cm]en.south west)
+      {\CNfaInLtr{\CNfaDisplay شبکه‌های ارتباطی پیشرفته}};
+    % module card
+    \node[anchor=north west, text width=15.5cm, align=left, text=white] (card) at ([yshift=-1.1cm]fa.south west)
+      {{\tikz[baseline=(s.base)]\node[signal, signal to=east, fill=CNsig, text=white, font=\CNcond\bfseries\large,
+          inner xsep=0.6em, inner ysep=0.25em] (s) {\CNprim{#1}};}\\[4mm]
+       {\fontsize{25}{31}\selectfont\bfseries\CNprim{#2}}\\[2.5mm]
+       {\large\color{white!70!CNink}\CNoth{#3}}};
+    % lower part: logo, people, term, generations
+    \node[anchor=north west] (logo) at ([xshift=1.8cm,yshift=-18.5cm]current page.north west)
+      {\includegraphics[height=3.1cm]{\CNroot/ferdowsi-logo.png}};
+    \node[anchor=north west, text=CNink, align=left] (ppl) at ([xshift=0.9cm, yshift=-0.1cm]logo.north east)
+      {{\color{CNsig}\CNcond\bfseries\small \CNprim{\CNlangNotes}}\\[1.5mm]
+       \href{\CNinstructorURL}{{\large\bfseries\CNprim{\CNlangInstructorLabel\ \CNlangInstructor}}}\\[1mm]
+       \href{\CNcompilerURL}{{\normalsize\color{CNcyanD}\CNprim{\CNlangCompiler}}}\\[1mm]
+       \href{\CNinstructorURL}{{\small\color{CNmuted}\CNoth{\CNlangInstructorOther}\quad{\ttfamily github.com/AminAzari}}}};
+    \begin{scope}[shift={([xshift=1.8cm,yshift=2.4cm]current page.south west)}]\CNgenline\end{scope}
+    \node[anchor=south east, text=CNink, align=right] at ([xshift=-1.8cm,yshift=1.95cm]current page.south east)
+      {{\large\bfseries\CNfaInLtr{نیمسال پاییز \CNyearfa}}\\[0.5mm]{\small\color{CNmuted}\CNcond FALL SEMESTER 2026-2027}};
+    \fill[CNink] (current page.south west) rectangle ([yshift=0.55cm]current page.south east);
+    \fill[CNsig] ([yshift=0.55cm]current page.south west) rectangle ([yshift=0.55cm, xshift=7cm]current page.south west);
+  \end{tikzpicture}%
+  \end{CNltr}%
+  \null\newpage}
+
+% module opener inside the full book: dark upper half, contents below
+\newcommand{\CNmoduleopener}[3]{%
+  \clearpage
+  \CNsetmodule{#1}{#2}{#3}%
+  \thispagestyle{empty}%
+  \addcontentsline{toc}{part}{\CNlangModule~#1\quad #2}%
+  \phantomsection\label{CNmod:#1}%
+  \begin{CNltr}%
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[CNink] (current page.north west) rectangle ([yshift=-12.2cm]current page.north east);
+    \begin{scope}[shift={(current page.north west)}, yshift=-12.2cm]
+      \CNhexgrid{21}{12.2}
+      \begin{scope}[yshift=0.35cm]\CNartdraw\end{scope}
+    \end{scope}
+    \fill[CNsig] ([yshift=-12.2cm]current page.north west) rectangle ([yshift=-12.45cm, xshift=7cm]current page.north west);
+    \node[text=CNsig, font=\CNcond\bfseries\fontsize{96}{96}\selectfont, anchor=north east]
+      at ([xshift=-1.7cm,yshift=-0.9cm]current page.north east) {\ifnum#1<10 0\fi#1};
+    \node[text=white, anchor=north west, align=left, text width=12.5cm]
+      at ([xshift=1.8cm,yshift=-1.6cm]current page.north west)
+      {{\color{CNamber}\CNcond\bfseries\large\CNprim{\CNlangModule~#1}}\\[3mm]
+       {\fontsize{25}{32}\selectfont\bfseries \CNprim{#2}}\\[2.5mm]{\large\color{white!70!CNink}\CNoth{#3}}};
+  \end{tikzpicture}%
+  \end{CNltr}%
+  \vspace*{10.2cm}}

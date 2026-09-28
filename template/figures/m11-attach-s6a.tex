@@ -1,0 +1,11 @@
+% Module 11 — S6a messages between MME and HSS during attach
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNactor, minimum width=2.4cm] (m) at (0,0) {MME}; \node[CNactor, minimum width=2.4cm] (h) at (8,0) {HSS};
+\draw[CNlife] (m.south) -- (0,-4.8); \draw[CNlife] (h.south) -- (8,-4.8);
+\draw[CNmsg] (0,-1.0) -- node[CNmlab, above] {AIR (IMSI, \CNL{visited PLMN}{\lr{PLMN} میزبان})} (8,-1.0);
+\node[CNnote, anchor=west] at (8.3,-1.45) {\CNL{generate auth vectors}{تولید بردارهای احراز هویت}};
+\draw[CNmsg] (8,-1.95) -- node[CNmlab, above] {AIA (RAND, AUTN, XRES, K\textsubscript{ASME})} (0,-1.95);
+\draw[CNmsg] (0,-3.0) -- node[CNmlab, above] {ULR (IMSI, \CNL{MME identity}{هویت \lr{MME}})} (8,-3.0);
+\node[CNnote, anchor=west, align=left] at (8.3,-3.5) {\CNL{store new MME location}{ذخیره مکان \lr{MME} جدید}\\\CNL{cancel old MME (if any)}{لغو \lr{MME} قبلی (در صورت وجود)}};
+\draw[CNmsg] (8,-4.15) -- node[CNmlab, above] {ULA (\CNL{subscription profile}{نمایه اشتراک})} (0,-4.15);
+\end{tikzpicture}

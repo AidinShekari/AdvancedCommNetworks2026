@@ -1,0 +1,19 @@
+% Module 8 — RACH attempts with power ramping and backoff
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, seg/.style={draw=CNinkL!70, minimum height=0.55cm, font=\sffamily\scriptsize, inner sep=2pt}]
+\node[CNtiny, anchor=east] at (-0.2,0) {\CNL{Attempt 1}{تلاش ۱}};
+\node[seg, fill=CNsig!15, minimum width=1.6cm, anchor=west] (a1) at (0,0) {Msg1};
+\node[seg, fill=white, minimum width=3.2cm, anchor=west] at (a1.east) {\CNL{wait RAR window}{انتظار پنجره \lr{RAR}}};
+\node[CNtiny, anchor=west] at (5.0,0) {(\CNL{no RAR received}{\lr{RAR} دریافت نشد})};
+\node[seg, fill=CNpaper, minimum width=4.8cm, anchor=west, dashed] at (0.3,-0.75) {backoff [0, BI]};
+\node[CNtiny, anchor=east] at (-0.2,-1.5) {\CNL{Attempt 2}{تلاش ۲}};
+\node[seg, fill=CNsig!25, minimum width=2.4cm, anchor=west] (b1) at (0,-1.5) {Msg1 (+2 dB)};
+\node[seg, fill=white, minimum width=1.6cm, anchor=west] at (b1.east) {\CNL{wait}{انتظار}};
+\node[CNtiny, anchor=west] at (4.2,-1.5) {(\CNL{RAR received, Msg3 collision}{\lr{RAR} دریافت شد، برخورد \lr{Msg3}})};
+\node[seg, fill=CNpaper, minimum width=4.8cm, anchor=west, dashed] at (0.3,-2.25) {backoff [0, BI]};
+\node[CNtiny, anchor=east] at (-0.2,-3.0) {\CNL{Attempt 3}{تلاش ۳}};
+\node[seg, fill=CNsig!35, minimum width=2.4cm, anchor=west] (c1) at (0,-3.0) {Msg1 (+4 dB)};
+\node[seg, fill=CNcyan!15, minimum width=1.4cm, anchor=west] (c2) at (c1.east) {Msg2};
+\node[seg, fill=CNcyan!15, minimum width=1.4cm, anchor=west] (c3) at (c2.east) {Msg3};
+\node[seg, fill=CNcyan!15, minimum width=1.4cm, anchor=west] (c4) at (c3.east) {Msg4};
+\node[font=\sffamily\small\bfseries, text=CNgreen, anchor=west] at ([xshift=2mm]c4.east) {\CNL{SUCCESS!}{موفق!}};
+\end{tikzpicture}

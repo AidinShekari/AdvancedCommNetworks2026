@@ -1,0 +1,9 @@
+% Module 10 — Diameter AVP structure
+\begin{tikzpicture}[CNfig]
+\CNbitruler
+\CNfield{0}{0}{32}{AVP Code}{CNsig!10}
+\foreach \f [count=\i from 0] in {V,M,P,r,r,r,r,r}{\CNfield{1}{\i}{1}{\f}{CNamber!20}}
+\CNfield{1}{8}{24}{AVP Length}{white}
+\CNfield{2}{0}{32}{Vendor-ID (\CNL{optional}{اختیاری})}{white}
+\CNfield{3}{0}{32}{Data \dots}{CNcyan!10}
+\end{tikzpicture}

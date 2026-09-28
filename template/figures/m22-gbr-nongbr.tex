@@ -1,0 +1,12 @@
+% Module 22 — GBR and non-GBR bearers
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNok, text width=6.4cm, align=left, minimum height=3.6cm, anchor=north west] (g) at (0,0) {};
+\node[font=\sffamily\small\bfseries, text=CNgreen, anchor=north west] at (0.2,-0.15) {\CNL{GBR bearer}{حامل \lr{GBR}}};
+\draw[CNgreen, line width=2.2pt] (0.3,-1.0) -- (2.3,-1.0) node[right, CNtiny, text=CNink, text width=3.8cm, align=left] {\CNL{Guaranteed Bit Rate (GBR) — guaranteed}{نرخ بیت تضمین‌شده (\lr{GBR}) — تضمین}};
+\draw[CNinkL, line width=0.9pt, dash pattern=on 4pt off 2pt] (0.3,-1.55) -- (2.3,-1.55) node[right, CNtiny, text=CNink, text width=3.8cm, align=left] {\CNL{Maximum Bit Rate (MBR) — cap}{نرخ بیت بیشینه (\lr{MBR}) — سقف}};
+\node[CNtiny, anchor=north west, align=left, text width=6.1cm] at (0.2,-2.0) {\CNL{Resources RESERVED at admission}{منابع هنگام پذیرش رزرو می‌شوند}\\\CNL{Used for: voice, video calls}{کاربرد: صدا، تماس تصویری}};
+\node[CNbox, text width=6.4cm, minimum height=3.6cm, anchor=north west] (n) at (7.2,0) {};
+\node[font=\sffamily\small\bfseries, text=CNinkL, anchor=north west] at (7.4,-0.15) {\CNL{Non-GBR bearer}{حامل \lr{Non-GBR}}};
+\draw[CNinkL, line width=1pt, decorate, decoration={snake, amplitude=1.3pt, segment length=6pt}] (7.5,-1.1) -- (10.6,-1.1) node[right, CNtiny, text=CNink] {\CNL{best effort}{بهترین تلاش}};
+\node[CNtiny, anchor=north west, align=left, text width=6.1cm] at (7.4,-1.6) {\CNL{No guaranteed rate}{بدون نرخ تضمین‌شده}\\\CNL{Limited by APN-AMBR / UE-AMBR}{محدود به \lr{APN-AMBR / UE-AMBR}}\\\CNL{No resource reservation}{بدون رزرو منابع}\\\CNL{Used for: web, email, apps}{کاربرد: وب، ایمیل، برنامه‌ها}};
+\end{tikzpicture}

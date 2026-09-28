@@ -1,0 +1,9 @@
+% Module 23 — GTP-U header: 8-byte mandatory part and optional fields
+\begin{tikzpicture}[CNfig]
+\CNbitruler
+\CNfield{0}{0}{3}{Ver}{CNcyan!12}\CNfield{0}{3}{1}{PT}{CNamber!20}\CNfield{0}{4}{1}{(*)}{CNamber!20}
+\CNfield{0}{5}{1}{E}{CNamber!20}\CNfield{0}{6}{1}{S}{CNamber!20}\CNfield{0}{7}{1}{PN}{CNamber!20}
+\CNfield{0}{8}{8}{Msg Type}{CNcyan!12}\CNfield{0}{16}{16}{Length}{white}
+\CNfield{1}{0}{32}{TEID (Tunnel Endpoint Identifier)}{CNcyan!20}
+\CNfield{2}{0}{16}{Sequence Number (opt)}{white}\CNfield{2}{16}{8}{N-PDU Number}{white}\CNfield{2}{24}{8}{Next Ext Hdr}{CNpaper}
+\end{tikzpicture}

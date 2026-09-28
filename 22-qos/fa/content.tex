@@ -1,0 +1,715 @@
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{1}{چرا \lr{\mbox{QoS}}؟}
+
+\CNchained\CNsubsection{}{مسیله: همه ترافیک‌ها برابر نیستند}
+
+کاربردهای مختلف نیازمندی‌های شبکه‌ای اساساً متفاوتی دارند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1475}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2623}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2623}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1803}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1475}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{خدمت} & \CNth{تحمل تأخیر} & \CNth{تحمل اتلاف} & \CNth{پهنای باند} & \CNth{الگو} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+صدا \lr{\mbox{(VoLTE)}} & بسیار کم (کمتر از \lr{\mbox{150ms}}) & کم (کمتر از 1\%) & کم \lr{(64~kbps)} & ثابت \\
+تماس ویدیویی & کم (کمتر از \lr{\mbox{300ms}}) & کم (کمتر از 1\%) & متوسط \lr{(1-5~Mbps)} & متغیر \\
+پخش جریانی ویدیو & متوسط (بافر کمتر از \lr{\mbox{5s}}) & بسیار کم & بالا \lr{(5-25~Mbps)} & انفجاری \\
+حسگر \lr{\mbox{IoT}} & بالا (ثانیه‌ها) & بسیار کم & بسیار کم \lr{\mbox{(kbps)}} & دوره‌ای \\
+مرور وب & متوسط (کمتر از \lr{\mbox{1s}}) & هیچ (بازارسال \lr{\mbox{TCP}}) & متغیر & انفجاری \\
+ایمیل & بالا (ثانیه‌ها) & هیچ (بازارسال \lr{\mbox{TCP}}) & کم & انفجاری \\
+رانندگی خودران & فوق‌العاده کم (کمتر از \lr{\mbox{10ms}}) & فوق‌العاده کم & متوسط & ثابت \\
+\end{longtable}
+}
+
+\CNsubsection{}{بدون \lr{\mbox{QoS}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  تماس‌های صوتی در حین ازدحام بریده‌بریده می‌شوند
+\item
+  ویدیو متوقف می‌شود در حالی که دانلودهای پس‌زمینه ادامه دارند
+\item
+  خدمات اضطراری با شبکه‌های اجتماعی رقابت می‌کنند
+\item
+  بسته‌های کنترل صنعتی توسط انتقال‌های انبوه به تأخیر می‌افتند
+\end{itemize}
+
+\CNsubsection{}{هدف \lr{\mbox{QoS}}:}
+
+\textbf{تمایز ترافیک و ارایه رفتار مناسب به هر خدمت بر اساس نیازمندی‌های آن.}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{تحول \lr{\mbox{QoS}} در نسل‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{2G}}} & \CNth{\lr{\mbox{3G}}} & \CNth{\lr{\mbox{LTE (4G)}}} & \CNth{\lr{\mbox{5G NR}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{بدون \lr{\mbox{QoS}}} (همه سوییچینگ مداری) & \textbf{۴ کلاس ترافیکی} & \textbf{\lr{\mbox{QoS}} مبتنی بر حامل} (\lr{\mbox{QCI}} + حامل) & \textbf{\lr{\mbox{QoS}} مبتنی بر جریان} (\lr{\mbox{5QI}} + جریان \lr{\mbox{QoS}}) \\
+کیفیت یکسان برای همه & مکالمه‌ای، جریانی، تعاملی، پس‌زمینه & ۹ \lr{\mbox{QCI}} استاندارد؛ \lr{GBR /\allowbreak{} Non-GBR}؛ حامل‌های پیش‌فرض + اختصاصی & ۹۰ \lr{\mbox{5QI}} استاندارد؛ \lr{GBR /\allowbreak{} Non-GBR /\allowbreak{} DC-GBR}؛ \lr{\mbox{QoS}} بازتابی؛ دانه‌بندی ظریف \\
+\end{longtable}
+}
+
+\CNsubsection{}{\lr{\mbox{2G (GSM)}}: بدون \lr{\mbox{QoS}} واقعی}
+
+\begin{itemize}
+\tightlist
+\item
+  همه خدمات \textbf{مدار-گزارشی} هستند
+\item
+  هر تماس یک شکاف زمانی اختصاصی می‌گیرد \ensuremath{\leftarrow} کیفیت یکسان برای همه
+\item
+  نیازی به تمایز نیست (فقط صدا + \lr{\mbox{SMS}})
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{\lr{3G (UMTS)}: چهار کلاس ترافیک}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کلاس} & \CNth{تأخیر} & \CNth{مثال} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+مکالمه‌ای & سختگیرانه (کمتر از \lr{\mbox{150ms}}) & صدا، تماس ویدیویی \\
+پخش جریانی & متوسط (کمتر از \lr{\mbox{1s}}) & پخش جریانی ویدیو \\
+تعاملی & متغیر & مرور وب \\
+پس‌زمینه & بهترین تلاش & ایمیل، دانلودها \\
+\end{longtable}
+}
+
+\CNsubsection{}{\lr{\mbox{LTE (4G)}}: \lr{\mbox{QoS}} مبتنی بر حامل}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{حامل‌های \lr{\mbox{EPS}}} با پارامترهای \lr{\mbox{QoS}} مشخص معرفی شدند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{QCI}}}}} (شناسه کلاس \lr{\mbox{QoS}}): کلاس‌های استانداردشده
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{ARP}}}}} (اولویت تخصیص و نگهداری)
+\item
+  حامل‌های \lr{\mbox{\textbf{\lr{\mbox{GBR}}}}} (نرخ بیت تضمین‌شده) در برابر \lr{\mbox{\textbf{\lr{\mbox{Non-GBR}}}}}
+\end{itemize}
+
+\CNsubsection{}{\lr{\mbox{5G NR}}: \lr{\mbox{QoS}} مبتنی بر جریان}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{جریان‌های \lr{\mbox{QoS}}} شناسایی‌شده با \lr{\mbox{\textbf{\lr{\mbox{QFI}}}}} (شناسه جریان \lr{\mbox{QoS}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{5QI}}}}} جایگزین \lr{\mbox{QCI}} با مقادیر بیشتر می‌شود
+\item
+  \textbf{\lr{\mbox{QoS}} بازتابی} برای رفتار \lr{\mbox{UL}} ساده‌شده
+\item
+  دانه‌بندی دقیق‌تر: چندین جریان در هر نشست \lr{\mbox{PDU}}
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-eps-bearer}{8}
+
+\CNsection{3}{\lr{\mbox{QoS}} مبتنی بر حامل در \lr{\mbox{LTE}}}
+
+\CNchained\CNsubsection{}{مفهوم حامل}
+
+\CNfigure{m22-eps-bearer}{حامل \lr{\mbox{EPS}} زنجیره‌ای از حامل‌های رادیویی، \lr{\mbox{S1}} و \lr{S5/\allowbreak{}S8} است}
+
+\textbf{حامل = تونل \lr{\mbox{GTP-U}} با پارامترهای \lr{\mbox{QoS}} مشخص (\lr{QCI + ARP} + نرخ بیت)}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{حامل‌های پیش‌فرض در برابر اختصاصی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{حامل پیش‌فرض} & \CNth{حامل اختصاصی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ایجاد & در اتصال \lr{\mbox{PDU}} (اتصال) & در صورت تقاضا (با محرک) \\
+طول عمر & همیشه فعال (تا جداسازی) & موقت (قابل آزادسازی) \\
+\lr{\mbox{QoS}} & بهترین تلاش \lr{\mbox{(QCI 9)}} & \lr{\mbox{QoS}} مشخص (هر \lr{\mbox{QCI}}) \\
+نوع & همیشه \lr{\mbox{Non-GBR}} & \lr{\mbox{GBR}} یا \lr{\mbox{Non-GBR}} \\
+آدرس \lr{\mbox{IP}} & همراه حامل تخصیص می‌یابد & \lr{\mbox{IP}} پیش‌فرض را به اشتراک می‌گذارد \\
+هدف & دسترسی اینترنت & \lr{\mbox{VoLTE}}، ویدیو، بازی \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{جدول \lr{\mbox{QCI}} (مقادیر استانداردشده)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.0562}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1573}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1124}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2247}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2584}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1910}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{QCI}}} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{نوع منبع}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{اولویت}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{بودجه تأخیر بسته}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{نرخ اتلاف خطای بسته}
+\end{minipage} & \CNth{خدمات نمونه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{GBR}} & 2 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-2}}} & صدای مکالمه‌ای \\
+2 & \lr{\mbox{GBR}} & 4 & \lr{\mbox{150~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & ویدیوی مکالمه‌ای \\
+3 & \lr{\mbox{GBR}} & 3 & \lr{\mbox{50~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & بازی بلادرنگ \\
+4 & \lr{\mbox{GBR}} & 5 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیوی غیرمکالمه‌ای (بافر‌شده) \\
+5 & \lr{\mbox{Non-GBR}} & 1 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & سیگنالینگ \lr{\mbox{IMS}} \\
+6 & \lr{\mbox{Non-GBR}} & 6 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو (بافر‌شده)، وب \lr{\mbox{TCP}} \\
+7 & \lr{\mbox{Non-GBR}} & 7 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & صدا، ویدیوی زنده، بازی \\
+8 & \lr{\mbox{Non-GBR}} & 8 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو (بافر‌شده)، وب \lr{\mbox{TCP}} \\
+9 & \lr{\mbox{Non-GBR}} & 9 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو، \lr{\mbox{TCP}}، ایمیل، چت \\
+\end{longtable}
+}
+
+\Needspace{23\baselineskip}
+
+\CNsubsubsection{مقادیر \lr{\mbox{QCI}} مأموریت-حیاتی \lr{(MCX) (65-82)}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}lcccl@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{QCI}}} & \CNth{نوع منبع} & \CNth{اولویت} & \CNth{تأخیر} & \CNth{مثال} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+65 & \lr{\mbox{GBR}} & \CNnum{0.7} & \lr{\mbox{75~ms}} & صدای \lr{\mbox{MC-PTT}} \\
+66 & \lr{\mbox{GBR}} & 2 & \lr{\mbox{100~ms}} & \lr{\mbox{MC}}-ویدیو (غیر بلادرنگ) \\
+67 & \lr{\mbox{GBR}} & \CNnum{1.5} & \lr{\mbox{100~ms}} & \lr{\mbox{MC-PTT}} ویدیو \\
+69 & \lr{\mbox{Non-GBR}} & \CNnum{0.5} & \lr{\mbox{60~ms}} & سیگنالینگ \lr{\mbox{MC-PTT}} \\
+70 & \lr{\mbox{Non-GBR}} & \CNnum{5.5} & \lr{\mbox{200~ms}} & داده \lr{\mbox{MC}} \\
+75 & \lr{\mbox{GBR}} & \CNnum{2.5} & \lr{\mbox{50~ms}} & پیام‌های \lr{\mbox{V2X}} \\
+79 & \lr{\mbox{Non-GBR}} & \CNnum{6.5} & \lr{\mbox{50~ms}} & پیام‌های \lr{\mbox{V2X}} \\
+82 & \lr{\mbox{GBR}} & \CNnum{1.9} & \lr{\mbox{10~ms}} & خودکارسازی گسسته \\
+83 & \lr{\mbox{GBR}} & \CNnum{2.2} & \lr{\mbox{10~ms}} & خودکارسازی گسسته \\
+\end{longtable}
+}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{ARP}} (اولویت تخصیص و نگهداری)}
+
+\lr{\mbox{ARP}} تعیین می‌کند آیا یک حامل می‌تواند در حین ازدحام برقرار شود:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3929}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3214}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{مقادیر} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+سطح اولویت & \CNnum{1-15} (\lr{\mbox{1}}=بالاترین) & اهمیت نسبی \\
+قابلیت پیش‌گیری & بله/\allowbreak{}خیر & آیا این حامل می‌تواند دیگران را پیش‌گیری کند؟ \\
+آسیب‌پذیری پیش‌گیری & بله/\allowbreak{}خیر & آیا این حامل می‌تواند پیش‌گیری شود؟ \\
+\end{longtable}
+}
+
+\textbf{سناریوی نمونه:}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Congestion situation - resources are full:
+
+Bearer A: Priority=5, Pre-emption Capability=Yes
+Bearer B: Priority=10, Pre-emption Vulnerability=Yes
+
+→ Bearer A can preempt (remove) Bearer B to get resources
+→ Emergency calls (Priority=1) can preempt regular calls
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNkeepfig{m22-gbr-nongbr}{3}
+
+\CNsubsection{}{حامل‌های \lr{\mbox{GBR}} در برابر \lr{\mbox{Non-GBR}}}
+
+\CNfigure{m22-gbr-nongbr}{حامل‌های \lr{\mbox{GBR}} و \lr{\mbox{Non-GBR}}}
+
+\CNsubsection{}{محدودیت‌های \lr{\mbox{QoS}} در \lr{\mbox{LTE}}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{دانه‌بندی درشت}: یک \lr{\mbox{QCI}} در هر حامل \ensuremath{\leftarrow} یک حامل در هر نوع خدمت
+\item
+  \textbf{سربار حامل}: هر \lr{\mbox{QCI}} جدید نیازمند یک تونل \lr{\mbox{GTP}} جدید است
+\item
+  \textbf{پر سیگنالینگ}: راه‌اندازی حامل اختصاصی نیازمند سیگنالینگ کامل \lr{NAS/\allowbreak{}S1AP} است
+\item
+  \textbf{غیرانعطاف‌پذیر}: نمی‌توان ترافیک با \lr{\mbox{QoS}} متفاوت را در یک حامل ترکیب کرد
+\item
+  \textbf{\lr{\mbox{QCI}}های محدود}: فقط 9 مقدار استاندارد (با \lr{\mbox{MCX}} به حدود 20 گسترش یافته)
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-qos-flows}{8}
+
+\CNsection{4}{\lr{\mbox{QoS}} مبتنی بر جریان در \lr{\mbox{5G}}}
+
+\CNchained\CNsubsection{}{مفهوم کلیدی: جریان \lr{\mbox{QoS}}}
+
+\CNfigure{m22-qos-flows}{جریان‌های \lr{\mbox{QoS}} درون یک نشست \lr{\mbox{PDU}} یک تونل \lr{\mbox{GTP-U}} مشترک دارند}
+
+\textbf{تفاوت‌های کلیدی با \lr{\mbox{LTE}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  چندین جریان \lr{\mbox{QoS}} یک نشست \lr{\mbox{PDU}} واحد (یک تونل \lr{\mbox{GTP}}) را به اشتراک می‌گذارند
+\item
+  \lr{\mbox{QFI}} (6 بیتی) جریان را درون تونل شناسایی می‌کند
+\item
+  نیازی به ایجاد/\allowbreak{}حذف حامل‌ها نیست \ensuremath{\leftarrow} سیگنالینگ کمتر
+\item
+  دانه‌بندی دقیق‌تر با سربار کمتر
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{جدول \lr{\mbox{5QI}} (مقادیر استاندارد کلیدی)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.0633}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1772}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1266}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1772}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2405}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2152}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{5QI}}} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{نوع منبع}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{اولویت}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{تأخیر بسته}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{نرخ خطای بسته}
+\end{minipage} & \CNth{خدمات نمونه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{GBR}} & 20 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-2}}} & صدای مکالمه‌ای \\
+2 & \lr{\mbox{GBR}} & 40 & \lr{\mbox{150~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & ویدیوی مکالمه‌ای \\
+3 & \lr{\mbox{GBR}} & 30 & \lr{\mbox{50~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & بازی بلادرنگ \\
+4 & \lr{\mbox{GBR}} & 50 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیوی غیرمکالمه‌ای (بافر‌شده) \\
+5 & \lr{\mbox{Non-GBR}} & 10 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & سیگنالینگ \lr{\mbox{IMS}} \\
+6 & \lr{\mbox{Non-GBR}} & 60 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو، \lr{\mbox{TCP}} (پیش‌فرض) \\
+7 & \lr{\mbox{Non-GBR}} & 70 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & صدا، ویدیو، بازی \\
+8 & \lr{\mbox{Non-GBR}} & 80 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو، وب \lr{\mbox{TCP}} \\
+9 & \lr{\mbox{Non-GBR}} & 90 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو، \lr{\mbox{TCP}}، ایمیل (پیش‌فرض) \\
+65 & \lr{\mbox{GBR}} & 7 & \lr{\mbox{75~ms}} & \lr{\mbox{10\textsuperscript{-2}}} & صدای \lr{\mbox{MC-PTT}} \\
+66 & \lr{\mbox{GBR}} & 20 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-2}}} & صدای غیر-\lr{\mbox{MC-PTT}} \\
+67 & \lr{\mbox{GBR}} & 15 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & \lr{\mbox{MC}} ویدیو \\
+69 & \lr{\mbox{Non-GBR}} & 5 & \lr{\mbox{60~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & سیگنالینگ \lr{\mbox{MC-PTT}} \\
+70 & \lr{\mbox{Non-GBR}} & 55 & \lr{\mbox{200~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & داده \lr{\mbox{MC}} \\
+79 & \lr{\mbox{Non-GBR}} & 65 & \lr{\mbox{50~ms}} & \lr{\mbox{10\textsuperscript{-2}}} & پیام‌های \lr{\mbox{V2X}} \\
+80 & \lr{\mbox{Non-GBR}} & 68 & \lr{\mbox{10~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & \lr{\mbox{eMBB}} کم-تأخیر \\
+82 & \lr{\mbox{DC-GBR}} & 19 & \lr{\mbox{10~ms}} & \lr{\mbox{10\textsuperscript{-4}}} & خودکارسازی گسسته (کوچک) \\
+83 & \lr{\mbox{DC-GBR}} & 22 & \lr{\mbox{10~ms}} & \lr{\mbox{10\textsuperscript{-4}}} & خودکارسازی گسسته (بزرگ) \\
+84 & \lr{\mbox{DC-GBR}} & 24 & \lr{\mbox{30~ms}} & \lr{\mbox{10\textsuperscript{-5}}} & حمل‌ونقل هوشمند \\
+85 & \lr{\mbox{DC-GBR}} & 21 & \lr{\mbox{5~ms}} & \lr{\mbox{10\textsuperscript{-5}}} & توزیع برق \\
+86 & \lr{\mbox{GBR}} & 18 & \lr{\mbox{5~ms}} & \lr{\mbox{10\textsuperscript{-4}}} & \lr{\mbox{V2X}} (کاروانی) \\
+87 & \lr{\mbox{DC-GBR}} & 25 & \lr{\mbox{5~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & خدمات تعاملی (حرکت) \\
+88 & \lr{\mbox{DC-GBR}} & 23 & \lr{\mbox{10~ms}} & \lr{\mbox{10\textsuperscript{-4}}} & خدمات تعاملی (فرمان) \\
+89 & \lr{\mbox{DC-GBR}} & 26 & \lr{\mbox{15~ms}} & \lr{\mbox{10\textsuperscript{-4}}} & محتوای بصری (بازی ابری) \\
+90 & \lr{\mbox{DC-GBR}} & 27 & \lr{\mbox{20~ms}} & \lr{\mbox{10\textsuperscript{-4}}} & محتوای بصری (\lr{AR/\allowbreak{}XR} ابری) \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\lr{\textbf{\lr{\mbox{DC-GBR}}} = GBR} حساس-به-تأخیر (جدید در \lr{\mbox{5G}})
+
+\end{CNquote}
+
+\CNkeepfig{m22-qos-rule}{5}
+
+\CNsubsection{}{قواعد \lr{\mbox{QoS}}}
+
+قواعد \lr{\mbox{QoS}} به \lr{\mbox{UE}} می‌گویند چگونه ترافیک پیوند بالاسو را طبقه‌بندی کند:
+
+\CNfigure{m22-qos-rule}{ساختار یک قاعده \lr{\mbox{QoS}} به همراه قواعد نمونه}
+
+\CNsubsection{}{\lr{\mbox{QoS}} بازتابی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  شبکه یک بسته \lr{\mbox{DL}} با \lr{\mbox{QFI = X}} و \lr{\mbox{RQI = 1}} (نشانگر \lr{\mbox{QoS}} بازتابی) ارسال می‌کند.
+\item
+  \lr{\mbox{UE}} سرآیندهای بسته \lr{\mbox{DL}} را مشاهده می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{IP}}/\allowbreak{}درگاه مبدأ \ensuremath{\leftarrow} به مقصد \lr{\mbox{UL}} تبدیل می‌شود
+  \item
+    \lr{\mbox{IP}}/\allowbreak{}درگاه مقصد \ensuremath{\leftarrow} به مبدأ \lr{\mbox{UL}} تبدیل می‌شود
+  \item
+    \lr{QFI = X \ensuremath{\leftarrow} UE} برای پاسخ از همان \lr{\mbox{QFI}} استفاده می‌کند
+  \end{itemize}
+\item
+  \lr{\mbox{UE}} به‌طور خودکار یک «قاعده \lr{\mbox{QoS}} استخراج‌شده» می‌سازد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    نیازی به سیگنالینگ صریح قاعده \lr{\mbox{QoS}} نیست
+  \item
+    قاعده مبتنی بر زمان‌سنج است: به مدت زمان‌سنج \lr{\mbox{RQ}} معتبر است
+  \end{itemize}
+\end{enumerate}
+
+\textbf{مزیت:} کاهش سیگنالینگ برای برقراری قواعد \lr{\mbox{QoS}}. \textbf{کاربرد:} وقتی \lr{\mbox{UE}} نشانی \lr{\mbox{IP}} سرور را از قبل نمی‌داند.
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-qos-mapping}{8}
+
+\CNsection{5}{نگاشت و اجرای \lr{\mbox{QoS}}}
+
+\CNchained\CNsubsection{}{نمودار نگاشت \lr{\mbox{QoS}} سرتاسری}
+
+\CNfigure{m22-qos-mapping}{نگاشت سرتاسری \lr{\mbox{QoS}} در \lr{\mbox{5G}}: \lr{\mbox{SDF}} \ensuremath{\to} جریان \lr{QoS \ensuremath{\to} DRB}}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{نقش هر عنصر شبکه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3214}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3571}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3214}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنصر} & \CNth{نقش \lr{\mbox{QoS}}} & \CNth{اقدامات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{PCF}}}}} & تصمیم سیاست & قواعد \lr{\mbox{PCC}} را ایجاد می‌کند، \lr{5QI/\allowbreak{}ARP} را تعیین می‌کند، به \lr{\mbox{SMF}} می‌فرستد \\
+\lr{\mbox{\textbf{\lr{\mbox{SMF}}}}} & کنترل \lr{\mbox{QoS}} & پروفایل‌های \lr{\mbox{QoS}} را مشتق می‌کند، قواعد \lr{\mbox{QoS}} را نصب می‌کند، \lr{\mbox{UPF}} را پیکربندی می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} & اجرای \lr{\mbox{DL}} & تشخیص \lr{\mbox{SDF}}، علامت‌گذاری \lr{\mbox{QFI}}، دروازه‌بندی، پلیسینگ، محدودسازی نرخ \\
+\lr{\mbox{\textbf{\lr{\mbox{gNB}}}}} & زمان‌بندی رادیویی & جریان‌های \lr{\mbox{QoS}} را به \lr{\mbox{DRB}}ها نگاشت می‌کند، بر اساس \lr{\mbox{5QI}} زمان‌بندی می‌کند، \lr{\mbox{AMBR}} را اجرا می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{UE}}}}} & طبقه‌بندی \lr{\mbox{UL}} & قواعد \lr{\mbox{QoS}} را اعمال می‌کند، بسته‌های \lr{\mbox{UL}} را به جریان‌های \lr{\mbox{QoS}} نگاشت می‌کند \\
+\end{longtable}
+}
+
+\CNkeepfig{m22-enforcement}{3}
+
+\CNsubsection{}{معماری اجرای \lr{\mbox{QoS}}}
+
+\CNfigure{m22-enforcement}{معماری سیاست‌گذاری و اعمال \lr{\mbox{QoS}}}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-bearer-vs-flow}{8}
+
+\CNsection{6}{مقایسه حامل در برابر جریان}
+
+\CNchained\CNsubsection{}{معماری کنار-به-کنار}
+
+\CNfigure{m22-bearer-vs-flow}{\lr{\mbox{QoS}} مبتنی بر حامل در \lr{\mbox{LTE}} در برابر \lr{\mbox{QoS}} مبتنی بر جریان در \lr{\mbox{5G}}}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{جدول مقایسه تفصیلی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1818}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4318}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3864}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{LTE}} (مبتنی بر حامل)} & \CNth{\lr{\mbox{5G}} (مبتنی بر جریان)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+واحد \lr{\mbox{QoS}} & حامل \lr{\mbox{EPS}} & جریان \lr{\mbox{QoS}} \\
+شناسه & \lr{\mbox{EBI}} (شناسه حامل \lr{\mbox{EPS}}) & \lr{\mbox{QFI}} (شناسه جریان \lr{\mbox{QoS}}، 6 بیتی) \\
+کلاس \lr{\mbox{QoS}} & \lr{QCI (1-9 + MCX)} & \lr{5QI (1-90+)} \\
+دانه‌بندی & درشت (\lr{\mbox{1 QCI}}/\allowbreak{}حامل) & دقیق (در هر جریان) \\
+تونل & \lr{\mbox{1 GTP-U}} در هر حامل & \lr{\mbox{1 GTP-U}} در هر نشست \lr{\mbox{PDU}} \\
+راه‌اندازی & سیگنالینگ \lr{\mbox{NAS}} در هر حامل & نصب قاعده \lr{\mbox{QoS}} (سبک‌تر) \\
+طبقه‌بندی \lr{\mbox{UL}} & \lr{\mbox{TFT}} (فیلتر بسته پیوند بالاسو) & قواعد \lr{\mbox{QoS}} \\
+طبقه‌بندی \lr{\mbox{DL}} & \lr{\mbox{TFT}} در \lr{\mbox{P-GW}} & قالب \lr{\mbox{SDF}} در \lr{\mbox{UPF}} \\
+کلاس \lr{\mbox{QoS}} جدید & حامل جدید (سیگنالینگ سنگین) & جریان جدید (سبک) \\
+اشتراک‌گذاری & بدون اشتراک بین حامل‌ها & جریان‌ها تونل را به اشتراک می‌گذارند \\
+\lr{\mbox{QoS}} بازتابی & پشتیبانی نمی‌شود & پشتیبانی می‌شود \lr{\mbox{(RQI)}} \\
+انواع منابع & \lr{\mbox{GBR}}، \lr{\mbox{Non-GBR}} & \lr{\mbox{GBR}}، \lr{\mbox{Non-GBR}}، \lr{\mbox{DC-GBR}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-resource-types}{8}
+
+\CNsection{7}{\lr{\mbox{GBR}} در برابر \lr{\mbox{Non-GBR}} در برابر \lr{\mbox{GBR}} حساس-به-تأخیر}
+
+\CNchained\CNsubsection{}{سه نوع منبع در \lr{\mbox{5G}}}
+
+\CNfigure{m22-resource-types}{سه نوع منبع \lr{\mbox{QoS}} در \lr{\mbox{5G}}}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{پارامترها بر اساس نوع منبع}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}lccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{\lr{\mbox{GBR}}} & \CNth{\lr{\mbox{Non-GBR}}} & \CNth{\lr{\mbox{DC-GBR}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{5QI}} & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNyes{}}} \\
+\lr{\mbox{ARP}} & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNyes{}}} \\
+\lr{\mbox{GFBR}} (نرخ بیت جریان تضمین‌شده) & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} \\
+\lr{\mbox{MFBR}} (حداکثر نرخ بیت جریان) & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} \\
+\lr{Session-AMBR} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNno{}}} \\
+حداکثر حجم انفجار داده & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} \\
+بودجه تأخیر بسته & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNyes{}}} (سختگیرانه) \\
+کنترل پذیرش & لازم & لازم نیست & لازم \\
+رزرو منابع & بله & خیر & بله \\
+\end{longtable}
+}
+
+\CNsubsection{}{توضیح پارامترهای نرخ}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{GFBR}} = نرخ بیت تضمین‌شده جریان \lr{(Guaranteed Flow Bit Rate)}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    شبکه باید دست‌کم این نرخ را فراهم کند
+  \item
+    در شرایط ازدحام، جریان‌های \lr{\mbox{GBR}} تا سقف \lr{\mbox{GFBR}} محافظت می‌شوند
+  \end{itemize}
+\item
+  \textbf{\lr{\mbox{MFBR}} = نرخ بیت بیشینه جریان \lr{(Maximum Flow Bit Rate)}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    شبکه می‌تواند تا این نرخ فراهم کند
+  \item
+    ترافیک بیش از \lr{\mbox{MFBR}} حذف یا شکل‌دهی می‌شود
+  \end{itemize}
+\end{itemize}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مثال} & \CNth{\lr{\mbox{GFBR}}} & \CNth{\lr{\mbox{MFBR}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{VoLTE}} & \lr{\mbox{40~kbps}} (نرخ کدک \lr{\mbox{AMR-NB}}) & \lr{\mbox{80~kbps}} (با حاشیه سربار) \\
+تماس تصویری & \lr{\mbox{1~Mbps}} (حداقل کیفیت قابل قبول) & \lr{\mbox{4~Mbps}} (کیفیت \lr{\mbox{HD}} در صورت وجود منابع) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-ambr}{8}
+
+\CNsection{8}{\lr{\mbox{AMBR}} (حداکثر نرخ بیت تجمیعی)}
+
+\CNchained\CNsubsection{}{سلسله‌مراتب \lr{\mbox{AMBR}}}
+
+\CNfigure{m22-ambr}{سلسله‌مراتب \lr{\mbox{AMBR}}: \lr{\mbox{UE-AMBR}} بالای \lr{Session-AMBR}؛ جریان‌های \lr{\mbox{GBR}} مستثنی هستند}
+
+\Needspace{12\baselineskip}
+
+\CNsubsection{}{نقاط اجرای \lr{\mbox{AMBR}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2619}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1667}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3095}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2619}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع \lr{\mbox{AMBR}}} & \CNth{دامنه} & \CNth{اجرا در} & \CNth{اعمال بر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE-AMBR}} & تمام نشست‌ها & \lr{gNB (RAN)} & تمام جریان‌های \lr{\mbox{Non-GBR}}، تمام نشست‌ها \\
+\lr{Session-AMBR} & در هر نشست \lr{\mbox{PDU}} & \lr{\mbox{UPF}} & جریان‌های \lr{\mbox{Non-GBR}} در آن نشست \\
+\end{longtable}
+}
+
+\textbf{قواعد کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{AMBR}} \textbf{فقط} بر جریان‌های \lr{\mbox{Non-GBR}} اعمال می‌شود
+\item
+  جریان‌های \lr{\mbox{GBR}} با \lr{\mbox{MFBR}} خود محدود می‌شوند، نه \lr{\mbox{AMBR}}
+\item
+  \lr{UE-AMBR \ensuremath{\ge}} مجموع \lr{Session-AMBR}ها (به‌طور منطقی)
+\item
+  به‌طور جداگانه برای \lr{\mbox{UL}} و \lr{\mbox{DL}} اجرا می‌شود
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-qos-signalling}{8}
+
+\CNsection{9}{معماری اجرای \lr{\mbox{QoS}}}
+
+\CNchained\CNsubsection{}{سیگنالینگ \lr{\mbox{QoS}} سرتاسری کامل}
+
+\CNfigure{m22-qos-signalling}{سیگنالینگ و اعمال سرتاسری کامل \lr{\mbox{QoS}}}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{خلاصه اقدامات اجرایی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1579}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3947}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4474}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گره} & \CNth{اقدامات پیوند بالاسو} & \CNth{اقدامات پیوند پایین‌سو} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{UE}}}}} & طبقه‌بندی بسته‌ها با استفاده از قواعد \lr{\mbox{QoS}}، علامت‌گذاری \lr{\mbox{QFI}} & دریافت و پردازش \\
+\lr{\mbox{\textbf{\lr{\mbox{gNB}}}}} & نگاشت جریان‌های \lr{\mbox{QoS}} به \lr{\mbox{DRB}}ها، اجرای \lr{\mbox{UE-AMBR}} & زمان‌بندی بر اساس اولویت \lr{\mbox{5QI}}، نگاشت \lr{\mbox{DRB}} به جریان‌ها \\
+\lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} & تأیید \lr{\mbox{QFI}}، اجرای \lr{Session-AMBR} & تشخیص \lr{\mbox{SDF}}، علامت‌گذاری \lr{\mbox{QFI}}، دروازه‌بندی/\allowbreak{}پلیسینگ/\allowbreak{}شکل‌دهی \\
+\lr{\mbox{\textbf{\lr{\mbox{SMF}}}}} & پیکربندی \lr{\mbox{UPF (N4)}}، سیگنالینگ \lr{\mbox{gNB (N2)}}، سیگنالینگ \lr{\mbox{UE (N1)}} & همان \\
+\lr{\mbox{\textbf{\lr{\mbox{PCF}}}}} & تولید قواعد \lr{\mbox{PCC}} از سیاست & همان \\
+\end{longtable}
+}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{خلاصه: نکات کلیدی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مفهوم} & \CNth{نکته کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+هدف \lr{\mbox{QoS}} & خدمات مختلف نیازمند رفتار شبکه‌ای متفاوتی هستند \\
+\lr{QCI (LTE)} & 9 کلاس استاندارد، یکی در هر حامل \\
+\lr{\mbox{5QI (5G)}} & بیش از 90 کلاس، در هر جریان \lr{\mbox{QoS}} \\
+حامل \lr{\mbox{(LTE)}} & نگاشت \CNnum{1:1} با \lr{\mbox{QCI}}، تونل \lr{\mbox{GTP}} جدا \\
+جریان \lr{\mbox{QoS (5G)}} & چندین جریان یک نشست \lr{\mbox{PDU}} را به اشتراک می‌گذارند، سیگنالینگ سبک‌تر \\
+\lr{\mbox{GBR}} & نرخ تضمین‌شده، کنترل پذیرش، منبع رزروشده \\
+\lr{\mbox{Non-GBR}} & بهترین تلاش، محدودشده با \lr{\mbox{AMBR}} \\
+\lr{\mbox{DC-GBR}} & \lr{\mbox{GBR}} + تأخیر کران‌دار \lr{\mbox{(MDBV)}}، برای \lr{\mbox{URLLC}} \\
+\lr{\mbox{AMBR}} & سقف تجمیعی بر \lr{\mbox{Non-GBR}} (سطح \lr{\mbox{UE}} و سطح نشست) \\
+\lr{\mbox{QoS}} بازتابی & \lr{\mbox{UE}} مقدار \lr{\mbox{QoS}} پیوند بالاسو را از پیوند پایین‌سو مشتق می‌کند (کاهش سیگنالینگ) \\
+\lr{\mbox{PCF}} & مغز سیاست، قواعد \lr{\mbox{PCC}} را ایجاد می‌کند \\
+\lr{\mbox{UPF}} & طبقه‌بند و مجری \lr{\mbox{DL}} \\
+\lr{\mbox{gNB}} & زمان‌بند رادیویی، نگاشت \lr{\mbox{DRB}}، \lr{\mbox{UE-AMBR}} \\
+\end{longtable}
+}
+
+\Needspace{22\baselineskip}
+
+\CNsection{}{مرجع سریع \lr{\mbox{QCI}} در برابر \lr{\mbox{5QI}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{\lr{QCI (LTE)}} & \CNth{\lr{\mbox{5QI (5G)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+مقادیر & \CNnum{1-9} استاندارد + \lr{65-82 MCX} & بیش از \CNnum{1-90} استانداردشده \\
+انواع منابع & \lr{\mbox{GBR}}، \lr{\mbox{Non-GBR}} & \lr{\mbox{GBR}}، \lr{\mbox{Non-GBR}}، \lr{\mbox{DC-GBR}} \\
+مقیاس اولویت & \CNnum{1-9} (\lr{\mbox{1}}=بالاترین) & \CNnum{1-127} (\lr{\mbox{1}}=بالاترین) \\
+مرتبط با & حامل \lr{\mbox{EPS}} & جریان \lr{\mbox{QoS}} \\
+محدوده تأخیر & \lr{50-300~ms} & \lr{\mbox{5-300~ms}} \\
+دسته جدید & \lr{\mbox{—}} & \lr{\mbox{GBR}} حساس-به-تأخیر \\
+پشتیبانی \lr{\mbox{URLLC}} & محدود & بومی (تأخیر \lr{\mbox{5ms}}، اتلاف \lr{\mbox{10\textsuperscript{-5}}}) \\
+\end{longtable}
+}
+
+\emph{ماژول 22 \lr{—} کیفیت خدمات \lr{\mbox{(QoS)}} \lr{—} شبکه‌های ارتباطی پیشرفته}

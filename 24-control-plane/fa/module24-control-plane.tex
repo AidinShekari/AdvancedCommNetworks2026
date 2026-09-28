@@ -1,0 +1,24 @@
+% !TEX program = xelatex
+% Advanced Communication Networks — Fall 2026-2027 (Persian)
+% Instructor: Amin Azari — compile with XeLaTeX (or tectonic).
+\documentclass[11pt]{article}
+\def\CNroot{../../template}
+\input{\CNroot/acn-fa}
+\CNsetmodule{24}{صفحه کنترل}{Control Plane}
+\begin{document}
+\CNcoverpage{ماژول ۲۴}{صفحه کنترل}{Control Plane}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{مفهوم صفحه کنترل}
+\CNtocitem{2}{2}{پروتکل‌های صفحه کنترل \lr{—} جدول مرجع اصلی}
+\CNtocitem{3}{3}{\lr{\mbox{NAS}} (لایه غیر-دسترسی)}
+\CNtocitem{4}{4}{\lr{\mbox{RRC}} (کنترل منابع رادیویی)}
+\CNtocitem{5}{5}{\lr{\mbox{NGAP}} (پروتکل کاربرد \lr{\mbox{NG}}) \lr{—} \lr{TS 38.413}}
+\CNtocitem{6}{6}{\lr{\mbox{GTP-C}} (صفحه کنترل \lr{\mbox{GTP}})}
+\CNtocitem{7}{7}{\lr{HTTP/\allowbreak{}2 SBI} (واسط خدمات‌محور)}
+\CNtocitem{8}{8}{تحول پروتکل سیگنالینگ: \lr{SS7 \ensuremath{\to} Diameter \ensuremath{\to} HTTP/\allowbreak{}2}}
+\CNtocitem{9}{}{نمودار معماری کامل صفحه کنترل \lr{\mbox{(5G)}}}
+\CNtocitem{10}{}{خلاصه: صفحه کنترل در برابر صفحه کاربر}
+\CNtocitem{11}{}{نکات کلیدی}
+\end{CNminitoc}
+\input{content}
+\end{document}

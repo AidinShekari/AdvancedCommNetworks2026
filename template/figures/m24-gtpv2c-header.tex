@@ -1,0 +1,8 @@
+% Module 24 — GTPv2-C header
+\begin{tikzpicture}[CNfig]
+\CNbitruler
+\CNfield{0}{0}{3}{Ver}{CNsig!10}\CNfield{0}{3}{1}{P}{CNamber!20}\CNfield{0}{4}{1}{T}{CNamber!20}\CNfield{0}{5}{3}{Spare}{CNpaper}
+\CNfield{0}{8}{8}{Message Type}{CNsig!10}\CNfield{0}{16}{16}{Length}{white}
+\CNfield{1}{0}{16}{TEID (\CNL{if}{اگر} T=1)}{CNcyan!10}\CNfield{1}{16}{11}{Sequence Number}{white}\CNfield{1}{27}{5}{Spare}{CNpaper}
+\CNfield{2}{0}{32}{IE (Information Elements)}{CNsig!6}
+\end{tikzpicture}

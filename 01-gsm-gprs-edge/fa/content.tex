@@ -1,0 +1,1180 @@
+\begin{CNbox}[unbreakable]{obj}{اهداف یادگیری}
+
+در پایان این ماژول، شما قادر خواهید بود:
+
+\begin{itemize}
+\tightlist
+\item
+  معماری کامل \lr{\mbox{GSM}} و نقش هر عنصر شبکه را توضیح دهید
+\item
+  توصیف کنید که \lr{\mbox{GSM}} چگونه تحرک، مدیریت مکان و احراز هویت را مدیریت می‌کند
+\item
+  بیان کنید \textbf{چرا} \lr{\mbox{GPRS}} معرفی شد و چه محدودیت‌هایی از \lr{\mbox{GSM}} را برطرف کرد
+\item
+  معماری لایه‌ای سوییچینگ بسته‌ای \lr{\mbox{GPRS}} را توضیح دهید
+\item
+  فعال‌سازی زمینه \lr{\mbox{PDP}} و مدیریت تحرک \lr{\mbox{GPRS}} را توصیف کنید
+\item
+  توضیح دهید که \lr{\mbox{EDGE}} چگونه نرخ داده را از طریق تغییرات مدولاسیون بهبود داد
+\item
+  مسیر تحول از \lr{\mbox{GSM}} تا \lr{\mbox{EDGE}} و سپس \lr{\mbox{3G}} را دنبال کنید
+\end{itemize}
+
+\end{CNbox}
+
+\Needspace{14\baselineskip}
+
+\CNsection{1}{معماری \lr{\mbox{GSM}}}
+
+\CNchained\CNsubsection{1.1}{چرا \lr{\mbox{GSM}}؟}
+
+پیش از \lr{\mbox{GSM}} (\lr{Global System for Mobile Communications} - سیستم جهانی ارتباطات موبایل)، اروپا چندین سیستم سلولی آنالوگ ناسازگار داشت (\lr{\mbox{NMT}}، \lr{\mbox{TACS}}، \lr{\mbox{C-Netz}}). یک مشترک در فرانسه نمی‌توانست به آلمان رومینگ کند. \lr{\mbox{GSM}} برای حل سه مشکل بنیادی ایجاد شد:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{قابلیت هم‌کاری} \lr{—} یک استاندارد واحد در سراسر اروپا (و در نهایت جهان)
+\item
+  \textbf{امنیت} \lr{—} سیستم‌های آنالوگ هیچ رمزنگاری نداشتند؛ هر کسی با یک اسکنر می‌توانست شنود کند
+\item
+  \textbf{ظرفیت} \lr{—} مدولاسیون دیجیتال به کاربران بیشتری در هر \lr{\mbox{MHz}} از طیف خدمات می‌دهد
+\end{enumerate}
+
+\CNkeepfig{m01-gsm-architecture}{3}
+
+\CNsubsection{1.2}{نمودار معماری شبکه \lr{\mbox{GSM}}}
+
+\CNfigure{m01-gsm-architecture}{معماری شبکه \lr{\mbox{GSM}}: \lr{\mbox{MS}}، \lr{\mbox{BSS}}، \lr{\mbox{NSS}} و شبکه‌های خارجی به همراه واسط‌ها}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{1.3}{درک لایه‌های معماری}
+
+معماری \lr{\mbox{GSM}} در سه زیرسیستم منطقی سازماندهی شده است که هر یک مشکلی متمایز را حل می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{زیرسیستم} & \CNth{مشکلی که حل می‌کند} & \CNth{عناصر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{BSS}}}}} (زیرسیستم ایستگاه پایه) & دسترسی رادیویی \lr{—} چگونه گوشی با شبکه صحبت می‌کند؟ & \lr{\mbox{BTS}}، \lr{\mbox{BSC}} \\
+\lr{\mbox{\textbf{\lr{\mbox{NSS}}}}} (زیرسیستم سوییچینگ شبکه) & مسیریابی تماس \lr{—} چگونه تماس‌ها متصل می‌شوند؟ & \lr{\mbox{MSC}}، \lr{\mbox{GMSC}}، \lr{\mbox{HLR}}، \lr{\mbox{VLR}}، \lr{\mbox{AuC}}، \lr{\mbox{EIR}} \\
+\lr{\mbox{\textbf{\lr{\mbox{OSS}}}}} (زیرسیستم پشتیبانی عملیات) & مدیریت \lr{—} چگونه اپراتورها شبکه را پایش و پیکربندی می‌کنند؟ & \lr{\mbox{OMC}}، \lr{\mbox{NMC}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{عناصر شبکه \lr{\mbox{GSM}} \lr{—} توضیح تفصیلی}
+
+\CNchained\CNsubsection{2.1}{ایستگاه موبایل \lr{\mbox{(MS)}}}
+
+\textbf{چیست:} دستگاه مشترک، که از دو بخش تشکیل شده است:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{ME}} (تجهیزات موبایل):} سخت‌افزار فیزیکی گوشی، که با \lr{\mbox{IMEI}} خود شناسایی می‌شود
+\item
+  \textbf{\lr{\mbox{SIM}} (ماژول هویت مشترک):} یک کارت هوشمند که هویت مشترک \lr{\mbox{(IMSI)}}، کلید احراز هویت \lr{\mbox{(Ki)}} و الگوریتم‌ها را حمل می‌کند
+\end{itemize}
+
+\textbf{چرا به \lr{\mbox{ME + SIM}} تفکیک شده است:} این تفکیک به این معناست که می‌توانید \lr{\mbox{SIM}} خود را در هر گوشی قرار دهید و شماره‌تان را حفظ کنید، یا اپراتور می‌تواند یک گوشی دزدیده‌شده را (با \lr{\mbox{IMEI}}) مسدود کند بدون آنکه به حساب مشترک آسیبی برسد.
+
+\CNsubsection{2.2}{ایستگاه فرستنده-گیرنده پایه \lr{\mbox{(BTS)}}}
+
+\textbf{چیست:} تجهیزات رادیویی (آنتن‌ها، فرستنده-گیرنده‌ها، تقویت‌کننده‌ها) در یک سایت سلول.
+
+\textbf{چرا وجود دارد:} کسی باید بین شبکه سیمی و امواج رادیویی تبدیل انجام دهد. \lr{\mbox{BTS}} موارد زیر را انجام می‌دهد:
+
+\begin{itemize}
+\tightlist
+\item
+  ارسال و دریافت سیگنال‌های رادیویی
+\item
+  کدگذاری کانال و رمزنگاری در واسط رادیویی
+\item
+  جهش فرکانسی (در صورت پیکربندی)
+\item
+  اندازه‌گیری پیشروی زمانی (برای جبران تأخیر انتشار)
+\end{itemize}
+
+\begin{CNinsight}
+
+\textbf{نکته کلیدی:} \lr{\mbox{BTS}} عمداً «کم‌هوش» است \lr{—} هوش حداقلی دارد. این یک انتخاب طراحی آگاهانه است تا سایت‌های رادیویی گران‌قیمت برای ویژگی‌های جدید نیازی به ارتقای نرم‌افزار نداشته باشند.
+
+\end{CNinsight}
+
+\CNsubsection{2.3}{کنترلر ایستگاه پایه \lr{\mbox{(BSC)}}}
+
+\textbf{چیست:} هوش پشت چندین \lr{\mbox{BTS}}. یک \lr{\mbox{BSC}} معمولاً ده‌ها تا صدها \lr{\mbox{BTS}} را کنترل می‌کند.
+
+\textbf{چرا وجود دارد:} \lr{\mbox{BSC}} مسیله \textbf{مدیریت منابع} را حل می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تصمیمات تحویل \lr{\mbox{(handover)}}:} چه زمانی باید یک تماس از یک \lr{\mbox{BTS}} به \lr{\mbox{BTS}} دیگر منتقل شود؟ \lr{\mbox{BSC}} اندازه‌گیری‌ها را از \lr{\mbox{MS}} و \lr{\mbox{BTS}}‌های همسایه جمع‌آوری می‌کند تا تصمیم بگیرد.
+\item
+  \textbf{تخصیص منابع رادیویی:} کدام فرکانس و شکاف زمانی باید به یک تماس جدید تخصیص یابد؟
+\item
+  \textbf{کنترل توان:} به \lr{\mbox{MS}} و \lr{\mbox{BTS}} دستور می‌دهد که توان را تنظیم کنند (باتری را ذخیره می‌کند، تداخل را کاهش می‌دهد)
+\item
+  \textbf{تبدیل کد \lr{\mbox{(Transcoding)}}:} بین کدک گفتار فشرده در واسط رادیویی \lr{(13~kbps)} و \lr{\mbox{PCM}} استاندارد \lr{\mbox{64~kbps}} مورد استفاده در شبکه هسته تبدیل انجام می‌دهد
+\end{itemize}
+
+\CNsubsection{2.4}{مرکز سوییچینگ موبایل \lr{\mbox{(MSC)}}}
+
+\textbf{چیست:} یک مرکز تلفن که به‌طور خاص برای مشترکین موبایل طراحی شده است.
+
+\textbf{چرا وجود دارد:} \lr{\mbox{MSC}} مسیله \textbf{مسیریابی تماس برای کاربران موبایل} را حل می‌کند. برخلاف مرکز تلفن خط ثابت، \lr{\mbox{MSC}} باید موارد زیر را مدیریت کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{برقراری و آزادسازی تماس} برای کاربرانی که ممکن است در حرکت باشند
+\item
+  \textbf{تحویل بین \lr{\mbox{BSC}}ها} (تحویل بین-\lr{\mbox{BSC}})
+\item
+  \textbf{واسط با شبکه‌های خارجی} (\lr{\mbox{PSTN}}، \lr{\mbox{ISDN}}، سایر شبکه‌های موبایل)
+\item
+  \textbf{خدمات تکمیلی} (انتقال تماس، انتظار تماس، تماس کنفرانسی)
+\item
+  \textbf{هماهنگی با \lr{\mbox{VLR}}} برای اعتبارسنجی مشترک
+\end{itemize}
+
+\CNsubsection{2.5}{\lr{\mbox{MSC}} دروازه‌ای \lr{\mbox{(GMSC)}}}
+
+\textbf{چیست:} یک \lr{\mbox{MSC}} تخصصی که به‌عنوان نقطه ورود برای تماس‌های آمده از شبکه‌های خارجی عمل می‌کند.
+
+\textbf{چرا وجود دارد:} وقتی کسی از یک تلفن ثابت به یک مشترک موبایل زنگ می‌زند، تماس به \lr{\mbox{GMSC}} می‌رسد. وظیفه \lr{\mbox{GMSC}} \textbf{یافتن مشترک} است \lr{—} از \lr{\mbox{HLR}} پرس‌وجو می‌کند تا تعیین کند مشترک در حال حاضر در کدام ناحیه \lr{MSC/\allowbreak{}VLR} قرار دارد، سپس تماس را به آنجا مسیریابی می‌کند. بدون \lr{\mbox{GMSC}}، شبکه‌های خارجی باید ساختار داخلی شبکه موبایل را می‌دانستند.
+
+\CNsubsection{2.6}{ثبت‌کننده مکان خانگی \lr{\mbox{(HLR)}}}
+
+\textbf{چیست:} پایگاه داده مرکزی که شامل تمام اطلاعات دایمی مشترک است.
+
+\textbf{چرا وجود دارد:} \lr{\mbox{HLR}} مسیله \textbf{«این مشترک کجاست؟»} را حل می‌کند. موارد زیر را ذخیره می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  هویت مشترک (\lr{\mbox{IMSI}}، \lr{\mbox{MSISDN}})
+\item
+  اطلاعات اشتراک (کدام خدمات مجاز هستند)
+\item
+  \textbf{مکان فعلی} (مشترک در کدام ناحیه \lr{VLR/\allowbreak{}MSC} ثبت‌نام شده است)
+\item
+  تنظیمات انتقال تماس
+\item
+  داده‌های خدمات تکمیلی
+\end{itemize}
+
+\begin{CNinsight}
+
+\textbf{نکته کلیدی:} به‌صورت منطقی یک \lr{\mbox{HLR}} در هر شبکه وجود دارد (هرچند از نظر فیزیکی ممکن است توزیع‌شده باشد). این تنها منبع حقیقت درباره هر مشترک است.
+
+\end{CNinsight}
+
+\CNsubsection{2.7}{ثبت‌کننده مکان بازدیدکننده \lr{\mbox{(VLR)}}}
+
+\textbf{چیست:} یک پایگاه داده موقت مرتبط با هر \lr{\mbox{MSC}}، که اطلاعات مشترکین حاضر در ناحیه آن \lr{\mbox{MSC}} را نگه می‌دارد.
+
+\textbf{چرا وجود دارد:} \lr{\mbox{VLR}} مسیله \textbf{کارایی} را حل می‌کند. بدون آن، هر برقراری تماس نیازمند پرس‌وجو از \lr{\mbox{HLR}} بود (که ممکن است دور باشد). در عوض:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  وقتی مشترکی وارد ناحیه یک \lr{\mbox{MSC}} می‌شود، \lr{\mbox{VLR}} پروفایل او را از \lr{\mbox{HLR}} می‌گیرد
+\item
+  عملیات بعدی از نسخه محلی \lr{\mbox{VLR}} استفاده می‌کنند
+\item
+  این کار بار سیگنالینگ روی \lr{\mbox{HLR}} را کاهش می‌دهد و تأخیر برقراری تماس را کم می‌کند
+\end{enumerate}
+
+\lr{\mbox{VLR}} همچنین داده‌های موقت را ذخیره می‌کند: \lr{\mbox{TMSI}} (هویت موقت)، ناحیه مکانی و سه‌گانه‌های احراز هویت.
+
+\CNsubsection{2.8}{مرکز احراز هویت \lr{\mbox{(AuC)}}}
+
+\textbf{چیست:} یک پایگاه داده محافظت‌شده که کلیدهای احراز هویت مخفی \lr{\mbox{(Ki)}} را برای هر مشترک ذخیره می‌کند.
+
+\textbf{چرا وجود دارد:} \lr{\mbox{AuC}} مسیله \textbf{«چگونه ثابت کنیم این مشترک اصیل است؟»} را حل می‌کند. این مرکز:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{Ki}} هر مشترک را ذخیره می‌کند (که هرگز از \lr{\mbox{AuC}} یا \lr{\mbox{SIM}} خارج نمی‌شود)
+\item
+  سه‌گانه‌های احراز هویت (\lr{\mbox{RAND}}، \lr{\mbox{SRES}}، \lr{\mbox{Kc}}) را در صورت درخواست تولید می‌کند
+\item
+  در برابر کلون‌سازی و دسترسی غیرمجاز محافظت می‌کند
+\end{itemize}
+
+\textbf{چرا از \lr{\mbox{HLR}} جدا است:} جداسازی امنیتی. مقادیر \lr{\mbox{Ki}} بسیار حساس هستند. با قرار دادن آن‌ها در یک عنصر فیزیکی امن و جداگانه، در صورت نفوذ به \lr{\mbox{HLR}}، کلیدهای احراز هویت افشا نمی‌شوند.
+
+\CNsubsection{2.9}{ثبت‌کننده هویت تجهیزات \lr{\mbox{(EIR)}}}
+
+\textbf{چیست:} یک پایگاه داده از هویت‌های تجهیزات موبایل (\lr{\mbox{IMEI}}ها) که در سه فهرست طبقه‌بندی می‌شوند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{فهرست سفید:} تجهیزات تأییدشده
+\item
+  \textbf{فهرست خاکستری:} تجهیزات تحت نظارت (شاید مفقود گزارش شده اما تأیید نشده)
+\item
+  \textbf{فهرست سیاه:} تجهیزات دزدیده‌شده یا غیرتأییدشده \lr{—} خدمات مسدود می‌شود
+\end{itemize}
+
+\textbf{چرا وجود دارد:} \lr{\mbox{EIR}} مسیله \textbf{گوشی دزدیده‌شده} را حل می‌کند. حتی اگر سارق یک \lr{\mbox{SIM}} جدید در گوشی دزدیده‌شده قرار دهد، شبکه می‌تواند سخت‌افزار را با \lr{\mbox{IMEI}} آن شناسایی و مسدود کند.
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{واسط‌های \lr{\mbox{GSM}}}
+
+\CNchained\CNsubsection{}{چرا واسط‌های استانداردشده اهمیت دارند}
+
+نبوغ \lr{\mbox{GSM}} در تعریف \textbf{واسط‌های باز} بین عناصر بود. این بدان معناست که یک \lr{\mbox{BTS}} از اریکسون می‌تواند به یک \lr{\mbox{BSC}} از نوکیا متصل شود. بدون واسط‌های استانداردشده، اپراتورها برای همه چیز به یک سازنده واحد وابسته می‌شدند.
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{3.1}{خلاصه واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2045}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3409}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2045}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{بین} & \CNth{پشته پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{Um}}}}} & \lr{\mbox{MS \ensuremath{\leftrightarrow} BTS}} & \lr{LAPDm /\allowbreak{} RR /\allowbreak{} MM /\allowbreak{} CC} & واسط رادیویی \lr{—} لینک رادیویی \\
+\lr{\mbox{\textbf{\lr{\mbox{Abis}}}}} & \lr{BTS \ensuremath{\leftrightarrow} BSC} & \lr{LAPD over PCM (E1/\allowbreak{}T1)} & حمل ترافیک + سیگنالینگ از سایت‌های رادیویی به کنترلر \\
+\lr{\mbox{\textbf{\lr{\mbox{A}}}}} & \lr{BSC \ensuremath{\leftrightarrow} MSC} & \lr{MTP /\allowbreak{} SCCP /\allowbreak{} BSSAP} & اتصال زیرسیستم رادیویی به زیرسیستم سوییچینگ \\
+\lr{\mbox{\textbf{\lr{\mbox{B}}}}} & \lr{MSC \ensuremath{\leftrightarrow} VLR} & \lr{\mbox{MAP}} & \lr{\mbox{MSC}} از \lr{\mbox{VLR}} محلی برای داده‌های مشترک پرس‌وجو می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{C}}}}} & \lr{GMSC \ensuremath{\leftrightarrow} HLR} & \lr{\mbox{MAP}} & \lr{\mbox{GMSC}} از \lr{\mbox{HLR}} می‌پرسد تماس‌های ورودی را کجا مسیریابی کند \\
+\lr{\mbox{\textbf{\lr{\mbox{D}}}}} & \lr{VLR \ensuremath{\leftrightarrow} HLR} & \lr{\mbox{MAP}} & به‌روزرسانی مکان، انتقال داده‌های مشترک \\
+\lr{\mbox{\textbf{\lr{\mbox{E}}}}} & \lr{MSC \ensuremath{\leftrightarrow} MSC} & \lr{MAP /\allowbreak{} ISUP} & تحویل بین-\lr{\mbox{MSC}} \\
+\lr{\mbox{\textbf{\lr{\mbox{F}}}}} & \lr{MSC \ensuremath{\leftrightarrow} EIR} & \lr{\mbox{MAP}} & بررسی \lr{\mbox{IMEI}} \\
+\lr{\mbox{\textbf{\lr{\mbox{G}}}}} & \lr{VLR \ensuremath{\leftrightarrow} VLR} & \lr{\mbox{MAP}} & انتقال اطلاعات مشترک در جابه‌جایی بین-\lr{\mbox{VLR}} \\
+\lr{\mbox{\textbf{\lr{\mbox{H}}}}} & \lr{HLR \ensuremath{\leftrightarrow} AuC} & \lr{\mbox{Proprietary}} & درخواست‌های بردار احراز هویت \\
+\end{longtable}
+}
+
+\CNsubsection{3.2}{واسط \lr{\mbox{Um}} (واسط رادیویی) \lr{—} به‌صورت عمیق}
+
+واسط \lr{\mbox{Um}} پیچیده‌ترین است زیرا باید با محیط رادیویی خصمانه سر و کار داشته باشد:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{دسترسی چندگانه:} \lr{\mbox{TDMA}} با 8 شکاف زمانی در هر حامل \lr{\mbox{200~kHz}} (ترکیبی \lr{FDMA/\allowbreak{}TDMA})
+\item
+  \textbf{مدولاسیون:} \lr{GMSK (Gaussian Minimum Shift Keying)} \lr{—} به دلیل پوش ثابت (تقویت‌کننده‌های توان کارآمد) و کارایی طیفی انتخاب شده است
+\item
+  \textbf{ساختار فریم:} ابرفریم \ensuremath{\leftarrow} ابرفریم بزرگ \ensuremath{\leftarrow} چندفریم \ensuremath{\leftarrow} فریم \ensuremath{\leftarrow} شکاف زمانی \ensuremath{\leftarrow} انفجار
+\item
+  \textbf{کانال‌های منطقی:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{\lr{\mbox{TCH}} (کانال ترافیک):} حمل گفتار/\allowbreak{}داده کاربر
+  \item
+    \textbf{\lr{\mbox{BCCH}} (کانال کنترل پخش):} پخش اطلاعات سیستم به همه گوشی‌ها
+  \item
+    \textbf{\lr{\mbox{RACH}} (کانال دسترسی تصادفی):} \lr{\mbox{MS}} درخواست دسترسی می‌کند (\lr{\mbox{ALOHA}} شکاف‌دار)
+  \item
+    \textbf{\lr{\mbox{PCH}} (کانال صفحه‌بندی):} شبکه برای تماس ورودی \lr{\mbox{MS}} را صفحه‌بندی می‌کند
+  \item
+    \textbf{\lr{\mbox{SDCCH}} (کانال کنترل اختصاصی مستقل):} سیگنالینگ (\lr{\mbox{SMS}}، به‌روزرسانی مکان)
+  \item
+    \lr{\textbf{\lr{SACCH/\allowbreak{}FACCH:}}} کنترل مرتبط برای اندازه‌گیری‌ها و فرمان‌های تحویل
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{3.3}{واسط \lr{\mbox{Abis}}}
+
+\textbf{چرا وجود دارد:} سایت‌های \lr{\mbox{BTS}} دورافتاده هستند (قله کوه‌ها، پشت‌بام‌ها). واسط \lr{\mbox{Abis}} به آن‌ها امکان می‌دهد از طریق خطوط استاندارد \lr{\mbox{E1}} با \lr{\mbox{2~Mbps}} (یا لینک‌های مایکروویو) به \lr{\mbox{BSC}} متصل شوند. این واسط موارد زیر را حمل می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  کانال‌های ترافیک \lr{\mbox{16~kbps}} (گفتار فشرده)
+\item
+  پیام‌های سیگنالینگ (پروتکل \lr{\mbox{LAPD}}، مشابه \lr{\mbox{ISDN}})
+\item
+  پیام‌های عملیات و نگهداری
+\end{itemize}
+
+\CNsubsection{3.4}{واسط \lr{\mbox{A}}}
+
+\textbf{چرا وجود دارد:} اینجا جایی است که دنیای رادیو با دنیای تلفن ملاقات می‌کند. واسط \lr{\mbox{A}} موارد زیر را حمل می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  گفتار \lr{PCM 64~kbps} (پس از تبدیل کد از \lr{\mbox{13~kbps}})
+\item
+  سیگنالینگ \lr{BSSAP (BSS Application Part)} روی \lr{\mbox{SS7}}
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{تحرک و مدیریت مکان \lr{\mbox{GSM}}}
+
+\CNchained\CNsubsection{4.1}{چرا مدیریت مکان لازم است}
+
+چالش بنیادی شبکه‌های موبایل: \textbf{چگونه تماسی را به کسی برسانید که مکانش نامعلوم است؟}
+
+راه‌حل ساده‌لوحانه: صفحه‌بندی هر سلول در شبکه. مشکل: این مقیاس‌پذیر نیست \lr{—} میلیون‌ها مشترک نیازمند صفحه‌بندی مداوم در هر سلول خواهند بود.
+
+راه‌حل \lr{\mbox{GSM}}: \textbf{نواحی مکانی \lr{\mbox{(LA)}}}
+
+\CNsubsection{4.2}{مفهوم ناحیه مکانی}
+
+\begin{itemize}
+\tightlist
+\item
+  شبکه به \textbf{نواحی مکانی} تقسیم می‌شود که هر یک شامل چندین سلول \lr{\mbox{(BTS)}} است
+\item
+  هر \lr{\mbox{LA}} دارای یک \lr{\mbox{\textbf{\lr{\mbox{LAI}}}}} (هویت ناحیه مکانی) منحصربه‌فرد است = \lr{MCC + MNC + LAC}
+\item
+  شبکه مکان مشترک را فقط با \textbf{دقت \lr{\mbox{LA}}} می‌داند
+\item
+  وقتی تماسی می‌رسد، مشترک در تمام سلول‌های \lr{\mbox{LA}} فعلی خود صفحه‌بندی می‌شود
+\end{itemize}
+
+\textbf{مبادله:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{LA}}های کوچک‌تر \ensuremath{\leftarrow} بار صفحه‌بندی کمتر، اما به‌روزرسانی‌های مکان بیشتر (سیگنالینگ)
+\item
+  \lr{\mbox{LA}}های بزرگ‌تر \ensuremath{\leftarrow} به‌روزرسانی‌های مکان کمتر، اما ترافیک صفحه‌بندی بیشتر
+\item
+  اپراتورها اندازه \lr{\mbox{LA}}ها را بر اساس الگوهای ترافیک تنظیم می‌کنند
+\end{itemize}
+
+\CNsubsection{4.3}{رویه به‌روزرسانی مکان}
+
+یک موبایل زمانی \textbf{به‌روزرسانی مکان} انجام می‌دهد که:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{به‌روزرسانی مکان عادی:} \lr{\mbox{MS}} تشخیص می‌دهد که وارد \lr{\mbox{LA}} جدیدی شده است (\lr{\mbox{LAI}} متفاوت روی \lr{\mbox{BCCH}})
+\item
+  \textbf{به‌روزرسانی مکان دوره‌ای:} تایمر منقضی می‌شود \lr{—} اثبات می‌کند که \lr{\mbox{MS}} هنوز قابل دسترسی است
+\item
+  \textbf{اتصال \lr{\mbox{IMSI}}:} \lr{\mbox{MS}} روشن می‌شود و با شبکه ثبت‌نام می‌کند
+\end{enumerate}
+
+\textbf{جریان به‌روزرسانی مکان:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{MS}} پیام \lr{LOCATION UPDATING REQUEST} را به \lr{MSC/\allowbreak{}VLR} جدید می‌فرستد
+\item
+  \lr{\mbox{VLR}} جدید با \lr{\mbox{HLR}} تماس می‌گیرد: «مشترک \lr{\mbox{X}} اکنون اینجاست»
+\item
+  \lr{\mbox{HLR}} پروفایل مشترک را به \lr{\mbox{VLR}} جدید می‌فرستد
+\item
+  \lr{\mbox{HLR}} به \lr{\mbox{VLR}} قدیمی می‌گوید که رکورد مشترک را حذف کند
+\item
+  \lr{\mbox{VLR}} جدید به \lr{\mbox{MS}} تأیید می‌کند: \lr{LOCATION UPDATING ACCEPT}
+\item
+  \lr{\mbox{MS TMSI}} جدید را ذخیره می‌کند (در صورت تخصیص مجدد)
+\end{enumerate}
+
+\CNsubsection{4.4}{\lr{\mbox{TMSI}} \lr{—} هویت موقت مشترک موبایل}
+
+\textbf{چرا:} پخش \lr{\mbox{IMSI}} روی واسط رادیویی به شنودکنندگان امکان ردیابی مشترکین را می‌داد. \lr{\mbox{TMSI}}:
+
+\begin{itemize}
+\tightlist
+\item
+  توسط \lr{\mbox{VLR}} تخصیص می‌یابد و فقط اهمیت محلی دارد
+\item
+  مکرراً تغییر می‌کند (در هر به‌روزرسانی مکان یا تماس)
+\item
+  بدین معناست که هویت دایمی \lr{\mbox{(IMSI)}} به‌ندرت روی هوا منتقل می‌شود
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{احراز هویت و امنیت \lr{\mbox{GSM}}}
+
+\CNchained\CNsubsection{5.1}{چرا احراز هویت حیاتی است}
+
+بدون احراز هویت:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{SIM}}های کلون‌شده می‌توانستند تماس‌هایی برقرار کنند که به حساب دیگری صورتحساب شود
+\item
+  کاربران غیرمجاز می‌توانستند به شبکه دسترسی یابند
+\item
+  شنودکنندگان می‌توانستند تماس‌ها را رهگیری کنند
+\end{itemize}
+
+\CNsubsection{5.2}{سازوکار سه‌گانه احراز هویت}
+
+\lr{\mbox{GSM}} از یک پروتکل \textbf{چالش-پاسخ} مبتنی بر رمزنگاری کلید مشترک استفاده می‌کند.
+
+\textbf{بازیگران:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Ki:}}}}} یک کلید مخفی 128 بیتی، که فقط روی \lr{\mbox{SIM}} و در \lr{\mbox{AuC}} ذخیره می‌شود. این کلید \textbf{هرگز} از هیچ واسطی عبور نمی‌کند.
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{RAND:}}}}} یک عدد تصادفی 128 بیتی که توسط \lr{\mbox{AuC}} تولید می‌شود (چالش)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{SRES:}}}}} یک پاسخ امضاشده 32 بیتی (پاسخ مورد انتظار)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Kc:}}}}} یک کلید رمز 64 بیتی برای رمزنگاری واسط رادیویی
+\end{itemize}
+
+\CNkeepfig{m01-a3-a8}{2}
+
+\textbf{چگونه کار می‌کند:}
+
+\CNfigure{m01-a3-a8}{\lr{\mbox{A3}} و \lr{\mbox{A8}} در هر دو سمت اجرا می‌شوند: \lr{\mbox{AuC}} و \lr{\mbox{SIM}} از \lr{\mbox{Ki}} و \lr{\mbox{RAND}} مقادیر یکسان \lr{\mbox{SRES}} و \lr{\mbox{Kc}} را به دست می‌آورند}
+
+\textbf{گام‌به‌گام:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{AuC}} مقدار \lr{\mbox{RAND}} را تولید می‌کند، \lr{SRES = A3(Ki, RAND)} و \lr{Kc = A8(Ki, RAND)} را محاسبه می‌کند
+\item
+  سه‌گانه (\lr{\mbox{RAND}}، \lr{\mbox{SRES}}، \lr{\mbox{Kc}}) به \lr{\mbox{VLR}} فرستاده می‌شود (پیش‌محاسبه‌شده، برای استفاده بعدی ذخیره می‌شود)
+\item
+  وقتی احراز هویت لازم است، \lr{\mbox{VLR}} مقدار \lr{\mbox{RAND}} را به \lr{\mbox{MS}} می‌فرستد
+\item
+  \lr{\mbox{SIM}} با استفاده از \lr{\mbox{Ki}} ذخیره‌شده خود \lr{SRES = A3(Ki, RAND)} را محاسبه می‌کند
+\item
+  \lr{\mbox{MS}} مقدار \lr{\mbox{SRES}} را به شبکه بازمی‌گرداند
+\item
+  \lr{\mbox{VLR}} مقدار \lr{\mbox{SRES}} دریافتی را با \lr{\mbox{SRES}} ذخیره‌شده مقایسه می‌کند \lr{—} اگر مطابقت داشته باشند، مشترک اصیل است
+\item
+  اکنون هر دو طرف \lr{\mbox{Kc}} را دارند \lr{—} که با الگوریتم \lr{\mbox{A5}} برای رمزنگاری واسط رادیویی استفاده می‌شود
+\end{enumerate}
+
+\textbf{چرا سه‌گانه‌ها پیش‌محاسبه می‌شوند:} \lr{\mbox{AuC}} ممکن است از نظر جغرافیایی دور باشد. پیش‌محاسبه چندین سه‌گانه و ذخیره آن‌ها در \lr{\mbox{VLR}} به این معناست که احراز هویت می‌تواند به‌صورت محلی و بدون دسترسی بلادرنگ به \lr{\mbox{AuC}} انجام شود.
+
+\CNsubsection{5.3}{رمزنگاری (الگوریتم \lr{\mbox{A5}})}
+
+پس از احراز هویت، هم \lr{\mbox{MS}} و هم \lr{\mbox{BTS}} دارای \lr{\mbox{Kc}} مشترک هستند. الگوریتم \lr{\mbox{A5}} یک جریان کلید تولید می‌کند که با ترافیک عمل \lr{\mbox{XOR}} انجام می‌دهد. این موارد را فراهم می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{محرمانگی} در واسط رادیویی (فقط \lr{\mbox{Um}} \lr{—} نه سرتاسری)
+\item
+  محافظت در برابر شنود اتفاقی
+\end{itemize}
+
+\textbf{ضعف شناخته‌شده:} \lr{A5/\allowbreak{}1} شکسته شده است. شبکه‌های مدرن از \lr{A5/\allowbreak{}3} (مبتنی بر \lr{\mbox{KASUMI}}) استفاده می‌کنند یا به \lr{3G/\allowbreak{}4G} با امنیت قوی‌تر منتقل شده‌اند.
+
+\Needspace{14\baselineskip}
+
+\Needspace{19\baselineskip}
+
+\CNsection{6}{چرا \lr{\mbox{GPRS}} لازم بود}
+
+\CNchained\CNsubsection{6.1}{مسیله داده \lr{\mbox{GSM}}}
+
+\lr{\mbox{GSM}} برای \textbf{صدا} طراحی شده بود. داده یک فکر بعدی بود:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5152}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2121}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2727}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{سرویس داده \lr{\mbox{GSM}}} & \CNth{سرعت} & \CNth{مشکل} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{CSD}} (داده سوییچینگ مداری) & \lr{\mbox{9.6~kbps}} & یک شکاف زمانی کامل را برای کل نشست اشغال می‌کند \\
+\lr{\mbox{HSCSD}} (\lr{\mbox{CSD}} پرسرعت) & تا \lr{57.6~kbps} & چندین شکاف زمانی را اشغال می‌کند \lr{—} بسیار گران \\
+\end{longtable}
+}
+
+\textbf{مسیله بنیادی: سوییچینگ مداری برای داده اشتباه است.}
+
+چرا؟ وب‌گردی را در نظر بگیرید:
+
+\begin{itemize}
+\tightlist
+\item
+  شما یک صفحه درخواست می‌کنید (1 ثانیه فعالیت)
+\item
+  آن را می‌خوانید (30 ثانیه عدم فعالیت)
+\item
+  روی یک لینک کلیک می‌کنید (1 ثانیه فعالیت)
+\item
+  دوباره می‌خوانید (30 ثانیه عدم فعالیت)
+\end{itemize}
+
+با سوییچینگ مداری، شما \textbf{در آن 30 ثانیه خواندن، هزینه یک شکاف زمانی را می‌پردازید و آن را مصرف می‌کنید}. کانال تخصیص یافته اما 95\% مواقع بیکار است.
+
+\CNsubsection{6.2}{\lr{\mbox{GPRS}} چه فراهم می‌کند}
+
+\textbf{\lr{\mbox{GPRS}} (\lr{General Packet Radio Service} - سرویس رادیویی بسته‌ای عمومی)} \textbf{سوییچینگ بسته‌ای} را به \lr{\mbox{GSM}} معرفی می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  منابع \textbf{فقط زمانی که داده واقعاً ارسال می‌شود} تخصیص می‌یابند
+\item
+  چندین کاربر به‌صورت آماری شکاف‌های زمانی را \textbf{به اشتراک می‌گذارند}
+\item
+  صورتحساب می‌تواند \textbf{بر مبنای مگابایت} باشد به‌جای دقیقه
+\item
+  اتصال «همیشه فعال» \lr{—} بدون تأخیر شماره‌گیری
+\item
+  سرعت‌های نظری: 8 شکاف زمانی \ensuremath{\times} \lr{21.4~kbps = \textbf{\lr{171.2~kbps}}} (حداکثر نظری)
+\item
+  سرعت‌های عملی: \lr{30–80~kbps}
+\end{itemize}
+
+\CNsubsection{6.3}{فلسفه طراحی \lr{\mbox{GPRS}}}
+
+\lr{\mbox{GPRS}} به‌عنوان یک \textbf{لایه} روی زیرساخت موجود \lr{\mbox{GSM}} طراحی شد. اپراتورها نیازی نداشتند کل شبکه خود را جایگزین کنند \lr{—} آن‌ها گره‌های سوییچینگ بسته جدید را در کنار هسته سوییچینگ مداری موجود اضافه کردند. این امر برای پذیرش تجاری حیاتی بود.
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{معماری \lr{\mbox{GPRS}}}
+
+\CNchained\CNsubsection{7.1}{عناصر شبکه جدید}
+
+\lr{\mbox{GPRS}} سه عنصر کلیدی جدید معرفی می‌کند:
+
+\CNsubsubsection{\lr{\mbox{SGSN}} \lr{—} گره پشتیبانی خدمات \lr{\mbox{GPRS}}}
+
+\textbf{چیست:} معادل سوییچینگ بسته‌ای ترکیب \lr{MSC/\allowbreak{}VLR}.
+
+\textbf{چرا وجود دارد:} کسی باید نشست‌های سوییچینگ بسته‌ای را همان‌طور که \lr{\mbox{MSC}} تماس‌های صوتی را مدیریت می‌کند، مدیریت کند. \lr{\mbox{SGSN}}:
+
+\begin{itemize}
+\tightlist
+\item
+  مکان موبایل‌های متصل به \lr{\mbox{GPRS}} را ردیابی می‌کند (با دقت ناحیه مسیریابی)
+\item
+  احراز هویت و رمزگذاری برای نشست‌های بسته‌ای انجام می‌دهد
+\item
+  مدیریت تحرک برای داده بسته‌ای را انجام می‌دهد
+\item
+  بسته‌ها را بین \lr{\mbox{MS}} و \lr{\mbox{GGSN}} مسیریابی می‌کند
+\item
+  اطلاعات صورت‌حساب را جمع‌آوری می‌کند
+\end{itemize}
+
+\CNsubsubsection{\lr{\mbox{GGSN}} \lr{—} گره پشتیبانی \lr{\mbox{GPRS}} دروازه‌ای}
+
+\textbf{چیست:} معادل سوییچینگ بسته‌ای \lr{\mbox{GMSC}} \lr{—} دروازه به شبکه‌های داده خارجی.
+
+\textbf{چرا وجود دارد:} شبکه موبایل باید به اینترنت (و شبکه‌های داخلی سازمانی) متصل شود. \lr{\mbox{GGSN}}:
+
+\begin{itemize}
+\tightlist
+\item
+  به‌عنوان \textbf{مسیریاب \lr{\mbox{IP}}} بین شبکه \lr{\mbox{GPRS}} و شبکه‌های داده بسته‌ای خارجی (\lr{\mbox{PDN}}ها) عمل می‌کند
+\item
+  آدرس‌های \lr{\mbox{IP}} را به دستگاه‌های موبایل تخصیص می‌دهد (یا از \lr{DHCP/\allowbreak{}RADIUS} بازپخش می‌کند)
+\item
+  \textbf{کپسوله‌سازی/\allowbreak{}واکپسوله‌سازی} داده کاربر را با استفاده از \lr{GTP (GPRS Tunneling Protocol)} انجام می‌دهد
+\item
+  سیاست‌ها و قواعد صورت‌حساب را اعمال می‌کند
+\item
+  از دید شبکه خارجی، \lr{\mbox{GGSN}} مانند یک مسیریاب \lr{\mbox{IP}} عادی به نظر می‌رسد
+\end{itemize}
+
+\CNsubsubsection{\lr{\mbox{PCU}} \lr{—} واحد کنترل بسته}
+
+\textbf{چیست:} یک افزودنی به \lr{\mbox{BSC}} که مدیریت منابع رادیویی سوییچینگ بسته‌ای را انجام می‌دهد.
+
+\textbf{چرا وجود دارد:} \lr{\mbox{BSC}} اصلی فقط تخصیص منابع سوییچینگ مداری را می‌فهمید. \lr{\mbox{PCU}} موارد زیر را اضافه می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  زمان‌بندی بسته روی کانال‌های رادیویی مشترک (\lr{\mbox{PDCH}} \lr{—} کانال‌های داده بسته‌ای)
+\item
+  قطعه‌بندی و بازمونتاژ فریم‌های \lr{\mbox{LLC}} به بلوک‌های رادیویی
+\item
+  تخصیص پویا شکاف‌های زمانی بین صدا \lr{\mbox{(TCH)}} و داده \lr{\mbox{(PDCH)}}
+\item
+  مدیریت پرچم وضعیت پیوند بالاسو و تأیید دریافت
+\end{itemize}
+
+\CNkeepfig{m01-gprs-data-path}{3}
+
+\CNsubsection{7.2}{مسیر داده بسته‌ای \lr{\mbox{GPRS}}}
+
+\CNfigure{m01-gprs-data-path}{مسیر داده بسته‌ای \lr{\mbox{GPRS}} از \lr{\mbox{MS}} تا شبکه بسته‌ای خارجی}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{7.3}{پشته پروتکل \lr{\mbox{GPRS}}}
+
+پشته پروتکل \lr{\mbox{GPRS}} لایه‌های جدیدی معرفی می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2692}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3846}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3462}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{لایه} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+کاربرد & \lr{\mbox{HTTP}}، \lr{\mbox{SMTP}} و غیره & کاربرد کاربر \\
+انتقال & \lr{TCP /\allowbreak{} UDP} & قابلیت اطمینان سرتاسری \\
+شبکه & \lr{\mbox{IP}} & آدرس‌دهی و مسیریابی \\
+تونل‌سازی & \lr{GTP (GPRS Tunneling Protocol)} & کپسوله‌سازی بسته‌های \lr{\mbox{IP}} بین \lr{\mbox{SGSN}} و \lr{\mbox{GGSN}} \\
+پیوند & \lr{LLC (Logical Link Control)} & لینک قابل اعتماد بین \lr{\mbox{MS}} و \lr{\mbox{SGSN}} \\
+پیوند & \lr{SNDCP (SubNetwork Dependent Convergence Protocol)} & فشرده‌سازی سرآیند، قطعه‌بندی \\
+رادیو & \lr{RLC/\allowbreak{}MAC} & انتقال بلوک رادیویی، \lr{\mbox{ARQ}} \\
+فیزیکی & مدولاسیون \lr{\mbox{GMSK}} روی \lr{\mbox{PDCH}} & بیت‌ها روی هوا \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.4}{واسط‌های \lr{\mbox{GPRS}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2250}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2250}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{بین} & \CNth{انتقال} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{Gb}}}}} & \lr{PCU/\allowbreak{}BSS \ensuremath{\leftrightarrow} SGSN} & \lr{Frame Relay} یا \lr{\mbox{IP}} & داده بسته‌ای از رادیو به هسته \\
+\lr{\mbox{\textbf{\lr{\mbox{Gn}}}}} & \lr{SGSN \ensuremath{\leftrightarrow} GGSN} (همان \lr{\mbox{PLMN}}) & \lr{GTP/\allowbreak{}UDP/\allowbreak{}IP} & تونل‌سازی داده کاربر درون شبکه \\
+\lr{\mbox{\textbf{\lr{\mbox{Gp}}}}} & \lr{SGSN \ensuremath{\leftrightarrow} GGSN} (\lr{\mbox{PLMN}} متفاوت) & \lr{GTP + security} & داده رومینگ \\
+\lr{\mbox{\textbf{\lr{\mbox{Gi}}}}} & \lr{GGSN \ensuremath{\leftrightarrow} PDN} خارجی & \lr{\mbox{IP}} & اتصال به اینترنت \\
+\lr{\mbox{\textbf{\lr{\mbox{Gr}}}}} & \lr{SGSN \ensuremath{\leftrightarrow} HLR} & \lr{\mbox{MAP}} & داده مشترک برای \lr{\mbox{GPRS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Gs}}}}} & \lr{SGSN \ensuremath{\leftrightarrow} MSC/\allowbreak{}VLR} & \lr{\mbox{BSSAP+}} & هماهنگی \lr{\mbox{CS}} و \lr{\mbox{PS}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{زمینه \lr{\mbox{PDP}}}
+
+\CNchained\CNsubsection{8.1}{زمینه \lr{\mbox{PDP}} چیست؟}
+
+یک \textbf{زمینه \lr{PDP (Packet Data Protocol Context)}} همان «نشست» است که باید پیش از آنکه یک موبایل بتواند داده بسته‌ای بفرستد یا دریافت کند وجود داشته باشد. آن را معادل \lr{\mbox{GPRS}} برای «شماره‌گیری» در نظر بگیرید \lr{—} اما بدون هدر دادن منابع در حالت بیکار.
+
+یک زمینه \lr{\mbox{PDP}} موارد زیر را تعریف می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{نوع \lr{\mbox{PDP}}:} معمولاً \lr{\mbox{IPv4}} یا \lr{\mbox{IPv6}}
+\item
+  \textbf{آدرس \lr{\mbox{PDP}}:} آدرس \lr{\mbox{IP}} تخصیص‌یافته به \lr{\mbox{MS}}
+\item
+  \textbf{نام نقطه دسترسی \lr{\mbox{(APN)}}:} به کدام شبکه خارجی متصل شود (مثلاً «\lr{\mbox{internet}}»، «\lr{\mbox{corporate.vpn}}»)
+\item
+  \textbf{پروفایل \lr{\mbox{QoS}}:} کیفیت خدمات درخواستی (اولویت، توان عملیاتی، کلاس تأخیر)
+\item
+  \textbf{آدرس \lr{\mbox{GGSN}}:} کدام \lr{\mbox{GGSN}} به این زمینه خدمات می‌دهد
+\end{itemize}
+
+\CNsubsection{8.2}{چرا زمینه \lr{\mbox{PDP}} وجود دارد}
+
+بدون شکلی از برقراری نشست:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{GGSN}} نمی‌دانست بسته‌های پیوند پایین‌سو را برای یک آدرس \lr{\mbox{IP}} مشخص کجا بفرستد
+\item
+  شبکه نمی‌توانست سیاست‌های \lr{\mbox{QoS}} یا صورت‌حساب را اعمال کند
+\item
+  هیچ تونلی بین \lr{\mbox{SGSN}} و \lr{\mbox{GGSN}} برقرار نمی‌شد
+\end{itemize}
+
+\CNkeepfig{m01-pdp-activation}{3}
+
+\CNsubsection{8.3}{رویه فعال‌سازی زمینه \lr{\mbox{PDP}}}
+
+\CNfigure{m01-pdp-activation}{فعال‌سازی زمینه \lr{\mbox{PDP}} و نخستین بسته‌های \lr{\mbox{IP}} در تونل \lr{\mbox{GTP}}}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{8.4}{حالت‌های زمینه \lr{\mbox{PDP}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2258}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2903}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4839}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{حالت} & \CNth{معنا} & \CNth{منابع مصرف‌شده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{INACTIVE}}}}} & زمینه \lr{\mbox{PDP}} وجود ندارد \lr{—} نمی‌توان داده فرستاد & هیچ \\
+\lr{\mbox{\textbf{\lr{\mbox{ACTIVE}}}}} & زمینه کامل وجود دارد، داده می‌تواند جریان یابد & تونل \lr{SGSN/\allowbreak{}GGSN}، آدرس \lr{\mbox{IP}} تخصیص‌یافته \\
+\lr{\mbox{\textbf{\lr{\mbox{STANDBY}}}}} (اختیاری) & زمینه وجود دارد اما منابع رادیویی آزاد شده‌اند & تونل حفظ می‌شود، تخصیص رادیویی وجود ندارد \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{9}{مدیریت تحرک \lr{\mbox{GPRS}}}
+
+\CNchained\CNsubsection{9.1}{چرا \lr{\mbox{GPRS}} به مدیریت تحرک خود نیاز دارد}
+
+\lr{\mbox{GSM}} از قبل مدیریت مکان دارد (نواحی مکانی، به‌روزرسانی‌های مکان). چرا \lr{\mbox{GPRS}} به یک سیستم جداگانه نیاز دارد؟
+
+\textbf{زیرا ترافیک سوییچینگ بسته‌ای و سوییچینگ مداری نیازهای متفاوتی دارند:}
+
+\begin{itemize}
+\tightlist
+\item
+  برای یک \textbf{تماس صوتی}، شبکه باید فوراً شما را پیدا کند (صفحه‌بندی باید سریع باشد)
+\item
+  برای \textbf{داده بسته‌ای}، تحمل بیشتری برای تأخیر وجود دارد \lr{—} اما شبکه باید بداند بسته‌های پیوند پایین‌سوی شما را به کدام \lr{\mbox{SGSN}} مسیریابی کند
+\end{itemize}
+
+\lr{\mbox{GPRS}} \textbf{ناحیه مسیریابی \lr{\mbox{(RA)}}} را معرفی می‌کند \lr{—} زیربخشی از ناحیه مکانی.
+
+\CNkeepfig{m01-la-ra}{3}
+
+\CNsubsection{9.2}{ناحیه مسیریابی در برابر ناحیه مکانی}
+
+\CNfigure{m01-la-ra}{یک ناحیه مکانی به چند ناحیه مسیریابی تقسیم می‌شود}
+
+\begin{itemize}
+\tightlist
+\item
+  یک \textbf{ناحیه مسیریابی} همیشه زیرمجموعه‌ای از یک ناحیه مکانی است (یا برابر با آن)
+\item
+  \lr{\mbox{RA}} با \lr{\mbox{\textbf{\lr{\mbox{RAI}}}}} شناسایی می‌شود = \lr{LAI + RAC} (کد ناحیه مسیریابی)
+\item
+  دقت بالاتر از \lr{\mbox{LA}} \ensuremath{\leftarrow} مکان دقیق‌تر برای مسیریابی بسته
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{9.3}{حالت‌های مدیریت تحرک \lr{\mbox{GPRS}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{حالت} & \CNth{آنچه شبکه می‌داند} & \CNth{چه زمانی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{IDLE}}}}} & هیچ \lr{—} \lr{\mbox{MS}} به \lr{\mbox{GPRS}} متصل نیست & خاموش یا جدا شده از \lr{\mbox{GPRS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{STANDBY}}}}} & ناحیه مسیریابی فعلی & متصل اما بدون انتقال داده فعال \\
+\lr{\mbox{\textbf{\lr{\mbox{READY}}}}} & سلول فعلی (دقیق) & در حال ارسال/\allowbreak{}دریافت فعال داده \\
+\end{longtable}
+}
+
+\textbf{گذارهای حالت:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{IDLE \ensuremath{\to} STANDBY}: اتصال \lr{\mbox{GPRS}}
+\item
+  \lr{STANDBY \ensuremath{\to} READY}: انتقال داده آغاز می‌شود (یا سیگنالینگ)
+\item
+  \lr{READY \ensuremath{\to} STANDBY}: تایمر \lr{\mbox{READY}} منقضی می‌شود (بدون داده برای حدود 44 ثانیه)
+\item
+  \lr{STANDBY \ensuremath{\to} IDLE}: جداسازی \lr{\mbox{GPRS}}
+\end{itemize}
+
+\CNsubsection{9.4}{به‌روزرسانی ناحیه مسیریابی \lr{\mbox{(RAU)}}}
+
+مشابه به‌روزرسانی مکان در \lr{\mbox{GSM}}، اما برای دامنه بسته‌ای:
+
+\textbf{زمانی که فعال می‌شود:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{MS}} به ناحیه مسیریابی جدیدی می‌رود (\lr{\mbox{RAI}} متفاوت روی \lr{\mbox{BCCH}})
+\item
+  تایمر \lr{\mbox{RAU}} دوره‌ای منقضی می‌شود
+\item
+  به‌روزرسانی ترکیبی \lr{RA/\allowbreak{}LA} (اگر \lr{\mbox{CS}} و \lr{\mbox{PS}} هماهنگ باشند)
+\end{enumerate}
+
+\textbf{انواع:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{RAU}} درون-\lr{\mbox{SGSN}}:} ناحیه مسیریابی جدید که توسط همان \lr{\mbox{SGSN}} خدمات می‌گیرد \lr{—} رویه محلی، بدون نیاز به تغییر تونل \lr{\mbox{GTP}}
+\item
+  \textbf{\lr{\mbox{RAU}} بین-\lr{\mbox{SGSN}}:} ناحیه مسیریابی جدید که توسط \lr{\mbox{SGSN}} متفاوت خدمات می‌گیرد \lr{—} نیازمند:
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    \lr{\mbox{SGSN}} جدید با \lr{\mbox{SGSN}} قدیمی تماس می‌گیرد تا زمینه‌های \lr{\mbox{PDP}} را بگیرد
+  \item
+    \lr{\mbox{SGSN}} جدید به \lr{\mbox{GGSN}} اطلاع می‌دهد که نقاط انتهایی تونل را به‌روزرسانی کند
+  \item
+    \lr{\mbox{SGSN}} جدید \lr{\mbox{HLR}} را با مکان جدید به‌روزرسانی می‌کند
+  \item
+    \lr{\mbox{SGSN}} قدیمی منابع را آزاد می‌کند
+  \end{enumerate}
+\end{itemize}
+
+\CNsubsection{9.5}{رویه اتصال \lr{\mbox{GPRS}}}
+
+پیش از آنکه هر زمینه \lr{\mbox{PDP}} فعال شود، \lr{\mbox{MS}} باید به شبکه \lr{\mbox{GPRS}} \textbf{متصل} شود:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{MS}} پیام \lr{\textbf{\lr{Attach Request}}} را می‌فرستد (با \lr{\mbox{IMSI}} یا \lr{\mbox{P-TMSI}})
+\item
+  \lr{\mbox{SGSN}} مشترک را احراز هویت می‌کند (همان سازوکار مبتنی بر \lr{\mbox{Ki}} در \lr{\mbox{GSM}})
+\item
+  \lr{\mbox{SGSN}} مقدار \lr{\mbox{HLR}} را با مکان \lr{\mbox{SGSN}} جدید مشترک به‌روزرسانی می‌کند
+\item
+  \lr{\mbox{SGSN}} یک \lr{\mbox{\textbf{\lr{\mbox{P-TMSI}}}}} تخصیص می‌دهد (\lr{Packet-TMSI} \lr{—} معادل \lr{\mbox{TMSI}} برای دامنه بسته‌ای)
+\item
+  \lr{\mbox{SGSN}} پیام \lr{\textbf{\lr{Attach Accept}}} را به \lr{\mbox{MS}} می‌فرستد
+\end{enumerate}
+
+پس از اتصال، \lr{\mbox{MS}} برای سرویس بسته‌ای «ثبت‌نام‌شده» است اما هنوز نشست داده فعالی ندارد \lr{—} این امر نیازمند فعال‌سازی زمینه \lr{\mbox{PDP}} است.
+
+\Needspace{14\baselineskip}
+
+\CNsection{10}{\lr{\mbox{EDGE}} \lr{—} نرخ داده بهبودیافته برای تحول \lr{\mbox{GSM}}}
+
+\CNchained\CNsubsection{10.1}{چرا \lr{\mbox{EDGE}} لازم بود}
+
+\lr{\mbox{GPRS}} کارایی را بهبود داد (سوییچینگ بسته‌ای) اما همچنان توسط \textbf{طرح مدولاسیون \lr{\mbox{GSM}}} محدود بود:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{GSM/\allowbreak{}GPRS} از \lr{\textbf{\lr{\mbox{GMSK}}} (Gaussian Minimum Shift Keying)} استفاده می‌کند
+\item
+  \lr{\mbox{GMSK}} \textbf{1 بیت در هر نماد} را کدگذاری می‌کند
+\item
+  حداکثر نرخ داده خام در هر شکاف زمانی: حدود \lr{21.4~kbps} (پس از کدگذاری)
+\item
+  حداکثر توان عملیاتی عملی: حدود \lr{40-60~kbps} با 4 شکاف زمانی
+\end{itemize}
+
+برای کاربردهای نوظهور (پیوست‌های ایمیل، وب موبایل اولیه)، این کافی نبود. اما اپراتورها هنوز توان استقرار شبکه‌های \lr{\mbox{3G}} کاملاً جدید را نداشتند.
+
+\textbf{ارزش پیشنهادی \lr{\mbox{EDGE}}:} سرعت به‌مراتب بیشتر با استفاده از \textbf{همان طیف، همان سایت‌های سلول، همان شبکه} \lr{—} فقط نرم‌افزار و فرستنده-گیرنده‌های ارتقایافته.
+
+\Needspace{11\baselineskip}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{10.2}{\lr{\mbox{EDGE}} چه چیزی را تغییر می‌دهد}
+
+\CNchained\CNsubsubsection{مدولاسیون: \lr{GMSK \ensuremath{\to} 8PSK}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2973}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3514}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3514}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{\lr{GPRS (GMSK)}} & \CNth{\lr{EDGE (8PSK)}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+مدولاسیون & \lr{\mbox{GMSK}} & \lr{8PSK (8-Phase Shift Keying)} \\
+بیت در هر نماد & 1 & 3 \\
+نرخ بیت خام در هر شکاف زمانی & \lr{22.8~kbps} & \lr{69.2~kbps} (3 برابر سریع‌تر) \\
+نرخ نماد & \lr{270.833 ksps} & \lr{270.833 ksps} (بدون تغییر!) \\
+پهنای باند حامل & \lr{\mbox{200~kHz}} & \lr{\mbox{200~kHz}} (بدون تغییر!) \\
+حداکثر نرخ داده (8 شکاف زمانی) & \lr{171.2~kbps} & \lr{473.6~kbps} \\
+حداکثر عملی & حدود \lr{\mbox{80~kbps}} & حدود \lr{200-236~kbps} \\
+\end{longtable}
+}
+
+\begin{CNinsight}
+
+\textbf{نکته کلیدی:} \lr{\mbox{EDGE}} به نرخ بیت خام 3 برابری دست می‌یابد زیرا \lr{\mbox{8PSK}} در هر نماد 3 بیت را کدگذاری می‌کند به‌جای 1 بیت. نرخ نماد و پهنای باند حامل تغییر نمی‌کنند \lr{—} این صرفاً یک بهره کارایی مدولاسیون است.
+
+\end{CNinsight}
+
+\CNsubsubsection{مبادله: چرا همیشه از \lr{\mbox{8PSK}} استفاده نمی‌شود؟}
+
+\lr{\mbox{8PSK}} \textbf{فاصله کمتری بین نقاط صور فلکی} نسبت به \lr{\mbox{GMSK}} دارد. این بدان معناست:
+
+\begin{itemize}
+\tightlist
+\item
+  حساسیت بیشتر به نویز و تداخل
+\item
+  نرخ خطای بیت بالاتر در لبه‌های سلول
+\item
+  استحکام کمتر در شرایط رادیویی ضعیف
+\end{itemize}
+
+\textbf{راه‌حل \lr{\mbox{EDGE}}: تطبیق پیوند}
+
+\begin{itemize}
+\tightlist
+\item
+  سیستم کیفیت کانال را به‌صورت بلادرنگ اندازه‌گیری می‌کند
+\item
+  نزدیک \lr{\mbox{BTS}} (سیگنال خوب): استفاده از \lr{\mbox{8PSK}} با کدگذاری سبک (\lr{\mbox{MCS-9}}: \lr{59.2~kbps} در هر شکاف)
+\item
+  دور از \lr{\mbox{BTS}} (سیگنال ضعیف): بازگشت به \lr{\mbox{GMSK}} با کدگذاری سنگین (\lr{\mbox{MCS-1}}: \lr{\mbox{8.8~kbps}} در هر شکاف)
+\item
+  9 طرح مدولاسیون و کدگذاری مختلف (\lr{\mbox{MCS-1}} تا \lr{\mbox{MCS-9}})
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{10.3}{طرح‌های کدگذاری \lr{\mbox{EDGE}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.0877}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1930}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1930}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1930}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{MCS}}} & \CNth{مدولاسیون} & \CNth{نرخ کد} & \CNth{نرخ داده در هر شکاف} & \CNth{چه زمانی استفاده می‌شود} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{MCS-1}} & \lr{\mbox{GMSK}} & \lr{\mbox{\textasciitilde{}0.53}} & \lr{\mbox{8.8~kbps}} & کانال بسیار ضعیف \\
+\lr{\mbox{MCS-2}} & \lr{\mbox{GMSK}} & \lr{\mbox{\textasciitilde{}0.66}} & \lr{11.2~kbps} & کانال ضعیف \\
+\lr{\mbox{MCS-3}} & \lr{\mbox{GMSK}} & \lr{\mbox{\textasciitilde{}0.80}} & \lr{14.8~kbps} & زیر میانگین \\
+\lr{\mbox{MCS-4}} & \lr{\mbox{GMSK}} & \lr{\mbox{\textasciitilde{}1.0}} & \lr{17.6~kbps} & میانگین (بدون افزونگی) \\
+\lr{\mbox{MCS-5}} & \lr{\mbox{8PSK}} & \lr{\mbox{\textasciitilde{}0.37}} & \lr{22.4~kbps} & کانال میانگین \\
+\lr{\mbox{MCS-6}} & \lr{\mbox{8PSK}} & \lr{\mbox{\textasciitilde{}0.49}} & \lr{29.6~kbps} & کانال خوب \\
+\lr{\mbox{MCS-7}} & \lr{\mbox{8PSK}} & \lr{\mbox{\textasciitilde{}0.76}} & \lr{44.8~kbps} & کانال بسیار خوب \\
+\lr{\mbox{MCS-8}} & \lr{\mbox{8PSK}} & \lr{\mbox{\textasciitilde{}0.92}} & \lr{54.4~kbps} & کانال عالی \\
+\lr{\mbox{MCS-9}} & \lr{\mbox{8PSK}} & \lr{\mbox{\textasciitilde{}1.0}} & \lr{59.2~kbps} & بهترین شرایط \\
+\end{longtable}
+}
+
+\CNsubsection{10.4}{\lr{\mbox{EGPRS}}: \lr{\mbox{EDGE}} به‌کاررفته برای داده بسته‌ای}
+
+وقتی مدولاسیون \lr{\mbox{EDGE}} روی \lr{\mbox{GPRS}} اعمال می‌شود، نتیجه \lr{\textbf{\lr{EGPRS (Enhanced GPRS)}}} نامیده می‌شود:
+
+\begin{itemize}
+\tightlist
+\item
+  همان معماری \lr{\mbox{GPRS}} (\lr{\mbox{SGSN}}، \lr{\mbox{GGSN}}، زمینه‌های \lr{\mbox{PDP}})
+\item
+  همان پشته پروتکل
+\item
+  فقط لایه فیزیکی و لایه \lr{\mbox{RLC}} بهبود یافته‌اند
+\item
+  \textbf{افزونگی افزایشی \lr{\mbox{(IR)}}} را اضافه می‌کند: اگر یک بلوک شکست بخورد، با سوراخ‌کاری متفاوت دوباره ارسال می‌شود؛ گیرنده تلاش‌ها را ترکیب می‌کند تا احتمال رمزگشایی بهتری به دست آید
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{10.5}{تغییرات شبکه مورد نیاز برای \lr{\mbox{EDGE}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2963}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4815}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2222}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تغییر} & \CNth{توضیح} & \CNth{هزینه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+فرستنده-گیرنده‌های جدید & \lr{\mbox{BTS}} به فرستنده‌های توانمند \lr{\mbox{8PSK}} (تقویت‌کننده‌های خطی) نیاز دارد & متوسط \\
+ارتقای نرم‌افزار & \lr{\mbox{BSC}} و \lr{\mbox{SGSN}} به پشتیبانی طرح کدگذاری جدید نیاز دارند & کم \\
+بدون طیف جدید & از فرکانس‌های موجود \lr{\mbox{GSM}} استفاده می‌کند & صفر \\
+بدون سایت جدید & از سایت‌های سلول موجود استفاده می‌کند & صفر \\
+بدون گره هسته جدید & همان زیرساخت \lr{SGSN/\allowbreak{}GGSN} & صفر \\
+\end{longtable}
+}
+
+این امر \lr{\mbox{EDGE}} را به‌عنوان یک پله «\lr{\mbox{2.5G}}+» بسیار جذاب می‌کرد.
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m01-evolution}{8}
+
+\CNsection{11}{مسیر تحول: \lr{GSM \ensuremath{\to} GPRS \ensuremath{\to} EDGE \ensuremath{\to} 3G}}
+
+\CNchained\CNsubsection{11.1}{خط زمانی تحول}
+
+\CNfigure{m01-evolution}{خط زمانی تحول از \lr{\mbox{GSM}} تا \lr{\mbox{UMTS}}}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{11.2}{هر گام چه چیزی افزود}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1746}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2381}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2540}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسل} & \CNth{نوآوری کلیدی} & \CNth{مسیله حل‌شده} & \CNth{چه چیزی ثابت ماند} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{GSM}}}}} & سلولی دیجیتال، رومینگ & سیستم‌های آنالوگ ناسازگار & \lr{\mbox{—}} \\
+\lr{\mbox{\textbf{\lr{\mbox{GPRS}}}}} & لایه سوییچینگ بسته‌ای & داده بیش از حد گران بود (سوییچینگ مداری) & رادیو \lr{\mbox{GSM}}، \lr{\mbox{BSS}}، طیف \\
+\lr{\mbox{\textbf{\lr{\mbox{EDGE}}}}} & مدولاسیون \lr{\mbox{8PSK}} + تطبیق پیوند & \lr{\mbox{GPRS}} برای کاربردهای نوظهور بیش از حد کند بود & معماری \lr{\mbox{GPRS}}، طیف، سایت‌ها \\
+\lr{\textbf{\lr{UMTS (3G)}}} & واسط رادیویی جدید \lr{\mbox{(WCDMA)}}، حامل‌های \lr{\mbox{5~MHz}} & \lr{\mbox{EDGE}} هنوز نمی‌توانست ویدیو/\allowbreak{}رسانه غنی را پشتیبانی کند & مفاهیم شبکه هسته (\lr{\mbox{SGSN}} \ensuremath{\leftarrow} مدرن‌شده) \\
+\end{longtable}
+}
+
+\CNsubsection{11.3}{چرا این مسیر تحول اهمیت دارد}
+
+پیشرفت \lr{GSM \ensuremath{\to} GPRS \ensuremath{\to} EDGE} یک اصل کلیدی در مهندسی مخابرات را نشان می‌دهد:
+
+\begin{CNquote}
+
+\textbf{بازده را از زیرساخت موجود به حداکثر برسانید پیش از استقرار نسل‌های جدید.}
+
+\end{CNquote}
+
+هر گام برای موارد زیر طراحی شد:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{استفاده مجدد} از سرمایه‌گذاری‌های موجود (طیف، سایت‌ها، شبکه هسته)
+\item
+  \textbf{افزودن} قابلیت به‌صورت افزایشی
+\item
+  \textbf{اجازه} دادن به اپراتورها برای ارتقای تدریجی (نه «انفجار بزرگ»)
+\end{enumerate}
+
+این فلسفه امروز نیز ادامه دارد: \lr{4G \ensuremath{\to} 4G-Advanced \ensuremath{\to} 5G NSA \ensuremath{\to} 5G SA}.
+
+\Needspace{24\baselineskip}
+
+\CNsection{}{جدول خلاصه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2917}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2083}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{موضوع} & \CNth{\lr{\mbox{GSM}}} & \CNth{\lr{\mbox{GPRS}}} & \CNth{\lr{\mbox{EDGE}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{سوییچینگ} & مداری & بسته‌ای & بسته‌ای \\
+\textbf{مدولاسیون} & \lr{\mbox{GMSK}} & \lr{\mbox{GMSK}} & \lr{GMSK + 8PSK} \\
+\textbf{حداکثر نرخ داده} & \lr{9.6~kbps (14.4 CSD)} & \lr{171.2~kbps} (نظری) & \lr{473.6~kbps} (نظری) \\
+\textbf{داده عملی} & \lr{\mbox{9.6~kbps}} & \lr{30–80~kbps} & \lr{120–236~kbps} \\
+\textbf{صورت‌حساب} & بر مبنای دقیقه & بر مبنای مگابایت & بر مبنای مگابایت \\
+\textbf{همیشه فعال؟} & خیر (شماره‌گیری) & بله & بله \\
+\textbf{زیرساخت جدید} & شبکه کامل & + \lr{\mbox{SGSN}}، \lr{\mbox{GGSN}}، \lr{\mbox{PCU}} & + فرستنده-گیرنده‌های \lr{\mbox{8PSK}} \\
+\textbf{طیف جدید؟} & بله \lr{(900/\allowbreak{}1800~MHz)} & خیر & خیر \\
+\end{longtable}
+}
+
+\CNboxsection{پرسش‌های مرور}
+
+\begin{CNbox}[unbreakable]{q}{پرسش‌های مرور}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  توضیح دهید چرا \lr{\mbox{BSS}} با \lr{\mbox{BTS}}های «کم‌هوش» و یک \lr{\mbox{BSC}} هوشمند طراحی شده است. مزایای این تفکیک چیست؟
+\item
+  چرا \lr{\mbox{VLR}} وجود دارد؟ اگر هر عملیات نیازمند پرس‌وجو از \lr{\mbox{HLR}} بود چه اتفاقی می‌افتاد؟
+\item
+  در فرآیند احراز هویت \lr{\mbox{GSM}}، چرا \lr{\mbox{Ki}} هرگز از \lr{\mbox{SIM}} یا \lr{\mbox{AuC}} خارج نمی‌شود؟ در صورت خروج چه پیامدی داشت؟
+\item
+  توضیح دهید چرا سوییچینگ مداری برای ترافیک داده انفجاری مانند وب‌گردی به‌طور بنیادی ناکارآمد است.
+\item
+  نقش تونل‌سازی \lr{\mbox{GTP}} بین \lr{\mbox{SGSN}} و \lr{\mbox{GGSN}} چیست؟ چرا بسته‌ها نمی‌توانند به‌سادگی به‌طور عادی مسیریابی شوند؟
+\item
+  چرا \lr{\mbox{EDGE}} در شرایط رادیویی ضعیف به \lr{\mbox{GMSK}} بازمی‌گردد به‌جای اینکه همیشه از \lr{\mbox{8PSK}} استفاده کند؟
+\item
+  اگر \lr{\mbox{EDGE}} می‌تواند به حدود \lr{\mbox{236~kbps}} دست یابد، چرا همچنان \lr{3G (UMTS)} لازم بود؟
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{مراجع}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{3GPP TS 03.02: Network Architecture (GSM)}
+\item
+  \lr{3GPP TS 23.060: GPRS Service Description (Stage 2)}
+\item
+  \lr{3GPP TS 43.064: GERAN Overall Description (EDGE)}
+\item
+  \lr{3GPP TS 45.001: Physical Layer on the Radio Path}
+\item
+  \lr{Halonen, Romero, Melero: ``GSM, GPRS and EDGE Performance'' (Wiley, 2003)}
+\item
+  \lr{Eberspächer, Vögel, Bettstetter: ``GSM – Architecture, Protocols and Services'' (Wiley, 2009)}
+\end{itemize}

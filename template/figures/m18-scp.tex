@@ -1,0 +1,10 @@
+% Module 18 — indirect communication through the SCP
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNcp, minimum width=2cm] (a) at (0,0) {NF-A}; \node[CNhl, minimum width=2.2cm, minimum height=1.3cm] (scp) at (5,0) {SCP};
+\node[CNcp, minimum width=2cm] (b) at (10,0) {NF-B}; \node[CNcp, minimum width=2cm] (nrf) at (5,2.6) {NRF};
+\draw[CNsigl, ->] ([yshift=2.5mm]a.east) -- node[CNelab, above=1pt, fill=none] {\CNL{request}{درخواست}} ([yshift=2.5mm]scp.west);
+\draw[CNsigl, <-] ([yshift=-2.5mm]a.east) -- node[CNelab, below=1pt, fill=none] {\CNL{response}{پاسخ}} ([yshift=-2.5mm]scp.west);
+\draw[CNsigl, ->] ([yshift=2.5mm]scp.east) -- node[CNelab, above=1pt, fill=none] {\CNL{request}{درخواست}} ([yshift=2.5mm]b.west);
+\draw[CNsigl, <-] ([yshift=-2.5mm]scp.east) -- node[CNelab, below=1pt, fill=none] {\CNL{response}{پاسخ}} ([yshift=-2.5mm]b.west);
+\draw[CNlink, <->] (nrf) -- node[CNelab, right=2pt, fill=none, align=left] {\CNL{discovery}{کشف}\\{\scriptsize (\CNL{delegated or pre-loaded}{تفویض‌شده یا از پیش بارگذاری‌شده})}} (scp);
+\end{tikzpicture}

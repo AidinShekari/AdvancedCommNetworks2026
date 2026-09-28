@@ -1,0 +1,13 @@
+% Module 17 — 3GPP organisational structure
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNdark, text width=13cm] (op) at (5,0) {\CNL{3GPP Organizational Partners}{شرکای سازمانی \lr{3GPP}}\\{\scriptsize ETSI \,·\, ARIB \,·\, ATIS \,·\, CCSA \,·\, TTA \,·\, TTC \,·\, TSDSI}};
+\node[CNcp, text width=3.6cm] (pcg) at (5,-1.8) {\CNL{Project Co-ordination Group}{گروه هماهنگی پروژه}\\(PCG)};
+\draw[CNlink, ->] (op) -- (pcg);
+\foreach \k/\x/\t/\d/\wg in {r/0.3/TSG RAN/{\CNL{Radio Access Network}{شبکه دسترسی رادیویی}}/{RAN1: L1/PHY\\RAN2: L2/L3\\RAN3: Iub/Iu/Xn/NG\\RAN4: RF/RRM\\RAN5: \CNL{conformance testing}{آزمون انطباق}},
+                          s/5/TSG SA/{\CNL{Service \& System Aspects}{جنبه‌های خدمات و سیستم}}/{SA1: \CNL{services}{خدمات}\\SA2: \CNL{architecture}{معماری}\\SA3: \CNL{security}{امنیت}\\SA4: \CNL{media}{رسانه}\\SA5: \CNL{management/charging}{مدیریت/صورت‌حساب}\\SA6: \CNL{app. enablement}{توانمندسازی کاربرد}},
+                          c/9.7/TSG CT/{\CNL{Core Network \& Terminals}{شبکه هسته و پایانه‌ها}}/{CT1: MM/SM/CC\\CT3: \CNL{interworking}{هم‌کاری}\\CT4: MAP/GTP/Diameter\\CT6: \CNL{smart cards}{کارت‌های هوشمند}}}{
+  \node[CNran, text width=3.9cm] (\k) at (\x,-3.9) {\textbf{\t}\\{\scriptsize \d}};
+  \draw[CNlink, ->] (pcg.south) -- ++(0,-0.4) -| (\k.north);
+  \node[CNbox, text width=3.9cm, align=left, anchor=north, font=\sffamily\scriptsize] at ([yshift=-0.45cm]\k.south) {\wg};
+  \draw[CNlink, ->] (\k.south) -- ++(0,-0.45);}
+\end{tikzpicture}

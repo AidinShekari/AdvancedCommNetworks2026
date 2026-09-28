@@ -1,0 +1,13 @@
+% Module 22 — QoS policy and enforcement architecture
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNcp] (pcf) at (0,0) {PCF}; \node[CNcp] (smf) at (5,0) {SMF}; \node[CNran] (gnb) at (10,0) {gNB};
+\node[CNup, text width=2.2cm] (upf) at (5,-2.8) {\textbf{UPF}};
+\node[CNtiny, anchor=west, align=left] at (6.3,-2.8) {\CNL{Enforces:}{اعمال می‌کند:}\\– \CNL{SDF detection}{تشخیص \lr{SDF}}\\– \CNL{QFI marking}{علامت‌گذاری \lr{QFI}}\\– \CNL{gate control (open/close)}{کنترل دروازه (باز/بسته)}\\– \CNL{rate policing (GBR/MBR)}{پلیس نرخ (\lr{GBR/MBR})}\\– \CNL{traffic measurement}{اندازه‌گیری ترافیک}};
+\node[CNhl] (af) at (0,-5.0) {AF (IMS)}; \node[CNext] (app) at (5,-5.0) {App};
+\draw[CNsigl, ->] (pcf) -- node[CNelab, above=1pt, fill=none] {PCC \CNL{rules}{قواعد}} (smf);
+\draw[CNsigl, ->] (smf) -- node[CNelab, above=1pt, fill=none] {QoS \CNL{profile}{نمایه}} (gnb);
+\draw[CNsigl, ->] (smf) -- node[CNelab, right=1pt, fill=none, align=left] {PDR/FAR/QER\\(PFCP \CNL{rules}{قواعد})} (upf);
+\draw[CNsigl, ->] (af) -- node[CNelab, left=1pt, fill=none, align=right] {\CNL{policy decision}{تصمیم سیاست}\\(\CNL{from AF/NEF}{از \lr{AF/NEF}})} (pcf);
+\draw[CNlink, ->] (app) -- node[CNelab, above=1pt, fill=none] {\CNL{service request}{درخواست خدمت}} (af);
+\node[CNnote, anchor=north, text width=11cm] at (5,-5.8) {\CNLP{Flow: AF requests QoS $\rightarrow$ PCF creates the policy $\rightarrow$ SMF enforces $\rightarrow$ UPF marks/polices $\rightarrow$ gNB schedules $\rightarrow$ UE classifies}{جریان: \lr{AF} درخواست \lr{QoS} می‌دهد $\leftarrow$ \lr{PCF} سیاست را می‌سازد $\leftarrow$ \lr{SMF} اعمال می‌کند $\leftarrow$ \lr{UPF} علامت‌گذاری/پلیس می‌کند $\leftarrow$ \lr{gNB} زمان‌بندی می‌کند $\leftarrow$ \lr{UE} طبقه‌بندی می‌کند}};
+\end{tikzpicture}

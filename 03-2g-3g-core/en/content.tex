@@ -1,0 +1,686 @@
+\Needspace{14\baselineskip}
+
+\CNsection{3.1}{Evolution from 2G to 3G — The Driving Forces}
+
+\CNchained\CNsubsection{}{Why Did We Need 3G?}
+
+The transition from 2G (GSM) to 3G (UMTS) was driven by fundamental market and technology demands:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Exploding Data Demand}: SMS and basic WAP browsing were insufficient. Users wanted email, web browsing, and file downloads on mobile devices.
+\item
+  \textbf{Multimedia Services}: Video calling, streaming audio/\allowbreak{}video, and rich content required bandwidth far beyond GSM’s 9.6~kbps (or even GPRS’s theoretical 171~kbps).
+\item
+  \textbf{Higher Data Rates}: The ITU’s IMT-2000 vision targeted:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    144~kbps for high mobility (vehicular)
+  \item
+    384~kbps for pedestrian
+  \item
+    2~Mbps for stationary/\allowbreak{}indoor
+  \end{itemize}
+\item
+  \textbf{Global Roaming}: A unified worldwide standard (unlike fragmented 2G: GSM vs CDMA vs PDC).
+\item
+  \textbf{Spectrum Efficiency}: WCDMA’s spreading codes allow more users per cell with graceful degradation.
+\end{enumerate}
+
+\CNkeepfig{m03-evolution}{3}
+
+\CNsubsection{}{The Evolution Path}
+
+\CNfigure{m03-evolution}{Generations and their peak data rates}
+
+\CNsection{3.2}{UMTS Architecture Overview}
+
+UMTS (Universal Mobile Telecommunications System) is built on two major domains:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{UTRAN} (UMTS Terrestrial Radio Access Network) — the radio/\allowbreak{}air interface side
+\item
+  \textbf{Core Network (CN)} — the intelligence and connectivity backbone
+\end{itemize}
+
+\CNsubsection{}{Key Design Principles}
+
+\begin{itemize}
+\tightlist
+\item
+  Backward compatibility with GSM/\allowbreak{}GPRS core
+\item
+  Separation of radio access from core network (allowing independent evolution)
+\item
+  Split core into Circuit-Switched (CS) and Packet-Switched (PS) domains
+\item
+  Support for simultaneous voice and data
+\end{itemize}
+
+\CNkeepfig{m03-umts-architecture}{3}
+
+\CNsubsection{}{UMTS Architecture Diagram}
+
+\CNfigure{m03-umts-architecture}{UMTS architecture: UTRAN with the CS and PS core domains}
+
+\Needspace{14\baselineskip}
+
+\Needspace{25\baselineskip}
+
+\CNsection{3.3}{UTRAN: NodeB and RNC}
+
+\CNchained\CNsubsection{}{NodeB (Base Station)}
+
+The NodeB is the 3G equivalent of the GSM BTS (Base Transceiver Station):
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4444}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5556}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Function} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Primary Role} & Radio transmission/\allowbreak{}reception over the Uu air interface \\
+\textbf{Spreading/\allowbreak{}Despreading} & Applies WCDMA spreading codes \\
+\textbf{Power Control} & Inner-loop power control (fast, 1500~Hz) \\
+\textbf{Soft Handover} & Supports macro-diversity combining \\
+\textbf{Channel Coding} & Encoding/\allowbreak{}decoding of transport channels \\
+\textbf{Interface} & Connected to RNC via Iub interface (ATM or IP-based) \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{Key Difference from GSM BTS}: NodeB has MORE intelligence — it handles fast power control and soft handover combining locally, reducing latency.
+
+\end{CNquote}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{RNC (Radio Network Controller)}
+
+The RNC is the 3G equivalent of the GSM BSC, but with significantly more responsibilities:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4444}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5556}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Function} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Radio Resource Management} & Admission control, code allocation, load control \\
+\textbf{Handover Decision} & Soft/\allowbreak{}softer/\allowbreak{}hard handover management \\
+\textbf{Outer-Loop Power Control} & SIR target adjustment \\
+\textbf{Ciphering/\allowbreak{}Integrity} & Security functions for user data and signaling \\
+\textbf{Protocol Termination} & RRC (Radio Resource Control) protocol endpoint \\
+\textbf{Macro-Diversity Combining} & Combines signals from multiple NodeBs \\
+\textbf{Segmentation/\allowbreak{}Reassembly} & RLC layer processing \\
+\end{longtable}
+}
+
+\CNsubsection{}{RNC Roles (One RNC Can Play Multiple Roles)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Serving RNC (S-RNC)}: Maintains the RRC connection with UE, performs outer-loop power control
+\item
+  \textbf{Drift RNC (D-RNC)}: Provides radio resources when UE moves but S-RNC doesn’t change
+\item
+  \textbf{Controlling RNC (C-RNC)}: Controls the logical resources of its NodeBs
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{UTRAN Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2444}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2222}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Connects} & \CNth{Protocol Stack} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Uu} & UE \ensuremath{\leftrightarrow} NodeB & WCDMA air interface & Radio transmission \\
+\textbf{Iub} & NodeB \ensuremath{\leftrightarrow} RNC & NBAP over ATM/\allowbreak{}IP & NodeB control and user data \\
+\textbf{Iur} & RNC \ensuremath{\leftrightarrow} RNC & RNSAP over ATM/\allowbreak{}IP & Inter-RNC soft handover, relocation \\
+\textbf{Iu-CS} & RNC \ensuremath{\leftrightarrow} MSC & RANAP over ATM & Circuit-switched traffic \\
+\textbf{Iu-PS} & RNC \ensuremath{\leftrightarrow} SGSN & RANAP over IP & Packet-switched traffic \\
+\end{longtable}
+}
+
+\Needspace{27\baselineskip}
+
+\CNsection{3.4}{3G Core Network: CS Domain + PS Domain}
+
+The 3G core network inherits the GSM/\allowbreak{}GPRS split architecture, maintaining two parallel domains:
+
+\CNsubsection{}{Circuit-Switched (CS) Domain}
+
+Handles real-time voice calls and video telephony (same as GSM core, upgraded for 3G).
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Element} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{MSC (Mobile Switching Centre)} & Call routing, handover between RNCs, call control signaling \\
+\textbf{VLR (Visitor Location Register)} & Temporary storage of subscriber data for visitors in the MSC area \\
+\textbf{GMSC (Gateway MSC)} & Interface to external networks (PSTN, ISDN), handles incoming calls \\
+\textbf{HLR (Home Location Register)} & Permanent subscriber database (shared with PS domain) \\
+\textbf{AuC (Authentication Centre)} & Stores authentication keys (Ki), generates security vectors \\
+\textbf{EIR (Equipment Identity Register)} & IMEI blacklist/\allowbreak{}whitelist for stolen device blocking \\
+\end{longtable}
+}
+
+\CNkeepfig{m03-cs-path}{2}
+
+\textbf{CS Domain Call Flow}:
+
+\CNfigure{m03-cs-path}{CS domain call flow}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{}{Packet-Switched (PS) Domain}
+
+Handles all data services (web, email, streaming) — evolved from GPRS.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Element} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{SGSN (Serving GPRS Support Node)} & Packet routing, mobility management, session management, ciphering \\
+\textbf{GGSN (Gateway GPRS Support Node)} & Interface to external packet networks (Internet), IP address allocation, billing anchor \\
+\end{longtable}
+}
+
+\CNkeepfig{m03-ps-path}{2}
+
+\textbf{PS Domain Data Flow}:
+
+\CNfigure{m03-ps-path}{PS domain data flow}
+
+\CNsubsection{}{Why Two Domains?}
+
+The split CS/\allowbreak{}PS approach was a \textbf{pragmatic engineering decision}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Legacy Compatibility}: Voice infrastructure (SS7, PSTN interconnect) was mature and reliable — no reason to rebuild it
+\item
+  \textbf{QoS Guarantees}: Circuit-switching provides deterministic delay for voice (guaranteed 20ms frame delivery)
+\item
+  \textbf{Incremental Deployment}: Operators could add PS domain without disrupting existing voice revenue
+\item
+  \textbf{Risk Mitigation}: IP networks in 2000 couldn’t guarantee voice quality — packet loss and jitter were real problems
+\end{enumerate}
+
+\CNsection{3.5}{The Iu Interface}
+
+The Iu interface is the critical boundary between UTRAN and the Core Network.
+
+\CNsubsection{}{Iu-CS (Circuit-Switched)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Transport}: ATM (AAL2 for user plane, AAL5 for control plane)
+\item
+  \textbf{Control Plane}: RANAP \ensuremath{\to} SCCP \ensuremath{\to} M3UA \ensuremath{\to} SCTP (or MTP3b)
+\item
+  \textbf{User Plane}: Iu UP protocol (framing for AMR voice codec frames)
+\item
+  \textbf{Purpose}: Carries voice calls and video telephony
+\end{itemize}
+
+\CNsubsection{}{Iu-PS (Packet-Switched)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Transport}: IP-based (GTP-U for user plane)
+\item
+  \textbf{Control Plane}: RANAP \ensuremath{\to} SCCP \ensuremath{\to} M3UA \ensuremath{\to} SCTP
+\item
+  \textbf{User Plane}: GTP-U (GPRS Tunneling Protocol - User plane)
+\item
+  \textbf{Purpose}: Carries all packet data (web, email, streaming)
+\end{itemize}
+
+\CNsubsection{}{RANAP (Radio Access Network Application Part)}
+
+Key procedures over Iu:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{RAB (Radio Access Bearer) Assignment}: Sets up the end-to-end bearer
+\item
+  \textbf{Relocation}: Moves Serving RNC role to another RNC (hard handover)
+\item
+  \textbf{Paging}: Core network pages UE through UTRAN
+\item
+  \textbf{Security Mode}: Activates ciphering and integrity protection
+\item
+  \textbf{Direct Transfer}: Passes NAS messages transparently (e.g., MM, CC, SM)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3.6}{Release 99 vs Release 5+ (HSPA Evolution)}
+
+\CNchained\CNsubsection{}{Release 99 (R99) — Original UMTS}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Downlink}: Up to 384~kbps (dedicated channels)
+\item
+  \textbf{Uplink}: Up to 384~kbps
+\item
+  \textbf{Channel Type}: Dedicated Channel (DCH) — one code per user
+\item
+  \textbf{Scheduling}: Done at RNC level (slow, \textasciitilde{}100ms TTI)
+\item
+  \textbf{Power Control}: Primary mechanism for link adaptation
+\item
+  \textbf{Limitation}: Inefficient for bursty data (keeps resources allocated even during silence)
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Release 5 — HSDPA (High Speed Downlink Packet Access)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{Improvement} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Peak Rate} & 14.4~Mbps (DL) \\
+\textbf{Shared Channel} & HS-DSCH — time-multiplexed among users \\
+\textbf{Scheduling} & Moved to NodeB (2ms TTI — fast, channel-aware) \\
+\textbf{AMC} & Adaptive Modulation \& Coding (QPSK \ensuremath{\to} 16QAM \ensuremath{\to} 64QAM) \\
+\textbf{HARQ} & Hybrid ARQ with soft combining at NodeB \\
+\textbf{No Power Control} & Transmits at full power, adapts rate instead \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Release 6 — HSUPA (High Speed Uplink Packet Access)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{Improvement} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Peak Rate} & 5.76~Mbps (UL) \\
+\textbf{Channel} & E-DCH (Enhanced Dedicated Channel) \\
+\textbf{Scheduling} & NodeB-controlled with 2ms/\allowbreak{}10ms TTI \\
+\textbf{HARQ} & Uplink soft combining \\
+\textbf{Benefit} & Better latency, higher throughput for uploads \\
+\end{longtable}
+}
+
+\CNsubsection{}{Release 7/\allowbreak{}8 — HSPA+}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{64QAM downlink}, \textbf{16QAM uplink}
+\item
+  \textbf{MIMO} (2\ensuremath{\times}2) for downlink
+\item
+  \textbf{Dual-carrier} operation (2 \ensuremath{\times} 5~MHz)
+\item
+  Peak rates: \textbf{42~Mbps DL}, \textbf{11.5~Mbps UL}
+\item
+  \textbf{Flat architecture option}: Direct NodeB-to-GGSN (bypassing RNC)
+\end{itemize}
+
+\CNsubsection{}{The Shift in Philosophy}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+R99:  RNC controls everything → Centralized, slow adaptation
+R5+:  NodeB makes fast decisions → Distributed, rapid adaptation (2ms vs 100ms)
+\end{Verbatim}
+\end{CNplaincode}
+
+This shift foreshadowed LTE’s design where the eNodeB handles almost all radio decisions.
+
+\Needspace{14\baselineskip}
+
+\CNsection{3.7}{IMS (IP Multimedia Subsystem) — Introduction}
+
+\CNchained\CNsubsection{}{What is IMS?}
+
+IMS is a \textbf{framework for delivering IP-based multimedia services} over mobile networks. Introduced in 3GPP Release 5, it represents the vision of converging ALL services (voice, video, messaging, presence) onto IP.
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{Why IMS?}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Problem} & \CNth{IMS Solution} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CS domain can’t evolve (legacy SS7) & All-IP signaling using SIP \\
+Adding new services requires network upgrades & Application servers plug in modularly \\
+Voice and data are separate worlds & Unified session control for all media \\
+No service interaction (voice OR data) & Combinational services (voice + video + sharing) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Key IMS Components}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{P-CSCF (Proxy-CSCF)}: First contact point, SIP proxy, policy enforcement
+\item
+  \textbf{I-CSCF (Interrogating-CSCF)}: Entry point from other networks, routes to correct S-CSCF
+\item
+  \textbf{S-CSCF (Serving-CSCF)}: Core session control, service trigger logic, SIP registrar
+\item
+  \textbf{HSS (Home Subscriber Server)}: Evolution of HLR, stores user profiles and service triggers
+\item
+  \textbf{Application Servers}: Provide actual services (VoIP, conferencing, messaging)
+\end{itemize}
+
+\CNsubsection{}{IMS Signaling Protocol: SIP}
+
+IMS uses \textbf{SIP (Session Initiation Protocol)} instead of SS7:
+
+\begin{itemize}
+\tightlist
+\item
+  Text-based, extensible
+\item
+  Works natively over IP
+\item
+  Supports any media type (voice, video, gaming, IoT)
+\item
+  Enables service composition and mashups
+\end{itemize}
+
+\CNsubsection{}{IMS’s Role in the 2G\ensuremath{\to}4G Journey}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+2G: Voice = CS (SS7)          Data = None/CSD
+3G: Voice = CS (SS7)          Data = PS (GTP)         IMS = Optional overlay
+4G: Voice = VoLTE via IMS     Data = PS (GTP)         IMS = Mandatory for voice
+5G: Voice = VoNR via IMS      Data = PS (GTP/SBA)     IMS = Still essential
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{27\baselineskip}
+
+\CNsection{3.8}{Major Comparison Table: Mobile Network Generations}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1286}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1857}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1857}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1429}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{2G (GSM)} & \CNth{2.5G (GPRS)} & \CNth{3G (UMTS R99)} & \CNth{3.5G (HSPA)} & \CNth{4G (LTE)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Radio Access} & TDMA/\allowbreak{}FDMA (200~kHz channels, 8 timeslots) & Same as GSM (shared timeslots) & WCDMA (5~MHz carrier, spreading codes) & WCDMA + shared channels (HS-DSCH/\allowbreak{}E-DCH) & OFDMA DL /\allowbreak{} SC-FDMA UL (1.4–20~MHz) \\
+\textbf{Core Network} & MSC/\allowbreak{}VLR/\allowbreak{}HLR (SS7-based) & MSC + SGSN/\allowbreak{}GGSN added & MSC/\allowbreak{}VLR (CS) + SGSN/\allowbreak{}GGSN (PS) & Same as 3G (optional flat arch in HSPA+) & EPC: MME/\allowbreak{}S-GW/\allowbreak{}P-GW (all-IP, flat) \\
+\textbf{Switching Type} & Circuit-switched only & CS (voice) + PS (data) & CS (voice) + PS (data) & CS (voice) + PS (data) & Packet-switched ONLY \\
+\textbf{Peak Data Rate (DL)} & 9.6~kbps (CSD) /\allowbreak{} 14.4~kbps (HSCSD) & 171.2~kbps (theoretical) /\allowbreak{} \textasciitilde{}40~kbps (practical) & 384~kbps (pedestrian) /\allowbreak{} 2~Mbps (indoor) & 14.4~Mbps (HSDPA) /\allowbreak{} 42~Mbps (HSPA+) & 300~Mbps (Cat 5) /\allowbreak{} 3~Gbps (Cat 20) \\
+\textbf{Peak Data Rate (UL)} & 9.6~kbps & 171.2~kbps (theoretical) /\allowbreak{} \textasciitilde{}20~kbps (practical) & 384~kbps & 5.76~Mbps (HSUPA) /\allowbreak{} 11.5~Mbps (HSPA+) & 75~Mbps (Cat 5) /\allowbreak{} 1.5~Gbps (Cat 20) \\
+\textbf{Latency (RTT)} & \textasciitilde{}500~ms (data) & \textasciitilde{}300–600~ms & \textasciitilde{}150–200~ms & \textasciitilde{}50–100~ms (HSPA) /\allowbreak{} \textasciitilde{}30~ms (HSPA+) & \textasciitilde{}10–30~ms (user plane) /\allowbreak{} \textasciitilde{}50~ms (control) \\
+\textbf{Mobility Support} & Handover (hard) up to 250 km/\allowbreak{}h & Same as GSM & Soft handover + hard handover, up to 500 km/\allowbreak{}h & Same as UMTS & Hard handover only, up to 500 km/\allowbreak{}h \\
+\textbf{Signaling Protocol} & SS7 (MAP, ISUP, BSSAP) & SS7 + GTP-C & SS7 (RANAP, MAP) + GTP-C & Same as 3G & Diameter + GTP-C v2 (all IP-based) \\
+\textbf{Main Innovation} & Digital voice, SMS, roaming, SIM & Always-on data, IP connectivity, shared radio & Wideband data, video calls, multimedia, soft handover & Fast scheduling at NodeB, AMC, HARQ, shared channels & All-IP flat architecture, OFDMA, MIMO, VoLTE \\
+\textbf{Main Limitation} & No real data capability & Low throughput, high latency, shared with voice timeslots & Dedicated channels waste resources for bursty data & Still CS voice, complex dual-stack & No native voice (needs VoLTE/\allowbreak{}IMS), complex handover to 2G/\allowbreak{}3G \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m03-cs-ps-domains}{10}
+
+\CNsection{3.9}{The CS/\allowbreak{}PS Split — And Why LTE Killed It}
+
+\CNchained\CNsubsection{}{The Problem with Dual Domains}
+
+Running CS and PS domains in parallel meant:
+
+\CNfigure{m03-cs-ps-domains}{Two parallel core domains in the operator network}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Costs of the Split Architecture}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5294}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4706}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Problem} & \CNth{Impact} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Duplicate infrastructure} & Two complete core networks to maintain, upgrade, and staff \\
+\textbf{Inefficient spectrum use} & CS reserves capacity even during silence (60\% of a call is silence) \\
+\textbf{No service convergence} & Voice and data can’t easily interact (e.g., sharing a photo during a call) \\
+\textbf{SS7 is legacy} & Hard to extend, proprietary equipment, no IP ecosystem benefits \\
+\textbf{Separate billing} & Voice minutes + data MB = complex charging systems \\
+\textbf{Scaling limitations} & CS scales with ports/\allowbreak{}trunks (expensive), PS scales with bandwidth (cheap) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Why LTE Unified to Packet-Only (EPC)}
+
+LTE’s Evolved Packet Core (EPC) made a radical decision: \textbf{NO circuit-switching at all}.
+
+\CNsubsubsection{The Technical Enablers (What Changed by 2008):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{IP Networks Matured}: QoS mechanisms (DiffServ, MPLS, dedicated bearers) could now guarantee voice quality
+\item
+  \textbf{Codec Efficiency}: AMR-WB and EVS codecs work well over IP with minimal bandwidth (\textasciitilde{}12~kbps)
+\item
+  \textbf{Low Latency Achieved}: LTE’s \textasciitilde{}10ms RTT is actually BETTER than CS voice (\textasciitilde{}50ms codec delay anyway)
+\item
+  \textbf{VoIP Proven}: Skype, Vonage proved IP voice was commercially viable
+\item
+  \textbf{IMS Was Ready}: After years of development, IMS could replace SS7 call control with SIP
+\item
+  \textbf{Economics}: IP equipment costs 1/\allowbreak{}10th of equivalent TDM/\allowbreak{}SS7 equipment
+\end{enumerate}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{The EPC Architecture (All Packet):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3448}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3448}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Element} & \CNth{Replaces} & \CNth{Function} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{MME} & MSC (control plane) & Mobility, authentication, bearer management — signaling only \\
+\textbf{S-GW} & SGSN (user plane) & Local mobility anchor, data forwarding between eNodeBs \\
+\textbf{P-GW} & GGSN & External network gateway, IP allocation, policy/\allowbreak{}charging \\
+\textbf{HSS} & HLR + AuC & Subscriber data, authentication vectors \\
+\textbf{PCRF} & — (new) & Policy and Charging Rules — enables QoS per-flow \\
+\end{longtable}
+}
+
+\CNkeepfig{m03-voice-paths}{2}
+
+\CNsubsubsection{How Voice Works Without CS (VoLTE):}
+
+\CNfigure{m03-voice-paths}{Voice path in 3G (circuit) versus LTE (VoLTE over IMS)}
+
+\CNsubsubsection{Benefits of Unified Packet Architecture:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Single infrastructure} to maintain \ensuremath{\to} 50\%+ OPEX reduction
+\item
+  \textbf{Statistical multiplexing} \ensuremath{\to} no wasted capacity during silence
+\item
+  \textbf{Service convergence} \ensuremath{\to} voice + video + data on same bearer simultaneously
+\item
+  \textbf{Rapid service innovation} \ensuremath{\to} new services via Application Servers, not network upgrades
+\item
+  \textbf{HD Voice} \ensuremath{\to} AMR-WB (wideband) sounds dramatically better than GSM’s narrowband codec
+\item
+  \textbf{Network simplification} \ensuremath{\to} fewer interfaces, fewer protocol stacks, fewer points of failure
+\end{enumerate}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{The Trade-off}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2286}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{CS (2G/\allowbreak{}3G)} & \CNth{PS-only (LTE)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Voice reliability & Extremely high (30+ years proven) & Depends on coverage and VoLTE implementation \\
+Call setup time & \textasciitilde{}3–5 seconds & \textasciitilde{}1–2 seconds (SIP is faster) \\
+Emergency calls & Always works (CS fallback) & Requires VoLTE or CSFB to 2G/\allowbreak{}3G \\
+Complexity & Simple for voice, complex overall & Simple overall, complex for voice QoS \\
+Coverage gaps & Voice still works at cell edge & Voice drops if LTE coverage drops (needs CSFB) \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{CSFB (Circuit-Switched Fallback)}: Early LTE networks fell back to 3G/\allowbreak{}2G for voice calls. This was a transitional solution until VoLTE coverage was ubiquitous.
+
+\end{CNquote}
+
+\CNsection{3.10}{Summary: Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{3G (UMTS)} introduced WCDMA radio with dedicated channels and maintained the 2G CS/\allowbreak{}PS split core
+\item
+  \textbf{UTRAN} separates radio functions: NodeB (physical layer) and RNC (radio resource management)
+\item
+  \textbf{The Iu interface} cleanly separates radio access from core — enabling independent evolution
+\item
+  \textbf{HSPA (R5/\allowbreak{}R6)} moved intelligence to NodeB (fast scheduling, HARQ, AMC) — a preview of LTE’s philosophy
+\item
+  \textbf{IMS} provides the all-IP service layer that eventually replaces SS7 for voice
+\item
+  \textbf{LTE unified everything to packets} because IP matured enough to guarantee voice QoS, and the economics of maintaining dual infrastructure became unjustifiable
+\item
+  \textbf{The evolution was gradual}: each generation solved real limitations of the previous one
+\end{enumerate}
+
+\CNboxsection{Review Questions}
+
+\begin{CNbox}[unbreakable]{q}{Review Questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Explain why UMTS maintained separate CS and PS domains instead of going all-packet from the start.
+\item
+  What is the difference between a Serving RNC and a Drift RNC?
+\item
+  How does HSDPA’s NodeB-based scheduling improve over R99’s RNC-based scheduling?
+\item
+  Draw the protocol stack for the Iu-PS interface.
+\item
+  Why was IMS necessary for LTE to eliminate the CS domain?
+\item
+  Compare the role of SGSN in 3G with S-GW in LTE — what changed and why?
+\end{enumerate}
+
+\emph{Module 3 — Advanced Communication Networks — 2G/\allowbreak{}3G Core Networks}\CNbr{}\emph{Next: Module 4 — LTE/\allowbreak{}EPC Architecture}
+
+\end{CNbox}

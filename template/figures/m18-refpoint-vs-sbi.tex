@@ -1,0 +1,14 @@
+% Module 18 — EPC reference points versus the 5G service bus
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle] at (1.3,1.2) {\CNL{EPC (reference points)}{\lr{EPC} (نقاط مرجع)}};
+\node[CNcp] (mme) at (0,0) {MME}; \node[CNcp] (sgw) at (2.8,0) {S-GW};
+\node[CNdb] (hss) at (0,-2.2) {HSS}; \node[CNcp] (pgw) at (2.8,-2.2) {P-GW};
+\draw[CNsigl] (mme) -- node[CNelab, above=1pt, fill=none] {S11} (sgw);
+\draw[CNsigl] (mme) -- node[CNelab, left=1pt, fill=none] {S6a} (hss);
+\draw[CNsigl] (sgw) -- node[CNelab, right=1pt, fill=none] {S5/S8} (pgw);
+\node[CNtitle] at (10.3,1.2) {\CNL{5G SBA (service-based)}{\lr{5G SBA} (خدمات‌محور)}};
+\node[CNdark, fill=CNsig, draw=CNsig, minimum width=9.6cm, minimum height=0.65cm] (bus) at (10.3,0.1) {\CNL{Common service bus (SBI)}{گذرگاه خدمات مشترک (\lr{SBI})}};
+\foreach \n/\s [count=\k from 0] in {AMF/Namf, SMF/Nsmf, PCF/Npcf, UDM/Nudm, AUSF/Nausf, NRF/Nnrf, NSSF/Nnssf}{
+  \node[CNcp, minimum width=1.2cm, text width=1.05cm, inner xsep=1pt] (n\k) at ({6.1+\k*1.4},-1.7) {\textbf{\n}\\{\scriptsize \s}};
+  \draw[CNlink, line width=1pt] (n\k.north) -- (n\k.north |- bus.south);}
+\end{tikzpicture}

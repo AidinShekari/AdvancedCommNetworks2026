@@ -1,0 +1,13 @@
+% Module 21 — shared network functions and slice-specific network functions
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.5,-0.75) rectangle (12.1,1.25);
+\node[font=\sffamily\small\bfseries, text=CNink] at (5.8,0.9) {\CNL{SHARED LAYER}{لایه مشترک}};
+\foreach \n [count=\k from 0] in {AMF, NSSF, NRF, UDM, AUSF}{\node[CNcp, minimum width=1.6cm] at ({1.0+\k*2.45},0) {\n};}
+\draw[CNline, line width=0.9pt, fill=white, rounded corners=5pt] (-0.5,-4.95) rectangle (12.1,-1.0);
+\node[font=\sffamily\small\bfseries, text=CNink] at (5.8,-1.35) {\CNL{SLICE-SPECIFIC LAYER}{لایه ویژه هر برش}};
+\foreach \s/\x/\i/\c in {{eMBB}/0.1/1/CNcyan, {URLLC}/6.2/2/CNsig}{
+  \draw[\c, line width=0.9pt, fill=\c!6, rounded corners=4pt] (\x,-4.7) rectangle (\x+5.4,-1.75);
+  \node[font=\sffamily\small\bfseries, text=\c] at (\x+2.7,-2.1) {\s{} \CNL{slice}{برش}};
+  \node[CNcp, minimum width=2.1cm] at (\x+1.4,-2.95) {SMF-\i}; \node[CNup, minimum width=2.1cm] at (\x+4.0,-2.95) {UPF-\i};
+  \node[CNcp, minimum width=2.1cm] at (\x+1.4,-4.0) {PCF-\i}; \node[CNbox, minimum width=2.1cm] at (\x+4.0,-4.0) {CHF-\i};}
+\end{tikzpicture}

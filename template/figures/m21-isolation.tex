@@ -1,0 +1,11 @@
+% Module 21 — three levels of slice isolation
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \l/\t/\d/\n/\c [count=\k from 0] in {
+   1/{\CNL{Logical isolation}{جداسازی منطقی}}/{\CNL{shared infrastructure, policy-based separation}{زیرساخت مشترک، جداسازی مبتنی بر سیاست}}/{\CNL{lowest cost, weakest guarantees}{کمترین هزینه، ضعیف‌ترین تضمین}}/CNcyan,
+   2/{\CNL{Virtual isolation}{جداسازی مجازی}}/{\CNL{dedicated VMs/containers, virtual networks}{\lr{VM}/کانتینر اختصاصی، شبکه‌های مجازی}}/{\CNL{moderate cost, good separation}{هزینه متوسط، جداسازی خوب}}/CNamber,
+   3/{\CNL{Physical isolation}{جداسازی فیزیکی}}/{\CNL{dedicated hardware, spectrum, fibre}{سخت‌افزار، طیف و فیبر اختصاصی}}/{\CNL{highest cost, strongest guarantees (enterprise/government)}{بیشترین هزینه، قوی‌ترین تضمین (سازمانی/دولتی)}}/CNsig}{
+  \node[CNdark, fill=\c, draw=\c, minimum width=1.9cm] (L\k) at (0,-\k*1.5) {\CNL{Level}{سطح} \l};
+  \node[CNbox, text width=6.2cm, align=left, anchor=west] at (1.2,-\k*1.5) {\textbf{\t}\\{\scriptsize \d}};
+  \node[CNtiny, anchor=west, text width=4.3cm, align=left] at (8.4,-\k*1.5) {\n};}
+\draw[CNlink, ->, line width=1.3pt] (-1.5,0.4) -- node[left, CNtiny, align=right] {\CNL{cost and}{هزینه و}\\\CNL{guarantees}{تضمین}} (-1.5,-3.4);
+\end{tikzpicture}

@@ -1,0 +1,21 @@
+% !TEX program = xelatex
+% Advanced Communication Networks — Fall 2026-2027 (English)
+% Instructor: Amin Azari — compile with XeLaTeX (or tectonic).
+\documentclass[11pt]{article}
+\def\CNroot{../../template}
+\input{\CNroot/acn-en}
+\CNsetmodule{13}{S-GW (Serving Gateway) and P-GW (PDN Gateway)}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده) و \lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}
+\begin{document}
+\CNcoverpage{Module 13}{S-GW (Serving Gateway) and P-GW (PDN Gateway)}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده) و \lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why Separate S-GW and P-GW?}
+\CNtocitem{2}{2}{S-GW (Serving Gateway)}
+\CNtocitem{3}{3}{P-GW (PDN Gateway)}
+\CNtocitem{4}{4}{GTP Protocol}
+\CNtocitem{5}{5}{Packet Path Trace (End-to-End with Encapsulation)}
+\CNtocitem{6}{6}{CUPS: Control and User Plane Separation}
+\CNtocitem{7}{7}{Evolution: S-GW + P-GW \ensuremath{\to} UPF (5G)}
+\CNtocitem{8}{}{Summary}
+\end{CNminitoc}
+\input{content}
+\end{document}

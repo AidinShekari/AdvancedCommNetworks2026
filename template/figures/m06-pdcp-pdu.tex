@@ -1,0 +1,8 @@
+% Module 6 — PDCP PDU format
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, fld/.style={draw=CNinkL!70, line width=0.7pt, minimum height=1.1cm, align=center, inner sep=2pt, font=\sffamily\small}]
+\node[fld, fill=CNsig!9, minimum width=1.3cm] (dc) at (0,0) {D/C\\{\scriptsize (1 b)}};
+\node[fld, fill=CNsig!9, minimum width=2.2cm, anchor=west] (sn) at (dc.east) {SN\\{\scriptsize (12/18 b)}};
+\node[fld, fill=CNcyan!14, minimum width=6.4cm, anchor=west] (d) at (sn.east) {Data \CNL{(encrypted)}{(رمزشده)}};
+\node[fld, fill=CNamber!18, minimum width=2.3cm, anchor=west] (mac) at (d.east) {MAC-I\\{\scriptsize (\CNL{CP only}{فقط \lr{CP}})}};
+\draw[decorate, decoration={brace, amplitude=4pt, mirror}, CNmuted] (dc.south west) -- node[below=5pt, CNtiny] {\CNL{header}{سرآیند}} (sn.south east);
+\end{tikzpicture}

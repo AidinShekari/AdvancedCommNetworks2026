@@ -1,0 +1,575 @@
+\Needspace{21\baselineskip}
+
+\CNsection{1}{Why SDN?}
+
+Traditional networks suffer from fundamental limitations that hinder innovation and agility:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Problem} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Distributed Control} & Every device runs its own control plane independently. No single entity has a global view of the network state. \\
+\textbf{Vendor Lock-in} & Proprietary hardware + software bundles. Migrating between vendors is costly and complex. \\
+\textbf{Slow Provisioning} & Manual, box-by-box configuration via CLI. Weeks to deploy a new service. Human errors cause outages. \\
+\textbf{Rigid Architecture} & Adding new protocols requires vendor firmware updates. Innovation cycles measured in years. \\
+\textbf{Inconsistent Policies} & Policies must be manually replicated across hundreds of devices. Drift is inevitable. \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{The Core Insight}: If we separate the ``brain'' (control plane) from the ``muscle'' (data plane), we can centralize intelligence, automate operations, and program the network like software.
+
+\end{CNquote}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{Traditional vs SDN Architecture}
+
+\CNchained\CNsubsection{}{Traditional Architecture}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Control plane embedded in every device}
+\item
+  Each device independently computes forwarding decisions
+\item
+  Distributed protocols (OSPF, BGP, STP) synchronize state
+\item
+  Convergence takes time; no global optimization
+\end{itemize}
+
+\CNsubsection{}{SDN Architecture}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Control plane extracted and centralized}
+\item
+  Switches become simple forwarding devices
+\item
+  Controller has a \textbf{global view} of the entire network
+\item
+  Programmable via APIs (northbound and southbound)
+\end{itemize}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3077}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1923}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Traditional} & \CNth{SDN} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Control Plane & Distributed (per device) & Centralized (controller) \\
+Data Plane & Coupled with control & Separated, simple forwarding \\
+Configuration & CLI, box-by-box & API-driven, programmable \\
+Vendor & Locked-in & Open, multi-vendor \\
+Innovation Speed & Years (firmware cycle) & Days (software development) \\
+Visibility & Per-device, fragmented & Global, real-time \\
+Automation & Scripts/\allowbreak{}templates & Native API + intent \\
+\end{longtable}
+}
+
+\CNkeepfig{m15-sdn-layers}{5}
+
+\CNsection{3}{SDN Architecture Layers}
+
+\CNfigure{m15-sdn-layers}{SDN architecture: application, control and infrastructure layers}
+
+\CNsubsection{3.1}{Infrastructure Layer (Data Plane)}
+
+\begin{itemize}
+\tightlist
+\item
+  Physical or virtual \textbf{switches and routers}
+\item
+  Performs packet forwarding based on \textbf{flow tables} programmed by the controller
+\item
+  No independent decision-making — follows instructions from the control layer
+\item
+  Hardware: white-box switches, programmable ASICs, TCAM for fast lookup
+\end{itemize}
+
+\CNsubsection{3.2}{Control Layer (SDN Controller)}
+
+\begin{itemize}
+\tightlist
+\item
+  The \textbf{``brain''} of the network
+\item
+  Maintains a \textbf{global view} of topology, links, hosts, and traffic
+\item
+  Translates high-level policies into low-level flow rules
+\item
+  Examples: ONOS, OpenDaylight (ODL), Ryu, Floodlight, Nokia NSP, Cisco ACI
+\end{itemize}
+
+\CNsubsection{3.3}{Application Layer}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Business logic and policies} expressed as software applications
+\item
+  Consumes the controller’s northbound API
+\item
+  Examples: traffic engineering, security (micro-segmentation), load balancing, monitoring, intent-based networking
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsection{4}{SDN Controller Functions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Topology Discovery} & Discovers all network devices, links, and hosts. Builds a graph representation. Uses LLDP, OFDP. \\
+\textbf{Path Computation /\allowbreak{} Routing} & Computes optimal paths using global view. Can apply constraints (latency, bandwidth, cost). \\
+\textbf{Policy Enforcement} & Translates high-level policies into device-level flow rules. \\
+\textbf{API Exposure} & Provides northbound REST/\allowbreak{}gRPC APIs for applications to consume network services. \\
+\textbf{State Management} & Maintains consistent network state (flow tables, counters, port status). \\
+\textbf{Multi-tenancy} & Network slicing and isolation between tenants. \\
+\textbf{Fault Management} & Detects link/\allowbreak{}device failures and reroutes traffic in milliseconds. \\
+\end{longtable}
+}
+
+\CNsection{5}{Southbound Interfaces}
+
+The southbound interface connects the \textbf{controller to infrastructure devices} (data plane).
+
+\CNsubsection{5.1}{OpenFlow}
+
+\begin{itemize}
+\tightlist
+\item
+  Most well-known SDN southbound protocol
+\item
+  Defined by \textbf{Open Networking Foundation (ONF)}
+\item
+  Provides a standard way to program \textbf{flow tables} in switches
+\item
+  Controller installs/\allowbreak{}modifies/\allowbreak{}deletes flow entries
+\item
+  Switch reports events (topology changes, packet-in) to controller
+\item
+  Versions: 1.0 \ensuremath{\to} 1.3 (most deployed) \ensuremath{\to} 1.5
+\end{itemize}
+
+\CNsubsection{5.2}{P4 (Programming Protocol-independent Packet Processors)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Domain-specific language} for programming the data plane itself
+\item
+  Goes beyond OpenFlow: defines \textbf{what} the switch can match on
+\item
+  Programmable packet parsing and processing pipelines
+\item
+  Target-independent: compiles to different hardware (Tofino, FPGA, software switches)
+\item
+  Use case: custom headers, in-network computing, INT (In-band Network Telemetry)
+\end{itemize}
+
+\CNsubsection{5.3}{ForCES (Forwarding and Control Element Separation)}
+
+\begin{itemize}
+\tightlist
+\item
+  IETF standard (RFC 5810)
+\item
+  Separates Control Element (CE) from Forwarding Element (FE)
+\item
+  Defines a protocol for CE-FE communication
+\item
+  Less adopted than OpenFlow in practice
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.4}{Other Southbound Protocols}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Protocol} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+NETCONF/\allowbreak{}YANG & Device configuration (model-driven) \\
+gNMI/\allowbreak{}gNOI & Streaming telemetry and operations \\
+BGP-LS & Topology export from traditional networks to SDN controller \\
+PCEP & Path computation for MPLS/\allowbreak{}SR networks \\
+\end{longtable}
+}
+
+\CNsection{6}{Northbound Interfaces}
+
+The northbound interface connects \textbf{applications to the controller}.
+
+\CNsubsection{6.1}{REST APIs}
+
+\begin{itemize}
+\item
+  Most common northbound interface
+\item
+  HTTP-based, JSON/\allowbreak{}XML payloads
+\item
+  CRUD operations on network resources (flows, topologies, policies)
+\item
+  Example:
+
+  \tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ErrorTok{POST} \ErrorTok{/api/v1/flows}
+\FunctionTok{\{}
+  \DataTypeTok{"switch"}\FunctionTok{:} \StringTok{"s1"}\FunctionTok{,}
+  \DataTypeTok{"match"}\FunctionTok{:} \FunctionTok{\{}\DataTypeTok{"src\_ip"}\FunctionTok{:} \StringTok{"10.0.0.1"}\FunctionTok{,} \DataTypeTok{"dst\_ip"}\FunctionTok{:} \StringTok{"10.0.0.2"}\FunctionTok{\},}
+  \DataTypeTok{"action"}\FunctionTok{:} \FunctionTok{\{}\DataTypeTok{"output"}\FunctionTok{:} \StringTok{"port3"}\FunctionTok{\},}
+  \DataTypeTok{"priority"}\FunctionTok{:} \DecValTok{100}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+\end{itemize}
+
+\CNsubsection{6.2}{Intent-Based Networking (IBN)}
+
+\begin{itemize}
+\tightlist
+\item
+  Higher abstraction: express \textbf{what} you want, not \textbf{how} to achieve it
+\item
+  Controller translates intent into device-level configuration
+\item
+  Example intent: \emph{``Ensure video traffic between Site A and Site B has latency \textless{} 10ms''}
+\item
+  The controller figures out the path, QoS policies, and failover
+\item
+  Implementations: ONOS intent framework, Cisco DNA Center, Nokia NSP
+\end{itemize}
+
+\CNsubsection{6.3}{gRPC /\allowbreak{} Protobuf}
+
+\begin{itemize}
+\tightlist
+\item
+  High-performance, streaming-capable API
+\item
+  Used in modern controllers for real-time telemetry and configuration
+\item
+  Strongly typed (protobuf schemas)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{25\baselineskip}
+
+\CNsection{7}{OpenFlow Basics}
+
+\CNchained\CNsubsection{7.1}{Flow Table Structure}
+
+Each switch maintains one or more \textbf{flow tables}. Each entry contains:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Field} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Match Fields} & Criteria to match packets (src/\allowbreak{}dst MAC, IP, port, VLAN, MPLS label) \\
+\textbf{Priority} & Higher priority entries matched first \\
+\textbf{Counters} & Packet/\allowbreak{}byte count for statistics \\
+\textbf{Instructions/\allowbreak{}Actions} & What to do with matched packets \\
+\textbf{Timeouts} & Idle timeout, hard timeout (auto-expire) \\
+\textbf{Cookie} & Opaque identifier set by controller \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.2}{Actions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Action} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\CNcode{OUTPUT(port)} & Forward packet to specified port \\
+\CNcode{DROP} & Discard the packet \\
+\CNcode{SET\_FIELD} & Modify header fields (rewrite MAC, IP, VLAN) \\
+\CNcode{PUSH/POP\_VLAN} & Add or remove VLAN tags \\
+\CNcode{GROUP} & Send to a group table (multipath, failover) \\
+\CNcode{METER} & Rate-limit the flow \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{7.3}{Group Tables}
+
+Enable advanced forwarding:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Group Type} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{All} & Multicast/\allowbreak{}broadcast (copy to all buckets) \\
+\textbf{Select} & Load balancing (round-robin or weighted) \\
+\textbf{Indirect} & Single next-hop (efficient pointer) \\
+\textbf{Fast Failover} & First live bucket used (link protection) \\
+\end{longtable}
+}
+
+\CNsubsection{7.4}{Meter Tables}
+
+\begin{itemize}
+\tightlist
+\item
+  Rate limiting per flow
+\item
+  Defined in \textbf{bands}: rate threshold + action (drop or DSCP remark)
+\item
+  Enables QoS enforcement at the switch level
+\end{itemize}
+
+\CNkeepfig{m15-pipeline}{3}
+
+\CNsubsection{7.5}{Packet Processing Pipeline}
+
+\CNfigure{m15-pipeline}{OpenFlow packet-processing pipeline}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{SDN in Telecom}
+
+\CNchained\CNsubsection{8.1}{Transport SDN (WAN Optimization)}
+
+\begin{itemize}
+\tightlist
+\item
+  Centralized control of optical/\allowbreak{}MPLS transport networks
+\item
+  Dynamic bandwidth allocation based on traffic demand
+\item
+  Multi-layer optimization (IP over optical)
+\item
+  Examples: Nokia NSP, Ciena Blue Planet, Cisco WAE
+\end{itemize}
+
+\CNsubsection{8.2}{SD-WAN (Software-Defined Wide Area Network)}
+
+\begin{itemize}
+\tightlist
+\item
+  SDN principles applied to enterprise WAN
+\item
+  Centralized controller manages branch CPE devices
+\item
+  Overlays on top of multiple underlay transports (MPLS, Internet, LTE)
+\item
+  Application-aware routing (route voice over MPLS, web over Internet)
+\item
+  Zero-touch provisioning for branch sites
+\item
+  Vendors: Cisco Viptela, VMware VeloCloud, Fortinet, Versa
+\end{itemize}
+
+\CNkeepfig{m15-smf-upf}{3}
+
+\CNsubsection{8.3}{5G Integration: SMF as SDN Controller for UPF}
+
+\CNfigure{m15-smf-upf}{The SMF acting as an SDN controller for the UPFs}
+
+\Needspace{16\baselineskip}
+
+\textbf{The 5G User Plane is inherently SDN-like:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4643}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5357}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{SDN Concept} & \CNth{5G Equivalent} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SDN Controller & \textbf{SMF} (Session Management Function) \\
+Data Plane Switch & \textbf{UPF} (User Plane Function) \\
+Southbound Protocol & \textbf{PFCP} (Packet Forwarding Control Protocol) \\
+Flow Rules & \textbf{PDRs} (Packet Detection Rules) + \textbf{FARs} (Forwarding Action Rules) \\
+QoS Enforcement & \textbf{QERs} (QoS Enforcement Rules) \\
+\end{longtable}
+}
+
+\CNsubsection{8.4}{UPF Programmability via PFCP}
+
+PFCP (3GPP TS 29.244) is the protocol between SMF and UPF:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PDR (Packet Detection Rule)}: Match criteria (source interface, IP, GTP TEID)
+\item
+  \textbf{FAR (Forwarding Action Rule)}: Action (forward, drop, buffer, encapsulate)
+\item
+  \textbf{QER (QoS Enforcement Rule)}: Rate limiting (MBR, GBR)
+\item
+  \textbf{URR (Usage Reporting Rule)}: Traffic measurement and reporting
+\end{itemize}
+
+This is functionally equivalent to OpenFlow’s match-action model!
+
+\Needspace{22\baselineskip}
+
+\CNsection{9}{Benefits of SDN}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Benefit} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Programmability} & Network is software-controlled; automate everything via APIs \\
+\textbf{Automation} & Zero-touch provisioning, auto-remediation, CI/\allowbreak{}CD for network \\
+\textbf{Multi-vendor} & Open interfaces allow mixing hardware vendors (white-box revolution) \\
+\textbf{Fast Innovation} & New services deployed in hours/\allowbreak{}days vs. months \\
+\textbf{Global Optimization} & Centralized view enables optimal path computation \\
+\textbf{Network Slicing} & Dynamic resource allocation per tenant/\allowbreak{}service \\
+\textbf{Cost Reduction} & Commodity hardware + open-source software vs. proprietary boxes \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{10}{Challenges of SDN}
+
+\CNchained\CNsubsection{10.1}{Controller Scalability}
+
+\begin{itemize}
+\tightlist
+\item
+  Single controller cannot handle thousands of switches + millions of flows
+\item
+  \textbf{Solution}: Controller clustering (ONOS, ODL support distributed controllers)
+\item
+  Trade-off: consistency vs. availability (CAP theorem applies)
+\end{itemize}
+
+\CNsubsection{10.2}{Single Point of Failure}
+
+\begin{itemize}
+\tightlist
+\item
+  If the controller fails, no new flows can be installed
+\item
+  Data plane continues forwarding existing flows (proactive mode)
+\item
+  \textbf{Mitigation}: Controller redundancy (active-standby, active-active)
+\end{itemize}
+
+\CNsubsection{10.3}{East-West Interface}
+
+\begin{itemize}
+\tightlist
+\item
+  Communication between controller instances in a cluster
+\item
+  No standard protocol (each controller has proprietary clustering)
+\item
+  Challenges: state synchronization, split-brain scenarios, consistency
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{10.4}{Security}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Threat} & \CNth{Impact} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Controller compromise & Attacker controls entire network \\
+Man-in-the-middle (controller\ensuremath{\leftrightarrow}switch) & Flow rule injection/\allowbreak{}modification \\
+DoS on controller & Overwhelm with Packet-In messages \\
+Malicious application & Rogue app installs harmful flows via NBI \\
+\end{longtable}
+}
+
+\textbf{Mitigations}: TLS on OpenFlow channel, RBAC for northbound API, rate-limiting Packet-In, application sandboxing.
+
+\CNboxsection{Key Takeaways}
+
+\begin{CNbox}[unbreakable]{sum}{Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  SDN \textbf{separates} the control plane from the data plane
+\item
+  A \textbf{centralized controller} provides a global view and programmability
+\item
+  \textbf{OpenFlow} is the foundational southbound protocol (match-action paradigm)
+\item
+  \textbf{P4} extends programmability to the data plane pipeline itself
+\item
+  5G architecture is \textbf{inherently SDN-like} (SMF controls UPF via PFCP)
+\item
+  SDN enables \textbf{network automation, slicing, and rapid service deployment}
+\item
+  Challenges remain around \textbf{scalability, security, and standardization}
+\end{enumerate}
+
+\end{CNbox}

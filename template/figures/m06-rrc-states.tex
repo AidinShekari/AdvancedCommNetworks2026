@@ -1,0 +1,17 @@
+% Module 6 — LTE RRC state machine (composite states with their sub-states and notes)
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[circle, fill=CNink, minimum size=0.34cm, inner sep=0pt] (start) at (-2.2,1.9) {};
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=6pt] (0,-1.45) rectangle (5.6,4.1);
+\node[font=\sffamily\small\bfseries, text=CNink, anchor=north west] at (0.15,4.0) {RRC\_IDLE};
+\node[CNbox, rounded corners=8pt, text width=4.7cm, align=left, anchor=north] (camped) at (2.8,3.45) {\textbf{Camped}\\[1pt]{\scriptsize\textbullet{} \CNL{PLMN selected}{\lr{PLMN} انتخاب شده}\\\textbullet{} \CNL{cell selected/reselected}{سلول انتخاب/انتخاب مجدد شده}\\\textbullet{} \CNL{monitors paging (DRX)}{پایش صفحه‌بندی (\lr{DRX})}\\\textbullet{} \CNL{reads system information}{خواندن اطلاعات سیستم}\\\textbullet{} \CNL{mobility: cell reselection (UE decision)}{تحرک: انتخاب مجدد سلول (تصمیم \lr{UE})}}};
+\draw[CNlink, ->] ([xshift=-6mm]camped.south) to[out=-110, in=-70, looseness=4] node[CNelab, below, fill=none] {\CNL{cell reselection}{انتخاب مجدد سلول}} ([xshift=6mm]camped.south);
+\draw[CNgreen, line width=0.9pt, fill=CNgreen!5, rounded corners=6pt] (9.6,-1.45) rectangle (15.2,4.1);
+\node[font=\sffamily\small\bfseries, text=CNgreen, anchor=north west] at (9.75,4.0) {RRC\_CONNECTED};
+\node[CNok, rounded corners=8pt, text width=4.7cm, align=left, anchor=north] (active) at (12.4,3.45) {\textbf{Active}\\[1pt]{\scriptsize\textbullet{} \CNL{UE has an RRC context in the eNB}{\lr{UE} در \lr{eNB} زمینه \lr{RRC} دارد}\\\textbullet{} \CNL{data transfer active}{انتقال داده فعال}\\\textbullet{} \CNL{mobility: handover (network decision)}{تحرک: تحویل (تصمیم شبکه)}\\\textbullet{} \CNL{measurements configured}{اندازه‌گیری‌ها پیکربندی شده}\\\textbullet{} \CNL{security activated}{امنیت فعال شده}\\\textbullet{} \CNL{known cell-level location}{مکان در سطح سلول معلوم}}};
+\draw[CNlink, ->] ([xshift=-6mm]active.south) to[out=-110, in=-70, looseness=4] node[CNelab, below, fill=none] {\CNL{handover}{تحویل}} ([xshift=6mm]active.south);
+\draw[CNlink, ->] (start) -- node[CNelab, above=2pt, fill=none, text width=2.0cm] {\CNL{power on + PLMN selection}{روشن‌شدن + انتخاب \lr{PLMN}}} (0,1.9);
+\draw[CNsig, ->, line width=1pt] (5.6,3.2) -- node[CNelab, above, fill=white, text width=3.6cm] {\CNL{RRC connection establishment}{برقراری اتصال \lr{RRC}}\\{\scriptsize (\CNL{service request / attach / MO data}{درخواست سرویس / اتصال / داده \lr{MO}})}} (9.6,3.2);
+\draw[CNcyan, ->, line width=1pt] (9.6,0.4) -- node[CNelab, below, fill=white, text width=3.6cm] {\CNL{RRC connection release}{آزادسازی اتصال \lr{RRC}}\\{\scriptsize (\CNL{inactivity timer / explicit release}{زمان‌سنج عدم فعالیت / آزادسازی صریح})}} (5.6,0.4);
+\node[CNnote, text width=5.3cm, anchor=north] at (2.8,-1.75) {\CNLP{UE known to the EPC (MME) only at tracking-area granularity. No eNB context exists.}{\lr{UE} فقط در دانه‌بندی ناحیه ردیابی برای \lr{EPC (MME)} شناخته‌شده است. هیچ زمینه‌ای در \lr{eNB} وجود ندارد.}};
+\node[CNnote, text width=5.3cm, anchor=north] at (12.4,-1.75) {\CNLP{UE has a context in a specific eNB. Known at cell level. Bearers established.}{\lr{UE} در یک \lr{eNB} مشخص زمینه دارد. در سطح سلول شناخته‌شده است. حامل‌ها برقرار هستند.}};
+\end{tikzpicture}

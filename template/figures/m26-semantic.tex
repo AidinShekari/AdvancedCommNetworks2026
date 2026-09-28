@@ -1,0 +1,14 @@
+% Module 26 — classical versus semantic communication
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, st/.style={CNbox, minimum height=0.8cm, font=\sffamily\scriptsize, text width=1.6cm, inner xsep=2pt, CNnohyph}]
+\node[CNtitle, anchor=west] at (-0.8,0.85) {\CNL{Classical communication — goal: minimise the BER}{ارتباط کلاسیک — هدف: کمینه‌سازی \lr{BER}}};
+\foreach \lab [count=\k from 0] in {Source, Source coding, Channel coding, Modulation, Channel, Demod, Channel decoding, Source decoding, Sink}{
+  \ifnum\k=4 \def\fc{CNpaper}\else\def\fc{white}\fi
+  \node[st, fill=\fc] (c\k) at ({\k*1.8},0) {\lab};
+  \ifnum\k>0 \pgfmathtruncatemacro{\p}{\k-1}\draw[CNlink, ->] (c\p) -- (c\k);\fi}
+\node[CNtitle, anchor=west] at (-0.8,-1.25) {\CNL{Semantic communication — goal: minimise the semantic error (meaning distortion)}{ارتباط معنایی — هدف: کمینه‌سازی خطای معنایی (اعوجاج معنا)}};
+\foreach \lab [count=\k from 0] in {Source, Semantic encoder, Joint source--\\channel coding, Channel, Semantic decoder, Task execution, Sink}{
+  \ifnum\k=3 \def\fc{CNpaper}\def\dc{CNinkL!70}\else\def\fc{CNgreen!12}\def\dc{CNgreen}\fi
+  \node[st, fill=\fc, draw=\dc] (s\k) at ({\k*2.3},-2.1) {\lab};
+  \ifnum\k>0 \pgfmathtruncatemacro{\p}{\k-1}\draw[CNlink, ->] (s\p) -- (s\k);\fi}
+\node[CNnote, anchor=north, text width=14cm, align=left] at (6.9,-3.0) {\textbf{\CNL{Example (image transmission)}{مثال (ارسال تصویر)}:}\ \CNL{classical — transmit all pixels, recover all pixels;}{کلاسیک — ارسال همه پیکسل‌ها و بازیابی همه آن‌ها؛}\ \CNL{semantic — extract key features, transmit a compact representation, reconstruct the image or classify directly.}{معنایی — استخراج ویژگی‌های کلیدی، ارسال نمایش فشرده و بازسازی تصویر یا طبقه‌بندی مستقیم.}};
+\end{tikzpicture}

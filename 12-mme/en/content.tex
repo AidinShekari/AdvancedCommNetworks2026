@@ -1,0 +1,421 @@
+\CNsection{1}{Why MME Exists}
+
+The MME is the \textbf{central control-plane entity} in the LTE/\allowbreak{}EPC architecture. It exists to:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Offload the RAN from core signaling}: In 2G/\allowbreak{}3G, the RNC/\allowbreak{}BSC handled significant core-network signaling. LTE’s flat architecture moved all NAS (Non-Access Stratum) signaling termination to the MME, simplifying eNodeB (eNB) design.
+\item
+  \textbf{Centralize control-plane intelligence}: Authentication, mobility management, bearer setup, and paging are all orchestrated by the MME.
+\item
+  \textbf{Decouple control and user planes}: The MME handles no user-plane traffic — it purely manages signaling, enabling independent scaling of CP and UP.
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Key Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer Node} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S1-MME & eNB & S1-AP (SCTP) & NAS transport, handover signaling \\
+S6a & HSS & Diameter & Authentication vectors, subscription data \\
+S11 & S-GW & GTPv2-C & Bearer/\allowbreak{}session management \\
+S10 & Other MME & GTPv2-C & Inter-MME handover, context transfer \\
+S3 & SGSN & GTPv2-C & 2G/\allowbreak{}3G \ensuremath{\leftrightarrow} LTE mobility \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{MME Functions}
+
+\CNchained\CNsubsection{2.1}{NAS Signaling Termination}
+
+\begin{itemize}
+\tightlist
+\item
+  The MME is the NAS endpoint — it terminates all NAS messages from the UE (transported transparently through eNB via S1-AP).
+\item
+  NAS messages are integrity-protected and ciphered between UE and MME.
+\end{itemize}
+
+\CNsubsection{2.2}{Mobility Management}
+
+\begin{itemize}
+\tightlist
+\item
+  Tracking Area (TA) management and TA List assignment
+\item
+  Handover signaling (S1-based and X2 with MME involvement)
+\item
+  Inter-RAT mobility (to/\allowbreak{}from 2G/\allowbreak{}3G via S3/\allowbreak{}S10)
+\end{itemize}
+
+\CNsubsection{2.3}{Authentication and Security}
+
+\begin{itemize}
+\tightlist
+\item
+  Retrieves authentication vectors from HSS (via S6a)
+\item
+  Runs EPS-AKA (Authentication and Key Agreement)
+\item
+  Derives NAS keys (\ensuremath{K_{\mathrm{NASint}}}, \ensuremath{K_{\mathrm{NASenc}}}) and AS keys (\ensuremath{K_{\mathrm{eNB}}})
+\item
+  Initiates NAS Security Mode Command
+\end{itemize}
+
+\CNsubsection{2.4}{Bearer Management}
+
+\begin{itemize}
+\tightlist
+\item
+  Establishes default EPS bearers during attach
+\item
+  Coordinates dedicated bearer activation/\allowbreak{}modification/\allowbreak{}deactivation
+\item
+  Interacts with S-GW (S11) and indirectly P-GW
+\end{itemize}
+
+\CNsubsection{2.5}{Paging}
+
+\begin{itemize}
+\tightlist
+\item
+  Pages UEs in ECM-IDLE state when downlink data arrives
+\item
+  Sends S1-AP Paging messages to all eNBs in the UE’s registered TA list
+\end{itemize}
+
+\CNsubsection{2.6}{Idle-Mode Reachability}
+
+\begin{itemize}
+\tightlist
+\item
+  Maintains UE context even when UE is IDLE (ECM-IDLE)
+\item
+  Knows which Tracking Areas the UE may be in
+\item
+  Triggers paging when data or signaling arrives
+\end{itemize}
+
+\CNsubsection{2.7}{MME Selection, Pooling, and Rebalancing}
+
+\begin{itemize}
+\tightlist
+\item
+  Multiple MMEs serve the same area (MME Pool)
+\item
+  Load balancing via relative capacity (weight factor) advertised to eNBs
+\item
+  Rebalancing: graceful transfer of UE contexts when adding/\allowbreak{}removing MMEs
+\end{itemize}
+
+\CNsection{3}{NAS Protocol Stack}
+
+NAS (Non-Access Stratum) operates between UE and MME, transparent to eNB.
+
+\CNsubsection{3.1}{EMM — EPS Mobility Management}
+
+Manages UE registration and mobility:
+
+\begin{itemize}
+\tightlist
+\item
+  Attach /\allowbreak{} Detach
+\item
+  Tracking Area Update (TAU)
+\item
+  Authentication (EPS-AKA)
+\item
+  Security Mode Control
+\item
+  GUTI Reallocation
+\item
+  Service Request
+\end{itemize}
+
+\textbf{EMM States:}
+
+\begin{itemize}
+\tightlist
+\item
+  EMM-DEREGISTERED: UE not registered
+\item
+  EMM-REGISTERED: UE attached to network
+\end{itemize}
+
+\CNsubsection{3.2}{ESM — EPS Session Management}
+
+Manages PDN connections and EPS bearers:
+
+\begin{itemize}
+\tightlist
+\item
+  PDN Connectivity Request/\allowbreak{}Accept
+\item
+  Bearer Resource Allocation
+\item
+  Bearer Modify /\allowbreak{} Deactivate
+\item
+  PDN Disconnect
+\end{itemize}
+
+\textbf{ESM operates piggybacked on EMM during attach} (ESM message embedded in Attach Request).
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m12-attach-1}{8}
+
+\CNsection{4}{Detailed Procedures}
+
+\CNchained\CNsubsection{4.1}{LTE Initial Attach (Full Flow)}
+
+\CNfigure{m12-attach-1}{LTE initial attach (full flow)\CNpart{1}{2}}
+
+\CNfigure{m12-attach-2}{LTE initial attach (full flow)\CNpart{2}{2}}
+
+\textbf{Key Points:}
+
+\begin{itemize}
+\tightlist
+\item
+  Steps 7-10: EPS-AKA + NAS security activation
+\item
+  Steps 13-16: GTP-C session establishment across S11/\allowbreak{}S5
+\item
+  The Attach Request carries a piggybacked PDN Connectivity Request (ESM)
+\item
+  The UE gets its IP address from P-GW (step 15)
+\end{itemize}
+
+\CNkeepfig{m12-auth-smc}{3}
+
+\CNsubsection{4.2}{Authentication and Security Mode}
+
+\CNfigure{m12-auth-smc}{EPS-AKA authentication and NAS security mode}
+
+\CNkeepfig{m12-key-chain}{2}
+
+\textbf{Key Derivation Hierarchy:}
+
+\CNfigure{m12-key-chain}{Key derivation hierarchy}
+
+\CNsubsection{4.3}{Tracking Area Update (TAU)}
+
+\textbf{Triggers:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Periodic TAU}: Timer T3412 expires (default \textasciitilde{}54~min) — confirms UE is still reachable
+\item
+  \textbf{Mobility-triggered TAU}: UE moves to a cell whose TAC is not in its TA List
+\end{itemize}
+
+\CNfigure{m12-tau}{Tracking area update, inter-MME and intra-MME}
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m12-detach-ue}{5}
+
+\CNsubsection{4.4}{Detach Procedure}
+
+\CNchained\CNsubsubsection{UE-Initiated Detach}
+
+\CNfigure{m12-detach-ue}{UE-initiated detach}
+
+\CNkeepfig{m12-detach-net}{2}
+
+\CNsubsubsection{Network-Initiated Detach}
+
+\CNfigure{m12-detach-net}{Network-initiated detach}
+
+\CNkeepfig{m12-paging}{3}
+
+\CNsubsection{4.5}{Paging (S1 Paging Procedure)}
+
+\CNfigure{m12-paging}{S1 paging of an idle UE}
+
+\CNkeepfig{m12-service-request}{3}
+
+\CNsubsection{4.6}{Service Request (UE in IDLE \ensuremath{\to} CONNECTED)}
+
+\CNfigure{m12-service-request}{Service request (ECM-IDLE \ensuremath{\to} ECM-CONNECTED)}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{Bearer Management}
+
+\CNchained\CNsubsection{5.1}{Default Bearer Setup}
+
+\begin{itemize}
+\tightlist
+\item
+  Created automatically during Initial Attach (part of Create Session)
+\item
+  One default bearer per PDN connection (always-on, non-GBR)
+\item
+  QCI typically 9 (best-effort Internet) or 5 (IMS signaling)
+\item
+  Cannot be deactivated without disconnecting the PDN
+\end{itemize}
+
+\CNkeepfig{m12-dedicated-bearer}{3}
+
+\CNsubsection{5.2}{Dedicated Bearer Activation}
+
+\CNfigure{m12-dedicated-bearer}{Network-initiated dedicated bearer activation}
+
+\CNsubsection{5.3}{Dedicated Bearer Modification}
+
+\begin{itemize}
+\tightlist
+\item
+  Triggered by PCRF policy change (e.g., QoS upgrade during VoLTE call)
+\item
+  Uses Update Bearer Request/\allowbreak{}Response across S5 \ensuremath{\to} S11 \ensuremath{\to} S1-AP
+\end{itemize}
+
+\CNsubsection{5.4}{Dedicated Bearer Deactivation}
+
+\begin{itemize}
+\tightlist
+\item
+  Triggered by PCRF (policy removal), P-GW, or MME
+\item
+  Uses Delete Bearer Request/\allowbreak{}Response
+\item
+  Default bearer deactivation = PDN disconnect (all bearers for that PDN removed)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{MME Selection}
+
+\CNchained\CNsubsection{6.1}{DNS-Based Selection}
+
+\begin{itemize}
+\tightlist
+\item
+  eNB resolves MME FQDN from TAI \ensuremath{\to} DNS returns list of MME IPs
+\item
+  Format: \CNcode{tac-XXXX.}\allowbreak{}\CNcode{tac-YYYY.}\allowbreak{}\CNcode{mme.}\allowbreak{}\CNcode{epc.}\allowbreak{}\CNcode{mnc\textless{}MNC\textgreater{}.}\allowbreak{}\CNcode{mcc\textless{}MCC\textgreater{}.}\allowbreak{}\CNcode{3gppnetwork.}\allowbreak{}\CNcode{org}
+\end{itemize}
+
+\CNsubsection{6.2}{Load Balancing}
+
+\begin{itemize}
+\tightlist
+\item
+  Each MME advertises a \textbf{Relative MME Capacity} (weight, 0-255) via S1 Setup
+\item
+  eNB distributes new UEs proportionally across pool members
+\item
+  Higher capacity value = more UEs directed to that MME
+\end{itemize}
+
+\CNsubsection{6.3}{GUMMEI — Globally Unique MME Identifier}
+
+\CNdisplay{\mathrm{GUMMEI} = \mathrm{MCC} + \mathrm{MNC} + \text{MME Group ID (MMEGI)} + \text{MME Code (MMEC)}}
+
+\begin{itemize}
+\tightlist
+\item
+  MMEGI identifies the MME pool
+\item
+  MMEC identifies a specific MME within the pool
+\item
+  GUTI = GUMMEI + M-TMSI (temporary UE identity)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{S1-Flex and MME Pooling}
+
+\CNchained\CNsubsection{}{Concept}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{S1-Flex}: Each eNB connects to \textbf{multiple MMEs} in a pool (not just one)
+\item
+  \textbf{MME Pool Area}: Geographic region served by a set of MMEs
+\item
+  Benefits:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Redundancy}: If one MME fails, others serve UEs
+  \item
+    \textbf{Load sharing}: New UEs distributed by weight
+  \item
+    \textbf{Geo-redundancy}: Pool members can be in different data centers
+  \item
+    \textbf{Graceful scaling}: Add/\allowbreak{}remove MMEs without service interruption
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{}{MME Overload and Rebalancing}
+
+\begin{itemize}
+\tightlist
+\item
+  MME sends \textbf{Overload Start} to eNBs \ensuremath{\to} eNB redirects new connections to other pool members
+\item
+  \textbf{Rebalancing}: MME requests UEs to re-attach to redistribute load (via implicit detach with re-attach indication)
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsection{8}{Evolution: MME \ensuremath{\to} AMF (5G)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3200}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3600}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3200}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{LTE MME} & \CNth{5G AMF} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Architecture & Monolithic NE & Microservice (SBI-based) \\
+Protocol & GTPv2-C, Diameter & HTTP/\allowbreak{}2, JSON (SBI), NGAP \\
+NAS & EMM + ESM (combined) & 5G-NAS (MM only; SM separated to SMF) \\
+Session Mgmt & MME handles bearer signaling & Delegated entirely to SMF \\
+Slicing & N/\allowbreak{}A & Slice-aware, routes to correct SMF per slice \\
+Registration & Attach/\allowbreak{}TAU & Registration (unified) \\
+State & Stateful & Designed for stateless (UDSF) \\
+Interface to RAN & S1-AP & NGAP (N2) \\
+Interface to UDM & Diameter S6a & Nudm (SBI) \\
+\end{longtable}
+}
+
+\textbf{Key Changes:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Session management decoupled}: MME handled both mobility + bearers; in 5G, AMF handles only mobility/\allowbreak{}security, SMF handles sessions
+\item
+  \textbf{Service-based interface}: AMF exposes Namf services, consumed by other NFs via HTTP/\allowbreak{}2
+\item
+  \textbf{Network slicing}: AMF performs slice selection (NSSF interaction) and routes to slice-specific SMF
+\item
+  \textbf{Stateless design}: UE context can be stored externally (UDSF) for resilience
+\item
+  \textbf{Unified registration}: No separate Attach vs TAU — single Registration procedure handles both
+\end{enumerate}

@@ -1,0 +1,684 @@
+\Needspace{14\baselineskip}
+
+\CNsection{3.1}{تحول از \lr{\mbox{2G}} به \lr{\mbox{3G}} \lr{—} نیروهای محرک}
+
+\CNchained\CNsubsection{}{چرا به \lr{\mbox{3G}} نیاز داشتیم؟}
+
+گذار از \lr{\mbox{2G (GSM)}} به \lr{3G (UMTS)} توسط تقاضاهای بنیادی بازار و فناوری هدایت شد:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{تقاضای انفجاری داده}: \lr{\mbox{SMS}} و وب‌گردی ابتدایی \lr{\mbox{WAP}} کافی نبود. کاربران ایمیل، وب‌گردی و دانلود فایل را روی دستگاه‌های موبایل می‌خواستند.
+\item
+  \textbf{خدمات چندرسانه‌ای}: تماس ویدیویی، پخش جریانی صدا/\allowbreak{}ویدیو و محتوای غنی نیازمند پهنای باندی بسیار فراتر از \lr{9.6~kbps GSM} (یا حتی \lr{\mbox{171~kbps}} نظری \lr{\mbox{GPRS}}) بود.
+\item
+  \textbf{نرخ داده بالاتر}: چشم‌انداز \lr{\mbox{IMT-2000}} اتحادیه مخابرات بین‌المللی \lr{\mbox{(ITU)}} هدف‌گذاری کرده بود:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{144~kbps}} برای تحرک بالا (خودرویی)
+  \item
+    \lr{\mbox{384~kbps}} برای حالت پیاده
+  \item
+    \lr{\mbox{2~Mbps}} برای حالت ساکن/\allowbreak{}داخل ساختمان
+  \end{itemize}
+\item
+  \textbf{رومینگ جهانی}: یک استاندارد یکپارچه جهانی (برخلاف \lr{\mbox{2G}} تکه‌تکه: \lr{\mbox{GSM}} در برابر \lr{\mbox{CDMA}} در برابر \lr{\mbox{PDC}}).
+\item
+  \textbf{کارایی طیفی}: کدهای گسترش \lr{\mbox{WCDMA}} به کاربران بیشتری در هر سلول با تخریب تدریجی امکان می‌دهند.
+\end{enumerate}
+
+\CNkeepfig{m03-evolution}{3}
+
+\CNsubsection{}{مسیر تحول}
+
+\CNfigure{m03-evolution}{نسل‌ها و نرخ داده بیشینه آن‌ها}
+
+\CNsection{3.2}{مرور معماری \lr{\mbox{UMTS}}}
+
+\lr{\mbox{UMTS}} (\lr{Universal Mobile Telecommunications System} - سیستم جهانی ارتباطات مخابراتی موبایل) بر دو دامنه اصلی بنا شده است:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UTRAN}}}}} (شبکه دسترسی رادیویی زمینی \lr{\mbox{UMTS}}) \lr{—} سمت واسط رادیویی/\allowbreak{}هوایی
+\item
+  \textbf{شبکه هسته \lr{\mbox{(CN)}}} \lr{—} ستون فقرات هوش و اتصال
+\end{itemize}
+
+\CNsubsection{}{اصول طراحی کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  سازگاری رو به عقب با هسته \lr{GSM/\allowbreak{}GPRS}
+\item
+  جداسازی دسترسی رادیویی از شبکه هسته (امکان تحول مستقل)
+\item
+  تقسیم هسته به دامنه سوییچینگ مداری \lr{\mbox{(CS)}} و سوییچینگ بسته‌ای \lr{\mbox{(PS)}}
+\item
+  پشتیبانی از صدا و داده همزمان
+\end{itemize}
+
+\CNkeepfig{m03-umts-architecture}{3}
+
+\CNsubsection{}{نمودار معماری \lr{\mbox{UMTS}}}
+
+\CNfigure{m03-umts-architecture}{معماری \lr{\mbox{UMTS}}: شبکه \lr{\mbox{UTRAN}} با دامنه‌های هسته \lr{\mbox{CS}} و \lr{\mbox{PS}}}
+
+\Needspace{14\baselineskip}
+
+\Needspace{25\baselineskip}
+
+\CNsection{3.3}{\lr{\mbox{UTRAN}}: \lr{\mbox{NodeB}} و \lr{\mbox{RNC}}}
+
+\CNchained\CNsubsection{}{\lr{\mbox{NodeB}} (ایستگاه پایه)}
+
+\lr{\mbox{NodeB}} معادل \lr{\mbox{3G}} برای \lr{\mbox{BTS}} (ایستگاه فرستنده-گیرنده پایه) در \lr{\mbox{GSM}} است:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{عملکرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{نقش اصلی} & ارسال/\allowbreak{}دریافت رادیویی روی واسط رادیویی \lr{\mbox{Uu}} \\
+\textbf{گسترش/\allowbreak{}واگسترش} & اعمال کدهای گسترش \lr{\mbox{WCDMA}} \\
+\textbf{کنترل توان} & کنترل توان حلقه داخلی (سریع، \lr{\mbox{1500~Hz}}) \\
+\textbf{تحویل نرم} & پشتیبانی از ترکیب تنوع بزرگ \\
+\textbf{کدگذاری کانال} & کدگذاری/\allowbreak{}رمزگشایی کانال‌های انتقال \\
+\textbf{واسط} & متصل به \lr{\mbox{RNC}} از طریق واسط \lr{\mbox{Iub}} (مبتنی بر \lr{\mbox{ATM}} یا \lr{\mbox{IP}}) \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{تفاوت کلیدی با \lr{\mbox{BTS}} در \lr{\mbox{GSM}}}: \lr{\mbox{NodeB}} هوش \textbf{بیشتری} دارد \lr{—} کنترل توان سریع و ترکیب تحویل نرم را به‌صورت محلی مدیریت می‌کند و تأخیر را کاهش می‌دهد.
+
+\end{CNquote}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{RNC}} (کنترلر شبکه رادیویی)}
+
+\lr{\mbox{RNC}} معادل \lr{\mbox{3G}} برای \lr{\mbox{BSC}} در \lr{\mbox{GSM}} است، اما با مسیولیت‌های به‌مراتب بیشتر:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{عملکرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{مدیریت منابع رادیویی} & کنترل پذیرش، تخصیص کد، کنترل بار \\
+\textbf{تصمیم تحویل} & مدیریت تحویل نرم/\allowbreak{}نرم‌تر/\allowbreak{}سخت \\
+\textbf{کنترل توان حلقه بیرونی} & تنظیم هدف \lr{\mbox{SIR}} \\
+\textbf{رمزگذاری/\allowbreak{}یکپارچگی} & توابع امنیتی برای داده کاربر و سیگنالینگ \\
+\textbf{پایان‌دهی پروتکل} & نقطه انتهایی پروتکل \lr{\mbox{RRC}} (کنترل منابع رادیویی) \\
+\textbf{ترکیب تنوع بزرگ} & ترکیب سیگنال‌ها از چندین \lr{\mbox{NodeB}} \\
+\textbf{قطعه‌بندی/\allowbreak{}بازمونتاژ} & پردازش لایه \lr{\mbox{RLC}} \\
+\end{longtable}
+}
+
+\CNsubsection{}{نقش‌های \lr{\mbox{RNC}} (یک \lr{\mbox{RNC}} می‌تواند چندین نقش ایفا کند)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{RNC}} خدمات‌دهنده \lr{\mbox{(S-RNC)}}}: اتصال \lr{\mbox{RRC}} با \lr{\mbox{UE}} را حفظ می‌کند، کنترل توان حلقه بیرونی را انجام می‌دهد
+\item
+  \textbf{\lr{\mbox{RNC}} رانشی \lr{\mbox{(D-RNC)}}}: وقتی \lr{\mbox{UE}} جابه‌جا می‌شود اما \lr{\mbox{S-RNC}} تغییر نمی‌کند، منابع رادیویی را فراهم می‌کند
+\item
+  \textbf{\lr{\mbox{RNC}} کنترل‌کننده \lr{\mbox{(C-RNC)}}}: منابع منطقی \lr{\mbox{NodeB}}های خود را کنترل می‌کند
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{واسط‌های \lr{\mbox{UTRAN}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2444}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2222}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{اتصال} & \CNth{پشته پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{Uu}}}}} & \lr{UE \ensuremath{\leftrightarrow} NodeB} & واسط رادیویی \lr{\mbox{WCDMA}} & انتقال رادیویی \\
+\lr{\mbox{\textbf{\lr{\mbox{Iub}}}}} & \lr{NodeB \ensuremath{\leftrightarrow} RNC} & \lr{NBAP over ATM/\allowbreak{}IP} & کنترل \lr{\mbox{NodeB}} و داده کاربر \\
+\lr{\mbox{\textbf{\lr{\mbox{Iur}}}}} & \lr{RNC \ensuremath{\leftrightarrow} RNC} & \lr{RNSAP over ATM/\allowbreak{}IP} & تحویل نرم بین-\lr{\mbox{RNC}}، جابه‌جایی \\
+\lr{\mbox{\textbf{\lr{\mbox{Iu-CS}}}}} & \lr{RNC \ensuremath{\leftrightarrow} MSC} & \lr{RANAP over ATM} & ترافیک سوییچینگ مداری \\
+\lr{\mbox{\textbf{\lr{\mbox{Iu-PS}}}}} & \lr{RNC \ensuremath{\leftrightarrow} SGSN} & \lr{RANAP over IP} & ترافیک سوییچینگ بسته‌ای \\
+\end{longtable}
+}
+
+\Needspace{27\baselineskip}
+
+\CNsection{3.4}{شبکه هسته \lr{\mbox{3G}}: دامنه \lr{\mbox{CS}} + دامنه \lr{\mbox{PS}}}
+
+شبکه هسته \lr{\mbox{3G}} معماری تقسیم‌شده \lr{GSM/\allowbreak{}GPRS} را به ارث می‌برد و دو دامنه موازی را حفظ می‌کند:
+
+\CNsubsection{}{دامنه سوییچینگ مداری \lr{\mbox{(CS)}}}
+
+تماس‌های صوتی بلادرنگ و تله‌فونی ویدیویی را مدیریت می‌کند (همانند هسته \lr{\mbox{GSM}}، ارتقایافته برای \lr{\mbox{3G}}).
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنصر} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{\lr{\mbox{MSC}} (مرکز سوییچینگ موبایل)} & مسیریابی تماس، تحویل بین \lr{\mbox{RNC}}ها، سیگنالینگ کنترل تماس \\
+\textbf{\lr{\mbox{VLR}} (ثبت‌کننده مکان بازدیدکننده)} & ذخیره‌سازی موقت داده مشترکین بازدیدکننده در ناحیه \lr{\mbox{MSC}} \\
+\textbf{\lr{\mbox{GMSC}} (\lr{\mbox{MSC}} دروازه‌ای)} & واسط با شبکه‌های خارجی (\lr{\mbox{PSTN}}، \lr{\mbox{ISDN}})، مدیریت تماس‌های ورودی \\
+\textbf{\lr{\mbox{HLR}} (ثبت‌کننده مکان خانگی)} & پایگاه داده دایمی مشترکین (مشترک با دامنه \lr{\mbox{PS}}) \\
+\textbf{\lr{\mbox{AuC}} (مرکز احراز هویت)} & ذخیره کلیدهای احراز هویت \lr{\mbox{(Ki)}}، تولید بردارهای امنیتی \\
+\textbf{\lr{\mbox{EIR}} (ثبت‌کننده هویت تجهیزات)} & فهرست سیاه/\allowbreak{}سفید \lr{\mbox{IMEI}} برای مسدودکردن دستگاه دزدیده‌شده \\
+\end{longtable}
+}
+
+\CNkeepfig{m03-cs-path}{2}
+
+\textbf{جریان تماس دامنه \lr{\mbox{CS}}}:
+
+\CNfigure{m03-cs-path}{جریان تماس در دامنه \lr{\mbox{CS}}}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{}{دامنه سوییچینگ بسته‌ای \lr{\mbox{(PS)}}}
+
+تمام خدمات داده (وب، ایمیل، پخش جریانی) را مدیریت می‌کند \lr{—} تکامل‌یافته از \lr{\mbox{GPRS}}.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنصر} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{\lr{\mbox{SGSN}} (گره پشتیبانی خدمات \lr{\mbox{GPRS}})} & مسیریابی بسته، مدیریت تحرک، مدیریت نشست، رمزگذاری \\
+\textbf{\lr{\mbox{GGSN}} (گره پشتیبانی \lr{\mbox{GPRS}} دروازه‌ای)} & واسط با شبکه‌های بسته‌ای خارجی (اینترنت)، تخصیص آدرس \lr{\mbox{IP}}، لنگر صورت‌حساب \\
+\end{longtable}
+}
+
+\CNkeepfig{m03-ps-path}{2}
+
+\textbf{جریان داده دامنه \lr{\mbox{PS}}}:
+
+\CNfigure{m03-ps-path}{جریان داده در دامنه \lr{\mbox{PS}}}
+
+\CNsubsection{}{چرا دو دامنه؟}
+
+رویکرد تقسیم \lr{CS/\allowbreak{}PS} یک \textbf{تصمیم مهندسی عمل‌گرایانه} بود:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{سازگاری با میراث}: زیرساخت صدا (\lr{\mbox{SS7}}، اتصال \lr{\mbox{PSTN}}) بالغ و قابل اعتماد بود \lr{—} دلیلی برای بازسازی آن وجود نداشت
+\item
+  \textbf{تضمین‌های \lr{\mbox{QoS}}}: سوییچینگ مداری تأخیر قطعی برای صدا فراهم می‌کند (تحویل تضمین‌شده فریم \lr{\mbox{20ms}})
+\item
+  \textbf{استقرار افزایشی}: اپراتورها می‌توانستند دامنه \lr{\mbox{PS}} را بدون مختل‌کردن درآمد صوتی موجود اضافه کنند
+\item
+  \textbf{کاهش ریسک}: شبکه‌های \lr{\mbox{IP}} در سال 2000 نمی‌توانستند کیفیت صدا را تضمین کنند \lr{—} افت بسته و جیتر مشکلات واقعی بودند
+\end{enumerate}
+
+\CNsection{3.5}{واسط \lr{\mbox{Iu}}}
+
+واسط \lr{\mbox{Iu}} مرز حیاتی بین \lr{\mbox{UTRAN}} و شبکه هسته است.
+
+\CNsubsection{}{\lr{\mbox{Iu-CS}} (سوییچینگ مداری)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{انتقال}: \lr{\mbox{ATM}} (\lr{\mbox{AAL2}} برای صفحه کاربر، \lr{\mbox{AAL5}} برای صفحه کنترل)
+\item
+  \textbf{صفحه کنترل}: \lr{RANAP \ensuremath{\to} SCCP \ensuremath{\to} M3UA \ensuremath{\to} SCTP} (یا \lr{\mbox{MTP3b}})
+\item
+  \textbf{صفحه کاربر}: پروتکل \lr{\mbox{Iu UP}} (قاب‌بندی برای فریم‌های کدک صوتی \lr{\mbox{AMR}})
+\item
+  \textbf{هدف}: حمل تماس‌های صوتی و تله‌فونی ویدیویی
+\end{itemize}
+
+\CNsubsection{}{\lr{\mbox{Iu-PS}} (سوییچینگ بسته‌ای)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{انتقال}: مبتنی بر \lr{\mbox{IP}} (\lr{\mbox{GTP-U}} برای صفحه کاربر)
+\item
+  \textbf{صفحه کنترل}: \lr{RANAP \ensuremath{\to} SCCP \ensuremath{\to} M3UA \ensuremath{\to} SCTP}
+\item
+  \textbf{صفحه کاربر}: \lr{\mbox{GTP-U}} (پروتکل تونل‌سازی \lr{\mbox{GPRS}} - صفحه کاربر)
+\item
+  \textbf{هدف}: حمل تمام داده بسته‌ای (وب، ایمیل، پخش جریانی)
+\end{itemize}
+
+\CNsubsection{}{\lr{\mbox{RANAP}} (بخش کاربرد شبکه دسترسی رادیویی)}
+
+رویه‌های کلیدی روی \lr{\mbox{Iu}}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تخصیص \lr{\mbox{RAB}} (حامل دسترسی رادیویی)}: حامل سرتاسری را برقرار می‌کند
+\item
+  \textbf{جابه‌جایی}: نقش \lr{\mbox{RNC}} خدمات‌دهنده را به \lr{\mbox{RNC}} دیگری منتقل می‌کند (تحویل سخت)
+\item
+  \textbf{صفحه‌بندی}: شبکه هسته \lr{\mbox{UE}} را از طریق \lr{\mbox{UTRAN}} صفحه‌بندی می‌کند
+\item
+  \textbf{حالت امنیتی}: رمزگذاری و حفاظت یکپارچگی را فعال می‌کند
+\item
+  \textbf{انتقال مستقیم}: پیام‌های \lr{\mbox{NAS}} را به‌صورت شفاف عبور می‌دهد (مثلاً \lr{\mbox{MM}}، \lr{\mbox{CC}}، \lr{\mbox{SM}})
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3.6}{نسخه 99 در برابر نسخه \lr{\mbox{5}}+ (تحول \lr{\mbox{HSPA}})}
+
+\CNchained\CNsubsection{}{نسخه \lr{99 (R99) — UMTS} اصلی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{پیوند پایین‌سو}: تا \lr{\mbox{384~kbps}} (کانال‌های اختصاصی)
+\item
+  \textbf{پیوند بالاسو}: تا \lr{\mbox{384~kbps}}
+\item
+  \textbf{نوع کانال}: کانال اختصاصی \lr{\mbox{(DCH)}} \lr{—} یک کد در هر کاربر
+\item
+  \textbf{زمان‌بندی}: در سطح \lr{\mbox{RNC}} انجام می‌شود (کند، \lr{\mbox{TTI}} حدود \lr{\mbox{100ms}})
+\item
+  \textbf{کنترل توان}: سازوکار اصلی برای تطبیق پیوند
+\item
+  \textbf{محدودیت}: ناکارآمد برای داده انفجاری (منابع را حتی در سکوت تخصیص‌یافته نگه می‌دارد)
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{نسخه \lr{5 — HSDPA} (دسترسی بسته‌ای پیوند پایین‌سوی پرسرعت)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4286}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5714}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{بهبود} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{نرخ اوج} & \lr{14.4~Mbps (DL)} \\
+\textbf{کانال مشترک} & \lr{\mbox{HS-DSCH}} \lr{—} چندگانه‌شده زمانی بین کاربران \\
+\textbf{زمان‌بندی} & منتقل‌شده به \lr{\mbox{NodeB}} (\lr{\mbox{TTI 2ms}} \lr{—} سریع، آگاه به کانال) \\
+\lr{\mbox{\textbf{\lr{\mbox{AMC}}}}} & مدولاسیون و کدگذاری تطبیقی \lr{(QPSK \ensuremath{\to} 16QAM \ensuremath{\to} 64QAM)} \\
+\lr{\mbox{\textbf{\lr{\mbox{HARQ}}}}} & \lr{\mbox{ARQ}} ترکیبی با ترکیب نرم در \lr{\mbox{NodeB}} \\
+\textbf{بدون کنترل توان} & با توان کامل ارسال می‌کند، در عوض نرخ را تطبیق می‌دهد \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{نسخه \lr{6 — HSUPA} (دسترسی بسته‌ای پیوند بالاسوی پرسرعت)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{بهبود} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{نرخ اوج} & \lr{5.76~Mbps (UL)} \\
+\textbf{کانال} & \lr{\mbox{E-DCH}} (کانال اختصاصی بهبودیافته) \\
+\textbf{زمان‌بندی} & کنترل‌شده توسط \lr{\mbox{NodeB}} با \lr{TTI 2ms/\allowbreak{}10ms} \\
+\lr{\mbox{\textbf{\lr{\mbox{HARQ}}}}} & ترکیب نرم پیوند بالاسو \\
+\textbf{مزیت} & تأخیر بهتر، توان عملیاتی بالاتر برای بارگذاری \\
+\end{longtable}
+}
+
+\CNsubsection{}{نسخه \lr{7/\allowbreak{}8 — HSPA}+}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{64QAM}} پیوند پایین‌سو}، \textbf{\lr{\mbox{16QAM}} پیوند بالاسو}
+\item
+  \lr{\textbf{\lr{\mbox{MIMO}}} (2\ensuremath{\times}2)} برای پیوند پایین‌سو
+\item
+  عملیات \textbf{دو-حامله} \lr{(2 \ensuremath{\times} 5~MHz)}
+\item
+  نرخ‌های اوج: \lr{\textbf{\lr{42~Mbps DL}}}، \lr{\textbf{\lr{11.5~Mbps UL}}}
+\item
+  \textbf{گزینه معماری مسطح}: \lr{\mbox{NodeB}} مستقیم به \lr{\mbox{GGSN}} (با دور زدن \lr{\mbox{RNC}})
+\end{itemize}
+
+\CNsubsection{}{تغییر در فلسفه}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+R99:  RNC controls everything → Centralized, slow adaptation
+R5+:  NodeB makes fast decisions → Distributed, rapid adaptation (2ms vs 100ms)
+\end{Verbatim}
+\end{CNplaincode}
+
+این تغییر پیش‌درآمدی بر طراحی \lr{\mbox{LTE}} بود که در آن \lr{\mbox{eNodeB}} تقریباً تمام تصمیمات رادیویی را مدیریت می‌کند.
+
+\Needspace{14\baselineskip}
+
+\CNsection{3.7}{\lr{\mbox{IMS}} (زیرسیستم چندرسانه‌ای \lr{\mbox{IP}}) \lr{—} مقدمه}
+
+\CNchained\CNsubsection{}{\lr{\mbox{IMS}} چیست؟}
+
+\lr{\mbox{IMS}} یک \textbf{چارچوب برای ارایه خدمات چندرسانه‌ای مبتنی بر \lr{\mbox{IP}}} روی شبکه‌های موبایل است. در نسخه 5 گروه \lr{\mbox{3GPP}} معرفی شد و چشم‌انداز همگرایی \lr{\mbox{ALL}} خدمات (صدا، ویدیو، پیام‌رسانی، حضور) روی \lr{\mbox{IP}} را نمایندگی می‌کند.
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{چرا \lr{\mbox{IMS}}؟}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مسیله} & \CNth{راه‌حل \lr{\mbox{IMS}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+دامنه \lr{\mbox{CS}} نمی‌تواند تحول یابد (\lr{\mbox{SS7}} میراثی) & سیگنالینگ تمام-\lr{\mbox{IP}} با استفاده از \lr{\mbox{SIP}} \\
+افزودن خدمات جدید نیازمند ارتقای شبکه است & سرورهای کاربردی به‌صورت ماژولار متصل می‌شوند \\
+صدا و داده دنیای جداگانه‌ای هستند & کنترل نشست یکپارچه برای تمام رسانه‌ها \\
+بدون تعامل خدمات (صدا یا داده) & خدمات ترکیبی (صدا + ویدیو + اشتراک‌گذاری) \\
+\end{longtable}
+}
+
+\CNsubsection{}{اجزای کلیدی \lr{\mbox{IMS}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{P-CSCF}} (\lr{\mbox{CSCF}} پروکسی)}: اولین نقطه تماس، پروکسی \lr{\mbox{SIP}}، اجرای سیاست
+\item
+  \textbf{\lr{\mbox{I-CSCF}} (\lr{\mbox{CSCF}} بازپرس)}: نقطه ورود از شبکه‌های دیگر، مسیریابی به \lr{\mbox{S-CSCF}} صحیح
+\item
+  \textbf{\lr{\mbox{S-CSCF}} (\lr{\mbox{CSCF}} خدمات‌دهنده)}: کنترل نشست اصلی، منطق محرک خدمات، ثبت‌کننده \lr{\mbox{SIP}}
+\item
+  \textbf{\lr{\mbox{HSS}} (سرور مشترک خانگی)}: تحول \lr{\mbox{HLR}}، ذخیره پروفایل کاربر و محرک‌های خدمات
+\item
+  \textbf{سرورهای کاربردی}: ارایه خدمات واقعی (\lr{\mbox{VoIP}}، کنفرانس، پیام‌رسانی)
+\end{itemize}
+
+\CNsubsection{}{پروتکل سیگنالینگ \lr{\mbox{IMS}}: \lr{\mbox{SIP}}}
+
+\lr{\mbox{IMS}} به‌جای \lr{\mbox{SS7}} از \textbf{\lr{\mbox{SIP}} (پروتکل آغاز نشست)} استفاده می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  متنی، قابل توسعه
+\item
+  به‌صورت بومی روی \lr{\mbox{IP}} کار می‌کند
+\item
+  از هر نوع رسانه‌ای پشتیبانی می‌کند (صدا، ویدیو، بازی، \lr{\mbox{IoT}})
+\item
+  ترکیب خدمات و مَش‌آپ‌ها را ممکن می‌سازد
+\end{itemize}
+
+\CNsubsection{}{نقش \lr{\mbox{IMS}} در سفر \lr{\mbox{2G\ensuremath{\to}4G}}}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+2G: Voice = CS (SS7)          Data = None/CSD
+3G: Voice = CS (SS7)          Data = PS (GTP)         IMS = Optional overlay
+4G: Voice = VoLTE via IMS     Data = PS (GTP)         IMS = Mandatory for voice
+5G: Voice = VoNR via IMS      Data = PS (GTP/SBA)     IMS = Still essential
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{27\baselineskip}
+
+\CNsection{3.8}{جدول مقایسه اصلی: نسل‌های شبکه موبایل}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1286}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1429}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1857}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1857}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1429}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{\lr{\mbox{2G (GSM)}}} & \CNth{\lr{2.5G (GPRS)}} & \CNth{\lr{3G (UMTS R99)}} & \CNth{\lr{3.5G (HSPA)}} & \CNth{\lr{\mbox{4G (LTE)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{دسترسی رادیویی} & \lr{TDMA/\allowbreak{}FDMA} (کانال‌های \lr{\mbox{200 kHz}}، 8 شکاف زمانی) & همان \lr{\mbox{GSM}} (شکاف‌های زمانی مشترک) & \lr{\mbox{WCDMA}} (حامل \lr{\mbox{5 MHz}}، کدهای گسترش) & \lr{\mbox{WCDMA}} + کانال‌های مشترک \lr{(HS-DSCH/\allowbreak{}E-DCH)} & \lr{OFDMA DL /\allowbreak{} SC-FDMA UL (1.4–20~MHz)} \\
+\textbf{شبکه هسته} & \lr{MSC/\allowbreak{}VLR/\allowbreak{}HLR} (مبتنی بر \lr{\mbox{SS7}}) & \lr{MSC + SGSN/\allowbreak{}GGSN} اضافه‌شده & \lr{MSC/\allowbreak{}VLR (CS) + SGSN/\allowbreak{}GGSN (PS)} & همان \lr{\mbox{3G}} (معماری مسطح اختیاری در \lr{\mbox{HSPA}}+) & \lr{\mbox{EPC}}: \lr{MME/\allowbreak{}S-GW/\allowbreak{}P-GW} (تمام-\lr{\mbox{IP}}، مسطح) \\
+\textbf{نوع سوییچینگ} & فقط سوییچینگ مداری & \lr{\mbox{CS}} (صدا) + \lr{\mbox{PS}} (داده) & \lr{\mbox{CS}} (صدا) + \lr{\mbox{PS}} (داده) & \lr{\mbox{CS}} (صدا) + \lr{\mbox{PS}} (داده) & فقط سوییچینگ بسته‌ای \\
+\textbf{حداکثر نرخ داده \lr{\mbox{(DL)}}} & \lr{9.6~kbps (CSD) /\allowbreak{} 14.4~kbps (HSCSD)} & \lr{171.2~kbps} (نظری) /\allowbreak{} حدود \lr{\mbox{40~kbps}} (عملی) & \lr{\mbox{384~kbps}} (پیاده) /\allowbreak{} \lr{\mbox{2~Mbps}} (داخل ساختمان) & \lr{14.4~Mbps (HSDPA) /\allowbreak{} 42~Mbps (HSPA+)} & \lr{300~Mbps (Cat 5) /\allowbreak{} 3~Gbps (Cat 20)} \\
+\textbf{حداکثر نرخ داده \lr{\mbox{(UL)}}} & \lr{\mbox{9.6~kbps}} & \lr{171.2~kbps} (نظری) /\allowbreak{} حدود \lr{\mbox{20~kbps}} (عملی) & \lr{\mbox{384~kbps}} & \lr{5.76~Mbps (HSUPA) /\allowbreak{} 11.5~Mbps (HSPA+)} & \lr{75~Mbps (Cat 5) /\allowbreak{} 1.5~Gbps (Cat 20)} \\
+\textbf{تأخیر \lr{\mbox{(RTT)}}} & حدود \lr{\mbox{500~ms}} (داده) & حدود \lr{300–600~ms} & حدود \lr{150–200~ms} & حدود \lr{50–100~ms (HSPA)} /\allowbreak{} حدود \lr{30~ms (HSPA+)} & حدود \lr{\mbox{10–30~ms}} (صفحه کاربر) /\allowbreak{} حدود \lr{\mbox{50~ms}} (کنترل) \\
+\textbf{پشتیبانی تحرک} & تحویل (سخت) تا \lr{250 km/\allowbreak{}h} & همان \lr{\mbox{GSM}} & تحویل نرم + تحویل سخت، تا \lr{500 km/\allowbreak{}h} & همان \lr{\mbox{UMTS}} & فقط تحویل سخت، تا \lr{500 km/\allowbreak{}h} \\
+\textbf{پروتکل سیگنالینگ} & \lr{\mbox{SS7}} (\lr{\mbox{MAP}}، \lr{\mbox{ISUP}}، \lr{\mbox{BSSAP}}) & \lr{SS7 + GTP-C} & \lr{\mbox{SS7}} (\lr{\mbox{RANAP}}، \lr{\mbox{MAP}}) + \lr{\mbox{GTP-C}} & همان \lr{\mbox{3G}} & \lr{Diameter + GTP-C v2} (تماماً مبتنی بر \lr{\mbox{IP}}) \\
+\textbf{نوآوری اصلی} & صدای دیجیتال، \lr{\mbox{SMS}}، رومینگ، \lr{\mbox{SIM}} & داده همیشه فعال، اتصال \lr{\mbox{IP}}، رادیو مشترک & داده پهن‌باند، تماس ویدیویی، چندرسانه‌ای، تحویل نرم & زمان‌بندی سریع در \lr{\mbox{NodeB}}، \lr{\mbox{AMC}}، \lr{\mbox{HARQ}}، کانال‌های مشترک & معماری مسطح تمام-\lr{\mbox{IP}}، \lr{\mbox{OFDMA}}، \lr{\mbox{MIMO}}، \lr{\mbox{VoLTE}} \\
+\textbf{محدودیت اصلی} & بدون قابلیت داده واقعی & توان عملیاتی پایین، تأخیر بالا، مشترک با شکاف‌های زمانی صدا & کانال‌های اختصاصی منابع را برای داده انفجاری هدر می‌دهند & همچنان صدای \lr{\mbox{CS}}، دو-پشته پیچیده & بدون صدای بومی (نیازمند \lr{VoLTE/\allowbreak{}IMS})، تحویل پیچیده به \lr{2G/\allowbreak{}3G} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m03-cs-ps-domains}{10}
+
+\CNsection{3.9}{تقسیم \lr{CS/\allowbreak{}PS} \lr{—} و چرا \lr{\mbox{LTE}} آن را از بین برد}
+
+\CNchained\CNsubsection{}{مشکل دو دامنه}
+
+اجرای موازی دامنه‌های \lr{\mbox{CS}} و \lr{\mbox{PS}} به این معنا بود:
+
+\CNfigure{m03-cs-ps-domains}{دو دامنه هسته موازی در شبکه اپراتور}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{هزینه‌های معماری تقسیم‌شده}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5294}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4706}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مسیله} & \CNth{تأثیر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{زیرساخت تکراری} & دو شبکه هسته کامل برای نگهداری، ارتقا و تأمین نیرو \\
+\textbf{استفاده ناکارآمد از طیف} & \lr{\mbox{CS}} حتی در سکوت ظرفیت رزرو می‌کند (60\% یک تماس سکوت است) \\
+\textbf{بدون همگرایی خدمات} & صدا و داده نمی‌توانند به‌راحتی تعامل کنند (مثلاً اشتراک‌گذاری عکس در حین تماس) \\
+\textbf{\lr{\mbox{SS7}} میراثی است} & سخت برای توسعه، تجهیزات اختصاصی، بدون مزایای اکوسیستم \lr{\mbox{IP}} \\
+\textbf{صورت‌حساب جداگانه} & دقیقه صدا + مگابایت داده = سیستم‌های صورت‌حساب پیچیده \\
+\textbf{محدودیت‌های مقیاس‌پذیری} & \lr{\mbox{CS}} با پورت/\allowbreak{}ترانک مقیاس می‌یابد (گران)، \lr{\mbox{PS}} با پهنای باند مقیاس می‌یابد (ارزان) \\
+\end{longtable}
+}
+
+\CNsubsection{}{چرا \lr{\mbox{LTE}} به فقط-بسته \lr{\mbox{(EPC)}} یکپارچه شد}
+
+هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}} در \lr{\mbox{LTE}} تصمیم رادیکالی گرفت: \textbf{هیچ سوییچینگ مداری در کار نیست}.
+
+\CNsubsubsection{توانمندسازهای فنی (چه چیزی تا سال 2008 تغییر کرد):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{شبکه‌های \lr{\mbox{IP}} بالغ شدند}: سازوکارهای \lr{\mbox{QoS}} (\lr{\mbox{DiffServ}}، \lr{\mbox{MPLS}}، حامل‌های اختصاصی) اکنون می‌توانستند کیفیت صدا را تضمین کنند
+\item
+  \textbf{کارایی کدک}: کدک‌های \lr{\mbox{AMR-WB}} و \lr{\mbox{EVS}} روی \lr{\mbox{IP}} با حداقل پهنای باند (حدود \lr{\mbox{12~kbps}}) خوب کار می‌کنند
+\item
+  \textbf{تأخیر کم محقق شد}: \lr{\mbox{RTT}} حدود \lr{\mbox{10ms}} در \lr{\mbox{LTE}} در واقع \textbf{بهتر} از صدای \lr{\mbox{CS}} است (به‌هرحال تأخیر کدک حدود \lr{\mbox{50ms}})
+\item
+  \textbf{\lr{\mbox{VoIP}} اثبات شد}: \lr{\mbox{Skype}} و \lr{\mbox{Vonage}} ثابت کردند صدای \lr{\mbox{IP}} از نظر تجاری قابل دوام است
+\item
+  \textbf{\lr{\mbox{IMS}} آماده بود}: پس از سال‌ها توسعه، \lr{\mbox{IMS}} می‌توانست کنترل تماس \lr{\mbox{SS7}} را با \lr{\mbox{SIP}} جایگزین کند
+\item
+  \textbf{اقتصاد}: تجهیزات \lr{\mbox{IP}} یک‌دهم تجهیزات معادل \lr{TDM/\allowbreak{}SS7} هزینه دارند
+\end{enumerate}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{معماری \lr{\mbox{EPC}} (تمام بسته):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3448}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3448}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنصر} & \CNth{جانشین} & \CNth{عملکرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{MME}}}}} & \lr{\mbox{MSC}} (صفحه کنترل) & تحرک، احراز هویت، مدیریت حامل \lr{—} فقط سیگنالینگ \\
+\lr{\mbox{\textbf{\lr{\mbox{S-GW}}}}} & \lr{\mbox{SGSN}} (صفحه کاربر) & لنگر تحرک محلی، ارسال داده بین \lr{\mbox{eNodeB}}ها \\
+\lr{\mbox{\textbf{\lr{\mbox{P-GW}}}}} & \lr{\mbox{GGSN}} & دروازه شبکه خارجی، تخصیص \lr{\mbox{IP}}، سیاست/\allowbreak{}صورت‌حساب \\
+\lr{\mbox{\textbf{\lr{\mbox{HSS}}}}} & \lr{HLR + AuC} & داده مشترک، بردارهای احراز هویت \\
+\lr{\mbox{\textbf{\lr{\mbox{PCRF}}}}} & \lr{—} (جدید) & سیاست و قواعد صورت‌حساب \lr{—} \lr{\mbox{QoS}} در هر جریان را ممکن می‌سازد \\
+\end{longtable}
+}
+
+\CNkeepfig{m03-voice-paths}{2}
+
+\CNsubsubsection{چگونه صدا بدون \lr{\mbox{CS}} کار می‌کند \lr{\mbox{(VoLTE)}}:}
+
+\CNfigure{m03-voice-paths}{مسیر صدا در \lr{\mbox{3G}} (مداری) در برابر \lr{\mbox{LTE}} (\lr{\mbox{VoLTE}} روی \lr{\mbox{IMS}})}
+
+\CNsubsubsection{مزایای معماری بسته یکپارچه:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{زیرساخت واحد} برای نگهداری \ensuremath{\leftarrow} کاهش بیش از 50\% در \lr{\mbox{OPEX}}
+\item
+  \textbf{مالتی‌پلکسینگ آماری} \ensuremath{\leftarrow} بدون ظرفیت هدررفته در حین سکوت
+\item
+  \textbf{همگرایی خدمات} \ensuremath{\leftarrow} صدا + ویدیو + داده همزمان روی همان حامل
+\item
+  \textbf{نوآوری سریع خدمات} \ensuremath{\leftarrow} خدمات جدید از طریق سرورهای کاربردی، نه ارتقای شبکه
+\item
+  \textbf{صدای \lr{\mbox{HD}}} \ensuremath{\to} \lr{\mbox{AMR-WB}} (پهن‌باند) به‌طور چشمگیری بهتر از کدک باریک‌باند \lr{\mbox{GSM}} به گوش می‌رسد
+\item
+  \textbf{ساده‌سازی شبکه} \ensuremath{\leftarrow} واسط‌های کمتر، پشته‌های پروتکل کمتر، نقاط شکست کمتر
+\end{enumerate}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{مبادله}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2286}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{CS (2G/\allowbreak{}3G)}} & \CNth{فقط-\lr{\mbox{PS (LTE)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+قابلیت اطمینان صدا & بسیار بالا (بیش از 30 سال اثبات‌شده) & بستگی به پوشش و پیاده‌سازی \lr{\mbox{VoLTE}} دارد \\
+زمان برقراری تماس & حدود \lr{\mbox{3–5}} ثانیه & حدود \lr{\mbox{1–2}} ثانیه (\lr{\mbox{SIP}} سریع‌تر است) \\
+تماس‌های اضطراری & همیشه کار می‌کند (بازگشت \lr{\mbox{CS}}) & نیازمند \lr{\mbox{VoLTE}} یا \lr{\mbox{CSFB}} به \lr{2G/\allowbreak{}3G} \\
+پیچیدگی & ساده برای صدا، پیچیده در کل & ساده در کل، پیچیده برای \lr{\mbox{QoS}} صدا \\
+شکاف‌های پوشش & صدا حتی در لبه سلول کار می‌کند & اگر پوشش \lr{\mbox{LTE}} افت کند صدا قطع می‌شود (نیازمند \lr{\mbox{CSFB}}) \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{\lr{\mbox{CSFB}} (بازگشت به سوییچینگ مداری)}: شبکه‌های \lr{\mbox{LTE}} اولیه برای تماس‌های صوتی به \lr{3G/\allowbreak{}2G} بازمی‌گشتند. این یک راه‌حل انتقالی بود تا زمانی که پوشش \lr{\mbox{VoLTE}} همه‌جاگیر شود.
+
+\end{CNquote}
+
+\CNsection{3.10}{خلاصه: نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\textbf{\lr{3G (UMTS)}}} رادیو \lr{\mbox{WCDMA}} با کانال‌های اختصاصی را معرفی کرد و هسته تقسیم‌شده \lr{CS/\allowbreak{}PS} نسل \lr{\mbox{2G}} را حفظ کرد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UTRAN}}}}} توابع رادیویی را جدا می‌کند: \lr{\mbox{NodeB}} (لایه فیزیکی) و \lr{\mbox{RNC}} (مدیریت منابع رادیویی)
+\item
+  \textbf{واسط \lr{\mbox{Iu}}} دسترسی رادیویی را به‌طور تمیز از هسته جدا می‌کند \lr{—} که تحول مستقل را ممکن می‌سازد
+\item
+  \lr{\textbf{\lr{HSPA (R5/\allowbreak{}R6)}}} هوش را به \lr{\mbox{NodeB}} منتقل کرد (زمان‌بندی سریع، \lr{\mbox{HARQ}}، \lr{\mbox{AMC}}) \lr{—} پیش‌نمایشی از فلسفه \lr{\mbox{LTE}}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{IMS}}}}} لایه خدمات تمام-\lr{\mbox{IP}} را فراهم می‌کند که در نهایت \lr{\mbox{SS7}} را برای صدا جایگزین می‌کند
+\item
+  \textbf{\lr{\mbox{LTE}} همه چیز را به بسته یکپارچه کرد} زیرا \lr{\mbox{IP}} به‌اندازه کافی بالغ شده بود تا \lr{\mbox{QoS}} صدا را تضمین کند، و اقتصاد نگهداری زیرساخت دوگانه غیرقابل توجیه شد
+\item
+  \textbf{تحول تدریجی بود}: هر نسل محدودیت‌های واقعی نسل قبلی را برطرف کرد
+\end{enumerate}
+
+\CNboxsection{پرسش‌های مرور}
+
+\begin{CNbox}[unbreakable]{q}{پرسش‌های مرور}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  توضیح دهید چرا \lr{\mbox{UMTS}} دامنه‌های جداگانه \lr{\mbox{CS}} و \lr{\mbox{PS}} را حفظ کرد به‌جای اینکه از ابتدا تمام-بسته باشد.
+\item
+  تفاوت بین \lr{\mbox{RNC}} خدمات‌دهنده و \lr{\mbox{RNC}} رانشی چیست؟
+\item
+  زمان‌بندی مبتنی بر \lr{\mbox{NodeB}} در \lr{\mbox{HSDPA}} چگونه نسبت به زمان‌بندی مبتنی بر \lr{\mbox{RNC}} در \lr{\mbox{R99}} بهبود می‌یابد؟
+\item
+  پشته پروتکل واسط \lr{\mbox{Iu-PS}} را رسم کنید.
+\item
+  چرا \lr{\mbox{IMS}} برای اینکه \lr{\mbox{LTE}} دامنه \lr{\mbox{CS}} را حذف کند ضروری بود؟
+\item
+  نقش \lr{\mbox{SGSN}} در \lr{\mbox{3G}} را با \lr{\mbox{S-GW}} در \lr{\mbox{LTE}} مقایسه کنید \lr{—} چه چیزی تغییر کرد و چرا؟
+\end{enumerate}
+
+\emph{ماژول 3 \lr{—} شبکه‌های ارتباطی پیشرفته \lr{—} شبکه‌های هسته \lr{2G/\allowbreak{}3G}}\CNbr{}\emph{بعدی: ماژول 4 \lr{—} معماری \lr{LTE/\allowbreak{}EPC}}
+
+\end{CNbox}

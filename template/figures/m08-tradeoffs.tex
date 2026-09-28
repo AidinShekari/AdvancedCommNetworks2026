@@ -1,0 +1,12 @@
+% Module 8 — RACH design trade-offs
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \a/\an/\b/\bn [count=\r from 0] in {
+   {\CNL{Coverage}{پوشش}}/{\CNL{long CP, few PRACH, large}{\lr{CP} بلند، \lr{PRACH} کم، }\,$N_{CS}$}/{\CNL{Capacity}{ظرفیت}}/{\CNL{short CP, many PRACH, small}{\lr{CP} کوتاه، \lr{PRACH} زیاد، }\,$N_{CS}$},
+   {\CNL{Latency}{تأخیر}}/{\CNL{2-step RACH, fewer retries}{\lr{RACH} دوگامی، تلاش‌های کمتر}}/{\CNL{Reliability}{قابلیت اطمینان}}/{\CNL{4-step RACH, power ramping}{\lr{RACH} چهارگامی، افزایش تدریجی توان}},
+   {\CNL{Access delay}{تأخیر دسترسی}}/{\CNL{low backoff}{عقب‌نشینی کم}}/{\CNL{Overload protection}{حفاظت در برابر اضافه‌بار}}/{\CNL{high backoff, ACB}{عقب‌نشینی زیاد، \lr{ACB}}}}{
+  \node[CNcp, minimum width=3.4cm] (l\r) at (0,-\r*1.9) {\a};
+  \node[CNran, minimum width=3.4cm] (r\r) at (9,-\r*1.9) {\b};
+  \draw[CNlink, <->, line width=1.2pt] (l\r) -- (r\r);
+  \node[CNtiny, anchor=north] at ([yshift=-1mm]l\r.south) {(\an)};
+  \node[CNtiny, anchor=north] at ([yshift=-1mm]r\r.south) {(\bn)};}
+\end{tikzpicture}

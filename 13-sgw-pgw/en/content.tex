@@ -1,0 +1,622 @@
+\Needspace{19\baselineskip}
+
+\CNsection{1}{Why Separate S-GW and P-GW?}
+
+LTE deliberately splits the user-plane gateway into two distinct nodes:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Role} & \CNth{S-GW} & \CNth{P-GW} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Anchoring} & Local mobility anchor (intra-LTE) & PDN/\allowbreak{}IP anchor (inter-RAT, global) \\
+\textbf{Scope} & Per-MME pool area & Per-PDN connection (could span MME areas) \\
+\textbf{Mobility} & Changes during inter-MME HO & Stays the same for entire PDN session \\
+\textbf{Placement} & Close to RAN (low latency) & Centralized (policy, charging) \\
+\end{longtable}
+}
+
+\textbf{Design Rationale:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Different lifetimes}: S-GW can relocate during mobility; P-GW remains fixed for IP continuity
+\item
+  \textbf{Independent scaling}: S-GW scales with local traffic; P-GW scales with subscribers/\allowbreak{}policies
+\item
+  \textbf{CUPS preparation}: The split enables Control/\allowbreak{}User Plane Separation — you can distribute S-GW-U at the edge while keeping S-GW-C centralized
+\item
+  \textbf{Roaming}: In home-routed roaming, S-GW is in visited PLMN; P-GW is in home PLMN (S8 interface)
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{S-GW (Serving Gateway)}
+
+\CNchained\CNsubsection{2.1}{User-Plane Forwarding}
+
+The S-GW is essentially a \textbf{GTP-U tunnel switch}:
+
+\begin{itemize}
+\tightlist
+\item
+  Receives DL packets from P-GW on S5/\allowbreak{}S8 GTP-U tunnel
+\item
+  Forwards them to eNodeB (eNB) on S1-U GTP-U tunnel
+\item
+  Receives UL packets from eNB on S1-U and forwards to P-GW on S5/\allowbreak{}S8
+\end{itemize}
+
+Each bearer has \textbf{separate GTP-U tunnels} on each interface (identified by TEID).
+
+\CNsubsection{2.2}{Local Mobility Anchor}
+
+During \textbf{X2 handover} (direct eNB-to-eNB):
+
+\begin{itemize}
+\tightlist
+\item
+  S-GW does NOT change
+\item
+  Source eNB forwards buffered/\allowbreak{}in-transit packets to target eNB via X2
+\item
+  After handover, MME sends \textbf{Modify Bearer Request} to S-GW with new eNB address/\allowbreak{}TEID
+\item
+  S-GW switches S1-U tunnel endpoint from source eNB to target eNB (\textbf{path switch})
+\end{itemize}
+
+This avoids tearing down the S5 tunnel to P-GW — only the S1-U leg changes.
+
+\CNsubsection{2.3}{Downlink Data Buffering}
+
+When UE is in \textbf{ECM-IDLE} (no S1-U tunnel exists):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  DL packets arrive from P-GW on S5 tunnel
+\item
+  S-GW has no S1-U endpoint \ensuremath{\to} \textbf{buffers packets}
+\item
+  S-GW sends \textbf{Downlink Data Notification} to MME (via S11)
+\item
+  MME initiates paging
+\item
+  After UE responds (Service Request), MME sends Modify Bearer Request with new eNB TEID
+\item
+  S-GW flushes buffered packets to eNB
+\end{enumerate}
+
+\textbf{Buffer limits}: Configurable per operator; typically 1-10 packets per bearer. Excess dropped.
+
+\CNsubsection{2.4}{Per-UE/\allowbreak{}Per-Bearer Charging}
+
+S-GW generates \textbf{CDRs (Charging Data Records)} with:
+
+\begin{itemize}
+\tightlist
+\item
+  UL/\allowbreak{}DL volume per bearer
+\item
+  Duration
+\item
+  QoS information (QCI, ARP, GBR/\allowbreak{}MBR)
+\item
+  Cause of record closure (HO, time limit, volume limit)
+\end{itemize}
+
+Sent to \textbf{offline charging system (CDF)} via Rf/\allowbreak{}Gz interface.
+
+\CNsubsection{2.5}{Lawful Interception}
+
+S-GW can mirror user-plane traffic for lawful interception (LI):
+
+\begin{itemize}
+\tightlist
+\item
+  X2 interface (ETSI standard) to Law Enforcement Monitoring Facility (LEMF)
+\item
+  Triggered by warrant, activated via X1 interface from LI administration
+\item
+  Duplicates packets without affecting UE service
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{2.6}{S-GW Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2973}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1622}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2703}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2703}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer} & \CNth{Protocol} & \CNth{Function} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{S1-U} & eNB & GTP-U (UDP) & User-plane to/\allowbreak{}from RAN \\
+\textbf{S5} & P-GW (same PLMN) & GTP-U + GTPv2-C & UP forwarding + CP session mgmt \\
+\textbf{S8} & P-GW (roaming) & GTP-U + GTPv2-C & Same as S5 but inter-PLMN \\
+\textbf{S11} & MME & GTPv2-C & CP: bearer/\allowbreak{}session management \\
+\textbf{S12} & UTRAN (3G) & GTP-U & Direct tunnel for 3G interworking \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{P-GW (PDN Gateway)}
+
+\CNchained\CNsubsection{3.1}{PDN Connectivity and IP Address Allocation}
+
+The P-GW is the \textbf{UE’s gateway to the Internet/\allowbreak{}PDN} — it assigns the UE its IP address:
+
+\textbf{IPv4 Allocation Methods:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Static}: Pre-configured in HSS subscription data
+\item
+  \textbf{Dynamic (DHCPv4)}: P-GW acts as DHCP server or relays to external DHCP
+\item
+  \textbf{Dynamic (internal pool)}: P-GW allocates from local address pool (most common)
+\end{itemize}
+
+\textbf{IPv6 Allocation:}
+
+\begin{itemize}
+\tightlist
+\item
+  P-GW assigns a /\allowbreak{}64 prefix via \textbf{Router Advertisement (SLAAC)}
+\item
+  UE generates Interface ID (EUI-64 or privacy extensions)
+\item
+  Prefix delivered in PCO (Protocol Configuration Options) during bearer activation
+\end{itemize}
+
+\textbf{Dual-Stack (IPv4v6):}
+
+\begin{itemize}
+\tightlist
+\item
+  Both IPv4 address and IPv6 prefix assigned simultaneously
+\item
+  Requires PDN Type = IPv4v6 in subscription
+\end{itemize}
+
+\CNsubsection{3.2}{Policy Enforcement}
+
+P-GW enforces policies received from \textbf{PCRF} via the \textbf{Gx interface}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PCC Rules (Policy and Charging Control):}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    SDF (Service Data Flow) filters — 5-tuple matching
+  \item
+    QoS parameters (QCI, GBR, MBR, ARP)
+  \item
+    Charging keys and rating groups
+  \item
+    Gate status (open/\allowbreak{}close specific flows)
+  \end{itemize}
+\item
+  \textbf{TFT (Traffic Flow Template):}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{DL TFT}: At P-GW — maps incoming DL packets to correct bearer
+  \item
+    \textbf{UL TFT}: Sent to UE — UE maps UL packets to correct bearer
+  \item
+    Packet filters: source/\allowbreak{}dest IP, port range, protocol, ToS/\allowbreak{}DSCP
+  \end{itemize}
+\end{itemize}
+
+\Needspace{12\baselineskip}
+
+\CNsubsection{3.3}{Charging}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1818}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1818}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3030}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Type} & \CNth{Interface} & \CNth{Node} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Online (OCS)} & Gy (Diameter) & OCS & Prepaid; real-time credit control \\
+\textbf{Offline (OFCS)} & Gz (GTP’) & CDF/\allowbreak{}CGF & Postpaid; CDR generation \\
+\end{longtable}
+}
+
+\textbf{Charging triggers:}
+
+\begin{itemize}
+\tightlist
+\item
+  Volume threshold (e.g., every 1~MB)
+\item
+  Time threshold (e.g., every 60 seconds)
+\item
+  QoS change, bearer modification
+\item
+  Re-authorization from OCS
+\end{itemize}
+
+\CNsubsection{3.4}{Packet Filtering and Routing}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DL}: Internet \ensuremath{\to} P-GW: Match destination IP to UE session, apply SDF filter to select bearer, encapsulate in GTP-U toward S-GW
+\item
+  \textbf{UL}: UE \ensuremath{\to} P-GW: Decapsulate GTP-U, apply NAT (if private addressing), route to Internet
+\item
+  \textbf{NAT/\allowbreak{}NAPT}: P-GW often performs NAT for IPv4 (private UE addresses \ensuremath{\to} public)
+\item
+  \textbf{Header compression}: Not at P-GW (done at PDCP layer in RAN)
+\end{itemize}
+
+\CNsubsection{3.5}{SGi Interface}
+
+\begin{itemize}
+\tightlist
+\item
+  SGi connects P-GW to \textbf{external PDNs} (Internet, IMS, enterprise VPNs)
+\item
+  IP-based interface (no GTP)
+\item
+  Equivalent to Gi in 3G (GGSN \ensuremath{\to} Internet)
+\item
+  Multiple PDNs supported (each identified by APN)
+\item
+  May connect to:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Internet (public APN)
+  \item
+    IMS core (ims APN)
+  \item
+    Enterprise VPN (private APN)
+  \item
+    Content/\allowbreak{}CDN platforms
+  \end{itemize}
+\end{itemize}
+
+\CNkeepfig{m13-tft-mapping}{3}
+
+\CNsubsection{3.6}{UL/\allowbreak{}DL TFT — Mapping Packets to Bearers}
+
+\CNfigure{m13-tft-mapping}{Several bearers per PDN connection and how packets are mapped to them}
+
+\Needspace{14\baselineskip}
+
+\Needspace{31\baselineskip}
+
+\CNsection{4}{GTP Protocol}
+
+\CNchained\CNsubsection{4.1}{GTP-C (GTP Control Plane) — GTPv2-C}
+
+GTP-C manages tunnel/\allowbreak{}session lifecycle on S11, S5/\allowbreak{}S8, S10, S3 interfaces.
+
+\textbf{Key Messages:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3793}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Message} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Create Session Request/\allowbreak{}Response & MME\ensuremath{\to}S-GW\ensuremath{\to}P-GW & Establish PDN connection + default bearer \\
+Modify Bearer Request/\allowbreak{}Response & MME\ensuremath{\to}S-GW & Update tunnel endpoints (HO, service request) \\
+Delete Session Request/\allowbreak{}Response & MME\ensuremath{\to}S-GW\ensuremath{\to}P-GW & Tear down PDN connection \\
+Create Bearer Request/\allowbreak{}Response & P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME & Dedicated bearer activation \\
+Update Bearer Request/\allowbreak{}Response & P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME & QoS modification \\
+Delete Bearer Request/\allowbreak{}Response & P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME & Dedicated bearer deactivation \\
+Downlink Data Notification & S-GW\ensuremath{\to}MME & Trigger paging for idle UE \\
+Release Access Bearers & MME\ensuremath{\to}S-GW & UE goes idle, release S1-U \\
+\end{longtable}
+}
+
+\CNkeepfig{m13-gtpv2c-header}{2}
+
+\textbf{GTPv2-C Header:}
+
+\CNfigure{m13-gtpv2c-header}{GTPv2-C header}
+
+\textbf{TEID (Tunnel Endpoint Identifier):}
+
+\begin{itemize}
+\tightlist
+\item
+  32-bit identifier, locally unique per node
+\item
+  Each side assigns its own TEID and communicates it to the peer
+\item
+  Allows multiplexing multiple tunnels on same IP:port
+\end{itemize}
+
+\CNkeepfig{m13-gtpu-header}{7}
+
+\CNsubsection{4.2}{GTP-U (GTP User Plane)}
+
+GTP-U encapsulates user IP packets for transport between EPC nodes.
+
+\textbf{GTP-U Header:}
+
+\CNfigure{m13-gtpu-header}{GTP-U header}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Message Type 0xFF (255)}: T-PDU — contains user data (most common)
+\item
+  \textbf{Transport}: UDP port 2152
+\item
+  \textbf{T-PDU}: The encapsulated user IP packet
+\item
+  \textbf{Sequence Number}: Optional, used for reordering during path switch/\allowbreak{}handover
+\end{itemize}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{4.3}{GTP-C vs GTP-U Comparison}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1860}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3953}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4186}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{GTP-C (GTPv2-C)} & \CNth{GTP-U (GTPv1-U)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Purpose} & Session/\allowbreak{}tunnel management & User data transport \\
+\textbf{Version} & v2 (in LTE) & v1 (unchanged from 3G) \\
+\textbf{Transport} & UDP port 2123 & UDP port 2152 \\
+\textbf{Reliability} & Request/\allowbreak{}Response + retransmission & No ACK (relies on upper layers) \\
+\textbf{TEID} & Identifies control session & Identifies user data tunnel (per-bearer) \\
+\textbf{Messages} & Create/\allowbreak{}Modify/\allowbreak{}Delete Session, etc. & T-PDU (0xFF), Echo, Error Indication \\
+\textbf{Interfaces} & S11, S5/\allowbreak{}S8, S10, S3 & S1-U, S5/\allowbreak{}S8 (user plane) \\
+\textbf{Payload} & IE (Information Elements) structured & Raw IP packet (T-PDU) \\
+\textbf{Header size} & 12~bytes (min) & 8~bytes (min), 12 with options \\
+\textbf{Statefulness} & Stateful (sessions) & Stateless (per-packet forwarding) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m13-downlink-trace}{8}
+
+\CNsection{5}{Packet Path Trace (End-to-End with Encapsulation)}
+
+\CNchained\CNsubsection{5.1}{Downlink: Internet \ensuremath{\to} UE}
+
+\CNfigure{m13-downlink-trace}{Downlink packet trace from the Internet to the UE with each encapsulation}
+
+\CNkeepfig{m13-headers}{3}
+
+\CNsubsection{5.2}{Headers at Each Point}
+
+\CNfigure{m13-headers}{Headers of a downlink packet on each segment}
+
+\CNkeepfig{m13-gtp-tunnels}{3}
+
+\CNsubsection{5.3}{GTP Tunnel Structure Diagram}
+
+\CNfigure{m13-gtp-tunnels}{GTP tunnel endpoints and TEIDs along the user-plane path}
+
+\textbf{Note:} Each GTP-U tunnel segment has \textbf{two TEIDs} — one for each direction:
+
+\begin{itemize}
+\tightlist
+\item
+  S1-U UL: eNB\ensuremath{\to}S-GW uses S-GW’s TEID (0x5678)
+\item
+  S1-U DL: S-GW\ensuremath{\to}eNB uses eNB’s TEID (0x1234)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m13-cups-split}{10}
+
+\CNsection{6}{CUPS: Control and User Plane Separation}
+
+\CNchained\CNsubsection{6.1}{Concept (3GPP Release 14+)}
+
+CUPS splits S-GW and P-GW each into control-plane and user-plane components:
+
+\CNfigure{m13-cups-split}{CUPS splits S-GW and P-GW into control-plane and user-plane parts}
+
+\CNsubsection{6.2}{Sx Interface and PFCP Protocol}
+
+\textbf{PFCP (Packet Forwarding Control Protocol)} — 3GPP TS 29.244:
+
+\begin{itemize}
+\tightlist
+\item
+  Runs between CP and UP components (Sxa for S-GW, Sxb for P-GW, Sxc for TDF)
+\item
+  \textbf{Session Establishment}: CP tells UP to create forwarding rules
+\item
+  \textbf{Session Modification}: CP updates rules (e.g., new TEID after handover)
+\item
+  \textbf{Session Deletion}: CP instructs UP to remove forwarding state
+\end{itemize}
+
+\textbf{PFCP Key Concepts:}\CNbr{}\textbar{} Element \textbar{} Purpose \textbar{}\CNbr{}\textbar{}———\textbar{}———\textbar{}\CNbr{}\textbar{} PDR (Packet Detection Rule) \textbar{} Match criteria (TEID, IP, port) \textbar{}\CNbr{}\textbar{} FAR (Forwarding Action Rule) \textbar{} What to do (forward, buffer, drop) \textbar{}\CNbr{}\textbar{} QER (QoS Enforcement Rule) \textbar{} Rate limiting (GBR/\allowbreak{}MBR) \textbar{}\CNbr{}\textbar{} URR (Usage Reporting Rule) \textbar{} Volume/\allowbreak{}time measurement for charging \textbar{}\CNbr{}\textbar{} BAR (Buffering Action Rule) \textbar{} Buffering behavior for idle UE \textbar{}
+
+\CNsubsection{6.3}{Benefits of CUPS}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Distributed user plane}: Deploy S-GW-U /\allowbreak{} P-GW-U at edge (low latency for MEC)
+\item
+  \textbf{Centralized control}: Keep S-GW-C /\allowbreak{} P-GW-C in central DC (simpler management)
+\item
+  \textbf{Independent scaling}: Scale UP with traffic volume, CP with signaling load
+\item
+  \textbf{Flexible deployment}: Multiple UP instances per CP, or vice versa
+\item
+  \textbf{5G readiness}: CUPS architecture directly maps to 5G SMF (CP) + UPF (UP) split
+\end{enumerate}
+
+\CNkeepfig{m13-cups}{3}
+
+\CNsubsection{6.4}{CUPS Architecture Diagram}
+
+\CNfigure{m13-cups}{CUPS: S-GW and P-GW split into control and user planes}
+
+\textbf{Blue = Control Plane} \textbar{} \textbf{Green = User Plane}
+
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{7}{Evolution: S-GW + P-GW \ensuremath{\to} UPF (5G)}
+
+\CNchained\CNsubsection{7.1}{Why Merged into UPF?}
+
+In 5G, S-GW and P-GW user-plane functions are \textbf{merged into a single UPF (User Plane Function)}:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2105}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2895}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{LTE (S-GW + P-GW)} & \CNth{5G (UPF)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Nodes & 2 separate (S-GW, P-GW) & 1 unified (UPF) \\
+GTP hops & 2 (S1-U + S5) & 1 (N3 only, or N3+N9 for chaining) \\
+Control & S-GW-C + P-GW-C & SMF (single CP for UP) \\
+CP-UP protocol & Sxa/\allowbreak{}Sxb PFCP & N4 PFCP (same protocol, evolved) \\
+Deployment & Typically centralized & Distributed (edge UPF, anchor UPF) \\
+Mobility anchor & Fixed P-GW & Flexible (SSC modes 1/\allowbreak{}2/\allowbreak{}3) \\
+Slicing & N/\allowbreak{}A & UPF per slice \\
+\end{longtable}
+}
+
+\CNsubsection{7.2}{Why the Merge Makes Sense}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Eliminates one GTP-U hop}: S1-U + S5 \ensuremath{\to} just N3 (+ optional N9 between UPFs)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Lower latency, fewer encap/\allowbreak{}decap operations
+  \end{itemize}
+\item
+  \textbf{Simplified forwarding}: One node handles both local mobility and PDN anchoring
+\item
+  \textbf{Edge deployment}: UPF placed close to user for MEC/\allowbreak{}URLLC — no need for separate S-GW-U at edge
+\item
+  \textbf{Flexible anchoring (SSC modes)}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    SSC 1: Fixed UPF (like LTE P-GW) — IP continuity
+  \item
+    SSC 2: UPF can change — new IP address (for non-persistent sessions)
+  \item
+    SSC 3: Multi-homing — old + new UPF active simultaneously during transition
+  \end{itemize}
+\item
+  \textbf{UPF chaining}: Multiple UPFs in series (I-UPF as intermediate, PSA-UPF as anchor) replaces S-GW\ensuremath{\to}P-GW chain with more flexible topology
+\end{enumerate}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{7.3}{Interface Mapping}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{LTE} & \CNth{5G} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S1-U (eNB \ensuremath{\leftrightarrow} S-GW) & N3 (gNB \ensuremath{\leftrightarrow} UPF) \\
+S5/\allowbreak{}S8 (S-GW \ensuremath{\leftrightarrow} P-GW) & N9 (UPF \ensuremath{\leftrightarrow} UPF, if chained) \\
+SGi (P-GW \ensuremath{\leftrightarrow} Internet) & N6 (UPF \ensuremath{\leftrightarrow} DN) \\
+S11 (MME \ensuremath{\leftrightarrow} S-GW) & N4 (SMF \ensuremath{\leftrightarrow} UPF) [PFCP] \\
+Gx (PCRF \ensuremath{\leftrightarrow} P-GW) & N7 (PCF \ensuremath{\leftrightarrow} SMF) [SBI] \\
+\end{longtable}
+}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{S-GW} & \CNth{P-GW} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+User-plane forwarding & \CNyes{} & \CNyes{} \\
+GTP-U termination & S1-U + S5 & S5 + SGi \\
+IP address allocation & \CNno{} & \CNyes{} \\
+Policy enforcement (PCC) & \CNno{} & \CNyes{} \\
+Charging (online) & \CNno{} & \CNyes{} (Gy) \\
+Charging (offline) & \CNyes{} (CDRs) & \CNyes{} (Gz) \\
+DL buffering + paging trigger & \CNyes{} & \CNno{} \\
+Local mobility anchor & \CNyes{} & \CNno{} \\
+PDN/\allowbreak{}IP anchor & \CNno{} & \CNyes{} \\
+Lawful interception & \CNyes{} & \CNyes{} \\
+NAT & \CNno{} & \CNyes{} \\
+TFT/\allowbreak{}SDF enforcement & \CNno{} & \CNyes{} \\
+\end{longtable}
+}

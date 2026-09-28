@@ -1,0 +1,17 @@
+% Module 1 — A3/A8 on both sides of the air interface (AuC and SIM compute the same values)
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \x/\side/\rand/\sres in {0/{\CNL{AuC side (network)}{سمت \lr{AuC} (شبکه)}}/{\CNL{generated randomly}{تولید تصادفی}}/{\CNL{expected}{مورد انتظار}},
+                                 8.4/{\CNL{SIM side (subscriber)}{سمت \lr{SIM} (مشترک)}}/{\CNL{received from network}{دریافتی از شبکه}}/{\CNL{computed}{محاسبه‌شده}}}{
+  \node[CNtitle] at (\x+1.4,1.75) {\side};
+  \node[CNdb, text width=3.6cm] (in) at (\x+1.4,0.55) {Ki \CNL{(stored)}{(ذخیره‌شده)}\\RAND (\rand)};
+  \node[CNcp, minimum width=2.3cm] (a3) at (\x+1.4,-1.35) {\textbf{A3}\\[-1pt]{\scriptsize Algorithm}};
+  \node[CNcp, minimum width=2.3cm] (a8) at (\x+1.4,-3.15) {\textbf{A8}\\[-1pt]{\scriptsize Algorithm}};
+  \draw[CNlink, ->] (in) -- (a3);
+  \draw[CNlink, ->] (a3) -- (a8);
+  \node[CNhl, anchor=west] (s) at ([xshift=0.7cm]a3.east) {SRES (\sres)};
+  \node[CNhl, anchor=west] (k) at ([xshift=0.7cm]a8.east) {Kc (\CNL{cipher key}{کلید رمز})};
+  \draw[CNlink, ->] (a3) -- (s);
+  \draw[CNlink, ->] (a8) -- (k);
+}
+\draw[CNline, dash pattern=on 4pt off 3pt, line width=0.8pt] (7.55,2.1) -- (7.55,-3.8);
+\end{tikzpicture}

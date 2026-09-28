@@ -1,0 +1,1590 @@
+\Needspace{14\baselineskip}
+
+\CNsection{1}{Registration (Initial Registration)}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The Initial Registration procedure allows a UE to register with the 5G Core Network (5GC) for the first time or after being deregistered. It establishes the UE’s presence in the network, authenticates the subscriber, allocates a 5G-GUTI (Globally Unique Temporary Identifier), and optionally establishes a PDU session for data connectivity.
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  UE is powered on and has a valid USIM with 5G subscription credentials
+\item
+  UE has selected a PLMN and camped on a cell (gNB)
+\item
+  UE is in RRC\_\allowbreak{}IDLE or RRC\_\allowbreak{}INACTIVE state
+\item
+  UE has no valid 5G-GUTI (first-time registration) or previous GUTI has expired
+\item
+  RRC connection has been established (Random Access procedure completed)
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE & Initiates registration, provides identity (SUCI/\allowbreak{}5G-GUTI) \\
+gNB & RAN node, forwards NAS messages between UE and AMF \\
+AMF & Anchor for registration, selects AUSF, manages context \\
+AUSF & Authentication server, validates credentials \\
+UDM & Stores subscription data, generates auth vectors \\
+ARPF & Authentication credential Repository (within UDM) \\
+PCF & Provides AM policies \\
+SMF & Session management (if PDU session requested) \\
+UPF & User plane (if PDU session requested) \\
+NRF & NF discovery and selection \\
+NSSF & Network Slice selection \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Uu (UE\ensuremath{\to}gNB) & RRCSetupRequest \\
+2 & Uu (gNB\ensuremath{\to}UE) & RRCSetup \\
+3 & Uu (UE\ensuremath{\to}gNB) & RRCSetupComplete + NAS Registration Request \\
+4 & N2 (gNB\ensuremath{\to}AMF) & NGAP Initial UE Message (NAS: Registration Request) \\
+5 & N12 (AMF\ensuremath{\to}AUSF) & Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Request \\
+6 & N13 (AUSF\ensuremath{\to}UDM) & Nudm\_\allowbreak{}UEAuthentication\_\allowbreak{}Get Request \\
+7 & N13 (UDM\ensuremath{\to}AUSF) & Nudm\_\allowbreak{}UEAuthentication\_\allowbreak{}Get Response (AV) \\
+8 & N12 (AUSF\ensuremath{\to}AMF) & Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Response \\
+9 & N2/\allowbreak{}NAS (AMF\ensuremath{\to}UE) & Authentication Request (RAND, AUTN) \\
+10 & N2/\allowbreak{}NAS (UE\ensuremath{\to}AMF) & Authentication Response (RES*) \\
+11 & N12 (AMF\ensuremath{\to}AUSF) & Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate (RES*) \\
+12 & N12 (AUSF\ensuremath{\to}AMF) & Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate (Success + \ensuremath{K_{\mathrm{SEAF}}}) \\
+13 & N2/\allowbreak{}NAS (AMF\ensuremath{\to}UE) & Security Mode Command \\
+14 & N2/\allowbreak{}NAS (UE\ensuremath{\to}AMF) & Security Mode Complete \\
+15 & N8 (AMF\ensuremath{\to}UDM) & Nudm\_\allowbreak{}UECM\_\allowbreak{}Registration \\
+16 & N8 (AMF\ensuremath{\to}UDM) & Nudm\_\allowbreak{}SDM\_\allowbreak{}Get (Subscription Data) \\
+17 & N15 (AMF\ensuremath{\to}PCF) & Npcf\_\allowbreak{}AMPolicyControl\_\allowbreak{}Create \\
+18 & N2/\allowbreak{}NAS (AMF\ensuremath{\to}UE) & Registration Accept (5G-GUTI, TAI List, Allowed NSSAI) \\
+19 & N2/\allowbreak{}NAS (UE\ensuremath{\to}AMF) & Registration Complete \\
+20 & N2 (AMF\ensuremath{\to}gNB) & NGAP Initial Context Setup Request \\
+\end{longtable}
+}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{RRC Connection Establishment}: UE performs Random Access and sends RRCSetupRequest to gNB
+\item
+  \textbf{RRC Setup}: gNB responds with RRCSetup message
+\item
+  \textbf{Registration Request}: UE sends RRCSetupComplete containing NAS Registration Request (includes SUCI or 5G-GUTI, Registration Type, UE Security Capabilities, Requested NSSAI)
+\item
+  \textbf{AMF Selection}: gNB selects appropriate AMF (via NSSF if needed) and forwards via NGAP Initial UE Message
+\item
+  \textbf{Identity Request (conditional)}: If AMF cannot resolve identity, sends Identity Request to UE
+\item
+  \textbf{SUCI Resolution}: AMF initiates authentication; sends SUCI to AUSF
+\item
+  \textbf{Auth Vector Request}: AUSF requests authentication vector from UDM/\allowbreak{}ARPF
+\item
+  \textbf{AV Generation}: UDM/\allowbreak{}ARPF generates 5G HE AV (RAND, AUTN, XRES*, \ensuremath{K_{\mathrm{AUSF}}}), resolves SUCI\ensuremath{\to}SUPI
+\item
+  \textbf{Auth Vector Response}: AUSF receives AV, computes HXRES\emph{, stores XRES}
+\item
+  \textbf{Authentication Request}: AMF sends NAS Authentication Request to UE (RAND, AUTN)
+\item
+  \textbf{UE Verification}: UE verifies AUTN, computes RES*, CK, IK, derives \ensuremath{K_{\mathrm{AUSF}}}
+\item
+  \textbf{Authentication Response}: UE sends Authentication Response (RES*) to AMF
+\item
+  \textbf{RES* Verification}: AMF sends RES* to AUSF; AUSF verifies HRES* matches HXRES*
+\item
+  \textbf{Authentication Confirmation}: AUSF confirms to AMF, provides \ensuremath{K_{\mathrm{SEAF}}}; AMF derives \ensuremath{K_{\mathrm{AMF}}}
+\item
+  \textbf{NAS Security}: AMF sends Security Mode Command (selected algorithms); UE responds with Security Mode Complete
+\item
+  \textbf{UDM Registration}: AMF registers with UDM (Nudm\_\allowbreak{}UECM\_\allowbreak{}Registration)
+\item
+  \textbf{Subscription Retrieval}: AMF retrieves subscription data from UDM (Nudm\_\allowbreak{}SDM\_\allowbreak{}Get)
+\item
+  \textbf{Policy Association}: AMF establishes AM Policy association with PCF
+\item
+  \textbf{Registration Accept}: AMF sends Registration Accept (5G-GUTI, TAI List, Allowed NSSAI, Registration Area)
+\item
+  \textbf{Registration Complete}: UE acknowledges with Registration Complete; stores new 5G-GUTI
+\end{enumerate}
+
+\CNkeepfig{m20-registration-1}{3}
+
+\CNsubsection{}{Detailed Sequence Diagram}
+
+\CNfigure{m20-registration-1}{Initial registration (TS 23.502 §4.2.2.2)\CNpart{1}{3}}
+
+\CNfigure{m20-registration-2}{Initial registration (TS 23.502 §4.2.2.2)\CNpart{2}{3}}
+
+\CNfigure{m20-registration-3}{Initial registration (TS 23.502 §4.2.2.2)\CNpart{3}{3}}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{Network Response} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Authentication Failure & Invalid credentials, SQN out of sync & Authentication Reject or Sync Failure \\
+Registration Reject & No subscription, roaming not allowed & Registration Reject (Cause: \#11, \#15) \\
+PLMN Not Allowed & UE not subscribed for visited PLMN & Registration Reject (Cause: \#11) \\
+Congestion & Network overload & Registration Reject (Cause: \#22) + back-off timer \\
+Integrity Check Failure & NAS MAC failure & Reject silently or re-authenticate \\
+UDM Unreachable & SBI communication failure & Registration Reject or AMF retry \\
+Slice Not Available & Requested S-NSSAI not supported & Registration Accept with reduced Allowed NSSAI \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{Authentication (5G-AKA)}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The 5G-AKA (Authentication and Key Agreement) procedure provides mutual authentication between the UE and network, and establishes shared cryptographic keys. It ensures the network verifies the subscriber’s identity and the UE verifies it is communicating with a legitimate network. The procedure generates the anchor key (\ensuremath{K_{\mathrm{AUSF}}}) from which all subsequent security keys are derived.
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  UE has initiated Registration or Re-authentication is triggered
+\item
+  UE has valid USIM with long-term key K and OP/\allowbreak{}OPc
+\item
+  AUSF is reachable from the serving AMF
+\item
+  UDM/\allowbreak{}ARPF has valid subscription credentials for the subscriber
+\item
+  SUCI has been provided (either from UE or resolved from 5G-GUTI)
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE (USIM) & Holds permanent key K; verifies AUTN; computes RES* \\
+AMF (SEAF) & Security Anchor; relays auth messages; derives \ensuremath{K_{\mathrm{AMF}}} \\
+AUSF & Verifies RES* against XRES*; derives \ensuremath{K_{\mathrm{SEAF}}} \\
+UDM/\allowbreak{}ARPF & Generates authentication vectors; holds permanent key K \\
+SIDF (in UDM) & Decrypts SUCI to obtain SUPI \\
+\end{longtable}
+}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} & \CNth{Key Parameters} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & N12 & Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Request & SUCI/\allowbreak{}SUPI, Serving Network Name \\
+2 & N13 & Nudm\_\allowbreak{}UEAuthentication\_\allowbreak{}Get Request & SUCI/\allowbreak{}SUPI, Serving Network Name \\
+3 & N13 & Nudm\_\allowbreak{}UEAuthentication\_\allowbreak{}Get Response & 5G HE AV (RAND, AUTN, XRES*, \ensuremath{K_{\mathrm{AUSF}}}) \\
+4 & N12 & Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Response & 5G SE AV (RAND, AUTN, HXRES*) \\
+5 & NAS & Authentication Request & RAND, AUTN, ngKSI \\
+6 & NAS & Authentication Response & RES* \\
+7 & N12 & Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate & RES* \\
+8 & N12 & Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Response & Result, \ensuremath{K_{\mathrm{SEAF}}}, SUPI \\
+\end{longtable}
+}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Trigger}: AMF determines authentication is needed (initial registration, periodic re-auth, or inter-AMF handover)
+\item
+  \textbf{AUSF Selection}: AMF selects AUSF based on SUPI home network (via NRF)
+\item
+  \textbf{Auth Initiation}: AMF sends SUCI and Serving Network Name (SN-name) to AUSF
+\item
+  \textbf{UDM Request}: AUSF forwards request to UDM with SUCI and SN-name
+\item
+  \textbf{SUCI Decryption}: SIDF (within UDM) decrypts SUCI using home network private key \ensuremath{\to} obtains SUPI
+\item
+  \textbf{AV Generation}: ARPF generates 5G HE AV using:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    RAND (random challenge)
+  \item
+    AUTN = SQN\ensuremath{\oplus}AK \textbar{}\textbar{} AMF \textbar{}\textbar{} MAC (network authentication token)
+  \item
+    XRES* = KDF(CK, IK, SN-name, RAND, RES) (expected response)
+  \item
+    \ensuremath{K_{\mathrm{AUSF}}} = KDF(CK, IK, SN-name, SQN\ensuremath{\oplus}AK) (anchor key)
+  \end{itemize}
+\item
+  \textbf{AV to AUSF}: UDM returns 5G HE AV to AUSF
+\item
+  \textbf{AUSF Processing}: AUSF stores XRES\emph{, computes HXRES} = SHA-256(XRES\emph{[128..255] \textbar{}\textbar{} XRES}), derives \ensuremath{K_{\mathrm{SEAF}}} from \ensuremath{K_{\mathrm{AUSF}}}
+\item
+  \textbf{SE AV to AMF}: AUSF sends 5G SE AV (RAND, AUTN, HXRES*) to AMF
+\item
+  \textbf{Challenge to UE}: AMF sends Authentication Request (RAND, AUTN, ngKSI) to UE
+\item
+  \textbf{UE Verification}: USIM verifies AUTN:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Extracts AK from RAND using f5, recovers SQN
+  \item
+    Computes XMAC and verifies XMAC == MAC (network authentication)
+  \item
+    Verifies SQN is in acceptable range (replay protection)
+  \end{itemize}
+\item
+  \textbf{UE Key Derivation}: UE computes:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    RES, CK, IK from RAND using f2, f3, f4
+  \item
+    RES* = KDF(CK, IK, SN-name, RAND, RES)
+  \item
+    \ensuremath{K_{\mathrm{AUSF}}} = KDF(CK, IK, SN-name, SQN\ensuremath{\oplus}AK)
+  \item
+    \ensuremath{K_{\mathrm{SEAF}}} = KDF(\ensuremath{K_{\mathrm{AUSF}}}, SN-name)
+  \item
+    \ensuremath{K_{\mathrm{AMF}}} = KDF(\ensuremath{K_{\mathrm{SEAF}}}, SUPI, ABBA)
+  \end{itemize}
+\item
+  \textbf{Response}: UE sends Authentication Response with RES* to AMF
+\item
+  \textbf{AMF Verification}: AMF computes HRES* and verifies HRES* == HXRES*
+\item
+  \textbf{AUSF Verification}: AMF forwards RES* to AUSF; AUSF verifies RES* == XRES*
+\item
+  \textbf{Success}: AUSF returns success, \ensuremath{K_{\mathrm{SEAF}}}, and confirmed SUPI to AMF
+\item
+  \textbf{\ensuremath{K_{\mathrm{AMF}}} Derivation}: AMF derives \ensuremath{K_{\mathrm{AMF}}} = KDF(\ensuremath{K_{\mathrm{SEAF}}}, SUPI, ABBA)
+\end{enumerate}
+
+\CNkeepfig{m20-key-hierarchy}{3}
+
+\CNsubsection{}{Key Hierarchy Derived}
+
+\CNfigure{m20-key-hierarchy}{Key hierarchy derived during 5G-AKA}
+
+\CNkeepfig{m20-5g-aka-1}{3}
+
+\CNsubsection{}{Detailed Sequence Diagram}
+
+\CNfigure{m20-5g-aka-1}{5G-AKA authentication (TS 33.501)\CNpart{1}{2}}
+
+\CNfigure{m20-5g-aka-2}{5G-AKA authentication (TS 33.501)\CNpart{2}{2}}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{UE Action} & \CNth{Network Action} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MAC Failure & AUTN verification fails (wrong K or tampered) & Send Auth Failure (MAC failure) & AMF informs AUSF; may retry \\
+SQN Sync Failure & SQN out of acceptable range & Send Auth Failure (Synch failure) + AUTS & UDM resynchronizes SQN, generates new AV \\
+Network Auth Failure & UE cannot verify network identity & Abort authentication & — \\
+RES* Mismatch & UE response doesn’t match expected & — & AUSF reports failure; AMF rejects registration \\
+HXRES* Mismatch & Initial check at AMF fails & — & AMF still forwards to AUSF for final decision \\
+AUSF Timeout & AUSF unreachable & — & AMF may select alternate AUSF or reject \\
+SUCI Decryption Failure & Invalid SUCI format or wrong HN key & — & UDM reports error; registration fails \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{Security Establishment}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The Security Establishment procedure activates NAS and AS security between the UE and the network. It selects and activates ciphering and integrity protection algorithms for both NAS signaling (between UE and AMF) and AS signaling/\allowbreak{}user plane (between UE and gNB). This procedure ensures all subsequent communications are protected against eavesdropping and tampering.
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  Authentication has been successfully completed
+\item
+  \ensuremath{K_{\mathrm{AMF}}} has been derived at both UE and AMF
+\item
+  UE Security Capabilities have been provided to the AMF
+\item
+  ngKSI is established (identifies the active security context)
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE & Derives NAS/\allowbreak{}AS keys, verifies algorithm selection \\
+AMF & Selects NAS algorithms, sends Security Mode Command, derives NAS keys \\
+gNB & Selects AS algorithms, activates RRC/\allowbreak{}UP security \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} & \CNth{Key Parameters} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & NAS & Security Mode Command & NAS algorithms, ngKSI, Replayed UE Sec Cap, IMEISV request \\
+2 & NAS & Security Mode Complete & IMEISV (if requested), NAS message container \\
+3 & N2 & Initial Context Setup Request & \ensuremath{K_{\mathrm{gNB}}}, UE Security Capabilities \\
+4 & RRC & SecurityModeCommand & AS algorithms (ciphering + integrity) \\
+5 & RRC & SecurityModeComplete & — \\
+6 & N2 & Initial Context Setup Response & — \\
+\end{longtable}
+}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{NAS Algorithm Selection}: AMF selects NAS security algorithms based on UE Security Capabilities and AMF policy (highest priority algorithm supported by both)
+\item
+  \textbf{NAS Key Derivation (AMF)}: AMF derives:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \ensuremath{K_{\mathrm{NASint}}} = KDF(\ensuremath{K_{\mathrm{AMF}}}, NAS-int-alg-ID, alg-type)
+  \item
+    \ensuremath{K_{\mathrm{NASenc}}} = KDF(\ensuremath{K_{\mathrm{AMF}}}, NAS-enc-alg-ID, alg-type)
+  \end{itemize}
+\item
+  \textbf{Security Mode Command}: AMF sends NAS Security Mode Command (integrity protected with \ensuremath{K_{\mathrm{NASint}}} but NOT ciphered):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Selected NAS ciphering algorithm (e.g., NEA1, NEA2)
+  \item
+    Selected NAS integrity algorithm (e.g., NIA1, NIA2)
+  \item
+    ngKSI, Replayed UE Security Capabilities, IMEISV request
+  \end{itemize}
+\item
+  \textbf{UE Verification}: UE verifies:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Replayed UE Security Capabilities match what was sent (anti-MITM)
+  \item
+    Integrity protection of the message using derived \ensuremath{K_{\mathrm{NASint}}}
+  \end{itemize}
+\item
+  \textbf{NAS Key Derivation (UE)}: UE derives \ensuremath{K_{\mathrm{NASint}}} and \ensuremath{K_{\mathrm{NASenc}}} using same KDF
+\item
+  \textbf{Security Mode Complete}: UE sends NAS Security Mode Complete (integrity protected AND ciphered)
+\item
+  \textbf{NAS Security Active}: NAS security context is now active in both directions
+\item
+  \textbf{\ensuremath{K_{\mathrm{gNB}}} Derivation}: AMF derives \ensuremath{K_{\mathrm{gNB}}} = KDF(\ensuremath{K_{\mathrm{AMF}}}, NAS UL COUNT) and sends to gNB via Initial Context Setup Request
+\item
+  \textbf{AS Algorithm Selection}: gNB selects AS algorithms based on UE Security Capabilities and gNB policy
+\item
+  \textbf{AS Key Derivation}: gNB derives:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \ensuremath{K_{\mathrm{RRCint}}} = KDF(\ensuremath{K_{\mathrm{gNB}}}, RRC-int-alg-ID)
+  \item
+    \ensuremath{K_{\mathrm{RRCenc}}} = KDF(\ensuremath{K_{\mathrm{gNB}}}, RRC-enc-alg-ID)
+  \item
+    \ensuremath{K_{\mathrm{UPenc}}} = KDF(\ensuremath{K_{\mathrm{gNB}}}, UP-enc-alg-ID)
+  \item
+    \ensuremath{K_{\mathrm{UPint}}} = KDF(\ensuremath{K_{\mathrm{gNB}}}, UP-int-alg-ID) [optional for DRBs]
+  \end{itemize}
+\item
+  \textbf{RRC Security Mode Command}: gNB sends RRC SecurityModeCommand to UE (integrity protected)
+\item
+  \textbf{UE AS Key Derivation}: UE derives same AS keys from \ensuremath{K_{\mathrm{gNB}}}
+\item
+  \textbf{RRC Security Mode Complete}: UE responds with RRC SecurityModeComplete (ciphered + integrity protected)
+\item
+  \textbf{AS Security Active}: Full AS security is now active
+\end{enumerate}
+
+\CNkeepfig{m20-key-derivation}{3}
+
+\CNsubsection{}{Key Hierarchy Diagram}
+
+\CNfigure{m20-key-derivation}{Derivation of the NAS and AS keys}
+
+\CNkeepfig{m20-security}{3}
+
+\CNsubsection{}{Condensed Sequence Diagram}
+
+\CNfigure{m20-security}{NAS and AS security establishment}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{Response} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE Sec Cap Mismatch & Replayed capabilities don’t match (bidding-down attack) & UE sends Security Mode Reject \\
+Integrity Verification Failure & MAC check fails on Security Mode Command & UE sends Security Mode Reject \\
+Algorithm Not Supported & Selected algorithm not in UE capabilities & UE sends Security Mode Reject \\
+NAS Security Mode Reject & Any NAS SMC failure & AMF may re-attempt or reject registration \\
+AS Security Mode Failure & RRC SMC integrity check fails & gNB reports failure; may release connection \\
+Null Integrity Not Allowed & NIA0 selected when not permitted & UE rejects (NIA0 only for emergency) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{PDU Session Establishment}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The PDU Session Establishment procedure creates a data connectivity session between the UE and a Data Network (DN). It allocates an IP address (or other PDU type), sets up QoS rules and flows, establishes GTP-U tunnels on N3 (gNB\ensuremath{\leftrightarrow}UPF) and N9 (UPF\ensuremath{\leftrightarrow}UPF) interfaces, and configures PFCP sessions on N4 (SMF\ensuremath{\leftrightarrow}UPF). This enables the UE to send and receive user plane data.
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  UE is registered with the 5GC (Registration procedure completed)
+\item
+  UE is in CM-CONNECTED state (RRC connection active)
+\item
+  NAS security context is established
+\item
+  UE has valid subscription for the requested DNN and S-NSSAI
+\item
+  SMF and UPF resources are available for the requested slice
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE & Initiates session request, provides DNN/\allowbreak{}S-NSSAI/\allowbreak{}PDU type \\
+gNB & Forwards NAS, establishes N3 GTP-U tunnel \\
+AMF & Routes SM NAS messages, selects SMF \\
+SMF & Session management, IP allocation, QoS policy, UPF selection/\allowbreak{}control \\
+UPF & User plane forwarding, packet detection/\allowbreak{}enforcement \\
+PCF & Provides SM policies and PCC rules \\
+UDM & Provides session management subscription data \\
+DN-AAA & External authentication (if required by DN) \\
+CHF & Charging function \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & NAS & PDU Session Establishment Request (in UL NAS Transport) \\
+2 & N11 & Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}CreateSMContext Request \\
+3 & N10 & Nudm\_\allowbreak{}SDM\_\allowbreak{}Get (SM Subscription Data) \\
+4 & N7 & Npcf\_\allowbreak{}SMPolicyControl\_\allowbreak{}Create \\
+5 & N4 & PFCP Session Establishment Request \\
+6 & N4 & PFCP Session Establishment Response \\
+7 & N11 & Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}CreateSMContext Response \\
+8 & N11 & Namf\_\allowbreak{}Communication\_\allowbreak{}N1N2MessageTransfer \\
+9 & N2 & NGAP PDU Session Resource Setup Request \\
+10 & RRC & RRCReconfiguration (DRB setup) \\
+11 & RRC & RRCReconfigurationComplete \\
+12 & N2 & NGAP PDU Session Resource Setup Response \\
+13 & N11 & Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext (N2 Info) \\
+14 & N4 & PFCP Session Modification Request (DL tunnel info) \\
+15 & NAS & PDU Session Establishment Accept \\
+\end{longtable}
+}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{UE Request}: UE sends PDU Session Establishment Request containing:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    PDU Session ID, PDU Type (IPv4/\allowbreak{}IPv6/\allowbreak{}IPv4v6/\allowbreak{}Ethernet/\allowbreak{}Unstructured)
+  \item
+    Requested DNN, S-NSSAI, SSC Mode
+  \item
+    SM PDU DN Request Container (optional)
+  \item
+    Requested QoS Rules and QoS Flow Descriptions
+  \end{itemize}
+\item
+  \textbf{NAS Transport}: AMF receives UL NAS Transport message with SM NAS container
+\item
+  \textbf{SMF Selection}: AMF selects SMF based on DNN, S-NSSAI, PLMN, and NRF discovery
+\item
+  \textbf{SM Context Creation}: AMF sends Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}CreateSMContext to selected SMF
+\item
+  \textbf{Subscription Data}: SMF retrieves session management subscription data from UDM (Nudm\_\allowbreak{}SDM\_\allowbreak{}Get)
+\item
+  \textbf{SMF Registration}: SMF registers with UDM for the PDU session
+\item
+  \textbf{Policy Association}: SMF creates SM Policy association with PCF (Npcf\_\allowbreak{}SMPolicyControl\_\allowbreak{}Create)
+\item
+  \textbf{PCF Response}: PCF returns PCC rules, QoS policies, and charging rules
+\item
+  \textbf{UPF Selection}: SMF selects appropriate UPF(s) based on UE location, DNN, slice, and data path requirements
+\item
+  \textbf{IP Allocation}: SMF allocates IP address/\allowbreak{}prefix (from local pool, UPF pool, or external DHCP/\allowbreak{}AAA)
+\item
+  \textbf{N4 Session Establishment}: SMF sends PFCP Session Establishment Request to UPF:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    PDRs (Packet Detection Rules), FARs (Forwarding Action Rules)
+  \item
+    QERs (QoS Enforcement Rules), URRs (Usage Reporting Rules)
+  \item
+    UL tunnel endpoint (F-TEID on UPF for N3)
+  \end{itemize}
+\item
+  \textbf{UPF Response}: UPF responds with allocated F-TEID (N3 UL endpoint)
+\item
+  \textbf{N1N2 Message Transfer}: SMF sends to AMF:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    N1 SM container: PDU Session Establishment Accept (IP addr, QoS rules, S-NSSAI)
+  \item
+    N2 SM container: PDU Session Resource Setup Request Transfer (UPF N3 TEID, QoS Profile)
+  \end{itemize}
+\item
+  \textbf{RAN Setup}: AMF forwards to gNB via NGAP PDU Session Resource Setup Request
+\item
+  \textbf{DRB Establishment}: gNB maps QoS flows to DRBs, sends RRCReconfiguration to UE
+\item
+  \textbf{UE Configuration}: UE applies QoS rules, configures DRBs, responds with RRCReconfigurationComplete
+\item
+  \textbf{gNB Response}: gNB sends NGAP PDU Session Resource Setup Response (gNB N3 F-TEID for DL)
+\item
+  \textbf{Path Update}: AMF forwards gNB’s DL tunnel info to SMF (Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext)
+\item
+  \textbf{N4 Modification}: SMF sends PFCP Session Modification to UPF with DL tunnel endpoint (gNB’s F-TEID)
+\item
+  \textbf{Session Active}: End-to-end user plane path is established: UE\ensuremath{\leftrightarrow}gNB\ensuremath{\leftrightarrow}UPF\ensuremath{\leftrightarrow}DN
+\end{enumerate}
+
+\CNkeepfig{m20-pdu-establish-1}{3}
+
+\CNsubsection{}{Detailed Sequence Diagram}
+
+\CNfigure{m20-pdu-establish-1}{PDU session establishment (TS 23.502 §4.3.2)\CNpart{1}{3}}
+
+\CNfigure{m20-pdu-establish-2}{PDU session establishment (TS 23.502 §4.3.2)\CNpart{2}{3}}
+
+\CNfigure{m20-pdu-establish-3}{PDU session establishment (TS 23.502 §4.3.2)\CNpart{3}{3}}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{Response} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Insufficient Resources & No IP addresses available or UPF overloaded & PDU Session Establishment Reject (Cause: \#26) \\
+DNN Not Subscribed & UE not authorized for requested DNN & Reject (Cause: \#27) \\
+Invalid S-NSSAI & Slice not in Allowed NSSAI & Reject (Cause: \#62) \\
+SMF Unavailable & No SMF available for DNN/\allowbreak{}slice & AMF rejects request \\
+UPF Selection Failure & No suitable UPF found & SMF rejects session \\
+PCF Policy Denial & PCF rejects session based on policy & SMF rejects session \\
+N4 Establishment Failure & PFCP to UPF fails & SMF retries or rejects \\
+DRB Setup Failure & gNB cannot allocate radio resources & Partial/\allowbreak{}failed resource setup reported to AMF \\
+Max Sessions Reached & UE subscription limit exceeded & Reject (Cause: \#65) \\
+Network Failure & Transport network issue & Session establishment timeout \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{PDU Session Release}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The PDU Session Release procedure tears down an existing PDU session, releasing all associated resources including IP address, GTP-U tunnels (N3/\allowbreak{}N9), PFCP sessions (N4), QoS flows, and DRBs. It can be initiated by the UE (user no longer needs connectivity), the SMF (inactivity timer, policy), or the AMF (deregistration).
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  An active PDU Session exists (SM context in SMF, N4 session in UPF)
+\item
+  UE is registered with the network
+\item
+  NAS security context is active
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE & Initiates release (UE-triggered) or acknowledges \\
+gNB & Releases DRBs and N3 tunnel resources \\
+AMF & Routes SM NAS messages \\
+SMF & Orchestrates release, removes SM context \\
+UPF & Removes PFCP session, releases tunnels \\
+PCF & Terminates SM policy association \\
+UDM & Deregisters PDU session \\
+CHF & Final charging record \\
+\end{longtable}
+}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & NAS & PDU Session Release Request (UE-initiated) \\
+2 & N11 & Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext (Release) \\
+3 & N4 & PFCP Session Deletion Request \\
+4 & N4 & PFCP Session Deletion Response \\
+5 & N7 & Npcf\_\allowbreak{}SMPolicyControl\_\allowbreak{}Delete \\
+6 & N2 & NGAP PDU Session Resource Release Command \\
+7 & NAS & PDU Session Release Command \\
+8 & RRC & RRCReconfiguration (DRB release) \\
+9 & N2 & NGAP PDU Session Resource Release Response \\
+10 & NAS & PDU Session Release Complete \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\CNchained\CNsubsubsection{UE-Initiated Release}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE sends PDU Session Release Request (PDU Session ID, Cause)
+\item
+  AMF forwards to SMF (Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext)
+\item
+  SMF initiates resource cleanup
+\item
+  SMF sends PFCP Session Deletion Request to UPF
+\item
+  UPF releases tunnels, responds with PFCP Session Deletion Response
+\item
+  SMF terminates PCF policy association
+\item
+  SMF deregisters session from UDM
+\item
+  SMF sends PDU Session Release Command to UE (via AMF N1N2 transfer)
+\item
+  AMF sends NGAP PDU Session Resource Release Command to gNB
+\item
+  gNB releases DRBs, sends RRCReconfiguration to UE
+\item
+  gNB responds with PDU Session Resource Release Response
+\item
+  UE sends PDU Session Release Complete
+\end{enumerate}
+
+\CNsubsubsection{Network-Initiated Release}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  SMF decides to release (inactivity, policy change, subscription withdrawal)
+\item
+  SMF sends PDU Session Release Command to UE via AMF
+\item
+  Remaining steps are similar to UE-initiated from step 9
+\end{enumerate}
+
+\CNkeepfig{m20-pdu-release}{3}
+
+\CNsubsection{}{Condensed Sequence Diagram}
+
+\CNfigure{m20-pdu-release}{PDU session release}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{Response} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UPF Unreachable & N4 path failure & SMF retries; local cleanup after timeout \\
+UE Unreachable (CM-IDLE) & UE in idle mode & SMF proceeds with network-side cleanup \\
+Timer Expiry & No response from UE & Implicit release; local resource cleanup \\
+Partial Release & Some resources fail to release & SMF performs cleanup of remaining resources \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{Service Request}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The Service Request procedure allows a UE in CM-IDLE state (or CM-CONNECTED with inactive user plane) to re-establish signaling and/\allowbreak{}or user plane connections when uplink data or signaling needs to be sent. It triggers transition from RRC\_\allowbreak{}IDLE/\allowbreak{}RRC\_\allowbreak{}INACTIVE to RRC\_\allowbreak{}CONNECTED and reactivates the user plane path (N3 GTP-U tunnels) for existing PDU sessions.
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  UE is registered with valid registration context
+\item
+  UE is in CM-IDLE (RRC\_\allowbreak{}IDLE or RRC\_\allowbreak{}INACTIVE) state
+\item
+  UE has at least one active PDU session (UP resources to reactivate)
+\item
+  NAS security context exists (\ensuremath{K_{\mathrm{AMF}}}, \ensuremath{K_{\mathrm{NASint}}}, \ensuremath{K_{\mathrm{NASenc}}} available)
+\item
+  UE has uplink data or NAS signaling to send
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE & Triggers service request when UL data arrives \\
+gNB & Establishes RRC connection, allocates DRBs \\
+AMF & Processes service request, coordinates UP reactivation \\
+SMF & Updates N4 session with new DL tunnel info \\
+UPF & Receives updated FAR for DL forwarding \\
+\end{longtable}
+}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Uu & RRC Resume/\allowbreak{}Setup Request (if RRC\_\allowbreak{}INACTIVE/\allowbreak{}IDLE) \\
+2 & NAS & Service Request (ngKSI, PDU Session Status) \\
+3 & N2 & NGAP Initial UE Message or UE Context Resume \\
+4 & N2 & NGAP Initial Context Setup /\allowbreak{} PDU Session Resource Setup \\
+5 & N11 & Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext (UP activate) \\
+6 & N4 & PFCP Session Modification (new DL TEID) \\
+7 & RRC & RRCReconfiguration (DRB reactivation) \\
+8 & NAS & Service Accept \\
+\end{longtable}
+}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Trigger}: UE application generates uplink data; NAS layer detects CM-IDLE state
+\item
+  \textbf{RRC Connection}: UE initiates RRC connection (RRC Setup from IDLE or RRC Resume from INACTIVE)
+\item
+  \textbf{Service Request}: UE sends NAS Service Request (integrity protected with \ensuremath{K_{\mathrm{NASint}}}):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ngKSI, Service Type (signaling/\allowbreak{}data/\allowbreak{}mobile-terminated)
+  \item
+    PDU Session Status, Uplink Data Status
+  \end{itemize}
+\item
+  \textbf{AMF Processing}: AMF verifies integrity, identifies active PDU sessions
+\item
+  \textbf{Security Activation}: AMF sends new \ensuremath{K_{\mathrm{gNB}}} to gNB (Initial Context Setup or UE Context Resume)
+\item
+  \textbf{UP Reactivation}: For each PDU session to reactivate:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    AMF sends Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext to SMF (new AN info needed)
+  \item
+    gNB allocates DRBs, assigns DL N3 TEID
+  \item
+    SMF updates UPF with new DL tunnel info (PFCP Session Modification)
+  \end{itemize}
+\item
+  \textbf{DRB Setup}: gNB sends RRCReconfiguration to UE with DRB configuration
+\item
+  \textbf{Service Accept}: AMF sends Service Accept to UE
+\item
+  \textbf{Data Flow}: User plane path is re-established; buffered DL data is forwarded
+\end{enumerate}
+
+\CNkeepfig{m20-service-request}{3}
+
+\CNsubsection{}{Condensed Sequence Diagram}
+
+\CNfigure{m20-service-request}{Service request}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{Response} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Integrity Failure & NAS MAC verification fails & AMF rejects; may trigger re-authentication \\
+Context Not Found & AMF has no UE context (e.g., AMF restart) & Service Reject (Cause: \#9) \ensuremath{\to} UE re-registers \\
+PDU Session Mismatch & Status inconsistency between UE and network & AMF triggers PDU session status sync \\
+RAN Resources Unavailable & gNB cannot allocate DRBs & Partial acceptance or rejection \\
+Security Context Invalid & ngKSI mismatch or expired context & Trigger re-authentication \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{Paging}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The Paging procedure allows the network to reach a UE that is in CM-IDLE state when downlink data or signaling arrives for that UE. The AMF distributes paging messages to all gNBs in the UE’s Registration Area (set of Tracking Areas), and the UE responds with a Service Request to re-establish connectivity.
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  UE is in CM-IDLE state (RRC\_\allowbreak{}IDLE or RRC\_\allowbreak{}INACTIVE)
+\item
+  Downlink data arrives at UPF for the UE, or MT signaling is pending
+\item
+  AMF has valid UE context with Registration Area information
+\item
+  UE is monitoring paging occasions in its current cell
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UPF & Detects DL data for idle UE, sends notification \\
+SMF & Receives data notification, triggers paging via AMF \\
+AMF & Distributes paging to gNBs in Registration Area \\
+gNB(s) & Broadcasts paging message on Uu interface \\
+UE & Monitors paging, initiates Service Request \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & N4 & Downlink Data Notification (UPF\ensuremath{\to}SMF via PFCP) \\
+2 & N11 & Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext (DL data pending) or Namf\_\allowbreak{}Communication\_\allowbreak{}N1N2MessageTransfer \\
+3 & N2 & NGAP Paging (to all gNBs in Registration Area) \\
+4 & Uu & RRC Paging message (5G-S-TMSI) \\
+5 & Uu & Service Request (UE response) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{DL Data Arrival}: Downlink packet arrives at UPF for a UE in CM-IDLE state
+\item
+  \textbf{Data Notification}: UPF buffers the packet and sends Downlink Data Notification to SMF (via N4 PFCP)
+\item
+  \textbf{Paging Trigger}: SMF sends Namf\_\allowbreak{}Communication\_\allowbreak{}N1N2MessageTransfer or Nsmf notification to AMF indicating DL data pending
+\item
+  \textbf{Paging Distribution}: AMF sends NGAP Paging message to all gNBs in the UE’s Registration Area:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    5G-S-TMSI (for UE identification)
+  \item
+    TAI List (Tracking Area Identities)
+  \item
+    Paging Priority (if applicable)
+  \item
+    Paging DRX information
+  \end{itemize}
+\item
+  \textbf{RRC Paging}: Each gNB broadcasts RRC Paging message on PCCH at the UE’s paging occasion
+\item
+  \textbf{UE Detection}: UE wakes up at its paging occasion (determined by 5G-S-TMSI and DRX cycle), detects its identity
+\item
+  \textbf{Service Request}: UE initiates Service Request procedure (see Section 6)
+\item
+  \textbf{Data Delivery}: After UP path is reactivated, UPF forwards buffered DL data
+\item
+  \textbf{Paging Retry}: If UE doesn’t respond within T3513, AMF retries paging (up to configured retransmissions)
+\end{enumerate}
+
+\CNkeepfig{m20-paging}{3}
+
+\CNsubsection{}{Condensed Sequence Diagram}
+
+\CNfigure{m20-paging}{Paging of a CM-IDLE UE}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{Response} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE Not Responding & UE powered off, out of coverage & AMF retries (T3513); eventually notifies SMF \\
+Paging Timeout & Max retransmissions reached & AMF informs SMF; UPF may discard buffered data \\
+Wrong Registration Area & UE moved without updating TA & Paging fails; UE will eventually re-register \\
+UPF Buffer Overflow & Too much buffered DL data & UPF discards oldest packets \\
+Paging Congestion & Too many paging requests & AMF applies paging restrictions/\allowbreak{}priorities \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{Xn Handover}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The Xn Handover procedure transfers a UE’s connection from a source gNB to a target gNB over the Xn interface without involving the AMF in the handover decision. It provides seamless mobility with minimal service interruption. The source gNB makes the handover decision based on measurement reports, prepares the target gNB, and the user plane path is switched at the UPF. This is used when both gNBs are connected to the same AMF and an Xn interface exists between them.
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  UE is in RRC\_\allowbreak{}CONNECTED state with active PDU sessions
+\item
+  Xn interface exists between source and target gNBs
+\item
+  Both gNBs are served by the same AMF
+\item
+  UE measurement reports indicate target cell is better than source
+\item
+  Target cell belongs to same or compatible network slice
+\item
+  Source gNB has the UE’s security context and active AS keys
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE & Sends measurement reports, performs handover to target \\
+Source gNB & Makes HO decision, prepares target, forwards data \\
+Target gNB & Admits UE, allocates resources, becomes new serving \\
+AMF & Updates UE context with new serving gNB (path switch) \\
+SMF & Updates N4 session for new downlink tunnel \\
+UPF & Switches downlink path to target gNB \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Uu & RRC MeasurementReport (UE\ensuremath{\to}Source gNB) \\
+2 & Xn & Handover Request (Source\ensuremath{\to}Target) \\
+3 & Xn & Handover Request Acknowledge (Target\ensuremath{\to}Source) \\
+4 & Uu & RRC RRCReconfiguration (HO Command) \\
+5 & — & UE detaches from source, syncs to target \\
+6 & Uu & RRC RRCReconfigurationComplete (UE\ensuremath{\to}Target) \\
+7 & Xn & SN Status Transfer (Source\ensuremath{\to}Target) \\
+8 & N2 & NGAP Path Switch Request (Target\ensuremath{\to}AMF) \\
+9 & N11 & Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext (AMF\ensuremath{\to}SMF) \\
+10 & N4 & PFCP Session Modification (SMF\ensuremath{\to}UPF) \\
+11 & N11 & Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext Response \\
+12 & N2 & NGAP Path Switch Request Acknowledge (AMF\ensuremath{\to}Target) \\
+13 & Xn & UE Context Release (Target\ensuremath{\to}Source) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Measurement Configuration}: Source gNB configures UE with measurement objects and reporting criteria
+\item
+  \textbf{Measurement Report}: UE detects target cell signal meets threshold; sends MeasurementReport to source gNB
+\item
+  \textbf{HO Decision}: Source gNB evaluates measurement report, selects target cell, decides to handover
+\item
+  \textbf{Handover Preparation}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Source gNB sends Handover Request to target gNB over Xn:
+
+    \begin{itemize}
+    \tightlist
+    \item
+      UE context (security, capabilities, PDU session info)
+    \item
+      UE History Information
+    \item
+      Source-to-Target transparent container (RRC config)
+    \end{itemize}
+  \end{itemize}
+\item
+  \textbf{Admission Control}: Target gNB performs admission control, allocates resources (DRBs, radio resources)
+\item
+  \textbf{Handover Request Ack}: Target gNB responds with:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Target-to-Source transparent container (RRC HO Command)
+  \item
+    Allocated DL forwarding tunnels (for data forwarding during HO)
+  \end{itemize}
+\item
+  \textbf{HO Command}: Source gNB sends RRCReconfiguration (mobilityControlInfo) to UE containing:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Target cell ID, new C-RNTI
+  \item
+    Target gNB security algorithm configuration
+  \item
+    Radio resource configuration for target cell
+  \end{itemize}
+\item
+  \textbf{Data Forwarding}: Source gNB begins forwarding buffered/\allowbreak{}incoming DL data to target gNB (via Xn forwarding tunnel)
+\item
+  \textbf{SN Status Transfer}: Source gNB sends PDCP SN Status Transfer to target gNB (for lossless handover on AM DRBs)
+\item
+  \textbf{Random Access}: UE synchronizes to target cell (RACH procedure)
+\item
+  \textbf{HO Complete}: UE sends RRCReconfigurationComplete to target gNB
+\item
+  \textbf{Path Switch}: Target gNB sends NGAP Path Switch Request to AMF:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    New security context info (NH/\allowbreak{}NCC if needed)
+  \item
+    New N3 tunnel info for each PDU session (target gNB’s F-TEID)
+  \end{itemize}
+\item
+  \textbf{UP Path Update}: AMF sends Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext to SMF with new AN tunnel info
+\item
+  \textbf{UPF Update}: SMF sends PFCP Session Modification to UPF \ensuremath{\to} update DL FAR to point to target gNB
+\item
+  \textbf{End Marker}: UPF sends end marker packet on old N3 tunnel (to source gNB) to indicate DL path switched
+\item
+  \textbf{Path Switch Ack}: AMF sends NGAP Path Switch Request Acknowledge to target gNB (new NH, NCC for future HO)
+\item
+  \textbf{UE Context Release}: Target gNB sends UE Context Release to source gNB over Xn
+\item
+  \textbf{Source Cleanup}: Source gNB releases UE context and resources
+\end{enumerate}
+
+\CNkeepfig{m20-xn-handover-1}{3}
+
+\CNsubsection{}{Detailed Sequence Diagram}
+
+\CNfigure{m20-xn-handover-1}{Xn handover\CNpart{1}{3}}
+
+\CNfigure{m20-xn-handover-2}{Xn handover\CNpart{2}{3}}
+
+\CNfigure{m20-xn-handover-3}{Xn handover\CNpart{3}{3}}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{Response} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+HO Preparation Failure & Target rejects (no resources, admission control) & Source gNB tries another target or maintains connection \\
+HO Failure (timer expiry) & UE fails RACH to target within T304 & UE initiates RRC Re-establishment to source or other cell \\
+RRC Re-establishment & Radio link failure during HO & UE attempts re-establishment; may trigger new HO \\
+Path Switch Failure & AMF/\allowbreak{}SMF fails to switch path & AMF sends Path Switch Request Failure; target may release UE \\
+Data Loss & Forwarding tunnel congestion & Some packets lost during HO gap (UM bearers) \\
+Too-Late HO & UE loses source before HO command & RLF; RRC Re-establishment required \\
+Too-Early HO & HO triggered before stable measurement & UE may fail at target; RRC Re-establishment back to source \\
+Xn Interface Failure & Transport issue between gNBs & Fall back to N2 (inter-AMF) handover via AMF \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{9}{N2 Handover (Inter-AMF)}
+
+\CNchained\CNsubsection{}{Purpose}
+
+The N2 Handover (inter-AMF) procedure handles mobility when the target gNB is served by a different AMF than the source. This is more complex than Xn Handover because it requires UE context transfer between AMFs, re-establishment of NF associations (SMF, PCF), and potentially re-authentication. It is used when no Xn interface exists between source and target gNBs, or when the target falls under a different AMF’s serving area.
+
+\CNsubsection{}{Preconditions}
+
+\begin{itemize}
+\tightlist
+\item
+  UE is in RRC\_\allowbreak{}CONNECTED state with active PDU sessions
+\item
+  Source gNB determines handover is needed (measurement reports)
+\item
+  Target gNB is NOT served by the same AMF (different AMF region/\allowbreak{}set)
+\item
+  OR no Xn interface exists between source and target gNBs
+\item
+  N2 interface available between source gNB and source AMF
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{NFs Involved}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE & Performs handover to target cell \\
+Source gNB & Initiates HO, sends HO Required to source AMF \\
+Target gNB & Admits UE, allocates resources \\
+Source AMF & Identifies target AMF, initiates context transfer \\
+Target AMF & Receives UE context, becomes new serving AMF \\
+SMF & Updates UP path for each PDU session \\
+UPF & Switches DL tunnel to target gNB \\
+UDM & Updates AMF registration (new AMF) \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Messages}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Interface} & \CNth{Message} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Uu & MeasurementReport (UE\ensuremath{\to}Source gNB) \\
+2 & N2 & NGAP Handover Required (Source gNB\ensuremath{\to}Source AMF) \\
+3 & N14 & Namf\_\allowbreak{}Communication\_\allowbreak{}CreateUEContext (Source AMF\ensuremath{\to}Target AMF) \\
+4 & N2 & NGAP Handover Request (Target AMF\ensuremath{\to}Target gNB) \\
+5 & N2 & NGAP Handover Request Acknowledge (Target gNB\ensuremath{\to}Target AMF) \\
+6 & N14 & Namf\_\allowbreak{}Communication\_\allowbreak{}CreateUEContext Response (Target AMF\ensuremath{\to}Source AMF) \\
+7 & N2 & NGAP Handover Command (Source AMF\ensuremath{\to}Source gNB) \\
+8 & Uu & RRC RRCReconfiguration (HO Command to UE) \\
+9 & Uu & RRC RRCReconfigurationComplete (UE\ensuremath{\to}Target gNB) \\
+10 & N2 & NGAP Handover Notify (Target gNB\ensuremath{\to}Target AMF) \\
+11 & N14/\allowbreak{}N2 & UE Context Release (cleanup) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Step-by-Step Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{HO Decision}: Source gNB decides handover based on measurement reports
+\item
+  \textbf{HO Required}: Source gNB sends NGAP Handover Required to source AMF:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Target ID (Target gNB + Target TAI)
+  \item
+    Source-to-Target RRC transparent container
+  \item
+    PDU Session Resource List
+  \end{itemize}
+\item
+  \textbf{Target AMF Selection}: Source AMF determines target gNB is served by different AMF (based on TAI\ensuremath{\to}AMF mapping)
+\item
+  \textbf{UE Context Transfer}: Source AMF sends Namf\_\allowbreak{}Communication\_\allowbreak{}CreateUEContext to target AMF:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    UE context (SUPI, security context, PDU session list)
+  \item
+    Source-to-Target container
+  \item
+    MM context, SM contexts
+  \end{itemize}
+\item
+  \textbf{Target gNB Preparation}: Target AMF sends NGAP Handover Request to target gNB
+\item
+  \textbf{Admission Control}: Target gNB performs admission, allocates resources
+\item
+  \textbf{HO Request Ack}: Target gNB sends Handover Request Acknowledge (HO Command, DL tunnel info)
+\item
+  \textbf{Context Response}: Target AMF responds to source AMF with HO Command
+\item
+  \textbf{HO Command Forwarded}: Source AMF sends NGAP Handover Command to source gNB
+\item
+  \textbf{RRC HO Command}: Source gNB forwards HO Command to UE via RRCReconfiguration
+\item
+  \textbf{Data Forwarding}: Source gNB forwards data to target gNB (indirect via UPF or direct if possible)
+\item
+  \textbf{UE Handover}: UE detaches from source, attaches to target cell
+\item
+  \textbf{HO Complete}: UE sends RRCReconfigurationComplete to target gNB
+\item
+  \textbf{HO Notify}: Target gNB sends NGAP Handover Notify to target AMF
+\item
+  \textbf{Registration Update}: Target AMF registers with UDM as new serving AMF
+\item
+  \textbf{UP Path Switch}: Target AMF triggers Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext for each PDU session
+\item
+  \textbf{N4 Update}: SMF updates UPF with new DL tunnel info (target gNB TEID)
+\item
+  \textbf{Source Cleanup}: Target AMF\ensuremath{\to}Source AMF: UE Context Release; Source AMF\ensuremath{\to}Source gNB: UE Context Release Command
+\end{enumerate}
+
+\CNkeepfig{m20-n2-handover-1}{3}
+
+\CNsubsection{}{Condensed Sequence Diagram}
+
+\CNfigure{m20-n2-handover-1}{N2 (inter-AMF) handover\CNpart{1}{2}}
+
+\CNfigure{m20-n2-handover-2}{N2 (inter-AMF) handover\CNpart{2}{2}}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{Failure Cases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure} & \CNth{Cause} & \CNth{Response} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Target AMF Unreachable & N14 communication failure & Source AMF sends HO Preparation Failure to gNB \\
+Target gNB Rejects & Admission control failure at target & Target AMF informs Source AMF; HO Preparation Failure \\
+HO Failure (UE side) & UE cannot reach target cell & UE attempts RRC Re-establishment \\
+Context Transfer Failure & Incomplete/\allowbreak{}corrupted UE context & Target AMF rejects; source maintains UE \\
+Timer Expiry (TRELOCprep) & Preparation takes too long & Source AMF cancels HO \\
+Timer Expiry (TRELOCoverall) & Overall HO takes too long & Source AMF releases, target AMF cleans up \\
+Path Switch Failure & SMF/\allowbreak{}UPF update fails & Handover may succeed but UP path broken; recovery needed \\
+Security Context Mismatch & Keys don’t match after transfer & Target AMF triggers re-authentication \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsection{}{Summary: Procedure Comparison Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Trigger} & \CNth{Key NFs} & \CNth{Latency Budget} & \CNth{3GPP Reference} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Initial Registration & UE power-on /\allowbreak{} new PLMN & AMF, AUSF, UDM, PCF & Seconds & TS 23.502 §4.2.2.2 \\
+5G-AKA & Registration /\allowbreak{} Re-auth & AMF, AUSF, UDM & \textasciitilde{}100ms (NW side) & TS 33.501 §6.1 \\
+Security Establishment & Post-authentication & AMF, gNB & \textasciitilde{}50ms & TS 33.501 §6.7 \\
+PDU Session Establishment & UE data request & AMF, SMF, UPF, PCF & \textasciitilde{}200-500ms & TS 23.502 §4.3.2 \\
+PDU Session Release & UE/\allowbreak{}Network decision & SMF, UPF & \textasciitilde{}100ms & TS 23.502 §4.3.4 \\
+Service Request & UL data in IDLE & AMF, SMF, UPF & \textasciitilde{}50-100ms & TS 23.502 §4.2.3 \\
+Paging & DL data for IDLE UE & AMF, gNBs & \textasciitilde{}320ms-2s (DRX) & TS 23.502 §4.2.3.3 \\
+Xn Handover & Mobility (same AMF) & gNBs, AMF, SMF, UPF & \textasciitilde{}30-50ms interrupt & TS 38.300 §9.2.3 \\
+N2 Handover & Mobility (diff AMF) & gNBs, AMFs, SMF, UPF, UDM & \textasciitilde{}50-100ms interrupt & TS 23.502 §4.9.1.3 \\
+\end{longtable}
+}
+
+\CNsection{}{Key References}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{3GPP TS 23.501}: System Architecture for the 5G System (5GS)
+\item
+  \textbf{3GPP TS 23.502}: Procedures for the 5G System (5GS)
+\item
+  \textbf{3GPP TS 33.501}: Security architecture and procedures for 5G System
+\item
+  \textbf{3GPP TS 38.300}: NR; NR and NG-RAN Overall Description
+\item
+  \textbf{3GPP TS 38.331}: NR; Radio Resource Control (RRC) Protocol
+\item
+  \textbf{3GPP TS 29.244}: Interface between the Control Plane and the User Plane (PFCP)
+\item
+  \textbf{3GPP TS 38.413}: NG-RAN; NG Application Protocol (NGAP)
+\item
+  \textbf{3GPP TS 38.423}: NG-RAN; Xn Application Protocol (XnAP)
+\end{itemize}

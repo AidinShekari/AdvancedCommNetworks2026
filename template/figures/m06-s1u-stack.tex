@@ -1,0 +1,6 @@
+% Module 6 — S1-U protocol stack
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\CNstack{s}{0}{0}{2.2cm}{GTP-U/CNupL, UDP/{}, IP/{}, {L2/L1}/CNphyL}
+\draw[CNcyan, <-] (s-1.east) -- ++(0.5,0) node[CNtiny, anchor=west, align=left] {\CNL{GTP tunnelling (the TEID identifies the bearer)}{تونل‌سازی \lr{GTP} (\lr{TEID} حامل را مشخص می‌کند)}};
+\draw[CNcyan, <-] (s-2.east) -- ++(0.5,0) node[CNtiny, anchor=west, align=left] {\CNL{port 2152}{درگاه \lr{2152}}};
+\end{tikzpicture}

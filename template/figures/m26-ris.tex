@@ -1,0 +1,12 @@
+% Module 26 — a reconfigurable intelligent surface steering a beam to a blocked UE
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNran] (bs) at (0,2.6) {\CNL{Base station}{ایستگاه پایه}};
+\foreach \i in {0,...,5}{\foreach \j in {0,...,4}{\draw[CNamber!80!black, fill=CNamber!25] ({7+\i*0.42},{1.4+\j*0.42}) rectangle ++(0.36,0.36);}}
+\node[CNtitle] at (8.2,3.8) {RIS \CNL{panel}{پنل}};
+\draw[CNcyan, ->, line width=1.3pt] (bs.east) -- (6.9,2.6);
+\draw[CNsig, ->, line width=1.3pt] (8.2,1.35) -- node[right, CNtiny, align=left] {\CNL{reflected beam}{پرتو بازتابی}\\(\CNL{steered toward the UE}{هدایت‌شده به سمت \lr{UE}})} (8.2,-0.9);
+\node[CNue] (ue) at (8.2,-1.35) {\CNphone\ UE (NLoS)};
+\node[CNtiny, anchor=west, align=left] at (9.8,2.4) {$\leftarrow$ \CNL{reflecting elements, each with a}{عناصر بازتابی، هرکدام با}\\\CNL{tunable phase shift}{جابه‌جایی فاز قابل تنظیم} $\varphi_n$};
+\draw[CNline, line width=3pt] (3.2,-0.3) -- (3.2,1.6) node[above, CNtiny] {\CNL{blockage}{مانع}};
+\node[CNnote, anchor=north, text width=7.6cm] at (3.2,-0.7) {\CNLP{Phase-shift design: $\varphi_n$ is chosen to create constructive interference at the desired UE location.}{طراحی جابه‌جایی فاز: $\varphi_n$ طوری انتخاب می‌شود که در محل \lr{UE} موردنظر تداخل سازنده ایجاد شود.}};
+\end{tikzpicture}

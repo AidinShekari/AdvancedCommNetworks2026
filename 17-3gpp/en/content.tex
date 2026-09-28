@@ -1,0 +1,692 @@
+\Needspace{27\baselineskip}
+
+\CNsection{1}{What is 3GPP?}
+
+The \textbf{3rd Generation Partnership Project (3GPP)} is a global collaboration of telecommunications standards organizations that develops technical specifications and reports for mobile communication systems. Founded in December 1998, 3GPP unites seven regional Organizational Partners (OPs) to produce globally applicable standards covering radio access, core network architecture, and service capabilities.
+
+\CNsubsection{}{Organizational Partners}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3214}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3929}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Partner} & \CNth{Region} & \CNth{Full Name} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{ETSI} & Europe & European Telecommunications Standards Institute \\
+\textbf{ARIB} & Japan & Association of Radio Industries and Businesses \\
+\textbf{ATIS} & North America & Alliance for Telecommunications Industry Solutions \\
+\textbf{CCSA} & China & China Communications Standards Association \\
+\textbf{TTA} & South Korea & Telecommunications Technology Association \\
+\textbf{TTC} & Japan & Telecommunication Technology Committee \\
+\textbf{TSDSI} & India & Telecommunications Standards Development Society, India \\
+\end{longtable}
+}
+
+\CNsubsection{}{Key Characteristics}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Not a legal entity} — 3GPP is a partnership project governed by its OPs
+\item
+  \textbf{Market Representation Partners (MRPs)} provide industry input (e.g., GSMA, 5GAA, NGMN)
+\item
+  \textbf{Individual Members} are companies participating through their regional OP
+\item
+  Specifications are \textbf{transposed} into regional standards by each OP (e.g., ETSI publishes them as EN/\allowbreak{}ES/\allowbreak{}TS)
+\item
+  Covers \textbf{2G (GSM/\allowbreak{}GPRS/\allowbreak{}EDGE), 3G (UMTS), 4G (LTE/\allowbreak{}LTE-A), and 5G (NR)} systems
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m17-org}{8}
+
+\CNsection{2}{3GPP Organizational Structure}
+
+\CNchained\CNsubsection{}{Organizational Structure Diagram}
+
+\CNfigure{m17-org}{3GPP organisational structure}
+
+\Needspace{11\baselineskip}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{}{Technical Specification Groups (TSGs)}
+
+\CNchained\CNsubsubsection{TSG RAN — Radio Access Network}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Working Group} & \CNth{Responsibility} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{RAN1} & Physical layer (PHY) specifications \\
+\textbf{RAN2} & Layer 2 (MAC, RLC, PDCP, SDAP) and Layer 3 (RRC) \\
+\textbf{RAN3} & Network architecture interfaces (Xn, NG, F1, E1) \\
+\textbf{RAN4} & Radio performance, RF parameters, RRM requirements \\
+\textbf{RAN5} & UE conformance testing \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{TSG SA — Service and System Aspects}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Working Group} & \CNth{Responsibility} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{SA1} & Service requirements and features \\
+\textbf{SA2} & System architecture and network functions \\
+\textbf{SA3} & Security and privacy \\
+\textbf{SA4} & Media codecs, streaming, MBMS \\
+\textbf{SA5} & Management, orchestration, and charging \\
+\textbf{SA6} & Application layer enablement (SEAL, CAPIF, EDGEAPP) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{TSG CT — Core Network and Terminals}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Working Group} & \CNth{Responsibility} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{CT1} & NAS protocols (MM, SM, call control) \\
+\textbf{CT3} & Interworking with external networks \\
+\textbf{CT4} & Control plane protocols (GTP-C, Diameter, HTTP/\allowbreak{}2-based SBI) \\
+\textbf{CT6} & Smart card application aspects (USIM, ISIM) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{17\baselineskip}
+
+\CNsection{3}{Specification Types}
+
+\CNchained\CNsubsection{3.1}{Types of Documents}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2069}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2069}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2759}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3103}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Type} & \CNth{Name} & \CNth{Nature} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{TS} & Technical Specification & \textbf{Normative} & Defines mandatory requirements, procedures, protocols \\
+\textbf{TR} & Technical Report & \textbf{Informational} & Documents studies, feasibility analyses, best practices \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{TS documents} contain ``shall'' requirements — they define what implementations MUST do
+\item
+  \textbf{TR documents} contain ``should/\allowbreak{}may'' language — they inform decisions but are not binding
+\item
+  TRs often precede TSs (a study item produces a TR, which leads to a work item producing/\allowbreak{}updating TSs)
+\end{itemize}
+
+\CNkeepfig{m17-numbering}{5}
+
+\CNsubsection{3.2}{Numbering System}
+
+The specification number format is: \textbf{xx.yyy} (or xx.yyy for series \ensuremath{\le} 13) and \textbf{xx.yyy} for all series.
+
+\CNfigure{m17-numbering}{Specification numbering: series and number}
+
+\textbf{Example:} \CNcode{38.331}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{38} = 5G NR radio technology series
+\item
+  \textbf{331} = RRC protocol specification
+\end{itemize}
+
+\CNsubsubsection{Series 00–13: Legacy GSM/\allowbreak{}GPRS Series (originally numbered without leading digits)}
+
+These map to the older GSM specification numbering and are maintained for backward compatibility.
+
+\Needspace{25\baselineskip}
+
+\CNsubsubsection{Series 21–38: UMTS and Beyond}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Series} & \CNth{Subject Area} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{21} & Requirements \\
+\textbf{22} & Service aspects (``stage 1'') \\
+\textbf{23} & Technical realization (``stage 2'' — architecture) \\
+\textbf{24} & Signalling protocols (``stage 3'' — UE to network) \\
+\textbf{25} & UTRAN radio technology (3G) \\
+\textbf{26} & Codecs \\
+\textbf{27} & Data (AT commands, etc.) \\
+\textbf{28} & Signalling protocols (``stage 3'' — SS, OAM) \\
+\textbf{29} & Core network protocols (stage 3 — network-to-network) \\
+\textbf{30} & Programme management (Rel-4 old numbering) \\
+\textbf{31} & UICC /\allowbreak{} USIM /\allowbreak{} ISIM \\
+\textbf{32} & OAM\&P (management and charging) \\
+\textbf{33} & Security \\
+\textbf{34} & UE test specifications \\
+\textbf{35} & Security algorithms \\
+\textbf{36} & LTE (Evolved UTRA) radio technology \\
+\textbf{37} & Radio measurement and protocol conformance (multi-RAT) \\
+\textbf{38} & 5G NR radio technology \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{3.3}{Stage Methodology (ITU-T approach)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1944}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3611}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4444}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Stage} & \CNth{Description} & \CNth{Typical Series} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Stage 1} & Service description from user’s perspective & 22.xxx \\
+\textbf{Stage 2} & Logical analysis /\allowbreak{} architecture & 23.xxx \\
+\textbf{Stage 3} & Protocol implementation /\allowbreak{} detailed procedures & 24.xxx, 29.xxx \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m17-lifecycle}{8}
+
+\CNsection{4}{Release System}
+
+\CNchained\CNsubsection{4.1}{Release Lifecycle}
+
+\CNfigure{m17-lifecycle}{Life cycle of a 3GPP release}
+
+\textbf{Phase Details:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Study Phase} — Feasibility and technical investigations; output is a TR
+\item
+  \textbf{Work Item Approval} — PCG/\allowbreak{}TSG approves; specification drafting begins
+\item
+  \textbf{Functional Freeze} — All features for the release are complete; no new functionality added
+\item
+  \textbf{ASN.1 /\allowbreak{} Protocol Freeze} — Protocol encoding (ASN.1, JSON, etc.) is frozen; only essential corrections
+\item
+  \textbf{Maintenance} — Only critical bug-fix Change Requests (CRs) accepted
+\end{enumerate}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{4.2}{Key Releases}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2250}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2750}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Release} & \CNth{Year} & \CNth{Generation} & \CNth{Key Features} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{R99} & 2000 & 3G (UMTS) & WCDMA air interface, CS/\allowbreak{}PS core, 384~kbps DL \\
+\textbf{Rel-4} & 2001 & 3G & TD-SCDMA, MSC server/\allowbreak{}MGW split \\
+\textbf{Rel-5} & 2002 & 3G/\allowbreak{}3.5G & HSDPA (14.4~Mbps DL), IMS introduction \\
+\textbf{Rel-6} & 2005 & 3.5G & HSUPA (5.76~Mbps UL), MBMS, WLAN interworking \\
+\textbf{Rel-7} & 2007 & 3.5G+ & HSPA+ (MIMO, 64QAM), VoIP over HSPA \\
+\textbf{Rel-8} & 2009 & \textbf{4G (LTE)} & OFDMA/\allowbreak{}SC-FDMA, flat architecture (eNB/\allowbreak{}EPC), 100~Mbps DL \\
+\textbf{Rel-9} & 2010 & 4G & eMBMS, dual-layer beamforming, HeNB \\
+\textbf{Rel-10} & 2011 & \textbf{4G (LTE-A)} & Carrier aggregation, 8\ensuremath{\times}8 MIMO, relay nodes, 1~Gbps DL \\
+\textbf{Rel-11} & 2013 & 4G+ & CoMP, enhanced ICIC, carrier aggregation enhancements \\
+\textbf{Rel-12} & 2015 & 4G+ & D2D (ProSe), MTC/\allowbreak{}M2M, dual connectivity, 256QAM DL \\
+\textbf{Rel-13} & 2016 & 4G+ & LAA, LTE-U, NB-IoT, eMTC (Cat-M1) \\
+\textbf{Rel-14} & 2017 & 4G+/\allowbreak{}pre-5G & V2X (LTE), eLAA, further IoT enhancements \\
+\textbf{Rel-15} & 2019 & \textbf{5G Phase 1} & NR NSA/\allowbreak{}SA, eMBB, mmWave, 5GC (SBA), network slicing \\
+\textbf{Rel-16} & 2020 & \textbf{5G Phase 2} & URLLC enhancements, NR V2X, IAB, NR-U, IIoT, NPN \\
+\textbf{Rel-17} & 2022 & 5G & NTN (satellite), RedCap, NR sidelink enh., XR, multicast \\
+\textbf{Rel-18} & 2024 & \textbf{5G-Advanced} & AI/\allowbreak{}ML for NR, duplex evolution, NR-light enh., XR enh. \\
+\textbf{Rel-19} & 2025-26 & 5G-Advanced+ & AI-native air interface studies, ambient IoT, further NTN \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m17-spec-anatomy}{10}
+
+\CNsection{5}{How to Navigate 3GPP Specifications}
+
+\CNchained\CNsubsection{5.1}{Spec-Numbering Convention}
+
+Understanding the number tells you immediately what a spec covers:
+
+\CNfigure{m17-spec-anatomy}{Reading a specification reference}
+
+\textbf{Version numbering:} The first digit of the version maps to the Release:
+
+\begin{itemize}
+\tightlist
+\item
+  Version 3.x.x \ensuremath{\to} Release 99
+\item
+  Version 4.x.x \ensuremath{\to} Release 4
+\item
+  …
+\item
+  Version 15.x.x \ensuremath{\to} Release 15
+\item
+  Version 17.x.x \ensuremath{\to} Release 17
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{5.2}{How to Find Specifications}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Resource} & \CNth{URL} & \CNth{Use} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Spec Finder & \url{https://www.3gpp.org/specifications/specification-numbering} & Search by number \\
+Specification series & \url{https://www.3gpp.org/specifications} & Browse by series \\
+Portal (latest + archive) & \url{https://portal.3gpp.org/} & Advanced search, CR tracking \\
+FTP server & \url{https://www.3gpp.org/ftp/Specs/} & Direct download of .zip files \\
+Work Plan & \url{https://www.3gpp.org/specifications/work-plan} & Track ongoing items \\
+\end{longtable}
+}
+
+\textbf{Practical Search Workflow:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Go to \textbf{portal.3gpp.org} \ensuremath{\to} ``Specifications'' tab
+\item
+  Enter spec number (e.g., ``23.501'') or keyword
+\item
+  Filter by Release and version
+\item
+  Download the latest approved version (.docx or .pdf)
+\end{enumerate}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{5.3}{Reading a 3GPP Specification}
+
+Every 3GPP spec follows a standard structure:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Section} & \CNth{Content} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{1. Scope} & What the spec covers and does NOT cover \\
+\textbf{2. References} & Normative and informative references to other specs \\
+\textbf{3. Definitions and abbreviations} & Precise term definitions; abbreviations list \\
+\textbf{4. General /\allowbreak{} Overview} & High-level system description \\
+\textbf{5+. Technical content} & Procedures, architecture, message flows \\
+\textbf{Annexes} & Additional information, ASN.1, examples \\
+\end{longtable}
+}
+
+\textbf{Tips for Reading:}
+
+\begin{itemize}
+\tightlist
+\item
+  Start with \textbf{Scope} to confirm you have the right document
+\item
+  Use \textbf{References} to trace dependencies (specs reference each other heavily)
+\item
+  The \textbf{Definitions} section resolves ambiguity — always consult it
+\item
+  Look for \textbf{``shall''} (mandatory), \textbf{``should''} (recommended), \textbf{``may''} (optional)
+\item
+  Use Ctrl+F for specific procedure names or information elements
+\end{itemize}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{5.4}{Key Specifications Every Telecom Engineer Should Know}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5357}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Spec} & \CNth{Title} & \CNth{Why It Matters} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{TS 23.501} & System architecture for the 5G System (5GS) & Defines 5GC architecture, network functions, reference points \\
+\textbf{TS 23.502} & Procedures for the 5G System & Registration, PDU session, handover procedures \\
+\textbf{TS 24.501} & NAS protocol for 5GS (UE \ensuremath{\leftrightarrow} AMF) & 5G NAS message definitions, state machines \\
+\textbf{TS 38.300} & NR and NG-RAN overall description & NR system overview, protocol stack, channels \\
+\textbf{TS 38.331} & NR RRC protocol specification & RRC procedures, measurements, reconfiguration \\
+\textbf{TS 38.211} & NR physical channels and modulation & OFDM parameters, resource grid, reference signals \\
+\textbf{TS 38.213} & NR physical layer control procedures & DCI formats, HARQ, power control \\
+\textbf{TS 38.214} & NR physical layer data procedures & Transport block size, CQI/\allowbreak{}MCS tables, scheduling \\
+\textbf{TS 33.501} & Security architecture for 5GS & 5G security framework, key hierarchy, algorithms \\
+\textbf{TS 28.541} & 5G NRM (Network Resource Model) & Network management and orchestration model \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m17-si-wi}{8}
+
+\CNsection{6}{Study Items vs Work Items}
+
+\CNchained\CNsubsection{6.1}{Overview}
+
+\CNfigure{m17-si-wi}{Study item versus work item}
+
+\CNsubsection{6.2}{Study Item (SI)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Purpose:} Investigate feasibility of a new feature or technology
+\item
+  \textbf{Output:} Technical Report (TR) documenting findings, options, conclusions
+\item
+  \textbf{Duration:} Typically 1–4 TSG meetings (9–18 months)
+\item
+  \textbf{Process:}
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    Company submits SI Description (SID) to TSG
+  \item
+    TSG approves the study
+  \item
+    Working group conducts the study (contributions from member companies)
+  \item
+    TR is produced with conclusions and recommendations
+  \item
+    If feasible \ensuremath{\to} WI proposal submitted
+  \end{enumerate}
+\end{itemize}
+
+\CNsubsection{6.3}{Work Item (WI)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Purpose:} Create or modify normative specifications
+\item
+  \textbf{Output:} New or updated Technical Specifications (TS)
+\item
+  \textbf{Duration:} Tied to the target Release timeline
+\item
+  \textbf{Process:}
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    Company submits Work Item Description (WID) based on SI conclusions
+  \item
+    TSG approves the WI (assigns to working group, sets milestones)
+  \item
+    Working group drafts Change Requests (CRs) to existing specs or new specs
+  \item
+    CRs are reviewed, revised, and approved at WG/\allowbreak{}TSG level
+  \item
+    Approved CRs are incorporated into the spec version for that Release
+  \end{enumerate}
+\end{itemize}
+
+\CNsubsection{6.4}{SI \ensuremath{\to} WI Flow Example}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Example: NR Sidelink Relay (Release 17)
+
+SI Phase (2019-2020):
+  └── TR 38.836: "Study on NR sidelink relay"
+        └── Conclusions: Relay architectures A and B feasible
+              └── Recommended for WI
+
+WI Phase (2020-2022):
+  └── WID approved at TSG RAN#90
+        └── Updates to: TS 38.300, TS 38.331, TS 38.321, TS 24.587
+              └── Feature complete at Rel-17 functional freeze
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{Practical Guide: Referencing 3GPP Specs in Academic Work}
+
+\CNchained\CNsubsection{7.1}{Standard Citation Format}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+3GPP, "Title of Specification," 3GPP TS/TR xx.yyy, Version Vx.y.z, Month Year.
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{Example (IEEE style):}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+[1] 3GPP, "System architecture for the 5G System (5GS); Stage 2,"
+    3GPP TS 23.501, Version 17.6.0, Sep. 2022.
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{Example (APA style):}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+3rd Generation Partnership Project. (2022). System architecture for the 5G System
+(5GS); Stage 2 (3GPP TS 23.501 V17.6.0). https://www.3gpp.org/
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{7.2}{Best Practices}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3636}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6364}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Do} & \CNth{Don’t} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\CNyes{} Cite specific version (Vx.y.z) & \CNno{} Cite without version (specs change every quarter) \\
+\CNyes{} Include the Release number & \CNno{} Assume ``latest'' is stable \\
+\CNyes{} Reference the exact section/\allowbreak{}clause & \CNno{} Cite entire 500-page spec without clause \\
+\CNyes{} Use official 3GPP document titles & \CNno{} Paraphrase titles \\
+\CNyes{} Include access URL/\allowbreak{}date for online refs & \CNno{} Link to unofficial mirrors \\
+\end{longtable}
+}
+
+\CNsubsection{7.3}{Where to Download for Citation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Official archive:} \url{https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=xxxx}
+\item
+  \textbf{Direct spec URL pattern:} \CNcode{https:/}\allowbreak{}\CNcode{/}\allowbreak{}\CNcode{www.}\allowbreak{}\CNcode{3gpp.}\allowbreak{}\CNcode{org/}\allowbreak{}\CNcode{ftp/}\allowbreak{}\CNcode{Specs/}\allowbreak{}\CNcode{archive/}\allowbreak{}\CNcode{[series]/}\allowbreak{}\CNcode{[spec\_}\allowbreak{}\CNcode{number]/}
+\item
+  Always cite the \textbf{approved} version (not drafts or working documents)
+\end{itemize}
+
+\CNsubsection{7.4}{Citing Change Requests (CRs) and Contributions}
+
+For referencing specific proposals or changes:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+3GPP TSG RAN WG1, "Title," Tdoc R1-21xxxxx, Meeting #10x, Month Year.
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{28\baselineskip}
+
+\CNsection{8}{Important Specification Series Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1905}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3095}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Series} & \CNth{Area} & \CNth{Description} & \CNth{Example Specs} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{21} & Requirements & Overall system requirements & 21.915 (Rel-15 summary) \\
+\textbf{22} & Services (Stage 1) & Service descriptions, use cases & 22.261 (5G service requirements) \\
+\textbf{23} & Architecture (Stage 2) & System architecture, functional descriptions & 23.501 (5GS arch), 23.502 (5GS procedures) \\
+\textbf{24} & UE-Network Signalling (Stage 3) & NAS protocols, SIP, AT commands & 24.501 (5G NAS), 24.229 (IMS SIP) \\
+\textbf{25} & UTRAN (3G Radio) & WCDMA physical layer, RLC, RRC & 25.331 (UTRAN RRC) \\
+\textbf{26} & Codecs & Speech, audio, video codecs & 26.171 (AMR-WB), 26.346 (MBMS) \\
+\textbf{27} & Data & Terminal adaptation, AT commands & 27.007 (AT commands) \\
+\textbf{28} & Signalling (Stage 3 - SS) & Supplementary services, OAM & 28.541 (5G NRM) \\
+\textbf{29} & CN Protocols (Stage 3) & Core network protocols (N-N) & 29.500 (5GC HTTP APIs), 29.244 (PFCP) \\
+\textbf{30} & Programme management & (Legacy - Rel-4 era) & — \\
+\textbf{31} & UICC/\allowbreak{}USIM/\allowbreak{}ISIM & SIM card specifications & 31.102 (USIM) \\
+\textbf{32} & OAM \& Charging & Management, performance, charging & 32.255 (5G charging) \\
+\textbf{33} & Security & Security architecture, algorithms & 33.501 (5G security) \\
+\textbf{34} & UE Testing & Test specifications, conformance & 34.229 (SIP conformance) \\
+\textbf{35} & Algorithms & Cryptographic algorithm specs & 35.231 (TUAK algorithm) \\
+\textbf{36} & LTE (E-UTRA) & LTE radio technology & 36.331 (LTE RRC), 36.211 (LTE PHY) \\
+\textbf{37} & Multi-RAT & Radio measurements across RATs & 37.340 (MR-DC) \\
+\textbf{38} & NR (5G Radio) & 5G New Radio technology & 38.331 (NR RRC), 38.211 (NR PHY) \\
+\end{longtable}
+}
+
+\CNsection{}{Summary}
+
+3GPP is the cornerstone of global mobile telecommunications standardization. Understanding its structure, specification numbering, and release system is essential for:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Engineers} implementing standards-compliant equipment
+\item
+  \textbf{Researchers} building on or extending current technology
+\item
+  \textbf{Product managers} planning feature roadmaps aligned with release timelines
+\item
+  \textbf{Regulators} referencing normative requirements
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{Quick Reference Card}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Question} & \CNth{Answer} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+What does 3GPP stand for? & 3rd Generation Partnership Project \\
+How many OPs? & 7 (ETSI, ARIB, ATIS, CCSA, TTA, TTC, TSDSI) \\
+How many TSGs? & 3 (RAN, SA, CT) \\
+TS vs TR? & TS = normative (shall); TR = informational (study) \\
+Current 5G release? & Rel-18 (5G-Advanced), Rel-19 in progress \\
+Key 5G arch spec? & TS 23.501 \\
+Key 5G NR spec? & TS 38.300 (overview), TS 38.331 (RRC) \\
+Spec format? & xx.yyy where xx = series, yyy = spec number \\
+Where to find? & portal.3gpp.org or 3gpp.\allowbreak{}org/\allowbreak{}specifications \\
+\end{longtable}
+}
+
+\emph{End of Module 17}

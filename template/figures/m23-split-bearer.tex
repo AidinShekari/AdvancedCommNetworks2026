@@ -1,0 +1,10 @@
+% Module 23 — dual connectivity split bearer
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ue) at (0,0) {UE};
+\node[CNran] (mn) at (5,0.9) {MN (Master Node: eNB/gNB)}; \node[CNran] (sn) at (5,-0.9) {SN (Secondary Node: gNB)};
+\node[CNcp] (core) at (9.8,0) {Core};
+\draw[CNdata, <-] (ue.east) -- node[CNelab, above=1pt, fill=none] {Radio} ++(1.4,0) |- (mn.west);
+\draw[CNdata] ([xshift=1.4cm]ue.east) |- (sn.west);
+\draw[CNdata, ->] (mn.east) -| ([xshift=-0.6cm]core.west) -- (core.west);
+\draw[CNdata] (sn.east) -| ([xshift=-0.6cm]core.west);
+\end{tikzpicture}

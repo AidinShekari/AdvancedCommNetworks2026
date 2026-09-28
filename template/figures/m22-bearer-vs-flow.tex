@@ -1,0 +1,11 @@
+% Module 22 — LTE bearer-based versus 5G flow-based QoS
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle] at (0,0.7) {\CNL{LTE (bearer-based)}{\lr{LTE} (مبتنی بر حامل)}}; \node[CNtitle] at (7.4,0.7) {\CNL{5G (flow-based)}{\lr{5G} (مبتنی بر جریان)}};
+\foreach \x/\items/\c/\tg in {0/{{SDF (IP flow)}/{}, {TFT (Traffic Flow Template)}/{}, {EPS Bearer}/{(1 QCI \CNL{per bearer}{برای هر حامل})}, {GTP-U Tunnel}/{(1 \CNL{tunnel per bearer}{تونل برای هر حامل})}, {Radio Bearer (DRB)}/{(1:1 \CNL{with the EPS bearer}{با حامل \lr{EPS}})}}/CNbad/L,
+                          7.4/{{SDF (IP flow)}/{}, {QoS Rule}/{(\CNL{packet filters}{فیلترهای بسته})}, {QoS Flow (QFI)}/{(1 5QI \CNL{per flow}{برای هر جریان})}, {PDU Session}/{(\CNL{1 tunnel, many flows}{۱ تونل، جریان‌های متعدد})}, {DRB}/{(\CNL{may carry several flows}{ممکن است چند جریان حمل کند})}}/CNok/F}{
+  \foreach \t/\d [count=\k from 0] in \items {
+    \node[\c, text width=4.8cm, minimum height=0.9cm] (n\tg-\k) at (\x,-\k*1.3) {\textbf{\t}\ifx\relax\d\relax\else\\{\scriptsize \d}\fi};
+    \ifnum\k>0 \pgfmathtruncatemacro{\p}{\k-1}\draw[CNlink, ->] (n\tg-\p) -- (n\tg-\k);\fi}}
+\node[CNnote, anchor=north, text width=4.8cm] at (0,-6.0) {\CNL{mapping}{نگاشت} 1:1:1:1\\{\scriptsize (SDF $\rightarrow$ bearer $\rightarrow$ tunnel $\rightarrow$ DRB)}};
+\node[CNnote, anchor=north, text width=4.8cm] at (7.4,-6.0) {\CNL{mapping}{نگاشت} N:M (\CNL{flexible}{انعطاف‌پذیر})\\{\scriptsize (SDFs $\rightarrow$ flows $\rightarrow$ session $\rightarrow$ DRBs)}};
+\end{tikzpicture}

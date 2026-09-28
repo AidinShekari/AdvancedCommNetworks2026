@@ -1,0 +1,15 @@
+# build tooling & intermediate files (only the module folders are published)
+tools/
+*.log
+*.aux
+*.toc
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+.DS_Store
+*.xdv
+*.bbl
+*.blg
+*.lof
+*.lot

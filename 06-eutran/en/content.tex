@@ -1,0 +1,1114 @@
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{6.1}{E-UTRAN Architecture}
+
+\CNchained\CNsubsection{}{Why No RNC? The Flat Architecture Decision}
+
+In UMTS (3G), the Radio Network Controller (RNC) sat between the NodeBs and the Core Network, centralizing radio resource management, handover decisions, and protocol termination. LTE \textbf{eliminated the RNC entirely}, creating a flat, single-node radio access network.
+
+\textbf{Reasons for removing the RNC:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4667}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Concern} & \CNth{3G (with RNC)} & \CNth{LTE (flat, no RNC)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Latency & Extra hop through RNC adds \textasciitilde{}5–10~ms & Direct eNB\ensuremath{\leftrightarrow}EPC path, sub-5~ms user-plane latency \\
+Single point of failure & RNC failure affects all connected NodeBs & Each eNB is independent \\
+Scalability & RNC capacity limits number of NodeBs & No bottleneck; eNBs scale independently \\
+Complexity & Three-node RAN (NodeB\ensuremath{\to}RNC\ensuremath{\to}CN) & Two-node RAN (eNB\ensuremath{\to}EPC) \\
+Cost & Expensive, proprietary RNC hardware & Distributed intelligence reduces CAPEX \\
+Handover speed & RNC-mediated = slower & Direct eNB-to-eNB via X2 = faster \\
+\end{longtable}
+}
+
+\CNkeepfig{m06-enb-epc}{2}
+
+\textbf{Key architectural principle:} All radio-related intelligence is pushed into the \textbf{eNodeB (eNB)}, which communicates directly with the Evolved Packet Core (EPC) via the S1 interface and with neighboring eNBs via the X2 interface.
+
+\CNfigure{m06-enb-epc}{Each eNB connects to the MME over S1-MME and to the S-GW over S1-U}
+
+\CNsection{6.2}{eNodeB Functions}
+
+The eNodeB is the \textbf{sole node} in E-UTRAN. It performs all functions previously split between NodeB and RNC:
+
+\CNsubsection{}{Radio Resource Management (RRM)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Radio Bearer Control:} Establishment, maintenance, and release of radio bearers
+\item
+  \textbf{Radio Admission Control (RAC):} Accept/\allowbreak{}reject new radio bearer requests based on interference and load
+\item
+  \textbf{Connection Mobility Control:} Handover decisions based on UE measurements
+\item
+  \textbf{Dynamic Resource Allocation (Scheduling):} Assigns resource blocks to UEs every TTI (1~ms)
+\end{itemize}
+
+\CNsubsection{}{Scheduling}
+
+\begin{itemize}
+\tightlist
+\item
+  Operates every \textbf{1~ms TTI} (Transmission Time Interval)
+\item
+  Frequency-domain and time-domain scheduling
+\item
+  Algorithms: Round Robin, Proportional Fair, Max Throughput
+\item
+  Uses \textbf{CQI} (Channel Quality Indicator) reports from UEs
+\item
+  Controls both DL and UL resource allocation
+\end{itemize}
+
+\CNsubsection{}{HARQ (Hybrid Automatic Repeat Request)}
+
+\begin{itemize}
+\tightlist
+\item
+  Stop-and-wait HARQ with \textbf{8 parallel processes}
+\item
+  Synchronous in UL, asynchronous in DL
+\item
+  Soft combining: Chase Combining or Incremental Redundancy
+\item
+  Round-trip time: 8~ms (4~ms each way)
+\end{itemize}
+
+\CNsubsection{}{Channel Encoding}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Turbo coding} (rate 1/\allowbreak{}3) for data channels
+\item
+  \textbf{Convolutional coding} for control channels
+\item
+  Rate matching and HARQ buffer management
+\item
+  CRC attachment for error detection
+\end{itemize}
+
+\CNsubsection{}{Other Functions}
+
+\begin{itemize}
+\tightlist
+\item
+  IP header compression (ROHC)
+\item
+  Ciphering and integrity protection
+\item
+  Paging message distribution
+\item
+  Broadcast information (SIBs, MIBs)
+\item
+  Measurement configuration and reporting
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m06-protocol-stack}{8}
+
+\CNsection{6.3}{LTE Protocol Stack}
+
+\CNchained\CNsubsection{}{Protocol Stack Diagram}
+
+\CNfigure{m06-protocol-stack}{LTE protocol stacks of the UE, the eNodeB and the EPC}
+
+\CNkeepfig{m06-cp-stack}{3}
+
+\CNsubsection{}{Control Plane Stack}
+
+\CNfigure{m06-cp-stack}{LTE control-plane protocol stack}
+
+\CNkeepfig{m06-up-stack}{3}
+
+\CNsubsection{}{User Plane Stack}
+
+\CNfigure{m06-up-stack}{LTE user-plane protocol stack}
+
+\Needspace{16\baselineskip}
+
+\CNsection{6.4}{Protocol Layers in Detail}
+
+\CNchained\CNsubsection{6.4.1}{Physical Layer (PHY)}
+
+\CNchained\CNsubsubsection{Downlink: OFDMA (Orthogonal Frequency Division Multiple Access)}
+
+\begin{itemize}
+\tightlist
+\item
+  Divides bandwidth into many narrow \textbf{subcarriers} (15~kHz spacing)
+\item
+  Each subcarrier is orthogonal \ensuremath{\to} no inter-carrier interference
+\item
+  Robust against multipath fading (cyclic prefix absorbs delay spread)
+\item
+  Enables flexible frequency-domain scheduling
+\end{itemize}
+
+\textbf{Resource Grid:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Resource Element (RE):} 1 subcarrier \ensuremath{\times} 1 OFDM symbol = smallest allocatable unit
+\item
+  \textbf{Resource Block (RB):} 12 subcarriers \ensuremath{\times} 7 OFDM symbols (1 slot = 0.5~ms) = \textbf{84~REs}
+\item
+  \textbf{Resource Block Pair:} 2~RBs = 1 subframe (1~ms TTI)
+\end{itemize}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Bandwidth} & \CNth{Number of RBs} & \CNth{Subcarriers} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1.4~MHz & 6 & 72 \\
+3~MHz & 15 & 180 \\
+5~MHz & 25 & 300 \\
+10~MHz & 50 & 600 \\
+15~MHz & 75 & 900 \\
+20~MHz & 100 & 1200 \\
+\end{longtable}
+}
+
+\textbf{Frame Structure (FDD):}
+
+\begin{itemize}
+\tightlist
+\item
+  1 radio frame = 10~ms = 10 subframes
+\item
+  1 subframe = 1~ms = 2 slots
+\item
+  1 slot = 0.5~ms = 7 OFDM symbols (normal CP)
+\end{itemize}
+
+\CNsubsubsection{Uplink: SC-FDMA (Single Carrier FDMA)}
+
+\begin{itemize}
+\tightlist
+\item
+  Also called DFT-spread OFDM (DFT-s-OFDM)
+\item
+  Lower \textbf{PAPR} (Peak-to-Average Power Ratio) than OFDMA \ensuremath{\to} better for battery-powered UEs
+\item
+  Single-carrier property achieved by DFT precoding before IFFT
+\item
+  Same resource grid structure as DL (12 subcarriers per RB)
+\item
+  \textbf{Constraint:} UL allocation must be contiguous in frequency
+\end{itemize}
+
+\CNsubsubsection{Key PHY Procedures}
+
+\begin{itemize}
+\tightlist
+\item
+  Cell search (PSS/\allowbreak{}SSS synchronization)
+\item
+  Channel estimation (reference signals: CRS, DM-RS, SRS)
+\item
+  MIMO: up to 4\ensuremath{\times}4 in DL, 1\ensuremath{\times}2 or 2\ensuremath{\times}2 in UL (Rel-8/\allowbreak{}10)
+\item
+  Link adaptation via CQI/\allowbreak{}PMI/\allowbreak{}RI feedback
+\item
+  Power control (open-loop and closed-loop)
+\end{itemize}
+
+\CNsubsection{6.4.2}{MAC Layer (Medium Access Control)}
+
+The MAC layer sits between RLC and PHY, responsible for \textbf{real-time scheduling} and data multiplexing.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Scheduling (DL and UL)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Operates every 1~ms TTI
+  \item
+    Assigns RBs based on CQI, buffer status, QoS priority, fairness
+  \item
+    DL: eNB decides; UL: eNB grants resources to UEs
+  \end{itemize}
+\item
+  \textbf{Multiplexing/\allowbreak{}Demultiplexing}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Multiplexes data from multiple logical channels into one transport block
+  \item
+    Uses Logical Channel Prioritization (LCP) in UL
+  \end{itemize}
+\item
+  \textbf{HARQ Entity}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    8 parallel stop-and-wait processes
+  \item
+    DL: Asynchronous adaptive HARQ
+  \item
+    UL: Synchronous HARQ (fixed timing)
+  \item
+    Generates ACK/\allowbreak{}NACK; soft combining at receiver
+  \end{itemize}
+\item
+  \textbf{Random Access Procedure}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Contention-based (4-step) or contention-free (2-step)
+  \item
+    Used for initial access, handover, UL synchronization recovery
+  \end{itemize}
+\item
+  \textbf{BSR (Buffer Status Report)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    UE informs eNB about pending UL data
+  \item
+    Triggers UL scheduling grants
+  \end{itemize}
+\item
+  \textbf{PHR (Power Headroom Report)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    UE reports remaining power margin
+  \item
+    Helps eNB with UL scheduling decisions
+  \end{itemize}
+\end{enumerate}
+
+\CNkeepfig{m06-channel-levels}{2}
+
+\CNsubsubsection{Channel Mapping at MAC}
+
+\CNfigure{m06-channel-levels}{Three levels of LTE channels}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{6.4.3}{RLC Layer (Radio Link Control)}
+
+RLC provides segmentation, reassembly, and (optionally) ARQ.
+
+\CNsubsubsection{Three Modes}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1304}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2391}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1087}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.3043}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2174}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Mode} & \CNth{Full Name} & \CNth{ARQ} & \CNth{Segmentation} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{TM} & Transparent Mode & No & No & BCCH, PCCH, CCCH (small, fixed-size messages) \\
+\textbf{UM} & Unacknowledged Mode & No & Yes & VoIP, real-time video (delay-sensitive) \\
+\textbf{AM} & Acknowledged Mode & Yes & Yes & TCP traffic, signaling (reliability needed) \\
+\end{longtable}
+}
+
+\CNsubsubsection{Key Functions}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Segmentation and Reassembly:} Splits PDCP PDUs into RLC-sized segments fitting transport block size
+\item
+  \textbf{Concatenation:} Packs multiple small SDUs into one PDU
+\item
+  \textbf{ARQ (AM only):} Retransmits lost RLC PDUs based on STATUS reports
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Polling mechanism: RLC sender requests STATUS from receiver
+  \item
+    Operates independently from HARQ (RLC ARQ catches what HARQ misses)
+  \end{itemize}
+\item
+  \textbf{Reordering (UM/\allowbreak{}AM):} Delivers SDUs in order to upper layers
+\item
+  \textbf{Duplicate Detection (AM):} Discards duplicate PDUs
+\end{itemize}
+
+\CNsubsubsection{RLC vs. HARQ}
+
+\begin{itemize}
+\tightlist
+\item
+  HARQ: Fast (8~ms RTT), limited retransmissions (typically 4)
+\item
+  RLC ARQ: Slower, but catches residual errors after HARQ exhaustion
+\item
+  Combined: achieves target BLER of 10\textsuperscript{-6} for AM bearers
+\end{itemize}
+
+\CNsubsection{6.4.4}{PDCP Layer (Packet Data Convergence Protocol)}
+
+PDCP sits above RLC, providing security and efficiency functions.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Header Compression (User Plane only)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Uses \textbf{ROHC} (Robust Header Compression, RFC 3095/\allowbreak{}4995)
+  \item
+    Compresses IP/\allowbreak{}UDP/\allowbreak{}RTP headers from \textasciitilde{}40–60~bytes \ensuremath{\to} 1–4~bytes
+  \item
+    Critical for VoIP: 40-byte header on 32-byte payload \ensuremath{\to} \textasciitilde{}56\% overhead without ROHC
+  \item
+    Multiple ROHC profiles for different protocol stacks
+  \end{itemize}
+\item
+  \textbf{Ciphering (User Plane + Control Plane)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Encrypts all user data and signaling
+  \item
+    Algorithms: EEA0 (null), 128-EEA1 (SNOW 3G), 128-EEA2 (AES-CTR), 128-EEA3 (ZUC)
+  \item
+    Uses COUNT (sequence number + HFN) + BEARER + DIRECTION as input
+  \end{itemize}
+\item
+  \textbf{Integrity Protection (Control Plane only)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Protects RRC signaling from tampering
+  \item
+    Algorithms: EIA1 (SNOW 3G), EIA2 (AES-CMAC), EIA3 (ZUC)
+  \item
+    Generates 32-bit MAC-I appended to each RRC message
+  \item
+    \textbf{Not applied to user plane in LTE} (added in 5G NR for user plane)
+  \end{itemize}
+\item
+  \textbf{Sequence Numbering and Reordering}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Assigns PDCP SN to each SDU
+  \item
+    Reorders out-of-sequence PDUs (important during handover)
+  \item
+    Detects duplicates
+  \end{itemize}
+\item
+  \textbf{Handover Support}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    In-sequence delivery and duplicate elimination during handover
+  \item
+    Status reporting: tells source eNB which PDUs were successfully delivered
+  \item
+    Enables lossless handover for AM bearers
+  \end{itemize}
+\end{enumerate}
+
+\CNkeepfig{m06-pdcp-pdu}{2}
+
+\CNsubsubsection{PDCP PDU Format}
+
+\CNfigure{m06-pdcp-pdu}{PDCP PDU format}
+
+\CNsubsection{6.4.5}{RRC Layer (Radio Resource Control)}
+
+RRC is the \textbf{control plane protocol} between UE and eNodeB, managing the radio connection.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Connection Management}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    RRC Connection Setup /\allowbreak{} Reconfiguration /\allowbreak{} Release
+  \item
+    Security activation (ciphering + integrity)
+  \item
+    SRB (Signaling Radio Bearer) establishment
+  \end{itemize}
+\item
+  \textbf{Measurement Configuration and Reporting}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Configures UE to measure serving and neighbor cells
+  \item
+    Events: A1–A6 (intra/\allowbreak{}inter-frequency), B1–B2 (inter-RAT)
+  \item
+    Reporting: periodic or event-triggered
+  \item
+    Quantities: RSRP, RSRQ, SINR
+  \end{itemize}
+\item
+  \textbf{Handover Control}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    eNB makes handover decision based on measurement reports
+  \item
+    Sends \CNcode{RRCConnectionReconfiguration} with mobility control info
+  \item
+    UE performs handover, sends \CNcode{RRCConnectionReconfigurationComplete}
+  \end{itemize}
+\item
+  \textbf{System Information Broadcasting}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{MIB:} Transmitted on PBCH every 40~ms (bandwidth, SFN, PHICH config)
+  \item
+    \textbf{SIB1:} Cell access info, scheduling of other SIBs (80~ms period)
+  \item
+    \textbf{SIB2:} Common channel config (RACH, paging, UL power control)
+  \item
+    \textbf{SIB3–SIB8:} Cell reselection, inter-frequency/\allowbreak{}inter-RAT info
+  \item
+    \textbf{SIB9–SIB19:} Additional info (home eNB, MBMS, etc.)
+  \end{itemize}
+\item
+  \textbf{Paging}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Notifies UEs in IDLE of incoming calls/\allowbreak{}data
+  \item
+    DRX-based: UE wakes at specific paging occasions
+  \end{itemize}
+\item
+  \textbf{NAS Message Transfer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Transparently carries NAS messages between UE and MME
+  \end{itemize}
+\end{enumerate}
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{Signaling Radio Bearers (SRBs)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{SRB} & \CNth{Purpose} & \CNth{RLC Mode} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SRB0 & RRC messages on CCCH (before security) & TM \\
+SRB1 & RRC messages + piggybacked NAS (after setup) & AM \\
+SRB2 & NAS messages (lower priority than SRB1) & AM \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{6.5}{LTE Channel Structure}
+
+\CNchained\CNsubsection{}{Channel Types Overview}
+
+LTE defines three categories of channels, each at a different layer of abstraction:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2128}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1489}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2340}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.4043}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Category} & \CNth{Layer} & \CNth{Defined By} & \CNth{Question Answered} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Logical Channels & MAC (upper) & \textbf{What} type of data & What is being transferred? \\
+Transport Channels & MAC (lower) & \textbf{How} data is transferred & How is it characterized? \\
+Physical Channels & PHY & \textbf{Where} in the resource grid & Where are the bits placed? \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{}{Logical Channels}
+
+\CNchained\CNsubsubsection{Control Channels}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Channel} & \CNth{Name} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{BCCH} & Broadcast Control Channel & DL & System information (MIB, SIBs) \\
+\textbf{PCCH} & Paging Control Channel & DL & Paging messages for IDLE UEs \\
+\textbf{CCCH} & Common Control Channel & DL/\allowbreak{}UL & Messages before RRC connection (Msg3/\allowbreak{}Msg4) \\
+\textbf{DCCH} & Dedicated Control Channel & DL/\allowbreak{}UL & Dedicated signaling (RRC after connection) \\
+\textbf{MCCH} & Multicast Control Channel & DL & MBMS control information \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsubsection{Traffic Channels}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Channel} & \CNth{Name} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{DTCH} & Dedicated Traffic Channel & DL/\allowbreak{}UL & User data (IP packets) \\
+\textbf{MTCH} & Multicast Traffic Channel & DL & MBMS user data \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Transport Channels}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Channel} & \CNth{Name} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{BCH} & Broadcast Channel & DL & Carries MIB; fixed format, 40~ms period \\
+\textbf{PCH} & Paging Channel & DL & Carries paging; supports DRX \\
+\textbf{DL-SCH} & Downlink Shared Channel & DL & Main DL data; supports HARQ, dynamic scheduling \\
+\textbf{UL-SCH} & Uplink Shared Channel & UL & Main UL data; supports HARQ, dynamic scheduling \\
+\textbf{RACH} & Random Access Channel & UL & Random access preambles \\
+\textbf{MCH} & Multicast Channel & DL & MBMS data; fixed scheduling \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{Physical Channels}
+
+\CNchained\CNsubsubsection{Downlink Physical Channels}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3750}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3750}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Channel} & \CNth{Name} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{PDSCH} & Physical DL Shared Channel & User data + system info (SIBs, paging) \\
+\textbf{PDCCH} & Physical DL Control Channel & DCI (scheduling grants, power control) \\
+\textbf{PBCH} & Physical Broadcast Channel & MIB transmission \\
+\textbf{PMCH} & Physical Multicast Channel & MBMS data \\
+\textbf{PCFICH} & Physical CFI Channel & Indicates \# of OFDM symbols for PDCCH \\
+\textbf{PHICH} & Physical HARQ Indicator Channel & UL HARQ ACK/\allowbreak{}NACK \\
+\end{longtable}
+}
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{Uplink Physical Channels}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Channel} & \CNth{Name} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{PUSCH} & Physical UL Shared Channel & UL user data + control info \\
+\textbf{PUCCH} & Physical UL Control Channel & CQI, HARQ ACK/\allowbreak{}NACK, SR \\
+\textbf{PRACH} & Physical Random Access Channel & Random access preambles \\
+\end{longtable}
+}
+
+\CNkeepfig{m06-channel-mapping}{3}
+
+\CNsubsection{}{Channel Mapping}
+
+\CNfigure{m06-channel-mapping}{Mapping of logical, transport and physical channels}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Complete Channel Mapping Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Logical Channel} & \CNth{Transport Channel} & \CNth{Physical Channel} & \CNth{Direction} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BCCH (MIB) & BCH & PBCH & DL \\
+BCCH (SIBs) & DL-SCH & PDSCH & DL \\
+PCCH & PCH & PDSCH & DL \\
+CCCH & DL-SCH & PDSCH & DL \\
+CCCH & UL-SCH & PUSCH & UL \\
+DCCH & DL-SCH & PDSCH & DL \\
+DCCH & UL-SCH & PUSCH & UL \\
+DTCH & DL-SCH & PDSCH & DL \\
+DTCH & UL-SCH & PUSCH & UL \\
+— (HARQ feedback) & — & PHICH & DL \\
+— (DCI/\allowbreak{}grants) & — & PDCCH & DL \\
+— (CFI) & — & PCFICH & DL \\
+— (CQI/\allowbreak{}SR/\allowbreak{}ACK) & — & PUCCH & UL \\
+— (RA preamble) & RACH & PRACH & UL \\
+\end{longtable}
+}
+
+\CNsection{6.6}{S1 Interface}
+
+The S1 interface connects the eNodeB to the EPC. It is split into:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{S1-MME (S1-C):} Control plane \ensuremath{\to} eNB \ensuremath{\leftrightarrow} MME
+\item
+  \textbf{S1-U:} User plane \ensuremath{\to} eNB \ensuremath{\leftrightarrow} S-GW
+\end{itemize}
+
+\CNkeepfig{m06-s1mme-stack}{3}
+
+\CNsubsection{}{S1-MME Protocol Stack}
+
+\CNfigure{m06-s1mme-stack}{S1-MME protocol stack}
+
+\textbf{Why SCTP (not TCP)?}
+
+\begin{itemize}
+\tightlist
+\item
+  Multi-streaming: avoids head-of-line blocking
+\item
+  Multi-homing: failover between IP addresses
+\item
+  Message-oriented (preserves boundaries)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{S1AP Procedures}
+
+\CNchained\CNsubsubsection{UE-Associated Procedures (per-UE context)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3548}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3548}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2903}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Initial UE Message & eNB \ensuremath{\to} MME & Carries first NAS message (Attach, Service Request) \\
+Downlink NAS Transport & MME \ensuremath{\to} eNB & Delivers NAS message to UE \\
+Uplink NAS Transport & eNB \ensuremath{\to} MME & Forwards NAS message from UE \\
+Initial Context Setup & MME \ensuremath{\to} eNB & Establishes security context + default bearer \\
+UE Context Release & MME \ensuremath{\leftrightarrow} eNB & Releases UE context (Request/\allowbreak{}Command/\allowbreak{}Complete) \\
+Handover Preparation & Source eNB \ensuremath{\to} MME & S1-based handover when X2 unavailable \\
+Handover Resource Allocation & MME \ensuremath{\to} Target eNB & Allocates resources at target \\
+Path Switch Request & Target eNB \ensuremath{\to} MME & Updates S-GW path after X2 handover \\
+E-RAB Setup/\allowbreak{}Modify/\allowbreak{}Release & MME \ensuremath{\to} eNB & Bearer management \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{Non-UE-Associated Procedures (global)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S1 Setup & eNB registers with MME (TAC, PLMN, capacity) \\
+Reset & Error recovery (partial or full) \\
+Paging & MME sends paging to eNBs in tracking area \\
+eNB/\allowbreak{}MME Configuration Update & Capacity/\allowbreak{}configuration changes \\
+Overload Start/\allowbreak{}Stop & MME signals congestion \\
+Error Indication & Report protocol errors \\
+\end{longtable}
+}
+
+\CNkeepfig{m06-s1u-stack}{3}
+
+\CNsubsection{}{S1-U Protocol Stack}
+
+\CNfigure{m06-s1u-stack}{S1-U protocol stack}
+
+\begin{itemize}
+\tightlist
+\item
+  Each E-RAB has a \textbf{GTP tunnel} identified by TEID (Tunnel Endpoint ID)
+\item
+  One-to-one mapping: EPS bearer \ensuremath{\leftrightarrow} S1 GTP tunnel \ensuremath{\leftrightarrow} radio bearer
+\end{itemize}
+
+\CNsection{6.7}{X2 Interface}
+
+The X2 interface connects \textbf{neighboring eNodeBs} directly for:
+
+\begin{itemize}
+\tightlist
+\item
+  Fast handover (no MME involvement for intra-LTE mobility)
+\item
+  Inter-cell load management
+\item
+  Inter-cell interference coordination (ICIC)
+\end{itemize}
+
+\CNkeepfig{m06-x2-stacks}{3}
+
+\CNsubsection{}{X2 Protocol Stack}
+
+\CNfigure{m06-x2-stacks}{X2 protocol stacks}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{X2AP Procedures}
+
+\CNchained\CNsubsubsection{Mobility Management (Handover)}
+
+\textbf{X2 Handover Sequence:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Source eNB} sends \CNcode{Handover Request} \ensuremath{\to} Target eNB (includes UE context, bearer info)
+\item
+  \textbf{Target eNB} performs admission control \ensuremath{\to} sends \CNcode{Handover Request Acknowledge}
+\item
+  \textbf{Source eNB} sends \CNcode{RRCConnectionReconfiguration} to UE (with target cell info)
+\item
+  \textbf{UE} synchronizes to target cell, sends \CNcode{RRCConnectionReconfigurationComplete}
+\item
+  \textbf{Target eNB} sends \CNcode{Path Switch Request} to MME (updates core network path)
+\item
+  \textbf{Source eNB} receives \CNcode{UE Context Release} \ensuremath{\to} releases resources
+\end{enumerate}
+
+\textbf{During handover:} Data forwarded source\ensuremath{\to}target via X2-U GTP tunnel (avoids data loss).
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{Load Management}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Resource Status Reporting & Request/\allowbreak{}report load information (PRB usage, composite load) \\
+Load Indication & Inform neighbor about UL interference (HII, OI) \\
+Mobility Change Request & Negotiate handover parameters (CIO adjustment) \\
+\end{longtable}
+}
+
+\CNsubsubsection{Inter-Cell Interference Coordination (ICIC)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Load Information message} carries:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{HII (High Interference Indication):} UL RBs where cell plans to schedule cell-edge UEs
+  \item
+    \textbf{OI (Overload Indicator):} UL RBs experiencing high interference
+  \item
+    \textbf{RNTP (Relative Narrowband TX Power):} DL RBs where cell will exceed power threshold
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{}{X2 Setup and Configuration}
+
+\begin{itemize}
+\tightlist
+\item
+  X2 link established via \textbf{X2 Setup procedure} (or via MME using S1 ENB Configuration Transfer)
+\item
+  Automatic Neighbor Relation (ANR): eNB discovers neighbors and establishes X2
+\item
+  Multiple eNBs can connect forming a mesh topology
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m06-rrc-states}{8}
+
+\CNsection{6.8}{RRC States and Transitions}
+
+\CNchained\CNsubsection{}{RRC State Machine}
+
+\CNfigure{m06-rrc-states}{LTE RRC state machine}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{RRC\_\allowbreak{}IDLE State}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Characteristic} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Context & No eNB context; registered with MME only \\
+Location & Known at \textbf{Tracking Area} level \\
+Mobility & \textbf{Cell reselection} (UE-controlled, based on SIBs) \\
+Data & No data transfer possible \\
+Paging & UE monitors paging channel with DRX cycle \\
+System Info & UE acquires MIB and relevant SIBs \\
+Power & Low power consumption (long DRX sleep) \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{RRC\_\allowbreak{}CONNECTED State}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Characteristic} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Context & Full UE context in serving eNB \\
+Location & Known at \textbf{cell} level \\
+Mobility & \textbf{Handover} (network-controlled, measurement-based) \\
+Data & Active data transfer (DL + UL) \\
+Measurements & Configured by eNB (events A1–A6, B1–B2) \\
+DRX & Connected-mode DRX possible (shorter cycles) \\
+Security & AS ciphering + integrity active \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{State Transitions}
+
+\CNchained\CNsubsubsection{IDLE \ensuremath{\to} CONNECTED (Connection Establishment)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE sends \textbf{RRC Connection Request} (on CCCH via SRB0)
+\item
+  eNB responds with \textbf{RRC Connection Setup} (configures SRB1)
+\item
+  UE sends \textbf{RRC Connection Setup Complete} (carries initial NAS message)
+\item
+  eNB forwards NAS to MME via S1AP \CNcode{Initial UE Message}
+\item
+  MME initiates \textbf{Initial Context Setup} (security + bearer establishment)
+\end{enumerate}
+
+\CNsubsubsection{CONNECTED \ensuremath{\to} IDLE (Connection Release)}
+
+\begin{itemize}
+\tightlist
+\item
+  MME triggers via S1AP \CNcode{UE Context Release Command}
+\item
+  eNB sends \textbf{RRC Connection Release} to UE
+\item
+  UE deletes AS context, returns to idle
+\item
+  Triggers: inactivity timer, explicit NAS detach, radio link failure recovery failure
+\end{itemize}
+
+\CNkeepfig{m06-rrc-inactive}{5}
+
+\CNsubsection{}{5G Extension: RRC\_\allowbreak{}INACTIVE State}
+
+In 5G NR (and late LTE Rel-15+), a third state is introduced:
+
+\CNfigure{m06-rrc-inactive}{5G NR RRC states with RRC\_\allowbreak{}INACTIVE}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1719}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1719}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2969}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1562}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2031}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{State} & \CNth{UE Context} & \CNth{Location Granularity} & \CNth{Mobility} & \CNth{CN Connection} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+IDLE & None in RAN & Tracking Area & Cell reselection & None \\
+INACTIVE & Stored in gNB (suspended) & RAN Notification Area & Cell reselection + RAN paging & Maintained with CN \\
+CONNECTED & Active in gNB & Cell level & Handover & Active \\
+\end{longtable}
+}
+
+\textbf{Benefits of INACTIVE state:}
+
+\begin{itemize}
+\tightlist
+\item
+  Faster resumption than IDLE\ensuremath{\to}CONNECTED (skip NAS procedures)
+\item
+  Power saving (no connected-mode signaling)
+\item
+  Reduced signaling load on core network
+\item
+  AS context preserved \ensuremath{\to} faster resume with single RRC Resume message
+\item
+  Ideal for IoT devices with intermittent small data transmissions
+\end{itemize}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4583}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5417}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Component} & \CNth{Key Takeaway} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Architecture & Flat (no RNC); eNB handles all RAN functions \\
+eNodeB & Scheduling, RRM, HARQ, handover decisions, encoding \\
+PHY & OFDMA (DL) /\allowbreak{} SC-FDMA (UL); resource blocks as basic unit \\
+MAC & 1~ms scheduling, HARQ, multiplexing, random access \\
+RLC & TM/\allowbreak{}UM/\allowbreak{}AM; segmentation + ARQ for reliability \\
+PDCP & ROHC compression, ciphering, integrity (CP), reordering \\
+RRC & Connection/\allowbreak{}mobility management, measurement, system info \\
+Channels & Logical\ensuremath{\to}Transport\ensuremath{\to}Physical mapping; shared channels dominate \\
+S1 & eNB\ensuremath{\leftrightarrow}EPC; S1AP (SCTP) for control, GTP-U for user plane \\
+X2 & eNB\ensuremath{\leftrightarrow}eNB; fast handover, load mgmt, interference coordination \\
+RRC States & IDLE (low power) \ensuremath{\leftrightarrow} CONNECTED (active); INACTIVE in 5G \\
+\end{longtable}
+}
+
+\emph{Module 6 — E-UTRAN (LTE Radio Access Network) — Advanced Communication Networks}

@@ -1,0 +1,789 @@
+\begin{CNbox}[unbreakable]{obj}{اهداف یادگیری}
+
+در پایان این ماژول، شما قادر خواهید بود:
+
+\begin{itemize}
+\tightlist
+\item
+  توضیح دهید چرا \lr{\mbox{5G}} مدل واسط نقطه-به-نقطه \lr{\mbox{EPC}} را رها کرد
+\item
+  اصول طراحی \lr{\mbox{SBA}} و نقش \lr{HTTP/\allowbreak{}2}، \lr{\mbox{JSON}} و \lr{\mbox{REST}} را توصیف کنید
+\item
+  تمام توابع شبکه هسته \lr{\mbox{5G}} و خدمات آن‌ها را شناسایی کنید
+\item
+  نقش حیاتی \lr{\mbox{NRF}} در کشف خدمات را توضیح دهید
+\item
+  مدل‌های ارتباطی مستقیم در برابر غیرمستقیم \lr{\mbox{(SCP)}} را مقایسه کنید
+\item
+  معماری \lr{\mbox{EPC}} را با \lr{\mbox{SBA}} در \lr{\mbox{5G}} مقایسه کنید
+\end{itemize}
+
+\end{CNbox}
+
+\Needspace{14\baselineskip}
+
+\Needspace{24\baselineskip}
+
+\CNsection{1}{چرا \lr{\mbox{5G}} از واسط‌های نقطه-به-نقطه \lr{\mbox{EPC}} فاصله گرفت}
+
+\CNchained\CNsubsection{1.1}{مشکل \lr{\mbox{EPC}}}
+
+در \lr{4G/\allowbreak{}LTE}، هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}} از \textbf{نقاط مرجع نقطه-به-نقطه} بین عناصر شبکه استفاده می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جفت عنصر} & \CNth{واسط} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{MME \ensuremath{\leftrightarrow} S-GW} & \lr{\mbox{S11}} \\
+\lr{MME \ensuremath{\leftrightarrow} HSS} & \lr{\mbox{S6a}} \\
+\lr{S-GW \ensuremath{\leftrightarrow} P-GW} & \lr{S5/\allowbreak{}S8} \\
+\lr{MME \ensuremath{\leftrightarrow} eNB} & \lr{\mbox{S1-MME}} \\
+\lr{P-GW \ensuremath{\leftrightarrow} PCRF} & \lr{\mbox{Gx}} \\
+\end{longtable}
+}
+
+\textbf{مشکل مقیاس‌پذیری:}
+
+\begin{itemize}
+\tightlist
+\item
+  با \lr{\mbox{N}} عنصر شبکه، تا \lr{\textbf{\lr{N\ensuremath{\times}(N-1)/\allowbreak{}2}}} نقطه مرجع یکتا نیاز دارید
+\item
+  هر واسط مشخصات پروتکل خود را دارد (\lr{\mbox{Diameter}}، \lr{\mbox{GTP-C}} و غیره)
+\item
+  افزودن یک عنصر شبکه جدید نیازمند تعریف واسط‌های جدید به هر عنصر موجود است
+\item
+  جفت‌شدگی سخت، تحول را بسیار دشوار می‌کند
+\item
+  هم‌کنش‌گری سازندگان نیازمند آزمون هر ترکیب واسط است
+\end{itemize}
+
+\textbf{مثال:} \lr{\mbox{EPC}} با 6 عنصر هسته \ensuremath{\leftarrow} تا 15 واسط یکتا، هر یک با پروتکل، قالب‌های پیام و رویه‌های خود.
+
+\CNsubsection{1.2}{راه‌حل \lr{\mbox{SBA}}}
+
+\lr{\mbox{5G}} \textbf{معماری خدمات‌محور} را معرفی می‌کند که در آن:
+
+\begin{itemize}
+\tightlist
+\item
+  توابع شبکه \lr{\mbox{(NF)}} \textbf{خدمات} را از طریق یک چارچوب واسط مشترک ارایه می‌دهند
+\item
+  هر \lr{\mbox{NF}} می‌تواند خدمات هر \lr{\mbox{NF}} دیگر را \textbf{کشف و مصرف} کند
+\item
+  افزودن یک \lr{\mbox{NF}} جدید فقط نیازمند ثبت خدمات آن است \lr{—} بدون نیاز به واسط‌های جدید
+\item
+  پشته پروتکل مشترک \lr{(HTTP/\allowbreak{}2 + JSON)} برای تمام ارتباطات صفحه کنترل
+\end{itemize}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{1.3}{اصول بومی-ابر}
+
+\lr{\mbox{SBA}} طراحی بومی-ابر را در آغوش می‌گیرد:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{اصل} & \CNth{پیاده‌سازی در \lr{\mbox{SBA 5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{میکروسرویس‌ها} & هر \lr{\mbox{NF}} به خدمات مستقل تجزیه می‌شود \\
+\textbf{بدون حالت} & نمونه‌های \lr{\mbox{NF}} وضعیت نشست را به‌صورت محلی ذخیره نمی‌کنند (به مخازن داده خارجی‌سازی می‌شود) \\
+\textbf{مقیاس‌پذیری افقی} & نمونه‌های \lr{\mbox{NF}} بیشتر پشت متعادل‌کننده‌های بار اضافه کنید \\
+\textbf{کانتینری‌سازی} & \lr{\mbox{NF}}ها به‌عنوان کانتینر در \lr{\mbox{Kubernetes}} مستقر می‌شوند \\
+\lr{\textbf{\lr{CI/\allowbreak{}CD}}} & مدیریت چرخه عمر مستقل \lr{\mbox{NF}} \\
+\lr{\textbf{\lr{Service mesh}}} & \lr{\mbox{SCP}} مسیریابی، توازن بار، دیدپذیری فراهم می‌کند \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m18-refpoint-vs-sbi}{8}
+
+\CNsection{2}{اصول طراحی \lr{\mbox{SBA}}}
+
+\CNchained\CNsubsection{2.1}{واسط‌های خدمات‌محور \lr{\mbox{(SBI)}} در برابر نقاط مرجع}
+
+\CNfigure{m18-refpoint-vs-sbi}{نقاط مرجع \lr{\mbox{EPC}} در برابر گذرگاه خدمات‌محور \lr{\mbox{5G}}}
+
+\textbf{نقاط مرجع \lr{\mbox{(4G)}}:} هر خط یک مشخصات پروتکل/\allowbreak{}واسط یکتا است\CNbr{}\textbf{واسط‌های خدمات‌محور \lr{\mbox{(5G)}}:} تمام \lr{\mbox{NF}}ها با استفاده از همان چارچوب پروتکل به یک گذرگاه مشترک متصل می‌شوند
+
+\CNsubsection{2.2}{مدل‌های تعامل خدمات \lr{\mbox{NF}}}
+
+\lr{\mbox{NF}}ها با استفاده از دو الگو ارتباط برقرار می‌کنند:
+
+\textbf{1. درخواست-پاسخ (همگام)}
+
+\begin{itemize}
+\tightlist
+\item
+  مصرف‌کننده \lr{\mbox{NF}} یک درخواست به تولیدکننده \lr{\mbox{NF}} می‌فرستد
+\item
+  تولیدکننده پردازش می‌کند و پاسخی بازمی‌گرداند
+\item
+  مثال: \lr{\mbox{AMF}} از \lr{\mbox{UDM}} برای داده مشترک پرس‌وجو می‌کند
+\end{itemize}
+
+\textbf{2. اشتراک-اعلان (ناهمگام)}
+
+\begin{itemize}
+\tightlist
+\item
+  مصرف‌کننده \lr{\mbox{NF}} به رویدادهای تولیدکننده \lr{\mbox{NF}} اشتراک می‌کند
+\item
+  تولیدکننده هنگام رخ‌دادن رویدادها اعلان می‌فرستد
+\item
+  مثال: \lr{\mbox{AMF}} به تغییرات داده اشتراک در \lr{\mbox{UDM}} اشتراک می‌کند
+\end{itemize}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{2.3}{\lr{HTTP/\allowbreak{}2} به‌عنوان پروتکل انتقال}
+
+\lr{\mbox{SBA}} در \lr{\mbox{5G}} به دلایل حیاتی \lr{HTTP/\allowbreak{}2} را بر \lr{HTTP/\allowbreak{}1.1} ترجیح داد:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{مزیت برای \lr{\mbox{5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{چندگانه‌سازی} & چندین درخواست/\allowbreak{}پاسخ روی یک اتصال \lr{\mbox{TCP}} \lr{—} کاهش تأخیر \\
+\textbf{فشرده‌سازی سرآیند \lr{\mbox{(HPACK)}}} & کاهش سربار برای سرآیندهای سیگنالینگ تکراری \\
+\textbf{ارسال سرور} & تحویل کارآمد اعلان را ممکن می‌سازد \\
+\textbf{قاب‌بندی دودویی} & تجزیه کارآمدتر از \lr{HTTP/\allowbreak{}1.1} متنی \\
+\textbf{اولویت‌بندی جریان} & سیگنالینگ حیاتی (مثلاً تماس‌های اضطراری) اولویت می‌گیرد \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{2.4}{\lr{\mbox{JSON}} به‌عنوان قالب داده}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{دلیل} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{قابل خواندن توسط انسان} & اشکال‌زدایی، ثبت گزارش، عیب‌یابی آسان \\
+\textbf{بومی-وب} & بهره‌گیری از ابزارهای عظیم اکوسیستم وب \\
+\textbf{ابزارها} & اعتبارسنج‌ها، ویرایشگرها، تجزیه‌گرها در هر زبانی موجودند \\
+\textbf{پشتیبانی طرح‌واره} & \lr{OpenAPI/\allowbreak{}JSON Schema} برای تعریف \lr{\mbox{API}} \\
+\textbf{سبک} & کم‌حجم‌تر از \lr{\mbox{XML}} (مورد استفاده در مشخصات قدیمی‌تر \lr{\mbox{3GPP}}) \\
+\end{longtable}
+}
+
+\CNsubsection{2.5}{اصول طراحی \lr{\mbox{API}} مبتنی بر \lr{\mbox{REST}}}
+
+\lr{\mbox{API}}های \lr{\mbox{SBA}} در \lr{\mbox{5G}} از قراردادهای \lr{\mbox{RESTful}} پیروی می‌کنند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{منابع} شناسایی‌شده با \lr{\mbox{URI}}: \lr{\CNcode{https:/}\allowbreak{}\CNcode{/}\allowbreak{}\CNcode{\{nfInstanceId\}.}\allowbreak{}\CNcode{5gc.}\allowbreak{}\CNcode{mnc\{MNC\}.}\allowbreak{}\CNcode{mcc\{MCC\}/}\allowbreak{}\CNcode{nsmf-pdusession/}\allowbreak{}\CNcode{v1/}\allowbreak{}\CNcode{sm-contexts}}
+\item
+  \textbf{متدهای \lr{\mbox{HTTP}}} به عملیات نگاشت می‌شوند: \lr{\mbox{GET}} (خواندن)، \lr{\mbox{POST}} (ایجاد)، \lr{\mbox{PUT}} (به‌روزرسانی)، \lr{\mbox{DELETE}} (حذف)، \lr{\mbox{PATCH}} (به‌روزرسانی جزیی)
+\item
+  \textbf{درخواست‌های بدون حالت} \lr{—} هر درخواست شامل تمام زمینه لازم است
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{HATEOAS}}}}} \lr{—} پاسخ‌ها شامل پیوندهایی به منابع مرتبط هستند
+\item
+  \textbf{نسخه‌بندی \lr{\mbox{API}}} \lr{—} نسخه در مسیر \lr{\mbox{URI}} (\lr{\mbox{v1}}، \lr{\mbox{v2}})
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m18-sba}{8}
+
+\CNsection{3}{توابع شبکه هسته \lr{\mbox{5G}}}
+
+\CNchained\CNsubsection{}{نمودار معماری \lr{\mbox{SBA}}}
+
+\CNfigure{m18-sba}{معماری خدمات‌محور \lr{\mbox{5G}} پیرامون \lr{\mbox{SBI}}}
+
+\CNsubsection{3.1}{\lr{\mbox{AMF}} \lr{—} تابع مدیریت دسترسی و تحرک}
+
+\textbf{هدف:} تمام سیگنالینگ مرتبط با دسترسی و تحرک \lr{\mbox{UE}} را مدیریت می‌کند.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Namf}}}
+
+\textbf{خدمات کلیدی:}\CNbr{}\lr{\textbar{}} خدمت \lr{\textbar{}} توضیح \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{Namf\_Communication} \textbar{}} انتقال پیام \lr{N1/\allowbreak{}N2}، سیگنالینگ مختص \lr{\mbox{UE}} \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Namf\_EventExposure} \textbar{}} نمایش رویدادهای تحرک (مکان، دسترسی‌پذیری) \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Namf\_MT} \textbar{}} تحویل پیام با مقصد موبایل \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Namf\_Location} \textbar{}} خدمات مکان \lr{\mbox{UE}} \lr{\textbar{}}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  ثبت‌نام و لغو ثبت‌نام \lr{\mbox{UE}}
+\item
+  مدیریت اتصال (بیکار \ensuremath{\leftrightarrow} متصل)
+\item
+  مدیریت تحرک (تحویل، به‌روزرسانی نواحی ردیابی)
+\item
+  مدیریت زمینه امنیتی (رمزنگاری/\allowbreak{}یکپارچگی \lr{\mbox{NAS}})
+\item
+  رله پیام‌های \lr{\mbox{NAS-SM}} بین \lr{\mbox{UE}} و \lr{\mbox{SMF}}
+\end{itemize}
+
+\CNsubsection{3.2}{\lr{\mbox{SMF}} \lr{—} تابع مدیریت نشست}
+
+\textbf{هدف:} نشست‌های \lr{\mbox{PDU}} (داده) بین \lr{\mbox{UE}} و شبکه داده را مدیریت می‌کند.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Nsmf}}}
+
+\textbf{خدمات کلیدی:}\CNbr{}\lr{\textbar{}} خدمت \lr{\textbar{}} توضیح \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{Nsmf\_PDUSession} \textbar{}} ایجاد، اصلاح، آزادسازی نشست‌های \lr{\mbox{PDU}} \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nsmf\_EventExposure} \textbar{}} رویدادهای نشست \lr{\mbox{PDU}} (مثلاً تغییر آدرس \lr{\mbox{IP}}) \lr{\textbar{}}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  برقراری، اصلاح، آزادسازی نشست \lr{\mbox{PDU}}
+\item
+  تخصیص و مدیریت آدرس \lr{\mbox{IP}} کاربر
+\item
+  انتخاب و کنترل \lr{\mbox{UPF}} (از طریق \lr{N4/\allowbreak{}PFCP})
+\item
+  مدیریت و اجرای جریان \lr{\mbox{QoS}}
+\item
+  اعلان داده پیوند پایین‌سو
+\item
+  پیکربندی هدایت و مسیریابی ترافیک
+\end{itemize}
+
+\CNsubsection{3.3}{\lr{\mbox{UPF}} \lr{—} تابع صفحه کاربر}
+
+\textbf{هدف:} بسته‌های داده کاربر را بین \lr{\mbox{RAN}} و شبکه‌های داده ارسال می‌کند.
+
+\textbf{\lr{\mbox{\CNwarn{}}} یادداشت:} \lr{\mbox{UPF}} از \lr{\mbox{SBI}} استفاده \textbf{نمی‌کند}. از نقاط مرجع استفاده می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{N3}}}}} \lr{—} بین \lr{\mbox{RAN}} و \lr{\mbox{UPF}} (تونل \lr{\mbox{GTP-U}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{N4}}}}} \lr{—} بین \lr{\mbox{SMF}} و \lr{\mbox{UPF}} (پروتکل \lr{\mbox{PFCP}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{N6}}}}} \lr{—} بین \lr{\mbox{UPF}} و شبکه داده (ترافیک \lr{\mbox{IP}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{N9}}}}} \lr{—} بین \lr{\mbox{UPF}}ها (تونل \lr{\mbox{GTP-U}} بین-\lr{\mbox{UPF}})
+\end{itemize}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  مسیریابی و ارسال بسته
+\item
+  مدیریت \lr{\mbox{QoS}} (علامت‌گذاری، پلیسینگ، شکل‌دهی)
+\item
+  گزارش‌دهی مصرف ترافیک
+\item
+  تأیید ترافیک پیوند بالاسو
+\item
+  رهگیری قانونی (صفحه کاربر)
+\item
+  بافرینگ بسته‌های پیوند پایین‌سو (\lr{\mbox{UE}} در حالت بیکار)
+\end{itemize}
+
+\CNsubsection{3.4}{\lr{\mbox{UDM}} \lr{—} مدیریت داده یکپارچه}
+
+\textbf{هدف:} داده مشترک را مدیریت و اعتبارنامه‌های احراز هویت را محاسبه می‌کند.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Nudm}}}
+
+\textbf{خدمات کلیدی:}\CNbr{}\lr{\textbar{}} خدمت \lr{\textbar{}} توضیح \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{Nudm\_}\allowbreak{}\CNcode{SubscriberDataManagement} \textbar{}} بازیابی/\allowbreak{}به‌روزرسانی داده اشتراک \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nudm\_}\allowbreak{}\CNcode{UEContextManagement} \textbar{}} ردیابی اینکه کدام \lr{AMF/\allowbreak{}SMF} به \lr{\mbox{UE}} خدمات می‌دهد \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nudm\_}\allowbreak{}\CNcode{UEAuthentication} \textbar{}} تولید بردارهای احراز هویت \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nudm\_EventExposure} \textbar{}} اعلان‌های تغییر داده اشتراک \lr{\textbar{}}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  ذخیره داده اشتراک (برش‌های مجاز، پروفایل‌های \lr{\mbox{QoS}}، مجوزهای \lr{\mbox{DNN}})
+\item
+  محاسبه اعتبارنامه‌های احراز هویت (با استفاده از \lr{\mbox{SUPI}}، \lr{\mbox{K}}، \lr{\mbox{OPc}})
+\item
+  مدیریت ثبت‌نام زمینه \lr{\mbox{UE}} (\lr{\mbox{AMF}} خدمات‌دهنده، \lr{\mbox{SMF}} خدمات‌دهنده)
+\item
+  رمزگشایی \lr{SUCI \ensuremath{\to} SUPI}
+\end{itemize}
+
+\CNsubsection{3.5}{\lr{\mbox{AUSF}} \lr{—} تابع سرور احراز هویت}
+
+\textbf{هدف:} رویه احراز هویت برای \lr{\mbox{UE}}ها را اجرا می‌کند.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Nausf}}}
+
+\textbf{خدمات کلیدی:}\CNbr{}\lr{\textbar{}} خدمت \lr{\textbar{}} توضیح \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{Nausf\_}\allowbreak{}\CNcode{UEAuthentication} \textbar{}} انجام احراز هویت \lr{\mbox{5G-AKA}} یا \lr{\mbox{EAP-AKA’}} \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nausf\_}\allowbreak{}\CNcode{SoRProtection} \textbar{}} امنیت هدایت رومینگ \lr{\textbar{}}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  احراز هویت \lr{\mbox{UE}}ها در حین ثبت‌نام
+\item
+  پشتیبانی از روش‌های \lr{\mbox{5G-AKA}} و \lr{\mbox{EAP-AKA’}}
+\item
+  ذخیره مواد کلید میانی \lr{\mbox{(\ensuremath{K_{\mathrm{AUSF}}})}}
+\item
+  واسط با \lr{\mbox{UDM}} برای بردارهای احراز هویت
+\end{itemize}
+
+\CNsubsection{3.6}{\lr{\mbox{PCF}} \lr{—} تابع کنترل سیاست}
+
+\textbf{هدف:} قواعد سیاستی که رفتار شبکه و \lr{\mbox{QoS}} را اداره می‌کنند فراهم می‌کند.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Npcf}}}
+
+\textbf{خدمات کلیدی:}\CNbr{}\lr{\textbar{}} خدمت \lr{\textbar{}} توضیح \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{Npcf\_}\allowbreak{}\CNcode{SMPolicyControl} \textbar{}} سیاست‌های سطح نشست (\lr{\mbox{QoS}}، صورت‌حساب، دروازه‌بندی) \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Npcf\_}\allowbreak{}\CNcode{AMPolicyControl} \textbar{}} سیاست‌های دسترسی و تحرک (\lr{\mbox{RFSP}}، ناحیه خدمات) \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Npcf\_}\allowbreak{}\CNcode{PolicyAuthorization} \textbar{}} سیاست با محرک \lr{\mbox{AF}} (مثلاً \lr{\mbox{IMS}} درخواست \lr{\mbox{QoS}} می‌کند) \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Npcf\_}\allowbreak{}\CNcode{BDTPolicyControl} \textbar{}} سیاست‌های انتقال داده پس‌زمینه \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Npcf\_EventExposure} \textbar{}} اعلان‌های رویداد مرتبط با سیاست \lr{\textbar{}}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  تصمیمات سیاست \lr{\mbox{QoS}}
+\item
+  قواعد سیاست صورت‌حساب
+\item
+  تصمیمات کنترل دسترسی و دروازه‌بندی
+\item
+  سیاست‌های شبکه‌بندی
+\item
+  کنترل پایش مصرف
+\end{itemize}
+
+\CNsubsection{3.7}{\lr{\mbox{NRF}} \lr{—} تابع مخزن شبکه}
+
+\textbf{هدف:} \textbf{ثبت مرکزی} تمام نمونه‌های \lr{\mbox{NF}} و خدمات آن‌ها \lr{—} ستون فقرات \lr{\mbox{SBA}}.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Nnrf}}}
+
+\textbf{خدمات کلیدی:}\CNbr{}\lr{\textbar{}} خدمت \lr{\textbar{}} توضیح \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{Nnrf\_NFManagement} \textbar{}} ثبت‌نام، به‌روزرسانی، لغو ثبت‌نام \lr{\mbox{NF}} \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nnrf\_NFDiscovery} \textbar{}} پرس‌وجوی \lr{\mbox{NF}}های موجود بر اساس نوع، برش، مکان \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nnrf\_AccessToken} \textbar{}} صدور نشانه‌های \lr{\mbox{OAuth2.0}} برای مجوزدهی \lr{\mbox{NF}}-به-\lr{\mbox{NF}} \lr{\textbar{}}
+
+\begin{CNquote}
+
+\lr{\mbox{\CNstar{}}} \textbf{\lr{\mbox{NRF}} توانمندساز حیاتی \lr{\mbox{SBA}} است} \lr{—} بدون آن، \lr{\mbox{NF}}ها نمی‌توانند یکدیگر را کشف کنند و مدل خدمات‌محور به پیکربندی ایستا بازمی‌گردد.
+
+\end{CNquote}
+
+\CNsubsection{3.8}{\lr{\mbox{NSSF}} \lr{—} تابع انتخاب برش شبکه}
+
+\textbf{هدف:} نمونه برش شبکه مناسب را برای \lr{\mbox{UE}} انتخاب می‌کند.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Nnssf}}}
+
+\textbf{خدمات کلیدی:}\CNbr{}\lr{\textbar{}} خدمت \lr{\textbar{}} توضیح \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{Nnssf\_NSSelection} \textbar{}} تعیین برش‌های مجاز و مجموعه \lr{\mbox{AMF}} هدف \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nnssf\_}\allowbreak{}\CNcode{NSSAIAvailability} \textbar{}} مدیریت دسترسی‌پذیری \lr{\mbox{NSSAI}} در هر ناحیه ردیابی \lr{\textbar{}}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  تعیین \lr{\mbox{NSSAI}} مجاز برای ثبت‌نام \lr{\mbox{UE}}
+\item
+  انتخاب مجموعه \lr{AMF/\allowbreak{}AMF} هدف بر اساس برش‌های درخواستی
+\item
+  مدیریت اطلاعات دسترسی‌پذیری \lr{\mbox{NSSAI}} در هر \lr{\mbox{TA}}
+\end{itemize}
+
+\CNsubsection{3.9}{\lr{\mbox{NEF}} \lr{—} تابع نمایش شبکه}
+
+\textbf{هدف:} قابلیت‌های شبکه \lr{\mbox{5G}} را به‌صورت ایمن به کاربردهای خارجی نمایش می‌دهد.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Nnef}}}
+
+\textbf{خدمات کلیدی:}\CNbr{}\lr{\textbar{}} خدمت \lr{\textbar{}} توضیح \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{Nnef\_EventExposure} \textbar{}} نمایش رویدادهای شبکه به \lr{\mbox{AF}}ها \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nnef\_PFDManagement} \textbar{}} مدیریت توصیف جریان بسته \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nnef\_}\allowbreak{}\CNcode{TrafficInfluence} \textbar{}} امکان تأثیر \lr{\mbox{AF}} بر مسیریابی ترافیک \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{Nnef\_}\allowbreak{}\CNcode{ParameterProvision} \textbar{}} تأمین رفتار مورد انتظار \lr{\mbox{UE}} \lr{\textbar{}}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  دروازه \lr{\mbox{API}} بین هسته \lr{\mbox{5G}} و دنیای خارجی
+\item
+  ترجمه اطلاعات داخلی \lr{\mbox{5GC}} به بازنمایی‌های خارجی
+\item
+  اجرای سیاست‌های امنیتی بر دسترسی خارجی
+\item
+  محدودسازی نرخ و مدیریت \lr{\mbox{API}}
+\end{itemize}
+
+\CNsubsection{3.10}{\lr{\mbox{AF}} \lr{—} تابع کاربرد}
+
+\textbf{هدف:} نمایندگی کاربردهای شخص سوم که با هسته \lr{\mbox{5G}} تعامل دارند.
+
+\textbf{واسط خدمات:} \lr{\mbox{\CNcode{Naf}}}
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  درخواست \lr{\mbox{QoS}} برای جریان‌های کاربرد (مثلاً پخش جریانی ویدیو)
+\item
+  تأثیر بر مسیریابی ترافیک (مثلاً رایانش لبه)
+\item
+  اشتراک در رویدادهای شبکه (مثلاً مکان \lr{\mbox{UE}})
+\item
+  می‌تواند مستقیماً به \lr{\mbox{5GC}} دسترسی یابد (مورد اعتماد) یا از طریق \lr{\mbox{NEF}} (غیرقابل اعتماد)
+\end{itemize}
+
+\textbf{مثال‌ها:} \lr{IMS (VoNR)}، پلتفرم‌های پخش جریانی، کاربردهای سازمانی، هماهنگ‌سازهای \lr{\mbox{MEC}}.
+
+\CNsection{4}{\lr{\mbox{NRF}} \lr{—} توانمندساز کلیدی \lr{\mbox{SBA}}}
+
+\lr{\mbox{NRF}} \textbf{حیاتی‌ترین مؤلفه} است که \lr{\mbox{SBA}} را کار می‌اندازد. بدون \lr{\mbox{NRF}}، \lr{\mbox{5G}} به اتصالات ایستا و پیش‌پیکربندی‌شده مانند \lr{\mbox{EPC}} بازمی‌گشت.
+
+\CNsubsection{4.1}{ثبت‌نام \lr{\mbox{NF}}}
+
+وقتی یک نمونه \lr{\mbox{NF}} راه‌اندازی می‌شود، با ارایه \textbf{پروفایل \lr{\mbox{NF}}} خود در \lr{\mbox{NRF}} \textbf{ثبت‌نام} می‌کند:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"nfInstanceId"}\FunctionTok{:} \StringTok{"3fa85f64{-}5717{-}4562{-}b3fc{-}2c963f66afa6"}\FunctionTok{,}
+  \DataTypeTok{"nfType"}\FunctionTok{:} \StringTok{"SMF"}\FunctionTok{,}
+  \DataTypeTok{"nfStatus"}\FunctionTok{:} \StringTok{"REGISTERED"}\FunctionTok{,}
+  \DataTypeTok{"heartBeatTimer"}\FunctionTok{:} \DecValTok{30}\FunctionTok{,}
+  \DataTypeTok{"plmnList"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"mcc"}\FunctionTok{:} \StringTok{"310"}\FunctionTok{,} \DataTypeTok{"mnc"}\FunctionTok{:} \StringTok{"014"}\FunctionTok{\}}\OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"sNssais"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"sst"}\FunctionTok{:} \DecValTok{1}\FunctionTok{,} \DataTypeTok{"sd"}\FunctionTok{:} \StringTok{"000001"}\FunctionTok{\}}\OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"fqdn"}\FunctionTok{:} \StringTok{"smf1.5gc.mnc014.mcc310.3gppnetwork.org"}\FunctionTok{,}
+  \DataTypeTok{"ipv4Addresses"}\FunctionTok{:} \OtherTok{[}\StringTok{"10.10.10.5"}\OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"nfServices"}\FunctionTok{:} \OtherTok{[}
+    \FunctionTok{\{}
+      \DataTypeTok{"serviceInstanceId"}\FunctionTok{:} \StringTok{"nsmf{-}pdusession{-}01"}\FunctionTok{,}
+      \DataTypeTok{"serviceName"}\FunctionTok{:} \StringTok{"nsmf{-}pdusession"}\FunctionTok{,}
+      \DataTypeTok{"versions"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"apiVersionInUri"}\FunctionTok{:} \StringTok{"v1"}\FunctionTok{,} \DataTypeTok{"apiFullVersion"}\FunctionTok{:} \StringTok{"1.2.0"}\FunctionTok{\}}\OtherTok{]}\FunctionTok{,}
+      \DataTypeTok{"scheme"}\FunctionTok{:} \StringTok{"https"}\FunctionTok{,}
+      \DataTypeTok{"nfServiceStatus"}\FunctionTok{:} \StringTok{"REGISTERED"}\FunctionTok{,}
+      \DataTypeTok{"capacity"}\FunctionTok{:} \DecValTok{100}\FunctionTok{,}
+      \DataTypeTok{"load"}\FunctionTok{:} \DecValTok{25}\FunctionTok{,}
+      \DataTypeTok{"priority"}\FunctionTok{:} \DecValTok{1}
+    \FunctionTok{\}}
+  \OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"smfInfo"}\FunctionTok{:} \FunctionTok{\{}
+    \DataTypeTok{"sNssaiSmfInfoList"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"sNssai"}\FunctionTok{:} \FunctionTok{\{}\DataTypeTok{"sst"}\FunctionTok{:} \DecValTok{1}\FunctionTok{\},} \DataTypeTok{"dnnSmfInfoList"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"dnn"}\FunctionTok{:} \StringTok{"internet"}\FunctionTok{\}}\OtherTok{]}\FunctionTok{\}}\OtherTok{]}
+  \FunctionTok{\},}
+  \DataTypeTok{"capacity"}\FunctionTok{:} \DecValTok{100}\FunctionTok{,}
+  \DataTypeTok{"load"}\FunctionTok{:} \DecValTok{25}\FunctionTok{,}
+  \DataTypeTok{"locality"}\FunctionTok{:} \StringTok{"DC{-}East{-}1"}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{پروفایل \lr{\mbox{NF}} شامل موارد زیر است:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{نوع \lr{\mbox{NF}}} \lr{—} چه نوع \lr{\mbox{NF}} (\lr{\mbox{AMF}}، \lr{\mbox{SMF}}، \lr{\mbox{PCF}} و غیره)
+\item
+  \textbf{خدمات ارایه‌شده} \lr{—} فهرست نام‌ها و نسخه‌های خدمات
+\item
+  \textbf{ظرفیت} \lr{—} ظرفیت نسبی برای توازن بار \CNnum{(0-65535)}
+\item
+  \textbf{بار} \lr{—} درصد بار فعلی \CNnum{(0-100)}
+\item
+  \textbf{محلیت} \lr{—} مکان جغرافیایی/\allowbreak{}مرکز داده برای انتخاب مبتنی بر نزدیکی
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{PLMN}}}}} \lr{—} این \lr{\mbox{NF}} به کدام شبکه‌ها خدمات می‌دهد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{S-NSSAI}}}}} \lr{—} این \lr{\mbox{NF}} از کدام برش‌ها پشتیبانی می‌کند
+\item
+  \lr{\textbf{\lr{IP/\allowbreak{}FQDN}}} \lr{—} چگونه به این \lr{\mbox{NF}} دسترسی یابیم
+\end{itemize}
+
+\CNsubsection{4.2}{کشف \lr{\mbox{NF}}}
+
+وقتی یک \lr{\mbox{NF}} به خدمتی نیاز دارد، از \lr{\mbox{NRF}} پرس‌وجو می‌کند:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+GET /nnrf-disc/v1/nf-instances?target-nf-type=SMF&requester-nf-type=AMF&snssai={"sst":1,"sd":"000001"}&dnn=internet
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{پارامترهای پرس‌وجوی کشف:}\CNbr{}\lr{\textbar{}} پارامتر \lr{\textbar{}} هدف \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{} \CNcode{target-nf-type} \textbar{}} نوع \lr{\mbox{NF}} مورد جستجو (اجباری) \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{requester-nf-type} \textbar{}} نوع \lr{\mbox{NF}} درخواست‌کننده (اجباری) \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{service-names} \textbar{}} خدمات مشخص مورد نیاز \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{} \CNcode{snssai} \textbar{}}} فیلتر برش شبکه \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{} \CNcode{dnn} \textbar{}}} فیلتر نام شبکه داده \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{} \CNcode{tai} \textbar{}}} ناحیه ردیابی برای محلیت \lr{\textbar{}}\CNbr{}\lr{\textbar{} \CNcode{preferred-locality} \textbar{}} ترجیح \lr{\mbox{NF}}ها در همان مرکز داده \lr{\textbar{}}
+
+\textbf{\lr{\mbox{NRF}} بازمی‌گرداند:} فهرست رتبه‌بندی‌شده نمونه‌های \lr{\mbox{NF}} منطبق با نقاط انتهایی و اطلاعات بار.
+
+\CNsubsection{4.3}{اعلان وضعیت \lr{\mbox{NF}}}
+
+\lr{\mbox{NF}}ها می‌توانند در \lr{\mbox{NRF}} برای رویدادهای وضعیت \textbf{اشتراک} کنند:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{NF}} ثبت‌نام شد /\allowbreak{} لغو ثبت‌نام شد
+\item
+  پروفایل \lr{\mbox{NF}} تغییر کرد (بار، ظرفیت)
+\item
+  وضعیت خدمات \lr{\mbox{NF}} تغییر کرد
+\end{itemize}
+
+این موارد را ممکن می‌سازد:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{AMF}}}}} هنگام در دسترس قرار گرفتن \lr{\mbox{SMF}}های جدید مطلع شود
+\item
+  \textbf{متعادل‌کننده‌های بار} هنگام تغییر بار \lr{\mbox{NF}} مسیریابی را به‌روزرسانی کنند
+\item
+  \textbf{تشخیص خطا} هنگام انقضای ضربان \lr{\mbox{NF}}
+\end{itemize}
+
+\CNkeepfig{m18-nrf-discovery}{3}
+
+\CNsubsection{}{نمودار جریان کشف \lr{\mbox{NF}}}
+
+\CNfigure{m18-nrf-discovery}{ثبت، کشف و اشتراک \lr{\mbox{NF}} از طریق \lr{\mbox{NRF}}}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{جریان کشف و ارتباط خدمات}
+
+\CNchained\CNsubsection{5.1}{ارتباط مستقیم}
+
+در \textbf{مدل مستقیم}، \lr{\mbox{NF-A}} پس از کشف مستقیماً با \lr{\mbox{NF-B}} ارتباط برقرار می‌کند:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+1. NF-A → NRF: "Find me an SMF for slice 1, DNN internet"
+2. NRF → NF-A: "Here are 3 SMFs: SMF-1 (load=20%), SMF-2 (load=45%), SMF-3 (load=80%)"
+3. NF-A selects SMF-1 (lowest load)
+4. NF-A → SMF-1: Direct service request
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{مزایا:} تأخیر کم (بدون گام واسطه)، ساده\CNbr{}\textbf{معایب:} \lr{\mbox{NF-A}} باید منطق توازن بار، تلاش مجدد و تغییر مسیر را مدیریت کند
+
+\CNkeepfig{m18-scp}{5}
+
+\CNsubsection{5.2}{ارتباط غیرمستقیم از طریق \lr{\mbox{SCP}}}
+
+\textbf{عامل ارتباط خدمات \lr{\mbox{(SCP)}}} به‌عنوان واسطه عمل می‌کند:
+
+\CNfigure{m18-scp}{ارتباط غیرمستقیم از طریق \lr{\mbox{SCP}}}
+
+\textbf{\lr{\mbox{SCP}} فراهم می‌کند:}
+
+\begin{itemize}
+\tightlist
+\item
+  کشف واگذارشده (\lr{\mbox{SCP}} به‌جای \lr{\mbox{NF-A}} از \lr{\mbox{NRF}} پرس‌وجو می‌کند)
+\item
+  توازن بار در بین نمونه‌های \lr{\mbox{NF-B}}
+\item
+  مسیریابی پیام و پنهان‌سازی توپولوژی
+\item
+  منطق تلاش مجدد و تغییر مسیر
+\item
+  پایش و دیدپذیری
+\item
+  استخرسازی اتصال
+\end{itemize}
+
+\textbf{مدل‌های ارتباطی \lr{(3GPP TS 23.501)}:}\CNbr{}\lr{\textbar{}} مدل \lr{\textbar{}} کشف \lr{\textbar{}} مسیریابی \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—\textbar{}—\textbar{}—\textbar{}}}\CNbr{}\lr{\textbar{}} مدل \lr{\mbox{A \textbar{} NF-A}} از طریق \lr{\mbox{NRF}} \lr{\textbar{}} مستقیم \lr{NF-A \ensuremath{\to} NF-B} \lr{\textbar{}}\CNbr{}\lr{\textbar{}} مدل \lr{\mbox{B \textbar{} NF-A}} از طریق \lr{\mbox{NRF}} \lr{\textbar{}} از طریق \lr{SCP (NF-A \ensuremath{\to} SCP \ensuremath{\to} NF-B)} \lr{\textbar{}}\CNbr{}\lr{\textbar{}} مدل \lr{\mbox{C}} \lr{\textbar{}} واگذارشده به \lr{\mbox{SCP}} \lr{\textbar{}} از طریق \lr{SCP (NF-A \ensuremath{\to} SCP \ensuremath{\to} NF-B)} \lr{\textbar{}}\CNbr{}\lr{\textbar{}} مدل \lr{\mbox{D}} \lr{\textbar{}} واگذارشده به \lr{\mbox{SCP}} \lr{\textbar{}} مستقیم \lr{NF-A \ensuremath{\to} NF-B} \lr{\textbar{}}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m18-sbi-stack}{8}
+
+\CNsection{6}{پشته پروتکل \lr{\mbox{SBI}}}
+
+\CNchained\CNsubsection{}{پشته پروتکل کامل}
+
+\CNfigure{m18-sbi-stack}{پشته پروتکل \lr{\mbox{SBI}}}
+
+\CNsubsection{}{\lr{OAuth 2.0} برای مجوزدهی \lr{\mbox{NF}}}
+
+پیش از آنکه \lr{\mbox{NF-A}} بتواند خدمت \lr{\mbox{NF-B}} را فراخوانی کند، باید یک \textbf{نشانه دسترسی} از \lr{\mbox{NRF}} دریافت کند:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+1. NF-A → NRF: POST /oauth2/token
+   {
+     "grant_type": "client_credentials",
+     "nfInstanceId": "{NF-A ID}",
+     "nfType": "AMF",
+     "targetNfType": "SMF",
+     "scope": "nsmf-pdusession"
+   }
+   
+2. NRF → NF-A: Access Token (JWT)
+   {
+     "access_token": "eyJ...",
+     "token_type": "Bearer",
+     "expires_in": 3600,
+     "scope": "nsmf-pdusession"
+   }
+
+3. NF-A → NF-B: Service Request + Authorization: Bearer eyJ...
+4. NF-B validates the token (signature, expiry, scope)
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m18-epc-vs-sba}{8}
+
+\CNsection{7}{مقایسه: واسط‌های \lr{\mbox{EPC}} در برابر \lr{\mbox{SBA}} در \lr{\mbox{5G}}}
+
+\CNchained\CNsubsection{}{نمودار مقایسه \lr{\mbox{EPC}} با \lr{\mbox{SBA}}}
+
+\CNfigure{m18-epc-vs-sba}{واسط‌های نقطه‌به‌نقطه \lr{\mbox{EPC}} در برابر گذرگاه \lr{\mbox{SBA}}}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{جدول مقایسه تفصیلی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{EPC}} در \lr{\mbox{4G}}} & \CNth{\lr{\mbox{SBA}} در \lr{\mbox{5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{معماری} & نقاط مرجع نقطه-به-نقطه & واسط‌های خدمات‌محور روی گذرگاه مشترک \\
+\textbf{پروتکل‌ها} & \lr{\mbox{Diameter}}، \lr{\mbox{GTP-C}}، \lr{\mbox{S1AP}} (متعدد) & \lr{HTTP/\allowbreak{}2 + JSON} (یکپارچه) \\
+\textbf{جفت‌شدگی} & سخت \lr{—} هر جفت واسط یکتا دارد & سست \lr{—} چارچوب مشترک برای همه \\
+\textbf{افزودن \lr{\mbox{NF}} جدید} & تعریف واسط‌های جدید به همه همتاها & ثبت خدمات در \lr{\mbox{NRF}} \\
+\textbf{کشف} & پیکربندی ایستا & پویا از طریق \lr{\mbox{NRF}} \\
+\textbf{مقیاس‌پذیری} & مقیاس‌دهی کل عنصر یکپارچه & مقیاس‌دهی مستقل هر خدمت \lr{\mbox{NF}} \\
+\textbf{استقرار} & تجهیزات سخت‌افزاری /\allowbreak{} \lr{\mbox{VM}} & کانتینرهای بومی-ابر \lr{\mbox{(Kubernetes)}} \\
+\textbf{حالت} & عناصر شبکه حالت‌دار & \lr{\mbox{NF}}های بدون حالت (حالت خارجی‌سازی‌شده) \\
+\textbf{افزونگی} & جفت‌های فعال-آماده & مقیاس‌پذیری افقی + انتخاب مجدد \lr{\mbox{NRF}} \\
+\textbf{توازن بار} & مبتنی بر \lr{\mbox{DNS}} یا ایستا & مبتنی بر \lr{\mbox{NRF}} (ظرفیت، بار، محلیت) \\
+\textbf{مجوزدهی} & \lr{\mbox{TLS}} گام-به-گام & نشانه‌های \lr{OAuth 2.0} سرتاسری \\
+\textbf{تعریف \lr{\mbox{API}}} & \lr{ASN.1/\allowbreak{}XML} اختصاصی \lr{\mbox{3GPP}} & \lr{OpenAPI 3.0} (استاندارد صنعت) \\
+\textbf{قابلیت توسعه} & نسخه جدید = واسط‌های جدید & خدمات جدید به‌صورت پویا ثبت می‌شوند \\
+\textbf{اکوسیستم سازندگان} & سازندگان مختص مخابرات & سازندگان ابر/\allowbreak{}\lr{\mbox{IT}} می‌توانند مشارکت کنند \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{نگاشت عملکردی: \lr{\mbox{EPC \ensuremath{\to} 5G}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنصر \lr{\mbox{EPC}}} & \CNth{معادل در \lr{\mbox{5G}}} & \CNth{تفاوت کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{MME}} & \lr{AMF + SMF} & جداسازی دسترسی/\allowbreak{}تحرک از مدیریت نشست \\
+\lr{S-GW + P-GW} & \lr{\mbox{UPF}} & ساده‌شده به یک عنصر صفحه کاربر واحد \\
+\lr{\mbox{HSS}} & \lr{UDM + AUSF} & جداسازی ذخیره‌سازی داده از احراز هویت \\
+\lr{\mbox{PCRF}} & \lr{\mbox{PCF}} & همان نقش، اکنون روی \lr{\mbox{SBI}} \\
+\lr{—} (جدید) & \lr{\mbox{NRF}} & ثبت خدمات (بدون معادل در \lr{\mbox{EPC}}!) \\
+\lr{—} (جدید) & \lr{\mbox{NSSF}} & انتخاب برش (بدون شبکه‌بندی در \lr{\mbox{4G}}) \\
+\lr{—} (جدید) & \lr{\mbox{NEF}} & جایگزین \lr{\mbox{SCEF}} با نمایش \lr{\mbox{API}} غنی‌تر \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsection{}{خلاصه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مفهوم} & \CNth{نکته کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{انگیزه \lr{\mbox{SBA}}} & واسط‌های \lr{N\ensuremath{\times}(N-1)/\allowbreak{}2} در \lr{\mbox{EPC}} مقیاس‌پذیر نیستند؛ \lr{\mbox{SBA}} از گذرگاه مشترک استفاده می‌کند \\
+\textbf{اصول طراحی} & \lr{HTTP/\allowbreak{}2}، \lr{\mbox{JSON}}، \lr{\mbox{REST}}، میکروسرویس‌ها، بدون حالت \\
+\lr{\mbox{\textbf{\lr{\mbox{NRF}}}}} & قلب \lr{\mbox{SBA}} \lr{—} ثبت‌نام، کشف، مجوزدهی \\
+\textbf{ارتباط} & مستقیم \lr{\mbox{(NF\ensuremath{\to}NF)}} یا غیرمستقیم (از طریق \lr{\mbox{SCP}}) \\
+\textbf{امنیت} & \lr{\mbox{mTLS}} + نشانه‌های \lr{OAuth 2.0} از \lr{\mbox{NRF}} \\
+\textbf{تفاوت کلیدی} & \lr{\mbox{EPC}} = ایستا، سخت، یکپارچه؛ \lr{\mbox{SBA}} = پویا، انعطاف‌پذیر، بومی-ابر \\
+\end{longtable}
+}
+
+\CNboxsection{پرسش‌های مرور}
+
+\begin{CNbox}[unbreakable]{q}{پرسش‌های مرور}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  محاسبه کنید برای 8 عنصر \lr{\mbox{EPC}} چند واسط یکتا لازم است. \lr{\mbox{SBA}} چگونه این را حل می‌کند؟
+\item
+  چرا \lr{HTTP/\allowbreak{}2} بر \lr{HTTP/\allowbreak{}1.1} برای \lr{\mbox{SBI}} انتخاب شد؟
+\item
+  در حین ثبت‌نام \lr{\mbox{NRF}} چه اطلاعاتی در پروفایل \lr{\mbox{NF}} گنجانده می‌شود؟
+\item
+  چرا \lr{\mbox{UPF}} به گذرگاه \lr{\mbox{SBI}} متصل نیست؟
+\item
+  مدل‌های ارتباطی \lr{\mbox{B}} و \lr{\mbox{C}} در \lr{\mbox{SCP}} را مقایسه کنید \lr{—} چه زمانی هر یک را استفاده می‌کنید؟
+\item
+  \lr{OAuth 2.0} در بستر \lr{\mbox{SBA}} در \lr{\mbox{5G}} چگونه کار می‌کند؟ \lr{\mbox{NRF}} چه نقشی دارد؟
+\item
+  یک اپراتور می‌خواهد یک \lr{\mbox{NF}} تحلیلی جدید \lr{\mbox{(NWDAF)}} اضافه کند. میزان تلاش را در معماری \lr{\mbox{EPC}} در برابر \lr{\mbox{SBA}} مقایسه کنید.
+\item
+  چرا \lr{\mbox{NRF}} به‌عنوان «تنها حیاتی‌ترین» مؤلفه \lr{\mbox{SBA}} در نظر گرفته می‌شود؟
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{مراجع}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{3GPP TS 23.501 — System Architecture for the 5G System (Stage 2)}
+\item
+  \lr{3GPP TS 23.502 — Procedures for the 5G System (Stage 2)}
+\item
+  \lr{3GPP TS 29.510 — NRF Services (Stage 3)}
+\item
+  \lr{3GPP TS 29.500 — Technical Realization of Service-Based Architecture}
+\item
+  \lr{3GPP TS 33.501 — Security Architecture and Procedures for 5G System}
+\end{itemize}

@@ -1,0 +1,11 @@
+% Module 21 — two-level slice-aware scheduling in the gNB MAC
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.4,-5.2) rectangle (11.4,1.0);
+\node[font=\sffamily\small\bfseries, text=CNink] at (5.5,0.65) {gNB MAC \CNL{scheduler}{زمان‌بند}};
+\node[CNhl, text width=2.6cm] (sla) at (1.6,-0.35) {\CNL{Slice SLA requirements}{نیازمندی‌های \lr{SLA} برش}};
+\node[CNcp, text width=3.2cm] (pool) at (7.4,-1.8) {\CNL{Resource pool}{مخزن منابع}\\{\scriptsize PRBs \CNL{per slot}{در هر شکاف}}};
+\draw[CNlink, ->] (sla.east) -| node[pos=0.25, above, CNtiny, align=center] {\CNL{inter-slice scheduler}{زمان‌بند بین برش‌ها}\\{\scriptsize (\CNL{allocates resources to slices}{تخصیص منابع به برش‌ها})}} (pool.north);
+\foreach \t/\x [count=\k] in {{\CNL{intra-slice (eMBB: proportional fair)}{زمان‌بندی درون‌برش (\lr{eMBB}: منصفانه تناسبی)}}/1.8, {\CNL{intra-slice (URLLC: EDF)}{زمان‌بندی درون‌برش (\lr{URLLC: EDF})}}/5.9, {\CNL{intra-slice (IoT)}{زمان‌بندی درون‌برش (\lr{IoT})}}/9.5}{
+  \node[CNran, text width=2.9cm, font=\sffamily\scriptsize] (i\k) at (\x,-4.2) {\t};
+  \draw[CNlink, ->] (pool.south) -- ++(0,-0.5) -| (i\k.north);}
+\end{tikzpicture}

@@ -1,0 +1,547 @@
+\Needspace{22\baselineskip}
+
+\CNsection{1}{چرا \lr{\mbox{NFV}}؟}
+
+شبکه‌های مخابراتی سنتی برای هر تابع شبکه بر \textbf{تجهیزات سخت‌افزاری اختصاصی} تکیه می‌کنند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مسیله} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{\lr{\mbox{CAPEX}} بالا} & هر تابع نیازمند سخت‌افزار اختصاصی و گران است (تجهیزات فایروال، متعادل‌کننده بار، جعبه \lr{\mbox{DPI}} و غیره) \\
+\textbf{\lr{\mbox{OPEX}} بالا} & توان، سرمایش، فضای رک، قراردادهای نگهداری سازنده برای هر تجهیز \\
+\textbf{مقیاس‌دهی کند} & ظرفیت بیشتر می‌خواهید؟ سخت‌افزار سفارش دهید، هفته‌ها منتظر تحویل بمانید، رک و پشته کنید، پیکربندی کنید \\
+\textbf{استفاده ناکافی} & سخت‌افزار برای بار اوج اندازه‌بندی می‌شود؛ استفاده میانگین اغلب \CNnum{20-30\%} است \\
+\textbf{وابستگی به سازنده} & قفل‌شدن در چرخه عمر سخت‌افزار، زمان‌بندی ارتقا و قیمت‌گذاری سازنده \\
+\textbf{استقرار سخت} & نمی‌توان به‌راحتی توابع را جابه‌جا، تغییر اندازه یا در صورت نیاز تکثیر کرد \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{بینش اصلی}: اگر توابع شبکه (فایروال، مسیریاب، متعادل‌کننده بار) فقط نرم‌افزار هستند، چرا آن‌ها را روی سرورهای استاندارد به‌عنوان \lr{\mbox{VM}} یا کانتینر اجرا نکنیم؟
+
+\end{CNquote}
+
+\textbf{\lr{\mbox{NFV}} توسط گروهی از اپراتورهای مخابراتی (\lr{\mbox{AT\&T}}، \lr{\mbox{BT}}، \lr{Deutsche Telekom} و غیره) آغاز شد که در سال 2012 مقاله سفید \lr{\mbox{NFV}} سازمان \lr{\mbox{ETSI}} را منتشر کردند.}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m16-traditional}{8}
+
+\CNsection{2}{مقایسه سنتی با \lr{\mbox{NFV}}}
+
+\CNchained\CNsubsection{}{رویکرد سنتی}
+
+\CNfigure{m16-traditional}{رویکرد سنتی: یک تجهیز اختصاصی برای هر تابع}
+
+\CNkeepfig{m16-nfv-approach}{3}
+
+\CNsubsection{}{رویکرد \lr{\mbox{NFV}}}
+
+\CNfigure{m16-nfv-approach}{رویکرد \lr{\mbox{NFV}}: توابع مجازی روی سخت‌افزار تجاری مشترک}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3077}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1923}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{سنتی} & \CNth{\lr{\mbox{NFV}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+سخت‌افزار & اختصاصی، با هدف خاص & سرورهای \lr{\mbox{COTS}} (تجاری آماده) \\
+نرم‌افزار & تعبیه‌شده در تجهیز & جدا شده، به‌عنوان \lr{\mbox{VM}}/\allowbreak{}کانتینر اجرا می‌شود \\
+مقیاس‌دهی & سخت‌افزار بیشتر بخرید & نمونه‌های بیشتر راه‌اندازی کنید (دقیقه‌ها) \\
+هزینه & \lr{CAPEX + OPEX} بالا & کمتر (سخت‌افزار عمومی + مجوزهای نرم‌افزار) \\
+انعطاف‌پذیری & عملکرد ثابت & هر تابع روی هر سرور \\
+چرخه عمر & نوسازی سخت‌افزار \CNnum{5-7} ساله & به‌روزرسانی‌های پیوسته نرم‌افزار \\
+\end{longtable}
+}
+
+\CNkeepfig{m16-etsi-nfv}{5}
+
+\CNsection{3}{معماری \lr{\mbox{NFV}} سازمان \lr{\mbox{ETSI}}}
+
+\CNfigure{m16-etsi-nfv}{معماری مرجع \lr{\mbox{ETSI NFV}}}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{سه مؤلفه اصلی:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6471}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3529}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مؤلفه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{NFVI}}}}} & زیرساخت: سخت‌افزار + لایه مجازی‌سازی که \lr{\mbox{VNF}}ها را میزبانی می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{VNF}}}}} & پیاده‌سازی نرم‌افزاری یک تابع شبکه که روی \lr{\mbox{NFVI}} اجرا می‌شود \\
+\lr{\mbox{\textbf{\lr{\mbox{MANO}}}}} & مدیریت و هماهنگ‌سازی: چرخه عمر، منابع، زنجیره‌سازی سرویس \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsection{4}{زیرساخت \lr{NFV (NFVI)}}
+
+\lr{\mbox{NFVI}} محیطی را فراهم می‌کند که \lr{\mbox{VNF}}ها در آن اجرا می‌شوند.
+
+\CNsubsection{4.1}{منابع سخت‌افزاری}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{منبع} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{محاسبه} & \lr{\mbox{CPU}}های \lr{x86/\allowbreak{}ARM}، شتاب‌دهنده‌های \lr{\mbox{GPU}}، توپولوژی \lr{\mbox{NUMA}} \\
+\textbf{ذخیره‌سازی} & \lr{SSD/\allowbreak{}NVMe} محلی، \lr{\mbox{SAN}}، ذخیره‌سازی توزیع‌شده \lr{\mbox{(Ceph)}} \\
+\textbf{شبکه} & کارت‌های شبکه \lr{(10/\allowbreak{}25/\allowbreak{}100G)}، \lr{\mbox{SmartNIC}}، سوییچ‌ها، توانمند \lr{\mbox{SR-IOV}} \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{4.2}{لایه مجازی‌سازی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4800}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5200}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فناوری} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{Hypervisor}}}}} & \lr{\mbox{KVM}}، \lr{VMware ESXi}، \lr{\mbox{Xen — VM}}ها را ایجاد می‌کند \\
+\textbf{زمان اجرا کانتینر} & \lr{\mbox{Docker}}، \lr{\mbox{containerd}}، \lr{\mbox{CRI-O}} \lr{—} کانتینرها را ایجاد می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{Kubernetes}}}}} & پلتفرم هماهنگ‌سازی کانتینر (برای \lr{\mbox{CNF}}ها) \\
+\end{longtable}
+}
+
+\CNsubsection{4.3}{سرورهای \lr{\mbox{COTS}}}
+
+\begin{itemize}
+\tightlist
+\item
+  سرورهای \textbf{تجاری آماده} (\lr{\mbox{Dell}}، \lr{\mbox{HP}}، \lr{\mbox{Supermicro}})
+\item
+  معماری استاندارد \lr{\mbox{x86}} \lr{—} بدون سخت‌افزار اختصاصی
+\item
+  پرحجم، قیمت‌گذاری رقابتی
+\item
+  عملکرد تقویت‌شده با: \lr{\mbox{SR-IOV}}، \lr{\mbox{DPDK}}، صفحات بزرگ، پین‌کردن \lr{\mbox{CPU}}، آگاهی از \lr{\mbox{NUMA}}
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{4.4}{فناوری‌های شتاب‌دهی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فناوری} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{SR-IOV}}}}} & دور زدن \lr{\mbox{hypervisor}} برای دسترسی مستقیم به \lr{\mbox{NIC}} (تأخیر کم) \\
+\lr{\mbox{\textbf{\lr{\mbox{DPDK}}}}} & پردازش بسته در فضای کاربر (دور زدن هسته) \\
+\lr{\textbf{\lr{SmartNIC/\allowbreak{}DPU}}} & تخلیه شبکه به سخت‌افزار \lr{\mbox{NIC}} \\
+\lr{\mbox{\textbf{\lr{\mbox{FPGA}}}}} & شتاب‌دهی سخت‌افزاری قابل برنامه‌ریزی \\
+\textbf{صفحات بزرگ} & کاهش خطاهای \lr{\mbox{TLB}} برای بارهای پرتوان‌عملیات \\
+\end{longtable}
+}
+
+\CNkeepfig{m16-vnf-vs-cnf}{5}
+
+\CNsection{5}{\lr{\mbox{VNF}} در برابر \lr{\mbox{CNF}}}
+
+\CNfigure{m16-vnf-vs-cnf}{\lr{\mbox{VNF}} (ماشین‌های مجازی) در برابر \lr{\mbox{CNF}} (کانتینرها)}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{مقایسه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1739}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3478}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4783}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{VNF}} (مبتنی بر \lr{\mbox{VM}})} & \CNth{\lr{\mbox{CNF}} (مبتنی بر کانتینر)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{زمان اجرا} & \lr{\mbox{Hypervisor}} (\lr{\mbox{KVM}}، \lr{\mbox{VMware}}) & زمان اجرا کانتینر \lr{\mbox{(K8s)}} \\
+\textbf{اندازه} & گیگابایت (تصویر کامل \lr{\mbox{OS}}) & مگابایت (هسته مشترک) \\
+\textbf{زمان راه‌اندازی} & دقیقه‌ها & ثانیه‌ها \\
+\textbf{معماری} & یکپارچه & میکروسرویس‌ها \\
+\textbf{حالت} & حالت‌دار (حالت محلی در \lr{\mbox{VM}}) & بدون حالت (مخزن حالت خارجی) \\
+\textbf{مقیاس‌دهی} & عمودی (\lr{\mbox{VM}} بزرگ‌تر) یا افقی کند & افقی سریع (تکثیرها) \\
+\textbf{به‌روزرسانی‌ها} & مخرب (راه‌اندازی مجدد \lr{\mbox{VM}}) & به‌روزرسانی‌های غلتان، کاناری \\
+\textbf{چرخه عمر} & \lr{\mbox{VNFM}} مدیریت می‌کند & \lr{\mbox{Kubernetes}} مدیریت می‌کند (\lr{\mbox{Helm}}، \lr{\mbox{Operators}}) \\
+\textbf{چگالی} & پایین (\lr{\mbox{VM}}های کم در هر سرور) & بالا (صدها کانتینر) \\
+\lr{\textbf{\lr{CI/\allowbreak{}CD}}} & دشوار & بومی (\lr{\mbox{GitOps}}، خطوط لوله) \\
+\end{longtable}
+}
+
+\CNsubsection{}{هسته \lr{\mbox{5G = CNF}}ها}
+
+هسته \lr{\mbox{5G}} گروه \lr{3GPP (5GC)} به‌عنوان یک \textbf{معماری خدمات‌محور \lr{\mbox{(SBA)}}} با اصول بومی-ابر طراحی شده است:
+
+\begin{itemize}
+\tightlist
+\item
+  هر تابع شبکه (\lr{\mbox{AMF}}، \lr{\mbox{SMF}}، \lr{\mbox{UPF}}، \lr{\mbox{NRF}} و غیره) یک \lr{\mbox{\textbf{\lr{\mbox{CNF}}}}} است
+\item
+  روی \lr{\mbox{\textbf{\lr{\mbox{Kubernetes}}}}} مستقر می‌شود
+\item
+  از طریق \textbf{\lr{HTTP/\allowbreak{}2 + API}های \lr{\mbox{REST}}} ارتباط برقرار می‌کند
+\item
+  طراحی بدون حالت با مخازن داده خارجی (مثلاً \lr{\mbox{UDSF}})
+\item
+  مقیاس‌پذیری افقی، ارتقاهای غلتان، خود-ترمیمی
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{22\baselineskip}
+
+\CNsection{6}{\lr{\mbox{MANO}} (مدیریت و هماهنگ‌سازی)}
+
+\CNchained\CNsubsection{6.1}{\lr{\mbox{NFVO}} (هماهنگ‌ساز \lr{\mbox{NFV}})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هماهنگ‌سازی سرویس} & خدمات شبکه سرتاسری را از چندین \lr{\mbox{VNF}} ترکیب می‌کند \\
+\textbf{مدیریت چرخه عمر} & سرویس‌ها را وارد، نمونه‌سازی، مقیاس‌دهی، به‌روزرسانی و خاتمه می‌دهد \\
+\textbf{هماهنگی منابع} & منابع را از \lr{\mbox{VIM}} در چندین مرکز داده درخواست می‌کند \\
+\textbf{مدیریت فهرست} & \lr{\mbox{NSD}} (توصیف‌گرهای سرویس شبکه) و بسته‌های \lr{\mbox{VNF}} را ذخیره می‌کند \\
+\textbf{مدیریت سیاست} & قواعد مکان‌یابی، هم‌بستگی، ضد-هم‌بستگی \\
+\end{longtable}
+}
+
+نمونه‌ها: \lr{\mbox{ONAP}}، \lr{\mbox{OSM}} (\lr{\mbox{MANO}} متن‌باز)، \lr{\mbox{Cloudify}}، \lr{Nokia CloudBand}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{6.2}{\lr{\mbox{VNFM}} (مدیر \lr{\mbox{VNF}})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{نمونه‌سازی} & \lr{\mbox{VNF}} را از بسته مستقر می‌کند (تصویر + توصیف‌گر) \\
+\textbf{مقیاس‌دهی} & مقیاس‌دهی بیرونی (افزودن نمونه) یا درونی (حذف) \\
+\textbf{ترمیم} & شکست را تشخیص می‌دهد و نمونه‌های \lr{\mbox{VNF}} را دوباره راه‌اندازی/\allowbreak{}جایگزین می‌کند \\
+\textbf{خاتمه} & خاموشی تدریجی و آزادسازی منابع \\
+\textbf{به‌روزرسانی/\allowbreak{}ارتقا} & اعمال نسخه نرم‌افزاری جدید \\
+\textbf{پیکربندی} & پیکربندی روز-0 (اولیه)، روز-1 (سرویس)، روز-2 (عملیاتی) \\
+\end{longtable}
+}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{6.3}{\lr{\mbox{VIM}} (مدیر زیرساخت مجازی)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{مدیریت محاسبه} & ایجاد/\allowbreak{}حذف \lr{\mbox{VM}}ها یا کانتینرها، تخصیص \lr{\mbox{CPU}}/\allowbreak{}حافظه \\
+\textbf{مدیریت شبکه} & شبکه‌های مجازی، زیرشبکه‌ها، پورت‌ها، گروه‌های امنیتی \\
+\textbf{مدیریت ذخیره‌سازی} & حجم‌ها، عکس‌های لحظه‌ای، ذخیره‌سازی شییی \\
+\textbf{پایش منابع} & استفاده، ظرفیت، هشدارها \\
+\end{longtable}
+}
+
+نمونه‌ها:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{OpenStack}}}}} \lr{—} رایج‌ترین \lr{\mbox{VIM}} برای \lr{\mbox{VNF}}ها (\lr{\mbox{Nova}}، \lr{\mbox{Neutron}}، \lr{\mbox{Cinder}})
+\item
+  \lr{\textbf{\lr{\mbox{Kubernetes}}} — VIM} برای \lr{\mbox{CNF}}ها (هماهنگ‌سازی بومی کانتینر)
+\item
+  \lr{\textbf{\lr{VMware vCenter}}} \lr{—} مجازی‌سازی سازمانی
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{7}{\lr{\mbox{NFV}} در مخابرات (مثال‌های واقعی)}
+
+\CNchained\CNsubsection{7.1}{\lr{\mbox{vEPC}} (هسته بسته تکامل‌یافته مجازی‌شده)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مؤلفه} & \CNth{سنتی} & \CNth{مجازی‌شده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{MME}} & شاسی اختصاصی & \lr{\mbox{VM}} اجراکننده نرم‌افزار \lr{\mbox{MME}} \\
+\lr{\mbox{S-GW}} & تجهیز اختصاصی & \lr{\mbox{VM}}/\allowbreak{}کانتینر با منطق \lr{\mbox{S-GW}} \\
+\lr{\mbox{P-GW}} & تجهیز اختصاصی & \lr{\mbox{VM}}/\allowbreak{}کانتینر با منطق \lr{\mbox{P-GW}} \\
+\lr{\mbox{HSS}} & سرور اختصاصی & \lr{\mbox{VM}} با پایگاه داده \\
+\end{longtable}
+}
+
+مزایا: مقیاس‌دهی مستقل \lr{\mbox{MME}} در حین رویدادهای انبوه، استقرار نمونه‌های منطقه‌ای
+
+\CNsubsection{7.2}{\lr{\mbox{vIMS}} (زیرسیستم چندرسانه‌ای \lr{\mbox{IP}} مجازی‌شده)}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{P-CSCF}}، \lr{\mbox{S-CSCF}}، \lr{\mbox{I-CSCF}} به‌عنوان \lr{\mbox{VNF}}
+\item
+  مقیاس‌دهی ظرفیت صدا/\allowbreak{}ویدیو بر اساس تقاضا
+\item
+  استقرار در بازارهای جدید بدون ارسال سخت‌افزار
+\end{itemize}
+
+\CNkeepfig{m16-k8s-5gc}{3}
+
+\CNsubsection{7.3}{هسته \lr{\mbox{5G}} به‌عنوان \lr{\mbox{CNF}} روی \lr{\mbox{Kubernetes}}}
+
+\CNfigure{m16-k8s-5gc}{توابع هسته \lr{\mbox{5G}} به صورت \lr{\mbox{CNF}} روی \lr{\mbox{Kubernetes}}}
+
+\begin{itemize}
+\tightlist
+\item
+  هر \lr{\mbox{NF}} در \lr{\mbox{5G}} یک استقرار \lr{\mbox{Kubernetes}} با چندین تکثیر است
+\item
+  نمودارهای \lr{\mbox{Helm}} یا \lr{\mbox{Operators}} چرخه عمر را مدیریت می‌کنند
+\item
+  خطوط لوله \lr{\mbox{GitOps}} برای \lr{CI/\allowbreak{}CD}
+\item
+  \lr{Horizontal Pod Autoscaler} برای مقیاس‌دهی پویا
+\end{itemize}
+
+\CNkeepfig{m16-evolution}{5}
+
+\CNsection{8}{تحول: فیزیکی \ensuremath{\leftarrow} مجازی \ensuremath{\leftarrow} بومی-ابر}
+
+\CNfigure{m16-evolution}{از تجهیزات فیزیکی تا توابع بومی ابر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2069}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2241}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2586}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1552}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1552}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسل} & \CNth{شکل} & \CNth{هماهنگ‌سازی} & \CNth{مقیاس‌دهی} & \CNth{به‌روزرسانی‌ها} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{فیزیکی} & تجهیز اختصاصی & دستی /\allowbreak{} \lr{\mbox{NMS}} & خرید سخت‌افزار & ارتقای فرم‌ور (زمان توقف) \\
+\textbf{مجازی \lr{\mbox{(VNF)}}} & \lr{\mbox{VM}} روی \lr{\mbox{hypervisor}} & \lr{MANO (NFVO/\allowbreak{}VNFM)} & \lr{\mbox{VM}}های جدید (دقیقه‌ها) & جایگزینی تصویر \lr{\mbox{VM}} \\
+\textbf{بومی-ابر \lr{\mbox{(CNF)}}} & کانتینر روی \lr{\mbox{K8s}} & \lr{Kubernetes + GitOps} & تکثیرهای \lr{\mbox{Pod}} (ثانیه‌ها) & غلتان /\allowbreak{} کاناری /\allowbreak{} آبی-سبز \\
+\end{longtable}
+}
+
+\CNsubsection{}{چرا صنعت به‌سمت \lr{\mbox{CNF}} حرکت کرد:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{مقیاس‌دهی سریع‌تر}: ثانیه‌ها در برابر دقیقه‌ها
+\item
+  \textbf{چگالی بالاتر}: توابع بیشتر در هر سرور
+\item
+  \textbf{بومی \lr{\mbox{DevOps}}}: \lr{CI/\allowbreak{}CD}، \lr{\mbox{GitOps}}، آزمون خودکار
+\item
+  \textbf{تاب‌آوری}: خود-ترمیمی، طراحی بدون حالت
+\item
+  \textbf{قابلیت حمل}: اجرا در هر جایی که \lr{\mbox{Kubernetes}} اجرا می‌شود (درون-محل، ابر عمومی، لبه)
+\end{enumerate}
+
+\Needspace{26\baselineskip}
+
+\CNsection{9}{مزایای \lr{\mbox{NFV}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مزیت} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{انعطاف‌پذیری} & استقرار هر تابع روی هر سرور؛ جابه‌جایی بارهای کاری \\
+\textbf{مقیاس‌دهی کشسان} & مقیاس‌دهی بیرونی/\allowbreak{}درونی بر اساس تقاضا (مقیاس‌دهی خودکار) \\
+\textbf{چند-مستأجری} & چندین مستأجر زیرساخت را به‌صورت ایمن به اشتراک می‌گذارند \\
+\lr{\textbf{\lr{CI/\allowbreak{}CD}}} & یکپارچه‌سازی و استقرار پیوسته توابع شبکه \\
+\textbf{کاهش هزینه} & کاهش \CNnum{40-60\%} در \lr{\mbox{CAPEX}}، کاهش \CNnum{30-50\%} در \lr{\mbox{OPEX}} (برآوردهای صنعت) \\
+\textbf{سرعت به بازار} & خدمات جدید در روز/\allowbreak{}هفته در برابر ماه/\allowbreak{}سال \\
+\textbf{تنوع سازندگان} & ترکیب \lr{\mbox{VNF}}های سازندگان مختلف روی همان زیرساخت \\
+\textbf{انعطاف جغرافیایی} & استقرار در لبه، \lr{\mbox{DC}} منطقه‌ای، یا ابر مرکزی \\
+\textbf{کارایی منابع} & استفاده بهتر از طریق اشتراک‌گذاری و تخصیص پویا \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{10}{چالش‌های \lr{\mbox{NFV}}}
+
+\CNchained\CNsubsection{10.1}{عملکرد (پردازش بسته)}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{VM}}ها/\allowbreak{}کانتینرها در مقایسه با پردازش \lr{\mbox{ASIC}} برهنه سربار اضافه می‌کنند
+\item
+  \textbf{کاهش اثر}: \lr{\mbox{DPDK}}، \lr{\mbox{SR-IOV}}، \lr{\mbox{SmartNIC}}ها، پین‌کردن \lr{\mbox{CPU}}، صفحات بزرگ
+\item
+  \lr{\mbox{UPF}} و سایر \lr{\mbox{VNF}}های صفحه داده حساس‌ترین هستند
+\end{itemize}
+
+\CNsubsection{10.2}{پیچیدگی هماهنگ‌سازی}
+
+\begin{itemize}
+\tightlist
+\item
+  پشته \lr{\mbox{MANO}} برای استقرار و بهره‌برداری پیچیده است
+\item
+  مسایل هم‌کنش‌گری \lr{\mbox{VNF}} چند-سازنده
+\item
+  استانداردسازی توصیف‌گر همچنان در حال تحول است (\lr{\mbox{TOSCA}}، \lr{SOL001/\allowbreak{}006})
+\item
+  عملیات روز-2 (پایش، ترمیم، سیاست‌های مقیاس‌دهی) دشوار است
+\end{itemize}
+
+\CNsubsection{10.3}{مدیریت حالت}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{VNF}}ها اغلب به‌عنوان یکپارچه‌های حالت‌دار طراحی می‌شوند (منتقل‌شده از تجهیزات)
+\item
+  \lr{\mbox{VM}}های حالت‌دار برای مقیاس‌دهی افقی یا مهاجرت دشوار هستند
+\item
+  رویکرد \lr{\mbox{CNF}}: خارجی‌سازی حالت (\lr{\mbox{Redis}}، \lr{\mbox{etcd}}، پایگاه‌های داده)
+\item
+  چالش: تأخیر دسترسی به حالت خارجی برای توابع پرتوان‌عملیات
+\end{itemize}
+
+\CNsubsection{10.4}{قابلیت اطمینان و دسترس‌پذیری}
+
+\begin{itemize}
+\tightlist
+\item
+  شکست‌های نرم‌افزاری مکررتر از شکست‌های سخت‌افزاری هستند
+\item
+  نیازمند پایش سلامت مقاوم، خود-ترمیمی، افزونگی
+\item
+  دسترس‌پذیری در سطح حامل \CNnum{(99.999\%)} نیازمند طراحی دقیق است
+\end{itemize}
+
+\CNsubsection{10.5}{امنیت}
+
+\begin{itemize}
+\tightlist
+\item
+  سطح حمله بزرگ‌تر (\lr{\mbox{hypervisor}}، \lr{\mbox{API}}های هماهنگ‌سازی، زیرساخت مشترک)
+\item
+  جداسازی چند-مستأجری باید در چندین لایه اجرا شود
+\item
+  آسیب‌پذیری‌های فرار از کانتینر
+\end{itemize}
+
+\CNsubsection{10.6}{شکاف مهارتی}
+
+\begin{itemize}
+\tightlist
+\item
+  اپراتورها باید فناوری‌های ابری را بیاموزند (\lr{\mbox{OpenStack}}، \lr{\mbox{K8s}}، \lr{CI/\allowbreak{}CD})
+\item
+  همگرایی مخابرات + فناوری اطلاعات نیازمند مدل‌های سازمانی جدید است
+\end{itemize}
+
+\CNboxsection{نکات کلیدی}
+
+\begin{CNbox}[unbreakable]{sum}{نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{NFV}} توابع شبکه را \textbf{از سخت‌افزار اختصاصی جدا می‌کند} \ensuremath{\leftarrow} نرم‌افزار روی \lr{\mbox{COTS}}
+\item
+  معماری \lr{\mbox{NFV}} سازمان \lr{\mbox{ETSI}}: \lr{\textbf{\lr{NFVI + VNF + MANO}}}
+\item
+  \textbf{\lr{\mbox{VNF}}ها} (مبتنی بر \lr{\mbox{VM}}) با \textbf{\lr{\mbox{CNF}}ها} (مبتنی بر کانتینر، بومی-ابر) جایگزین می‌شوند
+\item
+  \textbf{هسته \lr{\mbox{5G}} از ابتدا به‌عنوان \lr{\mbox{CNF}}} روی \lr{\mbox{Kubernetes}} طراحی شده است
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MANO}}}}} کل چرخه عمر را هماهنگ می‌کند: نمونه‌سازی، مقیاس‌دهی، ترمیم، خاتمه
+\item
+  تحول: فیزیکی \ensuremath{\leftarrow} مجازی \lr{\mbox{(VNF)}} \ensuremath{\leftarrow} \textbf{بومی-ابر \lr{\mbox{(CNF)}}}
+\item
+  چالش‌های کلیدی: \textbf{عملکرد، پیچیدگی هماهنگ‌سازی و مدیریت حالت}
+\item
+  \lr{NFV + SDN} با هم \textbf{شبکه‌های مخابراتی کاملاً قابل برنامه‌ریزی و خودکار} را ممکن می‌سازند
+\end{enumerate}
+
+\end{CNbox}

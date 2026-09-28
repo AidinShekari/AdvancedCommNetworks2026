@@ -1,0 +1,736 @@
+\Needspace{19\baselineskip}
+
+\CNsection{1}{چرا شبکه‌بندی؟}
+
+شبکه‌های موبایل سنتی یک زیرساخت واحد و یکپارچه را مستقر می‌کنند که برای مدل خدمات «یک‌اندازه-برای-همه» طراحی شده است. با این حال، \lr{\mbox{5G}} باید به‌طور همزمان نیازمندی‌های کاملاً متفاوتی را برآورده کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2941}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3824}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3235}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مورد استفاده} & \CNth{نیازمندی} & \CNth{چالش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+پهن‌باند موبایل بهبودیافته \lr{\mbox{(eMBB)}} & توان عملیاتی بالا \lr{\mbox{(Gbps)}}، تأخیر متوسط & پرمصرف پهنای باند \\
+فوق‌قابل اعتماد کم-تأخیر \lr{\mbox{(URLLC)}} & تأخیر زیر \lr{\mbox{1ms}}، قابلیت اطمینان \CNnum{99.999\%} & تضمین‌های قطعی \\
+\lr{\mbox{IoT}} انبوه \lr{\mbox{(MIoT)}} & میلیون‌ها دستگاه/\allowbreak{}\lr{\mbox{km\textsuperscript{2}}}، توان فوق‌العاده کم & مقیاس و کارایی \\
+خودرو-به-همه‌چیز \lr{\mbox{(V2X)}} & تأخیر کم + قابلیت اطمینان بالا + تحرک & حیاتی برای ایمنی \\
+\end{longtable}
+}
+
+\textbf{شبکه‌بندی} این را با اجازه دادن به \textbf{یک شبکه فیزیکی} برای خدمت‌دهی به تمام این نیازمندی‌های متنوع به‌طور همزمان از طریق چندین شبکه منطقی حل می‌کند، که هر یک برای هدف خاص خود بهینه شده است.
+
+\textbf{محرک‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{کارایی اقتصادی}: اشتراک‌گذاری زیرساخت گران (طیف، برج‌ها، فیبر) در بین خدمات
+\item
+  \textbf{تمایز خدمات}: ارایه \lr{\mbox{SLA}}های متناسب به صنایع مختلف (خودروسازی، بهداشت، صنعت)
+\item
+  \textbf{چابکی عملیاتی}: استقرار خدمات جدید بدون ساخت شبکه‌های فیزیکی جدید
+\item
+  \textbf{چند-مستأجری}: امکان فعالیت \lr{\mbox{MVNO}}ها و شرکت‌ها در شبکه‌های مجازی جدا
+\end{itemize}
+
+\CNsection{2}{مفهوم شبکه‌بندی}
+
+یک \textbf{برش شبکه} یک شبکه منطقی کامل و سرتاسری است که بر پایه زیرساخت فیزیکی مشترک ساخته می‌شود.
+
+\CNsubsection{2.1}{دامنه سرتاسری}
+
+هر برش کل شبکه را در بر می‌گیرد:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{برش \lr{\mbox{RAN}}}: تخصیص منابع رادیویی، سیاست‌های زمان‌بندی، پیکربندی شکل‌دهی پرتو
+\item
+  \textbf{برش انتقال}: تضمین‌های پهنای باند، مسیرهای مسیریابی، کران‌های تأخیر در بک‌هال/\allowbreak{}مید‌هال
+\item
+  \textbf{برش هسته}: توابع شبکه اختصاصی یا مشترک (\lr{\mbox{SMF}}، \lr{\mbox{UPF}}، \lr{\mbox{PCF}} و غیره)
+\end{itemize}
+
+\CNsubsection{2.2}{جداسازی بین برش‌ها}
+
+سه بُعد جداسازی:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{جداسازی منابع}: طیف، محاسبه، ذخیره‌سازی و پهنای باند اختصاصی در هر برش
+\item
+  \textbf{جداسازی امنیتی}: زمینه‌های امنیتی جدا، سلسله‌مراتب کلید، کنترل‌های دسترسی
+\item
+  \textbf{جداسازی شکست}: یک خطا در یک برش به دیگری منتشر نمی‌شود
+\end{enumerate}
+
+\CNsubsection{2.3}{سفارشی‌سازی در هر برش}
+
+هر برش می‌تواند به‌طور مستقل سفارشی شود:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{توابع شبکه}: انتخاب کنید کدام \lr{\mbox{NF}}ها مستقر شوند (مثلاً \lr{\mbox{URLLC}} ممکن است از برخی \lr{\mbox{NF}}ها صرف‌نظر کند)
+\item
+  \textbf{توپولوژی}: مکان‌یابی \lr{\mbox{NF}}ها را تعریف کنید (مثلاً \lr{\mbox{UPF}} لبه برای \lr{\mbox{URLLC}})
+\item
+  \textbf{پارامترهای \lr{\mbox{QoS}}}: مقادیر \lr{\mbox{5QI}}، \lr{\mbox{AMBR}}، سطوح اولویت مختص برش را پیکربندی کنید
+\item
+  \textbf{سیاست‌ها}: صورت‌حساب، کنترل دسترسی و قواعد مدیریت تحرک مستقل
+\end{itemize}
+
+\CNfigure{m21-slice-layers}{برش‌های سرتاسری در \lr{\mbox{RAN}}، شبکه انتقال و هسته}
+
+\Needspace{14\baselineskip}
+
+\Needspace{21\baselineskip}
+
+\CNsection{3}{شناسایی برش}
+
+\CNchained\CNsubsection{3.1}{\lr{\mbox{S-NSSAI}} (اطلاعات کمکی انتخاب برش شبکه واحد)}
+
+شناسه بنیادی برای یک برش شبکه از دو مؤلفه تشکیل شده است:
+
+\CNdisplay{\CNmtext{S-NSSAI} = \mathrm{SST} + \mathrm{SD}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2692}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فیلد} & \CNth{اندازه} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{SST}}}}} (نوع برش/\allowbreak{}خدمات) & 8 بیت & رفتار مورد انتظار برش را نشان می‌دهد (ویژگی‌های خدمات) \\
+\lr{\mbox{\textbf{\lr{\mbox{SD}}}}} (تفکیک‌کننده برش) & 24 بیت (اختیاری) & بین برش‌های با \lr{\mbox{SST}} یکسان تمایز می‌گذارد (مثلاً مستأجران مختلف) \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{3.2}{مقادیر استاندارد \lr{\mbox{SST}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مقدار \lr{\mbox{SST}}} & \CNth{نوع برش} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{eMBB}} & پهن‌باند موبایل بهبودیافته \\
+2 & \lr{\mbox{URLLC}} & ارتباطات فوق‌قابل اعتماد کم-تأخیر \\
+3 & \lr{\mbox{MIoT}} & \lr{\mbox{IoT}} انبوه \\
+4 & \lr{\mbox{V2X}} & خودرو-به-همه‌چیز \\
+\lr{\mbox{5–127}} & رزروشده & برای استفاده استاندارد شده آینده \\
+\lr{\mbox{128–255}} & مختص اپراتور & انواع برش سفارشی \\
+\end{longtable}
+}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{3.3}{\lr{\mbox{NSSAI}} (اطلاعات کمکی انتخاب برش شبکه)}
+
+\lr{\mbox{\textbf{\lr{\mbox{NSSAI}}}}} = مجموعه‌ای از \lr{\mbox{S-NSSAI}}ها. چندین نوع \lr{\mbox{NSSAI}} در سیستم وجود دارد:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3429}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع \lr{\mbox{NSSAI}}} & \CNth{محل ذخیره} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{\lr{\mbox{NSSAI}} پیکربندی‌شده} & \lr{\mbox{UE}} (از \lr{\mbox{HPLMN}}) & تمام \lr{\mbox{S-NSSAI}}هایی که \lr{\mbox{UE}} به آن‌ها اشتراک دارد \\
+\textbf{\lr{\mbox{NSSAI}} درخواستی} & فرستاده‌شده توسط \lr{\mbox{UE}} در ثبت‌نام & \lr{\mbox{S-NSSAI}}هایی که \lr{\mbox{UE}} اکنون می‌خواهد استفاده کند \\
+\textbf{\lr{\mbox{NSSAI}} مجاز} & بازگردانده‌شده توسط شبکه & \lr{\mbox{S-NSSAI}}هایی که \lr{\mbox{UE}} مجاز به استفاده در \lr{\mbox{PLMN}} فعلی است \\
+\textbf{\lr{\mbox{NSSAI}} ردشده} & بازگردانده‌شده توسط شبکه & \lr{\mbox{S-NSSAI}}های ردشده (با علت رد) \\
+\textbf{\lr{\mbox{NSSAI}} در انتظار} & داخلی \lr{\mbox{AMF}} & \lr{\mbox{S-NSSAI}}هایی که نیازمند مجوزدهی اضافی هستند \\
+\end{longtable}
+}
+
+\CNsubsection{3.4}{مثال}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+UE Subscription:
+  Configured NSSAI = { S-NSSAI(SST=1), S-NSSAI(SST=1,SD=0x000001),
+                       S-NSSAI(SST=2), S-NSSAI(SST=3) }
+
+Registration Request:
+  Requested NSSAI = { S-NSSAI(SST=1), S-NSSAI(SST=2) }
+
+Network Response:
+  Allowed NSSAI = { S-NSSAI(SST=1), S-NSSAI(SST=2) }
+  Rejected NSSAI = {}
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNkeepfig{m21-slice-selection}{10}
+
+\CNsection{4}{انتخاب برش (نقش \lr{\mbox{NSSF}})}
+
+\textbf{تابع انتخاب برش شبکه \lr{\mbox{(NSSF)}}} همان \lr{\mbox{NF}} اختصاصی مسیول تعیین نمونه(های) برش شبکه مناسب برای یک \lr{\mbox{UE}} است.
+
+\CNsubsection{4.1}{رویه انتخاب برش}
+
+\CNfigure{m21-slice-selection}{انتخاب برش با \lr{\mbox{NSSF}} و تخصیص مجدد \lr{\mbox{AMF}}}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{4.2}{توابع \lr{\mbox{NSSF}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{انتخاب برش} & تعیین \lr{\mbox{NSSAI}} مجاز بر اساس اشتراک، سیاست‌های \lr{\mbox{PLMN}} و دسترسی‌پذیری \\
+\textbf{تعیین مجموعه \lr{\mbox{AMF}}} & شناسایی مجموعه \lr{\mbox{AMF}}های قادر به خدمات‌دهی به برش‌های انتخاب‌شده \\
+\textbf{تغییر مسیر \lr{\mbox{NRF}}} & فراهم کردن نقطه انتهایی \lr{\mbox{NRF}} برای کشف \lr{\mbox{NF}} مختص برش \\
+\textbf{پشتیبانی رومینگ} & نگاشت بین \lr{\mbox{S-NSSAI}}های \lr{\mbox{HPLMN}} و \lr{\mbox{VPLMN}} \\
+\end{longtable}
+}
+
+\CNsubsection{4.3}{ورودی‌های انتخاب برش}
+
+\lr{\mbox{NSSF}} موارد زیر را در نظر می‌گیرد:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{NSSAI}} درخواستی} از \lr{\mbox{UE}}
+\item
+  \textbf{\lr{\mbox{S-NSSAI}}های اشتراک‌شده} از \lr{\mbox{UDM}} (داده اشتراک)
+\item
+  \textbf{سیاست‌های \lr{\mbox{PLMN}}} (کدام برش‌ها در این ناحیه در دسترس هستند)
+\item
+  \textbf{ناحیه ردیابی} (دسترسی‌پذیری برش ممکن است بر اساس مکان متفاوت باشد)
+\item
+  \textbf{توافق‌نامه‌های رومینگ} (نگاشت بین برش‌های \lr{\mbox{PLMN}} خانگی و بازدیدشده)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m21-shared-dedicated}{8}
+
+\CNsection{5}{معماری برش}
+
+\CNchained\CNsubsection{5.1}{\lr{\mbox{NF}}های اختصاصی در برابر مشترک}
+
+\CNfigure{m21-shared-dedicated}{توابع شبکه مشترک و توابع ویژه هر برش}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{5.2}{مدل استقرار \lr{\mbox{NF}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.0952}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.6429}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2619}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{NF}}} & \CNth{معمولاً مشترک/\allowbreak{}اختصاصی} & \CNth{منطق} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{AMF}}}}} & مشترک (یا مجموعه در هر برش) & دسترسی اولیه برای همه \lr{\mbox{UE}}ها را مدیریت می‌کند؛ ممکن است مجموعه‌های \lr{\mbox{AMF}} مختص برش داشته باشد \\
+\lr{\mbox{\textbf{\lr{\mbox{NSSF}}}}} & مشترک & منطق انتخاب برش مرکزی \\
+\lr{\mbox{\textbf{\lr{\mbox{NRF}}}}} & مشترک (با کشف آگاه به برش) & ثبت \lr{\mbox{NF}}، از پرس‌وجوهای مبتنی بر برش پشتیبانی می‌کند \\
+\lr{\textbf{\lr{UDM/\allowbreak{}AUSF}}} & مشترک & اشتراک/\allowbreak{}احراز هویت در هر \lr{\mbox{UE}} است، نه در هر برش \\
+\lr{\mbox{\textbf{\lr{\mbox{SMF}}}}} & اختصاصی در هر برش & مدیریت نشست بین انواع برش به‌طور قابل توجهی متفاوت است \\
+\lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} & اختصاصی در هر برش & سفارشی‌سازی صفحه داده (لبه در برابر مرکزی، توان عملیاتی در برابر تأخیر) \\
+\lr{\mbox{\textbf{\lr{\mbox{PCF}}}}} & اختصاصی در هر برش & سیاست‌ها بین \lr{\mbox{eMBB}} و \lr{\mbox{URLLC}} به‌شدت متفاوت است \\
+\lr{\mbox{\textbf{\lr{\mbox{CHF}}}}} & اختصاصی یا مشترک & مدل‌های صورت‌حساب ممکن است در هر برش متفاوت باشد \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{5.3}{سفارشی‌سازی مختص برش}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1818}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2955}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2727}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{برش \lr{\mbox{eMBB}}} & \CNth{برش \lr{\mbox{URLLC}}} & \CNth{برش \lr{\mbox{MIoT}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{مکان \lr{\mbox{UPF}}} & \lr{\mbox{DC}} مرکزی & لبه \lr{\mbox{(MEC)}} & \lr{\mbox{DC}} مرکزی \\
+\textbf{اولویت \lr{\mbox{QoS}}} & متوسط \lr{\mbox{(5QI=9)}} & بالاترین \lr{(5QI=80-82)} & پایین \lr{\mbox{(5QI=79)}} \\
+\textbf{افزونگی} & استاندارد & اتصال دوگانه، مسیرهای افزونه & حداقلی \\
+\textbf{تحرک} & پشتیبانی کامل تحویل & تحویل شرطی، \lr{\mbox{DAPS}} & به‌ندرت متحرک \\
+\textbf{صورت‌حساب} & مبتنی بر حجم & مبتنی بر \lr{\mbox{SLA}} تأخیر & نرخ ثابت در هر دستگاه \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsection{6}{جداسازی برش}
+
+جداسازی برش تضمین می‌کند برش‌ها با وجود اشتراک زیرساخت فیزیکی، به‌عنوان شبکه‌های مستقل رفتار کنند.
+
+\CNsubsection{6.1}{جداسازی منابع}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{منبع} & \CNth{سازوکار جداسازی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{طیف} & حامل‌های اختصاصی، \lr{\mbox{BWP}} (بخش‌های پهنای باند)، جداسازی زمان‌بندی \\
+\textbf{محاسبه} & \lr{\mbox{VM}}/\allowbreak{}کانتینر اختصاصی، پین‌کردن \lr{\mbox{CPU}}، تخصیص \lr{\mbox{NUMA}} \\
+\textbf{ذخیره‌سازی} & حجم‌های جدا، تضمین‌های \lr{\mbox{IOPS}} \\
+\textbf{انتقال} & قطعه‌بندی \lr{VLAN/\allowbreak{}VxLAN}، \lr{\mbox{FlexE}}، طول‌موج‌های اختصاصی \\
+\textbf{\lr{\mbox{NF}}های هسته} & نمونه‌های جدا \lr{(pod/\allowbreak{}VM)} در هر برش \\
+\end{longtable}
+}
+
+\CNsubsection{6.2}{جداسازی امنیتی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{دامنه‌های امنیتی جدا}: هر برش می‌تواند سیاست‌های امنیتی مستقل داشته باشد
+\item
+  \textbf{جداسازی سلسله‌مراتب کلید}: امکان مشتق‌سازی کلید جدا در هر برش
+\item
+  \textbf{کنترل دسترسی}: احراز هویت/\allowbreak{}مجوزدهی مختص برش (مثلاً برش سازمانی با \lr{\mbox{EAP}} اضافی)
+\item
+  \textbf{رمزنگاری ترافیک}: زمینه‌های رمزنگاری جدا بین برش‌ها
+\item
+  \textbf{مسیرهای حسابرسی}: ثبت گزارش و انطباق مستقل در هر برش
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{6.3}{جداسازی شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع شکست} & \CNth{رویکرد جداسازی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+سقوط \lr{\mbox{NF}} & \lr{\mbox{NF}}های اختصاصی برش بر سایر برش‌ها تأثیر نمی‌گذارند \\
+اضافه‌بار & سهمیه‌های منابع از گرسنگی یک برش توسط دیگری جلوگیری می‌کنند \\
+نقض امنیتی & برش نفوذشده نمی‌تواند به داده/\allowbreak{}کنترل برش دیگر دسترسی یابد \\
+خطای پیکربندی & پیکربندی محدود به برش شعاع اثر را محدود می‌کند \\
+شکست سخت‌افزاری & افزونگی و بازیابی آگاه به برش \\
+\end{longtable}
+}
+
+\CNkeepfig{m21-isolation}{3}
+
+\CNsubsection{6.4}{سطوح جداسازی}
+
+\CNfigure{m21-isolation}{سه سطح جداسازی برش}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m21-lifecycle}{8}
+
+\CNsection{7}{مدیریت چرخه عمر برش}
+
+\CNchained\CNsubsection{7.1}{مراحل چرخه عمر}
+
+\CNfigure{m21-lifecycle}{چرخه حیات برش شبکه}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{7.2}{توابع مدیریت}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6250}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3750}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{CSMF}}}}} (تابع مدیریت خدمات ارتباطی) & نیازمندی‌های مشتری را به نیازمندی‌های برش ترجمه می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{NSMF}}}}} (تابع مدیریت برش شبکه) & چرخه عمر کلی برش را مدیریت می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{NSSMF}}}}} (تابع مدیریت زیرشبکه برش شبکه) & زیرشبکه‌های برش منفرد (\lr{\mbox{RAN}}، هسته، انتقال) را مدیریت می‌کند \\
+\end{longtable}
+}
+
+\CNkeepfig{m21-mgmt-chain}{2}
+
+\textbf{سلسله‌مراتب:}
+
+\CNfigure{m21-mgmt-chain}{سلسله‌مراتب مدیریت برش}
+
+\CNsubsection{7.3}{مدیریت برش مبتنی بر قصد}
+
+به‌جای تعیین پارامترهای سطح پایین، اپراتورها \textbf{قصدها} را بیان می‌کنند:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{YAML}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Example Slice Intent}
+\FunctionTok{slice\_intent}\KeywordTok{:}
+\AttributeTok{  }\FunctionTok{name}\KeywordTok{:}\AttributeTok{ }\StringTok{"Enterprise{-}Manufacturing"}
+\AttributeTok{  }\FunctionTok{service\_type}\KeywordTok{:}\AttributeTok{ URLLC}
+\AttributeTok{  }\FunctionTok{requirements}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{latency}\KeywordTok{:}\AttributeTok{ }\StringTok{"\textless{} 5ms"}
+\AttributeTok{    }\FunctionTok{reliability}\KeywordTok{:}\AttributeTok{ }\StringTok{"99.999\%"}
+\AttributeTok{    }\FunctionTok{throughput}\KeywordTok{:}\AttributeTok{ }\StringTok{"\textgreater{} 100 Mbps"}
+\AttributeTok{    }\FunctionTok{isolation}\KeywordTok{:}\AttributeTok{ }\StringTok{"dedicated"}
+\AttributeTok{    }\FunctionTok{coverage}\KeywordTok{:}\AttributeTok{ }\StringTok{"Factory Floor Building A"}
+\AttributeTok{  }\FunctionTok{constraints}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{max\_devices}\KeywordTok{:}\AttributeTok{ }\DecValTok{500}
+\AttributeTok{    }\FunctionTok{mobility}\KeywordTok{:}\AttributeTok{ }\StringTok{"low"}
+\AttributeTok{    }\FunctionTok{security}\KeywordTok{:}\AttributeTok{ }\StringTok{"enhanced"}
+\end{Highlighting}
+\end{Shaded}
+
+سیستم مدیریت به‌طور خودکار این قصد را به موارد زیر ترجمه می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  پیکربندی‌های استقرار \lr{\mbox{NF}}
+\item
+  تصمیمات تخصیص منابع
+\item
+  پارامترهای زمان‌بندی \lr{\mbox{RAN}}
+\item
+  محاسبه مسیر انتقال
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{23\baselineskip}
+
+\CNsection{8}{موارد استفاده برش}
+
+\CNchained\CNsubsection{8.1}{برش \lr{\mbox{eMBB}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{پیکربندی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هدف} & حداکثر توان عملیاتی برای پهن‌باند موبایل \\
+\lr{\mbox{\textbf{\lr{\mbox{SST}}}}} & 1 \\
+\lr{\mbox{\textbf{\lr{\mbox{RAN}}}}} & طیف مشترک، پهنای باند گسترده (بیش از \lr{\mbox{100 MHz}})، \lr{\mbox{MIMO}} \\
+\lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} & مرکز داده مرکزی، ظرفیت بالا \\
+\textbf{خدمات معمول} & پخش جریانی ویدیو، \lr{AR/\allowbreak{}VR}، مرور وب \\
+\lr{\mbox{\textbf{\lr{\mbox{SLA}}}}} & \lr{\mbox{DL}}: تضمین \lr{\mbox{100 Mbps}}، تأخیر کمتر از \lr{\mbox{20ms}} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{8.2}{برش \lr{\mbox{URLLC}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{پیکربندی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هدف} & تأخیر فوق‌العاده کم قطعی و قابلیت اطمینان بالا \\
+\lr{\mbox{\textbf{\lr{\mbox{SST}}}}} & 2 \\
+\lr{\mbox{\textbf{\lr{\mbox{RAN}}}}} & طیف اختصاصی، مینی-اسلات‌ها، اعطای پیکربندی‌شده \\
+\lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} & استقرار در لبه \lr{\mbox{(MEC)}}، هم‌مکان با \lr{\mbox{gNB}} \\
+\textbf{خدمات معمول} & خودکارسازی صنعتی، جراحی از راه دور، رانندگی خودران \\
+\lr{\mbox{\textbf{\lr{\mbox{SLA}}}}} & تأخیر کمتر از \lr{\mbox{1ms}}، قابلیت اطمینان \CNnum{99.999\%} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{8.3}{برش \lr{\mbox{MIoT}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{پیکربندی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هدف} & پشتیبانی از تعداد انبوه دستگاه‌های کم‌توان \\
+\lr{\mbox{\textbf{\lr{\mbox{SST}}}}} & 3 \\
+\lr{\mbox{\textbf{\lr{\mbox{RAN}}}}} & حامل \lr{NB-IoT/\allowbreak{}LTE-M}، زمان‌بندی آسان‌گیر \\
+\lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} & مرکزی، بهینه‌شده برای بسته‌های کوچک \\
+\textbf{خدمات معمول} & کنتورهای هوشمند، حسگرها، پایش محیطی \\
+\lr{\mbox{\textbf{\lr{\mbox{SLA}}}}} & پشتیبانی از بیش از \lr{\mbox{1M}} دستگاه/\allowbreak{}\lr{\mbox{km\textsuperscript{2}}}، عمر باتری بیش از 10 سال \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{8.4}{برش سازمانی (شبکه خصوصی)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{پیکربندی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هدف} & شبکه خصوصی کاملاً جدا برای شرکت \\
+\lr{\mbox{\textbf{\lr{\mbox{SST}}}}} & مختص اپراتور (مثلاً 128) \\
+\lr{\mbox{\textbf{\lr{\mbox{RAN}}}}} & سلول‌های کوچک اختصاصی در محل شرکت \\
+\lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} & درون-محل (شکست محلی) \\
+\textbf{خدمات معمول} & اتصال پردیس، \lr{\mbox{IoT}} صنعتی، \lr{\mbox{LAN}} خصوصی \\
+\lr{\mbox{\textbf{\lr{\mbox{SLA}}}}} & سفارشی‌سازی کامل \lr{\mbox{SLA}}، منابع اختصاصی \\
+\textbf{جداسازی} & سطح 3 (جداسازی فیزیکی در صورت امکان) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m21-slice-dnn-qos}{8}
+
+\CNsection{9}{شبکه‌بندی در برابر \lr{\mbox{QoS}} در برابر \lr{\mbox{DNN}}}
+
+\CNchained\CNsubsection{9.1}{مقایسه مفهومی}
+
+\CNfigure{m21-slice-dnn-qos}{برش‌ها شامل \lr{\mbox{DNN}}ها و \lr{\mbox{DNN}}ها شامل جریان‌های \lr{\mbox{QoS}} هستند}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{9.2}{مقایسه تفصیلی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1600}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3200}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.4200}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{شبکه‌بندی} & \CNth{\lr{\mbox{QoS}} (\lr{\mbox{5QI}}/\allowbreak{}جریان‌های \lr{\mbox{QoS}})} & \CNth{\lr{\mbox{DNN}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{دامنه} & شبکه منطقی سرتاسری & رفتار بسته در هر جریان & نقطه انتهایی اتصال (نشست \lr{\mbox{PDU}}) \\
+\textbf{دانه‌بندی} & کل شبکه (\lr{\mbox{RAN}} + هسته + انتقال) & جریان‌های داده منفرد & در هر نشست \lr{\mbox{PDU}} \\
+\textbf{شناسه} & \lr{S-NSSAI (SST + SD)} & \lr{\mbox{5QI}}، \lr{\mbox{QFI}}، \lr{\mbox{ARP}} & رشته \lr{\mbox{DNN}} (مثلاً «\lr{\mbox{internet}}») \\
+\textbf{جداسازی} & کامل (منبع، امنیت، شکست) & بدون جداسازی (\lr{\mbox{NF}}های مشترک) & بدون جداسازی \\
+\textbf{سفارشی‌سازی} & توپولوژی \lr{\mbox{NF}}، مکان‌یابی، سیاست‌ها & اولویت زمان‌بندی، نرخ، تأخیر & مسیریابی به شبکه داده مشخص \\
+\textbf{قیاس} & سیستم‌های بزرگراه جدا & اولویت‌های خط در یک بزرگراه & خروجی بزرگراه (مقصد) \\
+\textbf{چه کسی تصمیم می‌گیرد} & شبکه \lr{\mbox{(NSSF)}} در ثبت‌نام & \lr{PCF/\allowbreak{}SMF} در هر نشست/\allowbreak{}جریان & \lr{\mbox{UE}} درخواست می‌کند در برقراری نشست \lr{\mbox{PDU}} \\
+\textbf{تعداد} & کم در هر \lr{\mbox{PLMN}} (حداکثر 8 در هر \lr{\mbox{UE}}) & زیاد در هر برش (تا 64 در هر نشست) & چندین در هر برش \\
+\textbf{رابطه} & شامل \lr{\mbox{DNN}}ها و \lr{\mbox{QoS}} & درون یک برش وجود دارد & درون یک برش وجود دارد \\
+\end{longtable}
+}
+
+\CNkeepfig{m21-slice-tree}{3}
+
+\CNsubsection{9.3}{رابطه سلسله‌مراتبی}
+
+\CNfigure{m21-slice-tree}{برش شامل \lr{\mbox{DNN}}ها و هر \lr{\mbox{DNN}} شامل نشست‌های \lr{\mbox{PDU}} و جریان‌های \lr{\mbox{QoS}} است}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{9.4}{چه زمانی از چه چیزی استفاده کنیم}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نیازمندی} & \CNth{راه‌حل} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+صنایع عمودی مختلف روی همان شبکه & \textbf{شبکه‌بندی} \\
+اولویت صدا بر ترافیک وب & \lr{\mbox{\textbf{\lr{\mbox{QoS}}}}} (مقادیر \lr{\mbox{5QI}} مختلف) \\
+اتصال به شبکه‌های داده خارجی مختلف & \lr{\mbox{\textbf{\lr{\mbox{DNN}}}}} \\
+جداسازی ترافیک سازمانی از مصرف‌کننده & \textbf{شبکه‌بندی} \\
+تمایز پخش جریانی ویدیو از دانلود فایل & \lr{\mbox{\textbf{\lr{\mbox{QoS}}}}} \\
+مسیریابی به کاربرد \lr{\mbox{MEC}} در برابر ابر مرکزی & \lr{\mbox{\textbf{\lr{\mbox{DNN}}}}} (+ انتخاب \lr{\mbox{UPF}}) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{22\baselineskip}
+
+\CNsection{10}{شبکه‌بندی \lr{\mbox{RAN}}}
+
+\CNchained\CNsubsection{10.1}{قطعه‌بندی منابع رادیویی}
+
+شبکه‌بندی \lr{\mbox{RAN}} منابع رادیویی را با استفاده از راهبردهای مختلف در بین برش‌ها تقسیم می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2941}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3824}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3235}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{راهبرد} & \CNth{توضیح} & \CNth{مبادله} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{قطعه‌بندی سخت} & \lr{\mbox{PRB}}/\allowbreak{}حامل اختصاصی در هر برش & جداسازی قوی، بهره چندگانه‌سازی کمتر \\
+\textbf{قطعه‌بندی نرم} & حداقل تضمین‌شده + استخر مشترک & جداسازی خوب + چندگانه‌سازی آماری \\
+\textbf{مبتنی بر اولویت} & منابع مشترک با زمان‌بندی اولویت‌دار & حداکثر کارایی، ضعیف‌ترین جداسازی \\
+\textbf{مبتنی بر \lr{\mbox{BWP}}} & تخصیص بخش‌های پهنای باند در هر برش & جداسازی تمیز در لایه فیزیکی \\
+\end{longtable}
+}
+
+\CNkeepfig{m21-scheduler}{5}
+
+\CNsubsection{10.2}{زمان‌بندی آگاه به برش}
+
+زمان‌بند \lr{\mbox{MAC}} در \lr{\mbox{gNB}} باید از عملیات چند-برشی پشتیبانی کند:
+
+\CNfigure{m21-scheduler}{زمان‌بندی دوسطحی آگاه از برش در \lr{\mbox{gNB}}}
+
+\textbf{زمان‌بندی دو-سطحی:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{زمان‌بند بین-برشی}: منابع (\lr{\mbox{PRB}}، شکاف‌ها) را بر اساس \lr{\mbox{SLA}} به هر برش تخصیص می‌دهد
+\item
+  \textbf{زمان‌بند درون-برشی}: \lr{\mbox{UE}}های منفرد درون یک برش را با الگوریتم‌های متناسب با برش زمان‌بندی می‌کند
+\end{enumerate}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{10.3}{اجرای \lr{\mbox{SLA}} برش \lr{\mbox{RAN}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر \lr{\mbox{SLA}}} & \CNth{سازوکار اجرا} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+حداقل توان عملیاتی & \lr{\mbox{PRB}}های رزروشده (حداقل تضمین‌شده) \\
+حداکثر تأخیر & زمان‌بندی اولویت‌دار، اعطاهای پیکربندی‌شده، مینی-اسلات‌ها \\
+هدف قابلیت اطمینان & پیکربندی \lr{\mbox{HARQ}}، تکرار، تنوع \\
+حداکثر تعداد \lr{\mbox{UE}} & کنترل پذیرش در هر برش \\
+سطح جداسازی & جداسازی \lr{\mbox{BWP}} یا قطعه‌بندی سخت \\
+\end{longtable}
+}
+
+\CNsubsection{10.4}{سیگنالینگ شبکه‌بندی \lr{\mbox{RAN}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{S-NSSAI}} در \lr{\mbox{RRC}}}: \lr{\mbox{UE}} مقدار \lr{\mbox{S-NSSAI}} را در حین راه‌اندازی \lr{\mbox{RRC}} ارایه می‌دهد، \lr{\mbox{gNB}} به برش مناسب نگاشت می‌کند
+\item
+  \textbf{نگاشت \lr{\mbox{DRB}} آگاه به برش}: جریان‌های \lr{\mbox{QoS}} از همان برش به \lr{\mbox{DRB}}های مشترک نگاشت می‌شوند
+\item
+  \textbf{توصیف‌گرهای برش \lr{\mbox{RAN}}}: \lr{\mbox{O-RAN}} سیاست‌های مدیریت منابع رادیویی سطح برش را تعریف می‌کند
+\item
+  \textbf{\lr{\mbox{NSSI}} (نمونه زیرشبکه برش شبکه)}: \lr{\mbox{RAN}} نمونه‌های زیرشبکه مختص برش را نگه می‌دارد
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsection{}{خلاصه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مفهوم} & \CNth{نکته کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{برش شبکه} & شبکه منطقی سرتاسری (\lr{\mbox{RAN}} + انتقال + هسته) روی زیرساخت مشترک \\
+\lr{\mbox{\textbf{\lr{\mbox{S-NSSAI}}}}} & \lr{\mbox{SST}} (نوع 8 بیتی) + \lr{\mbox{SD}} (تفکیک‌کننده 24 بیتی) یک برش را شناسایی می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{NSSF}}}}} & برش مناسب را برای \lr{\mbox{UE}} در حین ثبت‌نام انتخاب می‌کند \\
+\textbf{جداسازی} & جداسازی منابع + امنیت + شکست بین برش‌ها \\
+\textbf{چرخه عمر} & طراحی \ensuremath{\leftarrow} راه‌اندازی \ensuremath{\leftarrow} بهره‌برداری \ensuremath{\leftarrow} ازکاراندازی (مدیریت‌شده توسط \lr{NSMF/\allowbreak{}NSSMF}) \\
+\textbf{شبکه‌بندی \lr{\mbox{RAN}}} & قطعه‌بندی منابع رادیویی با زمان‌بندی دو-سطحی \\
+\textbf{برش در برابر \lr{\mbox{QoS}} در برابر \lr{\mbox{DNN}}} & برش (کل شبکه) \lr{\mbox{\ensuremath{\supset} DNN}} (اتصال) \lr{\mbox{\ensuremath{\supset} QoS}} (رفتار در هر جریان) \\
+\end{longtable}
+}
+
+\CNboxsection{نکات کلیدی}
+
+\begin{CNbox}[unbreakable]{sum}{نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{شبکه‌بندی ویژگی تعریف‌کننده معماری \lr{\mbox{5G}} است} \lr{—} یک شبکه فیزیکی واحد را به چندین شبکه منطقی هدف‌ساخته تبدیل می‌کند
+\item
+  \lr{\textbf{\lr{S-NSSAI = SST + SD}}} شناسه بنیادی برش است؛ \lr{\mbox{UE}} مقدار \lr{\mbox{NSSAI}} درخواستی را ارایه می‌دهد، شبکه \lr{\mbox{NSSAI}} مجاز را بازمی‌گرداند
+\item
+  \textbf{\lr{\mbox{NSSF}} مغز انتخاب برش است} \lr{—} تعیین می‌کند \lr{\mbox{UE}} به کدام برش‌ها دسترسی دارد و کدام \lr{\mbox{AMF}} باید به آن خدمات دهد
+\item
+  \textbf{جداسازی چند-بُعدی است} \lr{—} جداسازی منبع، امنیت و شکست همه باید مورد توجه قرار گیرند
+\item
+  \textbf{شبکه‌بندی \lr{\mbox{RAN}} نیازمند زمان‌بندی دو-سطحی است} \lr{—} تخصیص بین-برشی و سپس زمان‌بندی درون-برشی در هر \lr{\mbox{UE}}
+\item
+  \textbf{شبکه‌بندی \lr{\mbox{\ensuremath{\neq} QoS}}} \lr{—} شبکه‌بندی جداسازی شبکه منطقی سرتاسری فراهم می‌کند؛ \lr{\mbox{QoS}} رفتار در هر جریان را درون یک برش فراهم می‌کند
+\item
+  \textbf{مدیریت چرخه عمر} ایجاد تا ازکاراندازی برش را خودکار می‌کند، با محرک مشخصات مبتنی بر قصد
+\end{enumerate}
+
+\end{CNbox}

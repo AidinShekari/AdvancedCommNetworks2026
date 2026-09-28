@@ -1,0 +1,12 @@
+% Module 26 — network digital twin in a closed loop
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNdark, text width=11cm] (phy) at (0,0) {\CNL{PHYSICAL NETWORK}{شبکه فیزیکی}\\{\scriptsize\mdseries [gNB] [gNB] [UE] [UE] [Core] [Transport]}};
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-5.9,-1.4) rectangle (5.9,-5.3);
+\node[font=\sffamily\small\bfseries, text=CNink] at (0,-1.75) {\CNL{DIGITAL TWIN PLATFORM}{سکوی دوقلوی دیجیتال}};
+\foreach \t/\items/\x/\c in {{\CNL{Data layer}{لایه داده}}/{\CNL{telemetry}{تله‌متری}\\\CNL{topology}{توپولوژی}\\\CNL{traffic}{ترافیک}\\\CNL{events}{رویدادها}}/-3.8/CNcyan,
+    {\CNL{Model layer}{لایه مدل}}/{\CNL{PHY models}{مدل‌های \lr{PHY}}\\\CNL{propagation model}{مدل انتشار}\\\CNL{traffic}{ترافیک}\\\CNL{protocol}{پروتکل}}/0/CNviolet,
+    {\CNL{App layer}{لایه کاربرد}}/{\CNL{optimiser}{بهینه‌ساز}\\\CNL{what-if}{چه‌می‌شود‌اگر}\\\CNL{AI training}{آموزش \lr{AI}}\\\CNL{prediction}{پیش‌بینی}}/3.8/CNsig}{
+  \node[draw=\c, fill=\c!8, line width=0.8pt, rounded corners=3pt, text width=3.2cm, align=left, anchor=north, font=\sffamily\small] at (\x,-2.2) {\textbf{\t}\\{\scriptsize \items}};}
+\draw[CNlink, ->, line width=1.1pt] (phy.south) -- node[right, CNtiny, align=left] {\CNL{real-time data feeds}{جریان‌های داده بلادرنگ}\\(KPIs, config, topology, traffic)} (0,-1.4);
+\draw[CNsig, ->, line width=1.1pt] (5.9,-3.4) -- ++(0.8,0) |- node[pos=0.25, right, CNtiny, align=left] {\CNL{optimised decisions}{تصمیم‌های بهینه}\\(\CNL{closed loop}{حلقه بسته})} (phy.east);
+\end{tikzpicture}

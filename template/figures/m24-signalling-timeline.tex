@@ -1,0 +1,16 @@
+% Module 24 — evolution of mobile signalling protocols
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, item/.style={draw=#1, fill=#1!8, line width=0.6pt, rounded corners=2pt, text width=3.4cm, align=left, font=\sffamily\scriptsize, inner sep=3pt, anchor=north}]
+\draw[CNlink, ->, line width=1.3pt] (-0.4,0) -- (16.2,0);
+\foreach \g/\yr/\x/\c/\items in {
+  {2G GSM}/1991/1.9/CNinkL/{{SS7/MAP}/{\CNL{HLR/VLR subscriber mgmt}{مدیریت مشترک \lr{HLR/VLR}}}, {ISUP}/{\CNL{circuit-switched calls}{تماس‌های سوئیچینگ مداری}}, {SMS over MAP}/{\CNL{short messages}{پیام‌های کوتاه}}},
+  {3G UMTS}/2001/5.9/CNcyan/{{SS7/MAP + RANAP}/{\CNL{IP transport via SIGTRAN}{انتقال \lr{IP} از طریق \lr{SIGTRAN}}}, {GTP-C v1}/{\CNL{packet data (PDP context)}{داده بسته‌ای (زمینه \lr{PDP})}}, {CAMEL}/{\CNL{intelligent-network services}{خدمات شبکه هوشمند}}},
+  {4G LTE}/2009/9.9/CNsig/{{Diameter}/{\CNL{auth (S6a), policy (Gx), charging (Gy)}{احراز هویت (\lr{S6a})، سیاست (\lr{Gx})، صورت‌حساب (\lr{Gy})}}, {S1AP}/{\CNL{RAN–core signalling}{سیگنالینگ \lr{RAN}–هسته}}, {GTP-C v2}/{\CNL{session/bearer management}{مدیریت نشست/حامل}}, {SIP/IMS}/{\CNL{voice over LTE (VoLTE)}{صدا روی \lr{LTE (VoLTE)}}}},
+  {5G NR}/2020/13.9/CNgreen/{{HTTP/2 SBI}/{\CNL{service-based NF communication}{ارتباط خدمات‌محور \lr{NF}ها}}, {NGAP}/{\CNL{RAN–core signalling}{سیگنالینگ \lr{RAN}–هسته}}, {PFCP}/{\CNL{user-plane programming}{برنامه‌ریزی صفحه کاربر}}, {NAS 5G}/{\CNL{registration and session mgmt}{ثبت‌نام و مدیریت نشست}}}}{
+  \fill[\c] (\x,0) circle (0.14);
+  \node[font=\sffamily\small\bfseries, text=\c, anchor=south] at (\x,0.2) {\g{} (\yr)};
+  \def\yy{-0.35}
+  \foreach \p/\d in \items {
+    \node[item=\c] (it) at (\x,\yy) {\textbf{\p}\\\d};
+    \path (it.south); \pgfgetlastxy{\ix}{\iy}
+    \pgfmathsetmacro{\yy}{\iy/28.4527-0.15}\xdef\yy{\yy}}}
+\end{tikzpicture}

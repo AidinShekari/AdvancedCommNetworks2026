@@ -1,0 +1,17 @@
+% Module 17 — reading a specification reference
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, part/.style={font=\sffamily\Large\bfseries, inner sep=1pt}]
+\node[part, text=CNink] (o) at (0,0) {3GPP};
+\node[part, text=CNviolet, anchor=west] (t) at ([xshift=4pt]o.east) {TS};
+\node[part, text=CNsig, anchor=west] (s) at ([xshift=4pt]t.east) {23};
+\node[part, text=CNink, anchor=west] (dot) at (s.east) {.};
+\node[part, text=CNcyanD, anchor=west] (n) at (dot.east) {501};
+\node[part, text=CNgreen, anchor=west] (v) at ([xshift=6pt]n.east) {V17.6.0};
+\node[part, text=CNmuted, anchor=west] (d) at ([xshift=6pt]v.east) {(2022-09)};
+\foreach \node/\col/\y/\txt in {d/CNmuted/-0.8/{\CNL{publication date}{تاریخ انتشار}},
+    v/CNgreen/-1.35/{\CNL{version: Release.Major.Minor}{نسخه: \lr{Release.Major.Minor}}},
+    n/CNcyanD/-1.9/{\CNL{501 = 5G System (5GS) architecture}{\lr{501} = معماری سیستم \lr{5G (5GS)}}},
+    s/CNsig/-2.45/{\CNL{23 = Stage 2 (architecture) series}{\lr{23} = سری مرحله ۲ (معماری)}},
+    t/CNviolet/-3.0/{\CNL{TS = Technical Specification (normative)}{\lr{TS} = مشخصه فنی (الزامی)}},
+    o/CNink/-3.55/{\CNL{3GPP organisation}{سازمان \lr{3GPP}}}}{
+  \draw[\col, line width=0.8pt] (\node.south) |- (8.4,\y) node[CNtiny, anchor=west, text=\col] {\txt};}
+\end{tikzpicture}

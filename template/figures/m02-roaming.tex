@@ -1,0 +1,18 @@
+% Module 2 — signalling path for a roaming subscriber
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ue) at (0,0) {UE};
+\node[CNran] (bts) at (2.3,0) {BTS};
+\node[CNran] (bsc) at (4.4,0) {BSC};
+\node[CNcp] (msc) at (6.8,0) {MSC/VLR};
+\node[CNdb] (hlr) at (13.2,0) {HLR/AuC};
+\draw[CNdata, ->] (ue) -- (bts); \draw[CNlink, ->] (bts) -- (bsc); \draw[CNlink, ->] (bsc) -- (msc);
+\draw[CNsigl, <->] (msc) -- node[CNelab, above=2pt, fill=none] {SS7 / MAP} (hlr);
+\node[CNnote, anchor=north] (stp) at (10.0,-1.25) {\CNL{via STP / international SS7 links}{از طریق \lr{STP} / پیوندهای بین‌المللی \lr{SS7}}};
+\draw[CNline, line width=0.8pt] (stp.north) -- (10.0,0);
+\begin{pgfonlayer}{background}
+  \node[CNgroup, fit={(bts)(msc)($(bts.north)+(0,0.42)$)}] (v) {};
+  \node[CNgroup, fit={(hlr)($(hlr.north)+(0,0.42)$)}] (h) {};
+\end{pgfonlayer}
+\node[CNgrouplabel, anchor=north west] at (v.north west) {VPLMN \CNL{(visited network)}{(شبکه میزبان)}};
+\node[CNgrouplabel, anchor=north west] at (h.north west) {HPLMN \CNL{(home)}{(خانگی)}};
+\end{tikzpicture}

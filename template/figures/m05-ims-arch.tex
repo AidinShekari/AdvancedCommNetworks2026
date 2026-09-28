@@ -1,0 +1,9 @@
+% Module 5 — basic IMS signalling path
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ue) at (0,0) {UE};
+\node[CNcp] (p) at (2.6,0) {P-CSCF}; \node[CNcp] (i) at (5.4,0) {I-CSCF}; \node[CNcp] (s) at (8.2,0) {S-CSCF};
+\node[CNhl] (as) at (11.6,0) {\CNL{Application Servers}{سرورهای کاربرد}};
+\node[CNdb] (hss) at (8.2,-1.9) {HSS};
+\foreach \a/\b in {ue/p, p/i, i/s, s/as}{\draw[CNsigl, ->] (\a) -- (\b);}
+\draw[CNsigl, <->] (s) -- (hss);
+\end{tikzpicture}

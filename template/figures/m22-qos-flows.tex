@@ -1,0 +1,12 @@
+% Module 22 — 5G QoS flows inside one PDU session share one GTP-U tunnel
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNsig, line width=0.9pt, fill=CNsig!4, rounded corners=5pt] (0,0) rectangle (11,-5.4);
+\node[font=\sffamily\small\bfseries, text=CNsig, anchor=north west] at (0.2,-0.12) {\CNL{PDU session}{نشست \lr{PDU}}};
+\foreach \q/\v/\s/\t/\c [count=\k from 0] in {1/1/{src=UE, dst=IMS, proto=RTP}/{\CNL{Voice}{صدا}}/CNcyan, 2/2/{src=UE, dst=IMS, proto=RTP/video}/{\CNL{Video}{ویدئو}}/CNamber, 3/9/{src=UE, dst=*, proto=TCP}/{\CNL{Web}{وب}}/CNgreen}{
+  \node[draw=\c, fill=\c!10, line width=0.8pt, rounded corners=3pt, text width=10cm, align=left, anchor=north west, font=\sffamily\small, inner sep=4pt] at (0.4,{-0.65-\k*1.2}) {\textbf{QoS Flow \q} (QFI=\q, 5QI=\v) — \t\\{\scriptsize SDF: \s}};}
+\node[CNtiny, anchor=north west, align=left] at (0.4,-4.35) {\CNL{All flows share ONE N3/N9 GTP-U tunnel}{همه جریان‌ها یک تونل \lr{GTP-U} روی \lr{N3/N9} را به اشتراک می‌گذارند}\\(\CNL{QFI marked in the GTP-U extension header}{\lr{QFI} در سرآیند توسعه \lr{GTP-U} علامت‌گذاری می‌شود})};
+\node[CNue] (ue) at (0.9,-6.6) {UE}; \node[CNran] (g) at (4.2,-6.6) {gNB}; \node[CNup] (u) at (7.5,-6.6) {UPF}; \node[CNext] (dn) at (10.4,-6.6) {DN};
+\draw[CNdata] (ue) -- (g);
+\draw[CNdata] (g) -- node[CNelab, above=1pt, fill=none] {N3 (GTP-U)} node[CNelab, below=1pt, fill=none] {\CNL{QFI in header}{\lr{QFI} در سرآیند}} (u);
+\draw[CNdata] (u) -- node[CNelab, above=1pt, fill=none] {N9 (GTP-U)} node[CNelab, below=1pt, fill=none] {\CNL{QFI in header}{\lr{QFI} در سرآیند}} (dn);
+\end{tikzpicture}

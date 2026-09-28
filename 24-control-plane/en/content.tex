@@ -1,0 +1,687 @@
+\CNsection{1}{Control Plane Concept}
+
+The \textbf{Control Plane} (C-Plane) handles all \textbf{signaling} in the mobile network — the messages that set up, manage, modify, and tear down connections. It does NOT carry user data.
+
+\textbf{Control Plane responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Authentication \& Security}: Verify subscriber identity, establish encryption
+\item
+  \textbf{Registration \& Mobility}: Attach, detach, tracking area updates, handovers
+\item
+  \textbf{Session Management}: Establish/\allowbreak{}modify/\allowbreak{}release PDU sessions or bearers
+\item
+  \textbf{QoS Negotiation}: Agree on quality parameters for data flows
+\item
+  \textbf{Paging}: Locate idle UEs for incoming data/\allowbreak{}calls
+\item
+  \textbf{Policy \& Charging}: Apply operator rules to sessions
+\end{itemize}
+
+\textbf{Key principle:} The control plane ``programs'' the user plane — it sets up the tunnels, rules, and routing that the user plane then uses to forward data.
+
+\Needspace{28\baselineskip}
+
+\CNsection{2}{Control Plane Protocols — MAJOR Reference Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1887}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2075}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1321}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1321}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1698}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1698}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Protocol} & \CNth{Generation} & \CNth{Layer} & \CNth{Plane} & \CNth{Between} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{MAP} (Mobile Application Part) & 2G/\allowbreak{}3G & Application & Control & MSC\ensuremath{\leftrightarrow}HLR, VLR\ensuremath{\leftrightarrow}HLR & Subscriber data, auth, SMS routing, HO \\
+\textbf{ISUP} (ISDN User Part) & 2G/\allowbreak{}3G & Application & Control & MSC\ensuremath{\leftrightarrow}MSC, MSC\ensuremath{\leftrightarrow}PSTN & Circuit-switched call setup/\allowbreak{}release \\
+\textbf{RANAP} (RAN Application Protocol) & 3G & Application & Control & RNC\ensuremath{\leftrightarrow}CN (MSC/\allowbreak{}SGSN) & RAN-Core signaling (Iu interface) \\
+\textbf{S1AP} (S1 Application Protocol) & 4G & Application & Control & eNB\ensuremath{\leftrightarrow}MME & RAN-Core signaling (S1-MME) \\
+\textbf{NGAP} (NG Application Protocol) & 5G & Application & Control & gNB\ensuremath{\leftrightarrow}AMF & RAN-Core signaling (N2) \\
+\textbf{GTP-C v1} & 3G & Tunnel Control & Control & SGSN\ensuremath{\leftrightarrow}GGSN & PDP context create/\allowbreak{}modify/\allowbreak{}delete \\
+\textbf{GTP-C v2} & 4G/\allowbreak{}5G & Tunnel Control & Control & MME\ensuremath{\leftrightarrow}S-GW\ensuremath{\leftrightarrow}P-GW & Session create/\allowbreak{}modify/\allowbreak{}delete bearer \\
+\textbf{Diameter} & 4G & AAA/\allowbreak{}Policy & Control & MME\ensuremath{\leftrightarrow}HSS, PCRF\ensuremath{\leftrightarrow}P-GW & Auth (S6a), policy (Gx), charging (Gy) \\
+\textbf{HTTP/\allowbreak{}2 SBI} & 5G & Service-Based & Control & NF\ensuremath{\leftrightarrow}NF (all 5GC NFs) & Service discovery, registration, session mgmt \\
+\textbf{NAS EMM} & 4G & Non-Access Stratum & Control & UE\ensuremath{\leftrightarrow}MME & Attach, TAU, authentication, security \\
+\textbf{NAS ESM} & 4G & Non-Access Stratum & Control & UE\ensuremath{\leftrightarrow}MME (\ensuremath{\to}P-GW) & Bearer setup/\allowbreak{}modify/\allowbreak{}release \\
+\textbf{NAS 5GMM} & 5G & Non-Access Stratum & Control & UE\ensuremath{\leftrightarrow}AMF & Registration, authentication, service request \\
+\textbf{NAS 5GSM} & 5G & Non-Access Stratum & Control & UE\ensuremath{\leftrightarrow}SMF (via AMF) & PDU session establish/\allowbreak{}modify/\allowbreak{}release \\
+\textbf{RRC (LTE)} & 4G & Access Stratum & Control & UE\ensuremath{\leftrightarrow}eNB & Connection setup, meas config, HO, SIBs \\
+\textbf{RRC (NR)} & 5G & Access Stratum & Control & UE\ensuremath{\leftrightarrow}gNB & Same + BWP config, beam mgmt, CHO \\
+\textbf{SCTP} & 4G/\allowbreak{}5G & Transport & Control & eNB\ensuremath{\leftrightarrow}MME, gNB\ensuremath{\leftrightarrow}AMF & Reliable signaling transport (multi-stream) \\
+\textbf{SIP} (Session Initiation Protocol) & 4G/\allowbreak{}5G (IMS) & Application & Control & UE\ensuremath{\leftrightarrow}P-CSCF\ensuremath{\leftrightarrow}S-CSCF & VoLTE/\allowbreak{}VoNR call setup, IMS registration \\
+\textbf{PFCP} & 5G (4G CUPS) & Control & Control & SMF\ensuremath{\leftrightarrow}UPF & User plane rule programming (N4) \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-stack-relations}{3}
+
+\CNsubsection{}{Protocol Stack Relationships}
+
+\CNfigure{m24-stack-relations}{How the signalling protocols stack on transport protocols}
+
+\Needspace{31\baselineskip}
+
+\CNsection{3}{NAS (Non-Access Stratum)}
+
+NAS protocols operate \textbf{between the UE and the core network} — they pass transparently through the RAN (the eNB/\allowbreak{}gNB does not interpret NAS messages, only relays them).
+
+\CNsubsection{3.1}{LTE NAS (TS 24.301)}
+
+LTE NAS has two sub-layers:
+
+\textbf{EMM (EPS Mobility Management):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3667}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Messages} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Attach & Attach Request/\allowbreak{}Accept/\allowbreak{}Complete & Register UE to network \\
+Detach & Detach Request/\allowbreak{}Accept & Deregister UE \\
+TAU & TAU Request/\allowbreak{}Accept & Update Tracking Area \\
+Authentication & Auth Request/\allowbreak{}Response & Mutual authentication (AKA) \\
+Security Mode & SMC Command/\allowbreak{}Complete & Activate NAS ciphering/\allowbreak{}integrity \\
+Service Request & Service Request/\allowbreak{}Accept & Transition IDLE\ensuremath{\to}CONNECTED \\
+Identity & Identity Request/\allowbreak{}Response & Request IMSI if no GUTI \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\textbf{ESM (EPS Session Management):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3667}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Messages} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+PDN Connectivity & PDN Conn Request/\allowbreak{}Activate Default Bearer & Establish PDN connection \\
+Bearer Resource Alloc & Bearer Resource Alloc Req & UE-initiated dedicated bearer \\
+Activate Dedicated Bearer & Act Ded Bearer Req/\allowbreak{}Accept & Network-initiated QoS bearer \\
+Modify Bearer & Modify Bearer Req/\allowbreak{}Accept & Change bearer QoS \\
+Deactivate Bearer & Deact Bearer Req/\allowbreak{}Accept & Release bearer \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{3.2}{5G NAS (TS 24.501)}
+
+5G NAS also has two sub-layers but with enhanced capabilities:
+
+\textbf{5GMM (5G Mobility Management):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3667}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Messages} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Registration & Registration Req/\allowbreak{}Accept/\allowbreak{}Complete & Initial, mobility, periodic reg \\
+Deregistration & Dereg Request/\allowbreak{}Accept & UE or network initiated \\
+Authentication & Auth Request/\allowbreak{}Response/\allowbreak{}Failure & 5G-AKA or EAP-AKA’ \\
+Security Mode & SMC Command/\allowbreak{}Complete & NAS security activation \\
+Service Request & Service Request/\allowbreak{}Accept & Resume from IDLE/\allowbreak{}INACTIVE \\
+Configuration Update & Config Update Command/\allowbreak{}Complete & GUTI reallocation, NSSAI \\
+Notification & Notification/\allowbreak{}Response & Network triggers (SOR, UPU) \\
+\end{longtable}
+}
+
+\Needspace{12\baselineskip}
+
+\textbf{5GSM (5G Session Management):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3667}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Messages} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+PDU Session Establishment & PDU Session Est Req/\allowbreak{}Accept & Create PDU session \\
+PDU Session Modification & PDU Session Mod Req/\allowbreak{}Accept & Modify QoS flows \\
+PDU Session Release & PDU Session Rel Req/\allowbreak{}Accept & Tear down session \\
+\end{longtable}
+}
+
+\textbf{Key 5G NAS enhancements vs. 4G:}
+
+\begin{itemize}
+\tightlist
+\item
+  Registration replaces Attach + TAU (unified procedure)
+\item
+  Supports network slicing (requested NSSAI in registration)
+\item
+  PDU session types: IPv4, IPv6, IPv4v6, Ethernet, Unstructured
+\item
+  NAS messages routed via AMF to SMF for session management
+\end{itemize}
+
+\CNkeepfig{m24-nas-transparency}{3}
+
+\CNsubsection{3.3}{NAS Transparency Through RAN}
+
+\CNfigure{m24-nas-transparency}{NAS passes transparently through the gNB}
+
+\begin{itemize}
+\tightlist
+\item
+  NAS messages are carried inside RRC messages on the radio interface
+\item
+  RRC carries them inside NGAP (5G) or S1AP (4G) to the core
+\item
+  The RAN node does NOT decrypt or interpret NAS content
+\item
+  Separate NAS security context (NAS ciphering/\allowbreak{}integrity) from AS security (RRC/\allowbreak{}UP)
+\end{itemize}
+
+\Needspace{29\baselineskip}
+
+\CNsection{4}{RRC (Radio Resource Control)}
+
+RRC operates \textbf{between the UE and the base station} (Access Stratum) and controls the radio connection.
+
+\CNsubsection{4.1}{LTE RRC (TS 36.331)}
+
+\textbf{Key Procedures:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3667}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Messages} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Connection Setup & RRC Conn Setup Req/\allowbreak{}Setup/\allowbreak{}Complete & Establish SRB1 \\
+Connection Reconfiguration & RRC Conn Reconfig & Add/\allowbreak{}modify bearers, handover \\
+Connection Release & RRC Conn Release & Release radio resources \\
+Measurement Configuration & (in Reconfig) & Configure meas events (A1-A6, B1-B2) \\
+Handover & RRC Conn Reconfig (mobilityCtrlInfo) & Execute handover \\
+Security Mode & Security Mode Command/\allowbreak{}Complete & Activate AS ciphering/\allowbreak{}integrity \\
+System Information & MIB, SIB1-SIB19 & Broadcast cell parameters \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-lte-rrc}{2}
+
+\textbf{LTE RRC States:}
+
+\CNfigure{m24-lte-rrc}{LTE RRC states}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{4.2}{NR RRC (TS 38.331)}
+
+NR RRC includes all LTE RRC functions \textbf{plus}:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{BWP Configuration} & Configure Bandwidth Parts (active BWP switching) \\
+\textbf{Beam Management} & SSB beam indication, beam failure recovery, L1-RSRP reporting \\
+\textbf{Conditional Handover (CHO)} & Pre-configure HO conditions — execute when met (no HO command delay) \\
+\textbf{Cell Group Config} & MCG + SCG for dual connectivity \\
+\textbf{MeasConfig enhancements} & NR events (similar + inter-RAT NR\ensuremath{\leftrightarrow}LTE), L3 filtering per beam \\
+\textbf{SIB enhancements} & On-demand SIBs, SIB for RedCap, NTN, sidelink \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-nr-rrc}{3}
+
+\CNsubsection{4.3}{RRC States in 5G (Three States)}
+
+\CNfigure{m24-nr-rrc}{The three NR RRC states and their transitions}
+
+\textbf{RRC\_\allowbreak{}INACTIVE benefits:}
+
+\begin{itemize}
+\tightlist
+\item
+  UE context preserved in Last Serving gNB \ensuremath{\to} fast resume (\textasciitilde{}10~ms vs \textasciitilde{}50~ms)
+\item
+  No full connection setup needed — just RRC Resume
+\item
+  RNA (RAN-based Notification Area) for mobility without core notification
+\item
+  Ideal for IoT devices with infrequent small data
+\end{itemize}
+
+\CNkeepfig{m24-ngap-transport}{10}
+
+\CNsection{5}{NGAP (NG Application Protocol) — TS 38.413}
+
+NGAP is the \textbf{5G equivalent of S1AP} (LTE) — it runs between the \textbf{gNB and AMF} over the \textbf{N2 interface}.
+
+\CNsubsection{5.1}{Transport}
+
+\CNfigure{m24-ngap-transport}{NGAP transport stack}
+
+\begin{itemize}
+\tightlist
+\item
+  SCTP provides reliable, in-order delivery with multiple streams
+\item
+  Stream 0: non-UE-associated signaling (setup, reset)
+\item
+  Other streams: UE-associated signaling (one stream per UE-group)
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{5.2}{Key Procedures}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2941}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3235}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3824}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Category} & \CNth{Procedure} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Interface Mgmt} & NG Setup & gNB registers with AMF (capabilities, served cells) \\
+& AMF Configuration Update & AMF informs gNB of changes \\
+& NG Reset & Error recovery \\
+\textbf{UE Context} & Initial Context Setup & AMF\ensuremath{\to}gNB: create UE context, security, PDU sessions \\
+& UE Context Release & Release UE resources at gNB \\
+& UE Context Modification & Modify existing context \\
+\textbf{Mobility} & Handover Required & gNB\ensuremath{\to}AMF: request inter-gNB HO \\
+& Handover Request & AMF\ensuremath{\to}target gNB: prepare HO \\
+& Handover Notify & Target gNB confirms HO complete \\
+& Path Switch Request & Intra-AMF, X2-based HO notification \\
+\textbf{NAS Transport} & Initial UE Message & First NAS message from UE (gNB\ensuremath{\to}AMF) \\
+& Downlink NAS Transport & AMF\ensuremath{\to}gNB\ensuremath{\to}UE: carry NAS message \\
+& Uplink NAS Transport & UE\ensuremath{\to}gNB\ensuremath{\to}AMF: carry NAS message \\
+\textbf{Paging} & Paging & AMF\ensuremath{\to}gNB: page UE in TA cells \\
+\textbf{PDU Session} & PDU Session Resource Setup & Establish user plane resources \\
+& PDU Session Resource Modify & Modify QoS/\allowbreak{}resources \\
+& PDU Session Resource Release & Release UP resources \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{5.3}{NGAP vs. S1AP Comparison}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{S1AP (4G)} & \CNth{NGAP (5G)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Interface & S1-MME & N2 \\
+Nodes & eNB \ensuremath{\leftrightarrow} MME & gNB \ensuremath{\leftrightarrow} AMF \\
+Transport & SCTP & SCTP \\
+Session concept & E-RAB (bearer) & PDU Session + QoS Flows \\
+Slice support & No & Yes (S-NSSAI in procedures) \\
+UE states & IDLE, CONNECTED & IDLE, INACTIVE, CONNECTED \\
+Multi-connectivity & No & Yes (secondary RAT) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{15\baselineskip}
+
+\CNsection{6}{GTP-C (GTP Control Plane)}
+
+\CNchained\CNsubsection{6.1}{GTP-C v1 (3G — TS 29.060)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{6\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Between} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gn/\allowbreak{}Gp & SGSN \ensuremath{\leftrightarrow} GGSN & PDP Context management \\
+\end{longtable}
+}
+
+\textbf{Key messages:}
+
+\begin{itemize}
+\tightlist
+\item
+  Create PDP Context Request/\allowbreak{}Response
+\item
+  Update PDP Context Request/\allowbreak{}Response
+\item
+  Delete PDP Context Request/\allowbreak{}Response
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{6.2}{GTP-C v2 (4G — TS 29.274)}
+
+GTPv2-C is a complete redesign with improved efficiency:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Between} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S11 & MME \ensuremath{\leftrightarrow} S-GW & Session/\allowbreak{}bearer management \\
+S5/\allowbreak{}S8 & S-GW \ensuremath{\leftrightarrow} P-GW & Session/\allowbreak{}bearer management \\
+S10 & MME \ensuremath{\leftrightarrow} MME & Inter-MME handover \\
+S3 & MME \ensuremath{\leftrightarrow} SGSN & 3G\ensuremath{\leftrightarrow}4G mobility \\
+\end{longtable}
+}
+
+\Needspace{19\baselineskip}
+
+\textbf{Key GTPv2-C Messages:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3793}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Message} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Create Session Request/\allowbreak{}Response & MME\ensuremath{\to}S-GW\ensuremath{\to}P-GW & Establish PDN connection \\
+Modify Bearer Request/\allowbreak{}Response & MME\ensuremath{\to}S-GW & Update after HO (new eNB TEID) \\
+Delete Session Request/\allowbreak{}Response & MME\ensuremath{\to}S-GW\ensuremath{\to}P-GW & Release PDN connection \\
+Create Bearer Request/\allowbreak{}Response & P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME & Dedicated bearer setup \\
+Delete Bearer Request/\allowbreak{}Response & P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME & Dedicated bearer release \\
+Release Access Bearers & MME\ensuremath{\to}S-GW & UE goes IDLE (release S1-U) \\
+Downlink Data Notification & S-GW\ensuremath{\to}MME & DL data arrived for idle UE \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-gtpv2c-header}{2}
+
+\textbf{GTPv2-C Header:}
+
+\CNfigure{m24-gtpv2c-header}{GTPv2-C header}
+
+\CNsubsection{6.3}{5G: From GTP-C to PFCP + HTTP/\allowbreak{}2}
+
+In 5G, the traditional GTP-C role is split:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SMF \ensuremath{\leftrightarrow} UPF}: Uses \textbf{PFCP} (N4) — not GTP-C
+\item
+  \textbf{Inter-NF signaling}: Uses \textbf{HTTP/\allowbreak{}2 SBI} — not GTP-C
+\item
+  GTPv2-C remains for interworking with 4G (N26 interface: AMF\ensuremath{\leftrightarrow}MME)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{HTTP/\allowbreak{}2 SBI (Service-Based Interface)}
+
+\CNchained\CNsubsection{7.1}{Concept}
+
+5G Core replaces point-to-point interfaces with a \textbf{Service-Based Architecture (SBA)}:
+
+\begin{itemize}
+\tightlist
+\item
+  Each NF exposes \textbf{services} via RESTful APIs
+\item
+  Communication uses \textbf{HTTP/\allowbreak{}2} over \textbf{TLS 1.3} over \textbf{TCP}
+\item
+  Data format: \textbf{JSON} (OpenAPI 3.0 specifications)
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{7.2}{Key NF Services}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1212}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2727}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2727}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{NF} & \CNth{Service} & \CNth{Operations} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{AMF} & Namf\_\allowbreak{}Communication & N1N2MessageTransfer, UEContextTransfer & NAS relay, context \\
+\textbf{SMF} & Nsmf\_\allowbreak{}PDUSession & Create, Update, Release & PDU session lifecycle \\
+\textbf{UDM} & Nudm\_\allowbreak{}SubscriberDataMgmt & Get, Subscribe, Unsubscribe & Subscriber data \\
+\textbf{AUSF} & Nausf\_\allowbreak{}UEAuthentication & Authenticate & 5G-AKA, EAP-AKA’ \\
+\textbf{PCF} & Npcf\_\allowbreak{}SMPolicyControl & Create, Update, Delete & QoS/\allowbreak{}charging policy \\
+\textbf{NRF} & Nnrf\_\allowbreak{}NFDiscovery & Discover & Find NF instances \\
+\textbf{NSSF} & Nnssf\_\allowbreak{}NSSelection & Get & Network slice selection \\
+\textbf{NEF} & Nnef\_\allowbreak{}EventExposure & Subscribe, Unsubscribe & Event reporting to AF \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{7.3}{Communication Patterns}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2903}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4194}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2903}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Pattern} & \CNth{Description} & \CNth{Example} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Request-Response} & Synchronous API call & SMF queries UDM for subscription \\
+\textbf{Subscribe-Notify} & Asynchronous event & PCF subscribes to AMF for UE location \\
+\textbf{Service Discovery} & Query NRF for NF endpoint & AMF discovers SMF via NRF \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-sbi-stack}{3}
+
+\CNsubsection{7.4}{SBI Protocol Stack}
+
+\CNfigure{m24-sbi-stack}{SBI protocol stack}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{8}{Signaling Protocol Evolution: SS7 \ensuremath{\to} Diameter \ensuremath{\to} HTTP/\allowbreak{}2}
+
+\CNchained\CNsubsection{8.1}{Timeline}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2200}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3400}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3400}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Era} & \CNth{Technology} & \CNth{Signaling Stack} & \CNth{Characteristics} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{1G/\allowbreak{}2G} (1980s-90s) & GSM & SS7 (MAP, ISUP, SCCP, MTP) & Circuit-switched, TDM-based, binary encoding \\
+\textbf{3G} (2000s) & UMTS & SS7 + RANAP + GTP-C v1 & IP transport added (SIGTRAN), still SS7 app layer \\
+\textbf{4G} (2010s) & LTE & Diameter + S1AP + GTP-C v2 & All-IP, AVP-based encoding, point-to-point \\
+\textbf{5G} (2020s) & NR & HTTP/\allowbreak{}2 SBI + NGAP + PFCP & Cloud-native, RESTful, service-mesh, JSON \\
+\end{longtable}
+}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{8.2}{Key Evolutionary Drivers}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{SS7 (1980s)} & \CNth{Diameter (2010s)} & \CNth{HTTP/\allowbreak{}2 SBI (2020s)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+TDM transport & IP transport & IP transport \\
+Binary encoding & AVP binary encoding & JSON text encoding \\
+Fixed nodes & Fixed nodes & Microservices (NFs) \\
+Point-to-point & Point-to-point & Service mesh \\
+Centralised (STP) & Diameter agents (DRA) & Service discovery (NRF) \\
+Rigid interfaces & Defined interfaces & API-driven, extensible \\
+Hard to scale & Moderately scalable & Cloud-native, auto-scale \\
+Telecom-only & Telecom-specific & IT/\allowbreak{}cloud standard \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-signalling-timeline}{3}
+
+\CNsubsection{8.3}{Signaling Evolution Timeline Diagram}
+
+\CNfigure{m24-signalling-timeline}{Evolution of mobile signalling protocols}
+
+\CNkeepfig{m24-auth-ss7}{5}
+
+\CNsubsection{8.4}{Protocol Comparison: Auth Flow Example}
+
+\textbf{2G/\allowbreak{}3G (SS7/\allowbreak{}MAP):}
+
+\CNfigure{m24-auth-ss7}{2G/\allowbreak{}3G authentication over SS7/\allowbreak{}MAP}
+
+\CNkeepfig{m24-auth-diameter}{2}
+
+\textbf{4G (Diameter):}
+
+\CNfigure{m24-auth-diameter}{4G authentication over Diameter (S6a)}
+
+\CNkeepfig{m24-auth-http2}{2}
+
+\textbf{5G (HTTP/\allowbreak{}2):}
+
+\CNfigure{m24-auth-http2}{5G authentication over HTTP/\allowbreak{}2 SBI}
+
+\CNkeepfig{m24-cp-architecture}{5}
+
+\CNsection{}{Complete Control Plane Architecture Diagram (5G)}
+
+\CNfigure{m24-cp-architecture}{Complete 5G control-plane architecture}
+
+\Needspace{24\baselineskip}
+
+\CNsection{}{Summary: Control Plane vs. User Plane}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2353}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4118}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3529}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Control Plane} & \CNth{User Plane} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Carries & Signaling messages & User data (IP, voice, video) \\
+Purpose & Setup, manage, release connections & Transport data end-to-end \\
+Latency tolerance & Moderate (100s of ms OK) & Critical (low latency required) \\
+Volume & Low (small messages) & High (bulk data transfer) \\
+Protocols & NAS, RRC, NGAP, HTTP/\allowbreak{}2, Diameter & GTP-U, SDAP, PDCP \\
+5G separation & AMF, SMF, AUSF, etc. & UPF (controlled by SMF via PFCP) \\
+Scaling & Scale per signaling load & Scale per throughput demand \\
+State & Stateful (tracks UE context) & Stateless forwarding (rules from CP) \\
+\end{longtable}
+}
+
+\CNboxsection{Key Takeaways}
+
+\begin{CNbox}[unbreakable]{sum}{Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Control plane = signaling brain}: Sets up tunnels, authenticates users, manages mobility
+\item
+  \textbf{NAS is end-to-end (UE\ensuremath{\leftrightarrow}Core)} — transparent to RAN; separate security context
+\item
+  \textbf{RRC manages the radio} — connection setup, measurements, handover commands
+\item
+  \textbf{5G adds RRC\_\allowbreak{}INACTIVE} state for fast resume and IoT efficiency
+\item
+  \textbf{NGAP replaced S1AP} — supports slicing, QoS flows, and three RRC states
+\item
+  \textbf{GTP-C evolved}: v1 (3G) \ensuremath{\to} v2 (4G) \ensuremath{\to} replaced by PFCP+HTTP/\allowbreak{}2 in 5G
+\item
+  \textbf{HTTP/\allowbreak{}2 SBI is revolutionary} — cloud-native, RESTful, auto-scalable NF communication
+\item
+  \textbf{Signaling evolution}: SS7 (binary, TDM) \ensuremath{\to} Diameter (binary, IP) \ensuremath{\to} HTTP/\allowbreak{}2 (JSON, cloud-native)
+\end{enumerate}
+
+\end{CNbox}

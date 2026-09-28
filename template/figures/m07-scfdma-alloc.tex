@@ -1,0 +1,11 @@
+% Module 7 — SC-FDMA uplink allocations must be contiguous in frequency
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \row/\pat/\lab/\col [count=\r from 0] in {a/0111000000/{\CNL{valid (contiguous)}{معتبر (پیوسته)}}/CNgreen,
+                                                   b/0101001000/{\CNL{INVALID (non-contiguous)}{نامعتبر (ناپیوسته)}}/CNred}{
+  \foreach \k in {1,...,10}{
+    \StrChar{\pat}{\k}[\c]
+    \ifnum\c=1 \node[draw=CNinkL!70, fill=CNcyan!25, minimum width=0.8cm, minimum height=0.6cm, font=\sffamily\scriptsize] at ({\k*0.8},{-\r*1.1}) {UE};
+    \else \node[draw=CNinkL!70, fill=white, minimum width=0.8cm, minimum height=0.6cm] at ({\k*0.8},{-\r*1.1}) {}; \fi}
+  \node[anchor=west, font=\sffamily\small\bfseries, text=\col] at (8.7,{-\r*1.1}) {\lab};}
+\draw[CNlink, ->] (0.4,0.65) -- node[above, CNtiny] {\CNL{frequency}{فرکانس}} (8.4,0.65);
+\end{tikzpicture}

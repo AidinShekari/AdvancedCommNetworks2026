@@ -1,0 +1,16 @@
+% Module 4 — too-early handover: the target cell is still too weak
+\begin{tikzpicture}
+\begin{axis}[CNplot, width=12cm, height=6cm, xmin=0, xmax=10, ymin=0, ymax=6,
+  xtick={3.4}, xticklabels={\CNL{HO here}{تحویل اینجا}}, ytick=\empty, xlabel={\CNL{time}{زمان}}, ylabel={\CNL{signal}{سیگنال}}]
+  \addplot[CNcyan, domain=0:9, samples=60, smooth] {x<2 ? 4.6 : 4.6-0.62*(x-2)};
+  \addplot[CNsig, domain=0.5:10, samples=50] {0.05+0.55*x};
+  \addplot[CNinkL, dashed, line width=0.9pt, domain=0:10] {2.8};
+  \draw[CNamber!80!black, dashed, line width=0.9pt] (axis cs:3.4,0) -- (axis cs:3.4,5.6);
+  \node[CNnote, anchor=south west] at (axis cs:3.5,4.9) {\CNL{handover triggered (too early!)}{تحویل آغاز شد (خیلی زود!)}};
+  \fill[CNred] (axis cs:3.4,1.92) circle (3pt);
+  \node[font=\sffamily\scriptsize\bfseries, text=CNred, anchor=north west, align=left] at (axis cs:3.55,1.8) {\CNL{RLF at target (too weak!)}{\lr{RLF} در مقصد (خیلی ضعیف!)}};
+  \node[font=\sffamily\scriptsize, text=CNinkL, anchor=south east] at (axis cs:9.9,2.82) {\CNL{required signal level}{سطح سیگنال لازم}};
+  \node[font=\sffamily\scriptsize\bfseries, text=CNcyanD] at (axis cs:0.9,5.0) {\CNL{serving}{خدمت‌دهنده}};
+  \node[font=\sffamily\scriptsize\bfseries, text=CNsig] at (axis cs:9.3,5.9) {\CNL{target}{مقصد}};
+\end{axis}
+\end{tikzpicture}

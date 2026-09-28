@@ -1,0 +1,8 @@
+% Module 21 — slice-management hierarchy from customer intent to subnet managers
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNext] (ci) at (0,0) {\CNL{Customer intent}{قصد مشتری}};
+\node[CNcp] (csmf) at (3.2,0) {CSMF}; \node[CNcp] (nsmf) at (5.9,0) {NSMF};
+\foreach \d/\y [count=\k] in {RAN/1.1, Core/0, Transport/-1.1}{\node[CNran, minimum width=3.2cm] (s\k) at (10.0,\y) {NSSMF (\d)};
+  \draw[CNlink, ->] (nsmf.east) -- ++(0.6,0) |- (s\k.west);}
+\draw[CNlink, ->] (ci) -- (csmf); \draw[CNlink, ->] (csmf) -- (nsmf);
+\end{tikzpicture}

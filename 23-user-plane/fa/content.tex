@@ -1,0 +1,503 @@
+\CNsection{1}{مفهوم صفحه کاربر}
+
+\textbf{صفحه کاربر} (که \textbf{صفحه داده} یا \textbf{صفحه-\lr{\mbox{U}}} نیز نامیده می‌شود) مسیول حمل داده واقعی کاربر از طریق شبکه موبایل است. این شامل موارد زیر است:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{بسته‌های \lr{\mbox{IP}}} (مرور وب، داده کاربرد، انتقال فایل)
+\item
+  \textbf{داده صدا} (فریم‌های گفتار کدگذاری‌شده \lr{VoLTE/\allowbreak{}VoNR})
+\item
+  \textbf{جریان‌های ویدیو} (ویدیوی بلادرنگ، محتوای پخش جریانی)
+\item
+  \textbf{هر بار لایه کاربرد}
+\end{itemize}
+
+صفحه کاربر از صفحه کنترل متمایز است \lr{—} در حالی که صفحه کنترل اتصالات را برقرار، مدیریت و تخریب می‌کند، صفحه کاربر همان «لوله‌ای» است که داده پس از برقراری آن اتصالات در آن جریان می‌یابد.
+
+\textbf{ویژگی‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  نیازمندی توان عملیاتی بالا
+\item
+  حساسیت کم به تأخیر
+\item
+  ارسال بدون حالت (پس از برقراری تونل‌ها)
+\item
+  مدیریت بسته آگاه به \lr{\mbox{QoS}}
+\item
+  شفاف نسبت به سیگنالینگ \lr{—} داده را بدون تفسیر حمل می‌کند
+\end{itemize}
+
+\CNkeepfig{m23-gtpu-header}{12}
+
+\CNsection{2}{پروتکل \lr{\mbox{GTP-U}} (پروتکل تونل‌سازی \lr{\mbox{GPRS}} \lr{—} صفحه کاربر)}
+
+\lr{GTP-U (3GPP TS 29.281)} پروتکل تونل‌سازی اصلی است که برای انتقال داده کاربر بین گره‌های شبکه در تمام نسل‌ها (\lr{\mbox{3G}}، \lr{\mbox{4G}}، \lr{\mbox{5G}}) استفاده می‌شود.
+
+\CNsubsection{2.1}{ساختار سرآیند}
+
+سرآیند \lr{\mbox{GTP-U}} یک \textbf{بخش اجباری 8 بایتی} به‌علاوه سرآیندهای افزونه اختیاری دارد:
+
+\CNfigure{m23-gtpu-header}{سرآیند \lr{\mbox{GTP-U}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فیلد} & \CNth{بیت‌ها} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{Version}} & 3 & همیشه \lr{\CNcode{001} (GTPv1)} \\
+\lr{\mbox{PT}} (نوع پروتکل) & 1 & \lr{\mbox{\CNcode{1} = GTP}}، \lr{\mbox{\CNcode{0} = GTP’}} (صورت‌حساب) \\
+رزروشده \lr{\mbox{(*)}} & 1 & باید 0 باشد \\
+\lr{\mbox{E}} (سرآیند افزونه) & 1 & سرآیند افزونه در ادامه می‌آید \\
+\lr{\mbox{S}} (شماره ترتیب) & 1 & فیلد شماره ترتیب موجود است \\
+\lr{\mbox{PN}} (شماره \lr{\mbox{N-PDU}}) & 1 & فیلد شماره \lr{\mbox{N-PDU}} موجود است \\
+نوع پیام & 8 & \lr{\CNcode{0xFF} = T-PDU} (داده کاربر)، بقیه = سیگنالینگ \\
+طول & 16 & طول بار (بدون 8 بایت اجباری) \\
+\lr{\mbox{TEID}} & 32 & شناسه نقطه انتهایی تونل \\
+\end{longtable}
+}
+
+\CNsubsection{2.2}{\lr{\mbox{TEID}} (شناسه نقطه انتهایی تونل)}
+
+\lr{\mbox{\textbf{\lr{\mbox{TEID}}}}} یک مقدار 32 بیتی است که یک نقطه انتهایی تونل \lr{\mbox{GTP}} را در گره دریافت‌کننده به‌طور یکتا شناسایی می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  هر جهت یک تونل \lr{\mbox{TEID}} خود را دارد
+\item
+  \textbf{گره دریافت‌کننده} \lr{\mbox{TEID}} را تخصیص می‌دهد (به فرستنده می‌گوید «هنگام ارسال به من از این \lr{\mbox{TEID}} استفاده کن»)
+\item
+  \lr{\mbox{TEID = 0}} برای پیام‌های اولیه صفحه کنترل رزرو شده است
+\item
+  یک گره ممکن است هزاران \lr{\mbox{TEID}} فعال به‌طور همزمان داشته باشد (یکی در هر حامل/\allowbreak{}نشست در هر جهت)
+\end{itemize}
+
+\textbf{مثال:}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+gNB tells UPF: "For downlink data to UE-X, use TEID = 0x00A1B2C3 on N3"
+UPF tells gNB: "For uplink data from UE-X, use TEID = 0x00D4E5F6 on N3"
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNkeepfig{m23-gtpu-encap}{5}
+
+\CNsubsection{2.3}{کپسوله‌سازی /\allowbreak{} واکپسوله‌سازی}
+
+در هر گام \lr{\mbox{GTP-U}}، بسته \lr{\mbox{IP}} کاربر درون موارد زیر \textbf{کپسوله} می‌شود:
+
+\CNfigure{m23-gtpu-encap}{کپسوله‌سازی \lr{\mbox{GTP-U}} در هر گام}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{کپسوله‌سازی} (گره فرستنده): سرآیند \lr{GTP-U + UDP + IP} بیرونی را پیش اضافه می‌کند
+\item
+  \textbf{واکپسوله‌سازی} (گره دریافت‌کننده): \lr{\mbox{IP}} بیرونی + \lr{\mbox{UDP}} + سرآیند \lr{\mbox{GTP-U}} را حذف می‌کند، \lr{\mbox{IP}} درونی را ارسال می‌کند
+\item
+  در گره‌های میانی: ممکن است واکپسوله و با \lr{\mbox{TEID}} جدید دوباره کپسوله کند
+\end{itemize}
+
+\CNsubsection{2.4}{شماره‌های ترتیب و سرآیندهای افزونه}
+
+\textbf{شماره‌های ترتیب (16 بیتی):}
+
+\begin{itemize}
+\tightlist
+\item
+  اختیاری اما برای بازترتیبی در نقاط انتهایی تونل استفاده می‌شود
+\item
+  حیاتی در حین تحویل (تضمین عدم اتلاف/\allowbreak{}بازترتیبی بسته)
+\item
+  در هر \lr{\mbox{PDU}} در هر تونل افزایش می‌یابد
+\end{itemize}
+
+\textbf{سرآیندهای افزونه:}
+
+\begin{itemize}
+\tightlist
+\item
+  از طریق فیلد «نوع سرآیند افزونه بعدی» زنجیره می‌شوند
+\item
+  هر افزونه: \lr{\CNcode{[Length (1 byte)][Content (variable)][Next Ext Hdr Type (1 byte)]}}
+\end{itemize}
+
+\Needspace{12\baselineskip}
+
+سرآیندهای افزونه معمول:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{نام} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{0x85}} & محفظه نشست \lr{\mbox{PDU}} & شناسه جریان \lr{\mbox{QoS}} در \lr{\mbox{5G (QFI)}}، \lr{\mbox{QoS}} بازتابی \\
+\lr{\mbox{0xC0}} & شماره \lr{\mbox{PDU}} در \lr{\mbox{PDCP}} & برای تحویل بدون‌اتلاف \\
+\lr{\mbox{0x40}} & پورت \lr{\mbox{UDP}} & چندگانه‌سازی اضافی \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m23-lte-path}{8}
+
+\CNsection{3}{صفحه کاربر در \lr{\mbox{LTE (4G)}}}
+
+\CNchained\CNsubsection{3.1}{مسیر سرتاسری}
+
+\CNfigure{m23-lte-path}{مسیر سرتاسری صفحه کاربر \lr{\mbox{LTE}}}
+
+\CNkeepfig{m23-lte-segments}{3}
+
+\CNsubsection{3.2}{سرآیندهای بسته در هر بخش}
+
+\CNfigure{m23-lte-segments}{سرآیندهای بسته در هر بخش صفحه کاربر \lr{\mbox{LTE}}}
+
+\CNsubsection{3.3}{مدل حامل \lr{\mbox{LTE}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{حامل پیش‌فرض}: همیشه فعال، در اتصال برقرار می‌شود (یکی در هر اتصال \lr{\mbox{PDN}})
+\item
+  \textbf{حامل اختصاصی}: \lr{\mbox{QoS}} اضافی، در صورت تقاضا برقرار می‌شود (مثلاً \lr{\mbox{VoLTE}})
+\item
+  هر حامل = مجموعه یکتایی از \lr{\mbox{TEID}}ها روی \lr{\mbox{S1-U}} و \lr{\mbox{S5}}
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m23-5g-path}{8}
+
+\CNsection{4}{صفحه کاربر در \lr{\mbox{5G}}}
+
+\CNchained\CNsubsection{4.1}{مسیر سرتاسری}
+
+\CNfigure{m23-5g-path}{مسیر سرتاسری صفحه کاربر \lr{\mbox{5G}}}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{4.2}{نقاط مرجع \lr{\mbox{5G}} برای صفحه کاربر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{بین} & \CNth{انتقال} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{N3}}}}} & \lr{gNB \ensuremath{\leftrightarrow} UPF} & \lr{\mbox{GTP-U}} روی \lr{UDP/\allowbreak{}IP} & داده کاربر \lr{\mbox{RAN}} به هسته \\
+\lr{\mbox{\textbf{\lr{\mbox{N9}}}}} & \lr{UPF \ensuremath{\leftrightarrow} UPF} & \lr{\mbox{GTP-U}} روی \lr{UDP/\allowbreak{}IP} & ارسال بین-\lr{\mbox{UPF}} \\
+\lr{\mbox{\textbf{\lr{\mbox{N6}}}}} & \lr{\mbox{UPF \ensuremath{\leftrightarrow} DN}} & \lr{\mbox{IP}} خام & خروج به شبکه داده \\
+\end{longtable}
+}
+
+\CNkeepfig{m23-nr-stack}{5}
+
+\CNsubsection{4.3}{لایه \lr{\mbox{SDAP}} (پروتکل انطباق داده خدمات)}
+
+لایه \lr{\mbox{\textbf{\lr{\mbox{SDAP}}}}} در \lr{\mbox{5G NR}} جدید است (در \lr{\mbox{LTE}} وجود ندارد) و بالای \lr{\mbox{PDCP}} قرار می‌گیرد:
+
+\CNfigure{m23-nr-stack}{پشته صفحه کاربر \lr{\mbox{NR}} با لایه جدید \lr{\mbox{SDAP}}}
+
+\textbf{توابع \lr{\mbox{SDAP}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{پیوند پایین‌سو:} نگاشت جریان \lr{QoS \ensuremath{\to} DRB} (بر اساس \lr{\mbox{QFI}} در سرآیند افزونه \lr{\mbox{GTP-U}})
+\item
+  \textbf{پیوند بالاسو:} علامت‌گذاری \lr{\mbox{DRB}} \ensuremath{\leftarrow} جریان \lr{\mbox{QoS}} (\lr{\mbox{QFI}} را روی بسته‌های پیوند بالاسو می‌زند)
+\item
+  \textbf{\lr{\mbox{QoS}} بازتابی:} \lr{\mbox{UE}} نگاشت \lr{\mbox{DL}} را برای \lr{\mbox{UL}} بدون سیگنالینگ صریح آینه می‌کند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{4.4}{معماری چند-\lr{\mbox{UPF}}}
+
+\lr{\mbox{5G}} از \textbf{زنجیره‌سازی \lr{\mbox{UPF}}} برای مسیریابی انعطاف‌پذیر ترافیک پشتیبانی می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3846}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3846}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع \lr{\mbox{UPF}}} & \CNth{نقش} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{I-UPF}}}}} (میانی) & نقطه عبور/\allowbreak{}انشعاب & لنگر تحویل، هدایت ترافیک \\
+\lr{\mbox{\textbf{\lr{\mbox{PSA-UPF}}}}} (لنگر نشست \lr{\mbox{PDU}}) & لنگر نشست، تخصیص \lr{\mbox{IP}} & نقطه آدرس \lr{\mbox{IP}} پایدار \\
+\end{longtable}
+}
+
+\CNfigure{m23-upf-chain}{زنجیره \lr{\mbox{UPF}} با خروج محلی به لبه}
+
+\Needspace{24\baselineskip}
+
+\CNsection{5}{توابع \lr{UPF (3GPP TS 23.501)}}
+
+\lr{\mbox{UPF}} توسط \lr{\mbox{SMF}} از طریق \textbf{واسط \lr{\mbox{N4}}} با استفاده از \textbf{پروتکل \lr{\mbox{PFCP}}} (پروتکل کنترل ارسال بسته، \lr{TS 29.244}) کنترل می‌شود.
+
+\CNsubsection{5.1}{قواعد \lr{\mbox{PFCP}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3600}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{قاعده} & \CNth{سرواژه} & \CNth{عملکرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{قاعده تشخیص بسته} & \lr{\mbox{PDR}} & تطبیق بسته‌های ورودی (با \lr{\mbox{TEID}}، \lr{\mbox{IP}}، پورت، \lr{\mbox{QFI}} و غیره) \\
+\textbf{قاعده اقدام ارسال} & \lr{\mbox{FAR}} & چه کاری انجام شود (ارسال، دور ریختن، بافر، تکثیر) \\
+\textbf{قاعده اجرای \lr{\mbox{QoS}}} & \lr{\mbox{QER}} & محدودسازی نرخ \lr{(MBR/\allowbreak{}GBR)}، دروازه‌بندی، علامت‌گذاری \\
+\textbf{قاعده گزارش‌دهی مصرف} & \lr{\mbox{URR}} & اندازه‌گیری حجم/\allowbreak{}زمان، محرک‌های گزارش‌دهی \\
+\textbf{قاعده اقدام بافرینگ} & \lr{\mbox{BAR}} & بافر بسته‌های \lr{\mbox{DL}} وقتی \lr{\mbox{UE}} بیکار است، اطلاع به \lr{\mbox{SMF}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m23-pdr-rules}{3}
+
+\CNsubsection{5.2}{نحوه کار قواعد با هم}
+
+\CNfigure{m23-pdr-rules}{همکاری قواعد \lr{\mbox{PFCP}} در \lr{\mbox{UPF}}}
+
+\CNsubsection{5.3}{واسط \lr{N4/\allowbreak{}PFCP}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{SMF \ensuremath{\to} UPF:}}} درخواست برقراری/\allowbreak{}اصلاح/\allowbreak{}حذف نشست
+\item
+  \lr{\textbf{\lr{UPF \ensuremath{\to} SMF:}}} گزارش نشست (گزارش‌های مصرف، اعلان داده \lr{\mbox{DL}})
+\item
+  \lr{\mbox{PFCP}} از \lr{\mbox{\textbf{\lr{\mbox{SEID}}}}} (شناسه نقطه انتهایی نشست) استفاده می‌کند \lr{—} مشابه \lr{\mbox{TEID}} اما برای کنترل
+\item
+  روی پورت \lr{\mbox{UDP 8805}} اجرا می‌شود
+\end{itemize}
+
+\CNsubsection{5.4}{فهرست کامل توابع \lr{\mbox{UPF}}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  مسیریابی و ارسال بسته
+\item
+  بازرسی بسته (\lr{\mbox{DPI}} برای تشخیص کاربرد)
+\item
+  اجرای نرخ \lr{UL/\allowbreak{}DL} (در هر جریان \lr{\mbox{QoS}})
+\item
+  گزارش‌دهی مصرف ترافیک (برای صورت‌حساب)
+\item
+  بافرینگ و اعلان بسته \lr{\mbox{DL}}
+\item
+  مدیریت \lr{\mbox{QoS}} (علامت‌گذاری \lr{\mbox{DSCP}}، پلیسینگ)
+\item
+  رهگیری قانونی (جمع‌آوری \lr{\mbox{UP}})
+\item
+  علامت‌گذاری بسته در سطح انتقال (\lr{\mbox{DSCP}} سرآیند بیرونی)
+\end{enumerate}
+
+\CNkeepfig{m23-dl-steps}{10}
+
+\CNsection{6}{مثال ردیابی بسته: داده پیوند پایین‌سو}
+
+\textbf{سناریو:} کارساز روی اینترنت داده را به \lr{\mbox{UE}} می‌فرستد
+
+\CNsubsection{6.1}{گام-به-گام}
+
+\CNfigure{m23-dl-steps}{یک بسته پیوند پایین‌سو در هر گام از اینترنت تا \lr{\mbox{UE}}}
+
+\CNkeepfig{m23-encapsulation}{3}
+
+\CNsubsection{6.2}{نمودار لایه‌های کپسوله‌سازی}
+
+\CNfigure{m23-encapsulation}{سرآیندهای یک بسته پیوند پایین‌سو در هر گام}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m23-split-bearer}{10}
+
+\CNsection{7}{بهینه‌سازی صفحه کاربر}
+
+\CNchained\CNsubsection{7.1}{اتصال دوگانه \lr{\mbox{(DC)}} \lr{—} حامل تقسیم‌شده}
+
+در \lr{\mbox{\textbf{\lr{\mbox{EN-DC}}}}} (اتصال دوگانه \lr{E-UTRA–NR}) یا \lr{\mbox{\textbf{\lr{\mbox{NR-DC}}}}}:
+
+\CNfigure{m23-split-bearer}{اتصال دوگانه با حامل تقسیم‌شده}
+
+\Needspace{12\baselineskip}
+
+\textbf{انواع حامل تقسیم‌شده:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1935}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4194}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3871}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{توضیح} & \CNth{مسیر \lr{\mbox{GTP-U}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+حامل \lr{\mbox{MCG}} & داده فقط از طریق گره اصلی & \lr{\mbox{UPF \ensuremath{\leftrightarrow} MN}} \\
+حامل \lr{\mbox{SCG}} & داده فقط از طریق گره ثانویه & \lr{\mbox{UPF \ensuremath{\leftrightarrow} SN}} \\
+حامل تقسیم‌شده & داده در هر دو گره تقسیم می‌شود & \lr{UPF \ensuremath{\leftrightarrow} MN \ensuremath{\leftrightarrow} SN} (\lr{\mbox{MN}} مسیریابی می‌کند) \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  توان عملیاتی را با تجمیع منابع رادیویی از دو گره افزایش می‌دهد
+\item
+  لایه \lr{\mbox{PDCP}} در \lr{\mbox{MN}} بازترتیبی را برای حامل‌های تقسیم‌شده مدیریت می‌کند
+\end{itemize}
+
+\CNsubsection{7.2}{\lr{\mbox{UPF}} چند-مسیره}
+
+چندین \lr{\mbox{UPF}} در مسیر داده برای موارد زیر:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{توازن بار}: توزیع ترافیک در بین \lr{\mbox{UPF}}ها
+\item
+  \textbf{افزونگی}: پیوندهای \lr{\mbox{N9}} بین \lr{\mbox{UPF}}ها برای تاب‌آوری
+\item
+  \textbf{بهینه‌سازی جغرافیایی}: مسیریابی ترافیک از نزدیک‌ترین \lr{\mbox{UPF}}
+\end{itemize}
+
+\CNkeepfig{m23-ulcl}{7}
+
+\CNsubsection{7.3}{رایانش لبه (شکست محلی)}
+
+\lr{\mbox{5G}} \textbf{هدایت ترافیک} را برای \lr{\mbox{MEC}} (رایانش لبه چند-دسترسی) ممکن می‌سازد:
+
+\textbf{طبقه‌بند پیوند بالاسو \lr{\mbox{(UL CL)}}:}
+
+\CNfigure{m23-ulcl}{طبقه‌بند پیوند بالاسو برای خروج به لبه}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UL CL}} بسته‌های \lr{\mbox{UL}} را بازرسی می‌کند و ترافیک منطبق را به \lr{\mbox{DN}} محلی مسیریابی می‌کند
+\item
+  ترافیک غیرمنطبق به \lr{\mbox{DN}} مرکزی ادامه می‌یابد
+\item
+  \textbf{همان آدرس \lr{\mbox{IP UE}}} برای هر دو مسیر (شفاف نسبت به \lr{\mbox{UE}})
+\end{itemize}
+
+\CNkeepfig{m23-branching}{2}
+
+\textbf{نقطه انشعاب:}
+
+\CNfigure{m23-branching}{نقطه انشعاب برای چندمیزبانی \lr{\mbox{IPv6}}}
+
+\begin{itemize}
+\tightlist
+\item
+  لنگرهای نشست \lr{\mbox{PDU}} متفاوت برای محلی در برابر دور
+\item
+  ممکن است از آدرس‌های \lr{\mbox{IP}} متفاوت \lr{\mbox{UE}} استفاده کند
+\end{itemize}
+
+\textbf{مزایای رایانش لبه:}
+
+\begin{itemize}
+\tightlist
+\item
+  تأخیر فوق‌العاده کم (\lr{\mbox{RTT}} کمتر از \lr{\mbox{10~ms}})
+\item
+  پهنای باند بک‌هال کاهش‌یافته
+\item
+  پردازش داده محلی (حریم خصوصی، انطباق)
+\item
+  موارد استفاده: \lr{AR/\allowbreak{}VR}، رانندگی خودران، \lr{\mbox{IoT}} صنعتی
+\end{itemize}
+
+\CNkeepfig{m23-up-path}{5}
+
+\CNsection{}{نمودار مسیر کامل صفحه کاربر \lr{\mbox{5G}}}
+
+\CNfigure{m23-up-path}{مسیر کامل صفحه کاربر \lr{\mbox{5G}}}
+
+\Needspace{26\baselineskip}
+
+\CNsection{}{جدول خلاصه: صفحه کاربر در نسل‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{3G (UMTS)}} & \CNth{\lr{\mbox{4G (LTE)}}} & \CNth{\lr{\mbox{5G (NR)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+پروتکل تونل & \lr{\mbox{GTP-U}} & \lr{\mbox{GTP-U}} & \lr{\mbox{GTP-U}} \\
+واسط \lr{\mbox{RAN}}\ensuremath{\leftarrow}هسته & \lr{\mbox{Iu-PS}} & \lr{\mbox{S1-U}} & \lr{\mbox{N3}} \\
+درون هسته & \lr{Gn (SGSN\ensuremath{\leftrightarrow}GGSN)} & \lr{S5/\allowbreak{}S8 (SGW\ensuremath{\leftrightarrow}PGW)} & \lr{N9 (UPF\ensuremath{\leftrightarrow}UPF)} \\
+هسته\ensuremath{\leftarrow}\lr{\mbox{DN}} & \lr{\mbox{Gi}} & \lr{\mbox{SGi}} & \lr{\mbox{N6}} \\
+سازوکار \lr{\mbox{QoS}} & کلاس‌های ترافیک & حامل‌ها \lr{\mbox{(QCI)}} & جریان‌های \lr{QoS (QFI)} \\
+لایه \lr{\mbox{QoS}} رادیویی & \lr{\mbox{—}} & \lr{\mbox{—}} & \lr{\mbox{SDAP}} \\
+عملکرد دروازه & \lr{\mbox{GGSN}} & \lr{\mbox{P-GW}} & \lr{\mbox{UPF}} \\
+کنترل \lr{\mbox{UP}} & \lr{\mbox{—}} & \lr{\mbox{—}} & \lr{PFCP (N4)} \\
+پشتیبانی لبه & خیر & محدود & بومی (\lr{\mbox{UL CL}}، \lr{\mbox{BP}}) \\
+\end{longtable}
+}
+
+\CNboxsection{نکات کلیدی}
+
+\begin{CNbox}[unbreakable]{sum}{نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{GTP-U}}}}} تونل جهانی صفحه کاربر است \lr{—} همان پروتکل از \lr{\mbox{3G}} تا \lr{\mbox{5G}}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{TEID}}}}} هر نقطه انتهایی تونل را شناسایی می‌کند \lr{—} توسط گیرنده تخصیص می‌یابد
+\item
+  \textbf{\lr{\mbox{5G}} صفحه کنترل و صفحه کاربر را جدا می‌کند} \lr{(CUPS) — SMF} از طریق \lr{PFCP/\allowbreak{}N4 UPF} را کنترل می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{SDAP}}}}} لایه جدید \lr{\mbox{5G}} است که جریان‌های \lr{\mbox{QoS}} را به حامل‌های رادیویی نگاشت می‌کند
+\item
+  \textbf{قواعد \lr{UPF (PDR/\allowbreak{}FAR/\allowbreak{}QER/\allowbreak{}URR/\allowbreak{}BAR)}} پردازش بسته قابل برنامه‌ریزی فراهم می‌کنند
+\item
+  \textbf{رایانش لبه} به‌طور بومی از طریق طبقه‌بند پیوند بالاسو و نقطه انشعاب پشتیبانی می‌شود
+\item
+  بهینه‌سازی صفحه کاربر (\lr{\mbox{DC}}، چند-\lr{\mbox{UPF}}، لبه) موارد استفاده متنوع \lr{\mbox{5G}} را ممکن می‌سازد
+\end{enumerate}
+
+\end{CNbox}

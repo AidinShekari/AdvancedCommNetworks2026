@@ -1,0 +1,421 @@
+\CNsection{1}{چرا \lr{\mbox{MME}} وجود دارد}
+
+\lr{\mbox{MME}} \textbf{موجودیت مرکزی صفحه کنترل} در معماری \lr{LTE/\allowbreak{}EPC} است. دلیل وجود آن:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تخلیه \lr{\mbox{RAN}} از سیگنالینگ هسته}: در \lr{2G/\allowbreak{}3G}، \lr{RNC/\allowbreak{}BSC} سیگنالینگ قابل توجهی از شبکه هسته را مدیریت می‌کرد. معماری مسطح \lr{\mbox{LTE}} تمام پایان‌دهی سیگنالینگ \lr{\mbox{NAS}} (لایه غیر-دسترسی) را به \lr{\mbox{MME}} منتقل کرد و طراحی \lr{eNodeB (eNB)} را ساده کرد.
+\item
+  \textbf{متمرکزسازی هوش صفحه کنترل}: احراز هویت، مدیریت تحرک، برقراری حامل و صفحه‌بندی همه توسط \lr{\mbox{MME}} هماهنگ می‌شوند.
+\item
+  \textbf{جداکردن صفحه کنترل از صفحه کاربر}: \lr{\mbox{MME}} به هیچ ترافیک صفحه کاربری دست نمی‌زند \lr{—} صرفاً سیگنالینگ را مدیریت می‌کند، که مقیاس‌پذیری مستقل \lr{\mbox{CP}} و \lr{\mbox{UP}} را ممکن می‌سازد.
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{واسط‌های کلیدی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{گره همتا} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{S1-MME}} & \lr{\mbox{eNB}} & \lr{S1-AP (SCTP)} & انتقال \lr{\mbox{NAS}}، سیگنالینگ تحویل \\
+\lr{\mbox{S6a}} & \lr{\mbox{HSS}} & \lr{\mbox{Diameter}} & بردارهای احراز هویت، داده اشتراک \\
+\lr{\mbox{S11}} & \lr{\mbox{S-GW}} & \lr{\mbox{GTPv2-C}} & مدیریت حامل/\allowbreak{}نشست \\
+\lr{\mbox{S10}} & \lr{\mbox{MME}} دیگر & \lr{\mbox{GTPv2-C}} & تحویل بین-\lr{\mbox{MME}}، انتقال زمینه \\
+\lr{\mbox{S3}} & \lr{\mbox{SGSN}} & \lr{\mbox{GTPv2-C}} & تحرک \lr{2G/\allowbreak{}3G \ensuremath{\leftrightarrow} LTE} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{توابع \lr{\mbox{MME}}}
+
+\CNchained\CNsubsection{2.1}{پایان‌دهی سیگنالینگ \lr{\mbox{NAS}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{MME}} نقطه انتهایی \lr{\mbox{NAS}} است \lr{—} تمام پیام‌های \lr{\mbox{NAS}} از \lr{\mbox{UE}} را پایان می‌دهد (که از طریق \lr{\mbox{eNB}} با \lr{\mbox{S1-AP}} به‌صورت شفاف منتقل می‌شوند).
+\item
+  پیام‌های \lr{\mbox{NAS}} بین \lr{\mbox{UE}} و \lr{\mbox{MME}} محافظت‌شده با یکپارچگی و رمزگذاری‌شده هستند.
+\end{itemize}
+
+\CNsubsection{2.2}{مدیریت تحرک}
+
+\begin{itemize}
+\tightlist
+\item
+  مدیریت ناحیه ردیابی \lr{\mbox{(TA)}} و تخصیص فهرست \lr{\mbox{TA}}
+\item
+  سیگنالینگ تحویل (مبتنی بر \lr{\mbox{S1}} و \lr{\mbox{X2}} با دخالت \lr{\mbox{MME}})
+\item
+  تحرک بین-\lr{\mbox{RAT}} (به/\allowbreak{}از \lr{2G/\allowbreak{}3G} از طریق \lr{S3/\allowbreak{}S10})
+\end{itemize}
+
+\CNsubsection{2.3}{احراز هویت و امنیت}
+
+\begin{itemize}
+\tightlist
+\item
+  بردارهای احراز هویت را از \lr{\mbox{HSS}} بازیابی می‌کند (از طریق \lr{\mbox{S6a}})
+\item
+  \lr{\mbox{EPS-AKA}} (احراز هویت و توافق کلید) را اجرا می‌کند
+\item
+  کلیدهای \lr{\mbox{NAS}} (\lr{\mbox{\ensuremath{K_{\mathrm{NASint}}}}}، \lr{\mbox{\ensuremath{K_{\mathrm{NASenc}}}}}) و کلیدهای \lr{AS (\ensuremath{K_{\mathrm{eNB}}})} را مشتق می‌کند
+\item
+  \lr{NAS Security Mode Command} را آغاز می‌کند
+\end{itemize}
+
+\CNsubsection{2.4}{مدیریت حامل}
+
+\begin{itemize}
+\tightlist
+\item
+  حامل‌های پیش‌فرض \lr{\mbox{EPS}} را در حین اتصال برقرار می‌کند
+\item
+  فعال‌سازی/\allowbreak{}اصلاح/\allowbreak{}غیرفعال‌سازی حامل اختصاصی را هماهنگ می‌کند
+\item
+  با \lr{S-GW (S11)} و به‌طور غیرمستقیم با \lr{\mbox{P-GW}} تعامل دارد
+\end{itemize}
+
+\CNsubsection{2.5}{صفحه‌بندی}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}}ها را در حالت \lr{\mbox{ECM-IDLE}} هنگام رسیدن داده پیوند پایین‌سو صفحه‌بندی می‌کند
+\item
+  پیام‌های \lr{S1-AP Paging} را به تمام \lr{\mbox{eNB}}ها در فهرست \lr{\mbox{TA}} ثبت‌شده \lr{\mbox{UE}} می‌فرستد
+\end{itemize}
+
+\CNsubsection{2.6}{دسترسی‌پذیری در حالت بیکار}
+
+\begin{itemize}
+\tightlist
+\item
+  زمینه \lr{\mbox{UE}} را حتی وقتی \lr{\mbox{UE}} در \lr{IDLE (ECM-IDLE)} است حفظ می‌کند
+\item
+  می‌داند \lr{\mbox{UE}} ممکن است در کدام نواحی ردیابی باشد
+\item
+  هنگام رسیدن داده یا سیگنالینگ، صفحه‌بندی را فعال می‌کند
+\end{itemize}
+
+\CNsubsection{2.7}{انتخاب، استخرسازی و توازن مجدد \lr{\mbox{MME}}}
+
+\begin{itemize}
+\tightlist
+\item
+  چندین \lr{\mbox{MME}} به همان ناحیه خدمات می‌دهند (استخر \lr{\mbox{MME}})
+\item
+  توازن بار از طریق ظرفیت نسبی (عامل وزن) که به \lr{\mbox{eNB}}ها اعلام می‌شود
+\item
+  توازن مجدد: انتقال تدریجی زمینه‌های \lr{\mbox{UE}} هنگام افزودن/\allowbreak{}حذف \lr{\mbox{MME}}ها
+\end{itemize}
+
+\CNsection{3}{پشته پروتکل \lr{\mbox{NAS}}}
+
+\lr{\mbox{NAS}} (لایه غیر-دسترسی) بین \lr{\mbox{UE}} و \lr{\mbox{MME}} عمل می‌کند و نسبت به \lr{\mbox{eNB}} شفاف است.
+
+\CNsubsection{3.1}{\lr{\mbox{EMM}} \lr{—} مدیریت تحرک \lr{\mbox{EPS}}}
+
+ثبت‌نام و تحرک \lr{\mbox{UE}} را مدیریت می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{Attach /\allowbreak{} Detach}
+\item
+  به‌روزرسانی ناحیه ردیابی \lr{\mbox{(TAU)}}
+\item
+  احراز هویت \lr{(EPS-AKA)}
+\item
+  کنترل حالت امنیتی
+\item
+  تخصیص مجدد \lr{\mbox{GUTI}}
+\item
+  درخواست خدمات
+\end{itemize}
+
+\textbf{حالت‌های \lr{\mbox{EMM}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{EMM-DEREGISTERED}: \lr{\mbox{UE}} ثبت‌نام نشده است
+\item
+  \lr{EMM-REGISTERED}: \lr{\mbox{UE}} به شبکه متصل است
+\end{itemize}
+
+\CNsubsection{3.2}{\lr{\mbox{ESM}} \lr{—} مدیریت نشست \lr{\mbox{EPS}}}
+
+اتصالات \lr{\mbox{PDN}} و حامل‌های \lr{\mbox{EPS}} را مدیریت می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  درخواست/\allowbreak{}پذیرش اتصال \lr{\mbox{PDN}}
+\item
+  تخصیص منابع حامل
+\item
+  اصلاح /\allowbreak{} غیرفعال‌سازی حامل
+\item
+  قطع اتصال \lr{\mbox{PDN}}
+\end{itemize}
+
+\textbf{\lr{\mbox{ESM}} در حین اتصال به‌صورت حمل‌شده روی \lr{\mbox{EMM}} عمل می‌کند} (پیام \lr{\mbox{ESM}} درون \lr{Attach Request} جای می‌گیرد).
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m12-attach-1}{8}
+
+\CNsection{4}{رویه‌های تفصیلی}
+
+\CNchained\CNsubsection{4.1}{اتصال اولیه \lr{\mbox{LTE}} (جریان کامل)}
+
+\CNfigure{m12-attach-1}{اتصال اولیه در \lr{\mbox{LTE}} (جریان کامل)\CNpart{1}{2}}
+
+\CNfigure{m12-attach-2}{اتصال اولیه در \lr{\mbox{LTE}} (جریان کامل)\CNpart{2}{2}}
+
+\textbf{نکات کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  گام‌های \CNnum{7-10}: \lr{\mbox{EPS-AKA}} + فعال‌سازی امنیت \lr{\mbox{NAS}}
+\item
+  گام‌های \CNnum{13-16:} برقراری نشست \lr{\mbox{GTP-C}} در سراسر \lr{S11/\allowbreak{}S5}
+\item
+  درخواست اتصال، یک \lr{PDN Connectivity Request} حمل‌شده \lr{\mbox{(ESM)}} را حمل می‌کند
+\item
+  \lr{\mbox{UE}} آدرس \lr{\mbox{IP}} خود را از \lr{\mbox{P-GW}} می‌گیرد (گام 15)
+\end{itemize}
+
+\CNkeepfig{m12-auth-smc}{3}
+
+\CNsubsection{4.2}{احراز هویت و حالت امنیتی}
+
+\CNfigure{m12-auth-smc}{احراز هویت \lr{\mbox{EPS-AKA}} و حالت امنیتی \lr{\mbox{NAS}}}
+
+\CNkeepfig{m12-key-chain}{2}
+
+\textbf{سلسله‌مراتب مشتق‌سازی کلید:}
+
+\CNfigure{m12-key-chain}{سلسله‌مراتب استخراج کلید}
+
+\CNsubsection{4.3}{به‌روزرسانی ناحیه ردیابی \lr{\mbox{(TAU)}}}
+
+\textbf{محرک‌ها:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{TAU}} دوره‌ای}: تایمر \lr{\mbox{T3412}} منقضی می‌شود (پیش‌فرض حدود 54 دقیقه) \lr{—} تأیید می‌کند \lr{\mbox{UE}} هنوز قابل دسترسی است
+\item
+  \textbf{\lr{\mbox{TAU}} با محرک تحرک}: \lr{\mbox{UE}} به سلولی می‌رود که \lr{\mbox{TAC}} آن در فهرست \lr{\mbox{TA}} آن نیست
+\end{itemize}
+
+\CNfigure{m12-tau}{به‌روزرسانی ناحیه ردیابی، بین-\lr{\mbox{MME}} و درون-\lr{\mbox{MME}}}
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m12-detach-ue}{5}
+
+\CNsubsection{4.4}{رویه جداسازی}
+
+\CNchained\CNsubsubsection{جداسازی با شروع \lr{\mbox{UE}}}
+
+\CNfigure{m12-detach-ue}{جداسازی آغازشده توسط \lr{\mbox{UE}}}
+
+\CNkeepfig{m12-detach-net}{2}
+
+\CNsubsubsection{جداسازی با شروع شبکه}
+
+\CNfigure{m12-detach-net}{جداسازی آغازشده توسط شبکه}
+
+\CNkeepfig{m12-paging}{3}
+
+\CNsubsection{4.5}{صفحه‌بندی (رویه صفحه‌بندی \lr{\mbox{S1}})}
+
+\CNfigure{m12-paging}{صفحه‌بندی \lr{\mbox{S1}} برای \lr{\mbox{UE}} در حالت بیکار}
+
+\CNkeepfig{m12-service-request}{3}
+
+\CNsubsection{4.6}{درخواست خدمات (\lr{\mbox{UE}} از \lr{IDLE \ensuremath{\to} CONNECTED})}
+
+\CNfigure{m12-service-request}{درخواست سرویس \lr{(ECM-IDLE \ensuremath{\to} ECM-CONNECTED)}}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{مدیریت حامل}
+
+\CNchained\CNsubsection{5.1}{برقراری حامل پیش‌فرض}
+
+\begin{itemize}
+\tightlist
+\item
+  به‌طور خودکار در حین اتصال اولیه ایجاد می‌شود (بخشی از \lr{Create Session})
+\item
+  یک حامل پیش‌فرض در هر اتصال \lr{\mbox{PDN}} (همیشه فعال، غیر-\lr{\mbox{GBR}})
+\item
+  \lr{\mbox{QCI}} معمولاً 9 (اینترنت بهترین تلاش) یا 5 (سیگنالینگ \lr{\mbox{IMS}})
+\item
+  بدون قطع اتصال \lr{\mbox{PDN}} نمی‌تواند غیرفعال شود
+\end{itemize}
+
+\CNkeepfig{m12-dedicated-bearer}{3}
+
+\CNsubsection{5.2}{فعال‌سازی حامل اختصاصی}
+
+\CNfigure{m12-dedicated-bearer}{فعال‌سازی حامل اختصاصی آغازشده توسط شبکه}
+
+\CNsubsection{5.3}{اصلاح حامل اختصاصی}
+
+\begin{itemize}
+\tightlist
+\item
+  با محرک تغییر سیاست \lr{\mbox{PCRF}} (مثلاً ارتقای \lr{\mbox{QoS}} در حین تماس \lr{\mbox{VoLTE}})
+\item
+  از \lr{Update Bearer Request/\allowbreak{}Response} در سراسر \lr{S5 \ensuremath{\to} S11 \ensuremath{\to} S1-AP} استفاده می‌کند
+\end{itemize}
+
+\CNsubsection{5.4}{غیرفعال‌سازی حامل اختصاصی}
+
+\begin{itemize}
+\tightlist
+\item
+  با محرک \lr{\mbox{PCRF}} (حذف سیاست)، \lr{\mbox{P-GW}} یا \lr{\mbox{MME}}
+\item
+  از \lr{Delete Bearer Request/\allowbreak{}Response} استفاده می‌کند
+\item
+  غیرفعال‌سازی حامل پیش‌فرض = قطع اتصال \lr{\mbox{PDN}} (تمام حامل‌های آن \lr{\mbox{PDN}} حذف می‌شوند)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{انتخاب \lr{\mbox{MME}}}
+
+\CNchained\CNsubsection{6.1}{انتخاب مبتنی بر \lr{\mbox{DNS}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{eNB}} نام \lr{\mbox{FQDN}} مربوط به \lr{\mbox{MME}} را از \lr{\mbox{TAI}} حل می‌کند \ensuremath{\leftarrow} \lr{\mbox{DNS}} فهرست \lr{\mbox{IP}}های \lr{\mbox{MME}} را بازمی‌گرداند
+\item
+  قالب: \lr{\CNcode{tac-XXXX.}\allowbreak{}\CNcode{tac-YYYY.}\allowbreak{}\CNcode{mme.}\allowbreak{}\CNcode{epc.}\allowbreak{}\CNcode{mnc\textless{}MNC\textgreater{}.}\allowbreak{}\CNcode{mcc\textless{}MCC\textgreater{}.}\allowbreak{}\CNcode{3gppnetwork.}\allowbreak{}\CNcode{org}}
+\end{itemize}
+
+\CNsubsection{6.2}{توازن بار}
+
+\begin{itemize}
+\tightlist
+\item
+  هر \lr{\mbox{MME}} یک \textbf{ظرفیت نسبی \lr{\mbox{MME}}} (وزن، \CNnum{0-255)} را از طریق \lr{\mbox{S1 Setup}} اعلام می‌کند
+\item
+  \lr{\mbox{eNB UE}}های جدید را به‌تناسب در بین اعضای استخر توزیع می‌کند
+\item
+  مقدار ظرفیت بالاتر = \lr{\mbox{UE}}های بیشتر به آن \lr{\mbox{MME}} هدایت می‌شوند
+\end{itemize}
+
+\CNsubsection{6.3}{\lr{\mbox{GUMMEI}} \lr{—} شناسه یکتای جهانی \lr{\mbox{MME}}}
+
+\CNdisplay{\mathrm{GUMMEI} = \mathrm{MCC} + \mathrm{MNC} + \text{\rl{شناسه گروه MME (MMEGI)}} + \text{\rl{کد MME (MMEC)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{MMEGI}} استخر \lr{\mbox{MME}} را شناسایی می‌کند
+\item
+  \lr{\mbox{MMEC}} یک \lr{\mbox{MME}} مشخص درون استخر را شناسایی می‌کند
+\item
+  \lr{GUTI = GUMMEI + M-TMSI} (هویت موقت \lr{\mbox{UE}})
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{\lr{\mbox{S1-Flex}} و استخرسازی \lr{\mbox{MME}}}
+
+\CNchained\CNsubsection{}{مفهوم}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{S1-Flex}}}}}: هر \lr{\mbox{eNB}} به \textbf{چندین \lr{\mbox{MME}}} در یک استخر متصل می‌شود (نه فقط یکی)
+\item
+  \textbf{ناحیه استخر \lr{\mbox{MME}}}: ناحیه جغرافیایی که توسط مجموعه‌ای از \lr{\mbox{MME}}ها خدمات می‌گیرد
+\item
+  مزایا:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{افزونگی}: اگر یک \lr{\mbox{MME}} شکست بخورد، بقیه به \lr{\mbox{UE}}ها خدمات می‌دهند
+  \item
+    \textbf{اشتراک بار}: \lr{\mbox{UE}}های جدید بر اساس وزن توزیع می‌شوند
+  \item
+    \textbf{افزونگی جغرافیایی}: اعضای استخر می‌توانند در مراکز داده مختلف باشند
+  \item
+    \textbf{مقیاس‌دهی تدریجی}: افزودن/\allowbreak{}حذف \lr{\mbox{MME}}ها بدون وقفه سرویس
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{}{اضافه‌بار و توازن مجدد \lr{\mbox{MME}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{MME}} یک \lr{\textbf{\lr{Overload Start}}} به \lr{\mbox{eNB}}ها می‌فرستد \ensuremath{\leftarrow} \lr{\mbox{eNB}} اتصالات جدید را به سایر اعضای استخر هدایت می‌کند
+\item
+  \textbf{توازن مجدد}: \lr{\mbox{MME}} از \lr{\mbox{UE}}ها می‌خواهد دوباره متصل شوند تا بار را بازتوزیع کند (از طریق جداسازی ضمنی با نشانه اتصال مجدد)
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsection{8}{تحول: \lr{MME \ensuremath{\to} AMF (5G)}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3200}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3600}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3200}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{MME}} در \lr{\mbox{LTE}}} & \CNth{\lr{\mbox{AMF}} در \lr{\mbox{5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+معماری & \lr{\mbox{NE}} یکپارچه & میکروسرویس (مبتنی بر \lr{\mbox{SBI}}) \\
+پروتکل & \lr{\mbox{GTPv2-C}}، \lr{\mbox{Diameter}} & \lr{HTTP/\allowbreak{}2}، \lr{JSON (SBI)}، \lr{\mbox{NGAP}} \\
+\lr{\mbox{NAS}} & \lr{EMM + ESM} (ترکیبی) & \lr{\mbox{5G-NAS}} (فقط \lr{\mbox{MM}}؛ \lr{\mbox{SM}} به \lr{\mbox{SMF}} جدا شد) \\
+مدیریت نشست & \lr{\mbox{MME}} سیگنالینگ حامل را انجام می‌دهد & کاملاً به \lr{\mbox{SMF}} واگذار شده \\
+شبکه‌بندی & \lr{N/\allowbreak{}A} & آگاه به برش، مسیریابی به \lr{\mbox{SMF}} صحیح در هر برش \\
+ثبت‌نام & \lr{Attach/\allowbreak{}TAU} & \lr{\mbox{Registration}} (یکپارچه) \\
+حالت & حالت‌دار & طراحی‌شده برای بدون-حالت \lr{\mbox{(UDSF)}} \\
+واسط با \lr{\mbox{RAN}} & \lr{\mbox{S1-AP}} & \lr{NGAP (N2)} \\
+واسط با \lr{\mbox{UDM}} & \lr{Diameter S6a} & \lr{Nudm (SBI)} \\
+\end{longtable}
+}
+
+\textbf{تغییرات کلیدی:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{جداسازی مدیریت نشست}: \lr{\mbox{MME}} هم تحرک و هم حامل‌ها را انجام می‌داد؛ در \lr{\mbox{5G}}، \lr{\mbox{AMF}} فقط تحرک/\allowbreak{}امنیت را انجام می‌دهد، \lr{\mbox{SMF}} نشست‌ها را مدیریت می‌کند
+\item
+  \textbf{واسط خدمات‌محور}: \lr{\mbox{AMF}} خدمات \lr{\mbox{Namf}} را ارایه می‌دهد که توسط سایر \lr{\mbox{NF}}ها از طریق \lr{HTTP/\allowbreak{}2} مصرف می‌شود
+\item
+  \textbf{شبکه‌بندی}: \lr{\mbox{AMF}} انتخاب برش (تعامل \lr{\mbox{NSSF}}) را انجام می‌دهد و به \lr{\mbox{SMF}} مختص برش مسیریابی می‌کند
+\item
+  \textbf{طراحی بدون حالت}: زمینه \lr{\mbox{UE}} می‌تواند به‌صورت خارجی \lr{\mbox{(UDSF)}} برای تاب‌آوری ذخیره شود
+\item
+  \textbf{ثبت‌نام یکپارچه}: بدون \lr{\mbox{Attach}} در برابر \lr{\mbox{TAU}} جداگانه \lr{—} رویه \lr{\mbox{Registration}} واحد هر دو را مدیریت می‌کند
+\end{enumerate}

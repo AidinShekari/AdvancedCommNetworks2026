@@ -1,0 +1,35 @@
+# Advanced Communication Networks — Course Description
+
+## Introduction
+
+**Advanced Communication Networks** is a 3-credit course (48 hours, 16 weeks × 3 hours) for senior undergraduate and graduate students of electrical and telecommunication engineering, taught as lectures with laboratories and a project. The course is a coherent technical journey through the evolution of mobile networks from GSM (2G) to LTE (4G), 5G NR/SA and the emerging concepts of 6G — not a collection of separate technologies, but a continuous analysis of **why** each generation appeared, **what** problem it solved and **how** traffic flows through its architecture. The course is built on a “why / what / how” logic so that students can analyse and evaluate architectural decisions instead of memorising lists of protocols.
+
+## Structure and Content
+
+The material is organised in **26 modules**:
+
+- **2G/3G foundations (modules 1–4):** GSM architecture, GPRS and EDGE, circuit switching and SS7 signalling, 2G/3G core networks and the basics of mobility management and handover.
+- **4G access and core (modules 5–13):** LTE architecture, the E-UTRAN access network, the protocol stack, resource scheduling, the random access channel (RACH), the Evolved Packet Core (EPC), the Diameter protocol, the HSS and authentication, the MME, and the S-GW/P-GW with GTP tunnelling.
+- **Software-driven architectures (modules 15–18):** software-defined networking (SDN), network function virtualisation (NFV), the 3GPP standardisation process and the 5G service-based architecture (SBA).
+- **5G core and procedures (modules 14, 19–22):** the 5G core architecture, signalling procedures (registration, 5G-AKA authentication, PDU session establishment and release, paging, handover), network slicing and the evolution of the QoS framework (from QCI to 5QI).
+- **Planes and outlook (modules 23–26):** the user plane and the control plane, a comprehensive synthesis of network evolution, and 6G research directions including ISAC, RIS, AI-native networks, cell-free MIMO and sub-THz.
+
+Every module comes with comparison tables, architecture diagrams, step-by-step signalling sequence diagrams and review questions. A prerequisites review recalls the basics of OSI, RF, modulation, OFDM, IP networking, probability and decibel arithmetic.
+
+## Learning Objectives
+
+By the end of the course, students can trace the evolution of the generations; analyse core architectures (circuit-switched, packet-switched, the all-IP EPC and the service-based 5G core); compare mobility management and handover across generations; apply network slicing, QoS, SDN and NFV in modern networks; explain 5G core procedures at the signalling level; and critically assess 6G research directions.
+
+## Assessment and Practical Work
+
+| Component | Weight |
+|-------|-----|
+| Exams (midterm 20% + final 30%) | 50% |
+| Laboratories (6 labs × 5%) | 30% |
+| Project (proposal 5% + report and demo 15%) | 20% |
+
+The laboratory assignments cover the LTE link budget, EPC signalling traces, 5G NR scheduling and resource allocation, SBA service discovery, network slicing configuration and user-plane traffic tracing. The project, individual or in pairs, is defined on topics such as a comparative analysis of LTE versus 5G, an enterprise network-slicing design, implementing a scheduling algorithm with the simulator, or signalling analysis with real packet captures.
+
+## Main References
+
+Sesia et al. (*LTE – The UMTS Long Term Evolution*), Dahlman et al. (*5G NR: The Next Generation Wireless Access Technology*), Holma and Toskala (*LTE for UMTS*), the 3GPP specifications (TS 23.501, 23.502, 24.501, 38.300) and Rappaport (*Wireless Communications*).

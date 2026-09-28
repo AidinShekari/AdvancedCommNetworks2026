@@ -1,0 +1,10 @@
+% Module 4 — the location-update trade-off
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, every node/.append style={minimum height=1.05cm}]
+\node[CNbox, text width=3.6cm] (a1) at (0,0) {\CNL{More frequent}{به‌روزرسانی مکان}\\\CNL{location updates}{پرتکرارتر}};
+\node[CNok,  text width=3.6cm] (a2) at (5.2,0) {\CNL{Better paging}{دقت صفحه‌بندی}\\\CNL{accuracy}{بهتر}};
+\node[CNbad, text width=3.6cm] (a3) at (10.4,0) {\CNL{More signalling}{سربار سیگنالینگ}\\\CNL{overhead}{بیشتر}};
+\node[CNbox, text width=3.6cm] (b1) at (0,-1.9) {\CNL{Less frequent}{به‌روزرسانی مکان}\\\CNL{location updates}{کم‌تکرارتر}};
+\node[CNok,  text width=3.6cm] (b2) at (5.2,-1.9) {\CNL{Less signalling}{سیگنالینگ کمتر}};
+\node[CNbad, text width=3.6cm] (b3) at (10.4,-1.9) {\CNL{Longer paging}{تأخیر صفحه‌بندی}\\\CNL{delay}{بیشتر}};
+\foreach \r in {a,b}{\draw[CNlink, ->] (\r1) -- (\r2); \draw[CNlink, ->] (\r2) -- (\r3);}
+\end{tikzpicture}

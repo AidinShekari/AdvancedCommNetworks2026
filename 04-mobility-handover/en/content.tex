@@ -1,0 +1,1836 @@
+\begin{CNbox}[unbreakable]{obj}{Learning Objectives}
+
+By the end of this module, you will be able to:
+
+\begin{itemize}
+\tightlist
+\item
+  Explain WHY mobility management is essential in cellular networks
+\item
+  Distinguish between Location Areas, Routing Areas, and Tracking Areas
+\item
+  Describe cell reselection mechanisms in idle mode
+\item
+  Classify and compare handover types across generations
+\item
+  Analyze the handover decision process using measurement events
+\item
+  Trace the LTE X2 handover procedure step by step
+\item
+  Identify handover failures and their mitigation strategies
+\item
+  Compare mobility evolution from 2G through 5G
+\end{itemize}
+
+\end{CNbox}
+
+\Needspace{14\baselineskip}
+
+\CNsection{1}{Why Mobility Management Is Needed}
+
+\CNchained\CNsubsection{}{WHY}
+
+Users are mobile — they walk, drive, and travel while expecting uninterrupted voice calls, video streams, and data sessions. Without mobility management, a user crossing a cell boundary would experience immediate service disconnection.
+
+\CNsubsection{}{WHAT}
+
+Mobility management is the set of network procedures that:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Track} the user’s location (so the network can reach them for incoming calls/\allowbreak{}data)
+\item
+  \textbf{Maintain} service continuity when the user moves between cells (handover)
+\item
+  \textbf{Optimize} radio resource usage by connecting users to the best-serving cell
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{}{HOW}
+
+The network achieves this through two complementary mechanisms:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4074}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{State} & \CNth{Mechanism} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Idle mode} & Cell reselection + location/\allowbreak{}tracking updates & Network knows user’s approximate location \\
+\textbf{Connected mode} & Handover & Seamless transfer of active connection \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-lu-tradeoff}{3}
+
+\CNsubsection{}{The Fundamental Trade-off}
+
+\CNfigure{m04-lu-tradeoff}{The location-update trade-off: paging accuracy versus signalling load}
+
+The network must balance:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Signaling load} (updates consume radio resources)
+\item
+  \textbf{Paging load} (larger areas = more cells to page)
+\item
+  \textbf{Service latency} (time to reach the user for incoming services)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{Location Management: LA vs RA vs TA}
+
+\CNchained\CNsubsection{}{WHY}
+
+The network needs to know WHERE a user is (approximately) to deliver incoming calls or data. Different generations use different grouping strategies to balance signaling vs. paging efficiency.
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{WHAT}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2292}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2708}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2083}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2917}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Generation} & \CNth{Area Concept} & \CNth{Used For} & \CNth{Typical Size} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2G (GSM) & \textbf{Location Area (LA)} & Circuit-switched services & 20–100 cells \\
+2.5G (GPRS) & \textbf{Routing Area (RA)} & Packet-switched services & Subset of LA, 10–50 cells \\
+4G (LTE) & \textbf{Tracking Area (TA)} & All services (all-IP) & 30–80 cells \\
+5G (NR) & \textbf{Tracking Area} + RNA & All services + RAN-level & Configurable per UE \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-la-cells}{3}
+
+\CNsubsection{}{HOW — Location Area (2G)}
+
+\CNfigure{m04-la-cells}{A Location Area groups many cells}
+
+\begin{itemize}
+\tightlist
+\item
+  UE performs \textbf{Location Area Update (LAU)} when crossing LA boundary
+\item
+  Network pages ALL cells in the LA for incoming call
+\item
+  Managed by MSC/\allowbreak{}VLR
+\end{itemize}
+
+\CNsubsection{}{HOW — Routing Area (GPRS)}
+
+\begin{itemize}
+\tightlist
+\item
+  RA is a \textbf{subset} of an LA (one LA contains multiple RAs)
+\item
+  UE performs \textbf{Routing Area Update (RAU)} for packet services
+\item
+  Managed by SGSN
+\item
+  Allows finer-grained location for data users
+\end{itemize}
+
+\CNsubsection{}{HOW — Tracking Area (LTE/\allowbreak{}5G)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Tracking Area List (TAL)}: UE is assigned a LIST of TAs — no update needed when moving within the list
+\item
+  Reduces signaling for high-mobility users (larger TAL)
+\item
+  Low-mobility users get smaller TAL to reduce paging area
+\end{itemize}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+UE TAL = {TA1, TA2, TA3, TA4}
+
+Moving TA1→TA2→TA3→TA4: NO update needed
+Moving TA4→TA5 (outside TAL): Tracking Area Update triggered
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNsubsection{}{5G Enhancement: RAN-based Notification Area (RNA)}
+
+\begin{itemize}
+\tightlist
+\item
+  In \textbf{RRC\_\allowbreak{}INACTIVE} state (new in 5G), the gNB manages a smaller RNA
+\item
+  Reduces core network signaling
+\item
+  Two-level mobility: RNA (RAN-managed) + TA (core-managed)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{Cell Reselection (Idle Mode Mobility)}
+
+\CNchained\CNsubsection{}{WHY}
+
+Even when not in an active call/\allowbreak{}session, the UE must camp on the best cell to:
+
+\begin{itemize}
+\tightlist
+\item
+  Receive paging messages efficiently
+\item
+  Ensure good signal quality when a connection is needed
+\item
+  Avoid unnecessary location updates
+\end{itemize}
+
+\CNsubsection{}{WHAT}
+
+Cell reselection is the \textbf{UE-autonomous} process of selecting a new cell to camp on while in idle mode. The network provides parameters via System Information Broadcasts (SIBs), but the UE makes the decision independently.
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{HOW — Cell Reselection Criteria}
+
+\CNchained\CNsubsubsection{Ranking Criterion (S-criterion)}
+
+A cell is suitable for camping if it meets the S-criterion:
+
+\CNdisplay{
+\begin{aligned}
+S_{\mathrm{rxlev}} &= Q_{\mathrm{rxlevmeas}} - \left(Q_{\mathrm{rxlevmin}} + Q_{\mathrm{rxlevminoffset}}\right) - P_{\mathrm{compensation}} > 0\\
+S_{\mathrm{qual}} &= Q_{\mathrm{qualmeas}} - \left(Q_{\mathrm{qualmin}} + Q_{\mathrm{qualminoffset}}\right) > 0
+\end{aligned}
+}
+
+Where:
+
+\begin{itemize}
+\tightlist
+\item
+  \CNcode{Qrxlevmeas}: Measured RSRP (dBm)
+\item
+  \CNcode{Qrxlevmin}: Minimum required RSRP (-124 to -44~dBm, typical: -124~dBm)
+\item
+  \CNcode{Qqualmeas}: Measured RSRQ (dB)
+\item
+  \CNcode{Qqualmin}: Minimum required RSRQ (-20 to -3~dB, typical: -20~dB)
+\end{itemize}
+
+\CNsubsubsection{Cell Ranking (R-criterion)}
+
+For intra-frequency reselection, cells are ranked:
+
+\CNdisplay{
+\begin{aligned}
+R_s &= Q_{\mathrm{meas},s} + Q_{\mathrm{Hyst}} &&\text{(serving cell)}\\
+R_n &= Q_{\mathrm{meas},n} - Q_{\mathrm{offset}} &&\text{(neighbour cell)}
+\end{aligned}
+}
+
+Reselect to the neighbour if $R_n > R_s$ holds for the duration $T_{\mathrm{reselection}}$.
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{Priority-Based Reselection (Inter-frequency/\allowbreak{}Inter-RAT)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5556}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4444}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Priority} & \CNth{Action} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Higher priority layer & Reselect if neighbor meets ThreshX,High \\
+Equal priority layer & Use ranking (R-criterion) \\
+Lower priority layer & Reselect only if serving \textless{} ThreshServing,Low AND neighbor \textgreater{} ThreshX,Low \\
+\end{longtable}
+}
+
+\CNsubsection{}{HOW — Hysteresis and Timers}
+
+\textbf{Hysteresis (QHyst)} prevents ping-pong reselection:
+
+\begin{itemize}
+\tightlist
+\item
+  Typical values: 2–6~dB
+\item
+  Adds ``stickiness'' to the serving cell
+\end{itemize}
+
+\textbf{Treselection timer} (typically 1–4 seconds):
+
+\begin{itemize}
+\tightlist
+\item
+  Neighbor must remain better for this duration before reselection occurs
+\item
+  Prevents reselection due to momentary fading
+\end{itemize}
+
+\CNfigure{m04-reselection}{Cell reselection: the neighbour must stay above serving + QHyst for Treselection}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Typical Cell Reselection Parameters}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3235}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4118}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2647}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Typical Value} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+QHyst & 4~dB & Serving cell hysteresis \\
+Treselection & 2~s & Stability timer \\
+Qrxlevmin & -124~dBm & Minimum RSRP for cell selection \\
+Qqualmin & -20~dB & Minimum RSRQ for cell selection \\
+ThreshServing,Low & 4 (= 4~dB) & Threshold to leave serving (to lower priority) \\
+ThreshX,High & 8 (= 8~dB) & Threshold to enter higher priority layer \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{Handover Types}
+
+\CNchained\CNsubsection{}{WHY}
+
+Different mobility scenarios require different handover strategies. A user walking between co-channel cells needs a different mechanism than a user on a high-speed train crossing between LTE and 3G coverage areas.
+
+\CNkeepfig{m04-ho-types}{3}
+
+\CNsubsection{}{WHAT — Classification Overview}
+
+\CNfigure{m04-ho-types}{Classification of handovers}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.1}{Intra-Frequency Handover}
+
+\CNchained\CNsubsubsection{WHY}
+
+Most common handover — occurs when user moves between cells operating on the \textbf{same carrier frequency}. This is the typical scenario in dense urban deployments.
+
+\CNsubsubsection{WHAT}
+
+\begin{itemize}
+\tightlist
+\item
+  Source and target cells use the same frequency (e.g., both on 1800~MHz Band 3)
+\item
+  UE can measure neighbors WITHOUT measurement gaps
+\item
+  Fastest and simplest handover type
+\end{itemize}
+
+\CNsubsubsection{HOW}
+
+\begin{itemize}
+\tightlist
+\item
+  UE continuously measures RSRP/\allowbreak{}RSRQ of serving and intra-frequency neighbors
+\item
+  No interruption to measurements needed (same frequency = can measure while receiving)
+\item
+  Triggered by Event A3: Neighbor becomes offset better than serving
+\end{itemize}
+
+\textbf{Typical scenario}: Walking between adjacent cells in a shopping mall (all cells on same frequency)
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.2}{Inter-Frequency Handover}
+
+\CNchained\CNsubsubsection{WHY}
+
+Networks deploy multiple frequency layers for capacity (e.g., macro on 800~MHz for coverage, small cells on 2600~MHz for capacity). Users must move between these layers.
+
+\CNsubsubsection{WHAT}
+
+\begin{itemize}
+\tightlist
+\item
+  Source and target cells operate on \textbf{different carrier frequencies}
+\item
+  UE needs \textbf{measurement gaps} to tune its receiver to other frequencies
+\item
+  Slightly longer interruption than intra-frequency
+\end{itemize}
+
+\CNsubsubsection{HOW}
+
+\begin{itemize}
+\tightlist
+\item
+  Network configures measurement gaps (6~ms every 40 or 80~ms)
+\item
+  UE measures inter-frequency neighbors during gaps
+\item
+  Triggered by Event A4 (neighbor on other frequency becomes better than threshold) or A5 (serving degrades AND neighbor is good)
+\end{itemize}
+
+\textbf{Typical scenario}: User moves from indoor small cell (2600~MHz) to outdoor macro (800~MHz)
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.3}{Inter-RAT Handover}
+
+\CNchained\CNsubsubsection{WHY}
+
+Not all areas have LTE/\allowbreak{}5G coverage. When LTE signal degrades, the UE may need to fall back to 3G (UMTS) or even 2G (GSM) to maintain service. Also used for CS Fallback (voice calls).
+
+\CNsubsubsection{WHAT}
+
+\begin{itemize}
+\tightlist
+\item
+  Handover between different radio access technologies
+\item
+  Examples: LTE \ensuremath{\to} UMTS, LTE \ensuremath{\to} GSM, NR \ensuremath{\to} LTE
+\item
+  Most complex type — different protocols, different core networks
+\end{itemize}
+
+\CNsubsubsection{HOW}
+
+\begin{itemize}
+\tightlist
+\item
+  UE measures inter-RAT neighbors during measurement gaps
+\item
+  Triggered by Event B1 (inter-RAT neighbor above threshold) or B2 (serving below threshold AND inter-RAT above threshold)
+\item
+  Requires inter-RAT coordination between eNB and RNC/\allowbreak{}BSC
+\end{itemize}
+
+\textbf{Typical scenario}:
+
+\begin{itemize}
+\tightlist
+\item
+  VoLTE not available \ensuremath{\to} CS Fallback to 3G for voice call
+\item
+  User drives into rural area with only 3G coverage
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.4}{Hard Handover (Break-Before-Make)}
+
+\CNchained\CNsubsubsection{WHY}
+
+When simultaneous connection to two cells is not possible (different frequencies, different technologies, or system design choice), the old connection must be released before the new one is established.
+
+\CNsubsubsection{WHAT}
+
+\begin{itemize}
+\tightlist
+\item
+  Connection to source cell is \textbf{released} before connecting to target
+\item
+  Brief interruption in service (typically 20–50~ms in LTE)
+\item
+  Used in: GSM, LTE, 5G NR
+\end{itemize}
+
+\CNkeepfig{m04-hard-ho-gap}{2}
+
+\CNsubsubsection{HOW}
+
+\CNfigure{m04-hard-ho-gap}{Hard handover: break before make}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Advantage}: Simpler, no need for combining/\allowbreak{}splitting
+\item
+  \textbf{Disadvantage}: Brief interruption (acceptable for data, noticeable for voice in 2G)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.5}{Soft Handover (Make-Before-Break) — 3G UMTS Specific}
+
+\CNchained\CNsubsubsection{WHY}
+
+CDMA-based 3G systems can receive the same signal from multiple cells simultaneously (same frequency, code division). This enables seamless handover with NO interruption.
+
+\CNsubsubsection{WHAT}
+
+\begin{itemize}
+\tightlist
+\item
+  UE is connected to \textbf{multiple cells simultaneously} (Active Set)
+\item
+  Signals from multiple cells are \textbf{combined} for diversity gain
+\item
+  Unique to CDMA/\allowbreak{}WCDMA (3G) — NOT used in LTE or 5G
+\end{itemize}
+
+\CNsubsubsection{HOW — Active Set Management}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Active Set Events (3GPP UMTS):
+- Event 1A: Add cell to Active Set (neighbor strong enough)
+- Event 1B: Remove cell from Active Set (cell too weak)
+- Event 1C: Replace cell in Active Set (better candidate found)
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNfigure{m04-soft-ho-region}{Soft handover region: the UE is connected to both cells}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Active Set}: Set of cells currently serving the UE (max 3–6 cells)
+\item
+  \textbf{Soft handover}: Between cells of same Node B or different Node Bs, same frequency
+\item
+  \textbf{Softer handover}: Between sectors of the SAME Node B (MRC combining at Node B)
+\end{itemize}
+
+\textbf{Advantages}:
+
+\begin{itemize}
+\tightlist
+\item
+  No interruption
+\item
+  Macro-diversity gain (2–3~dB)
+\item
+  Reduced ping-pong
+\end{itemize}
+
+\textbf{Disadvantages}:
+
+\begin{itemize}
+\tightlist
+\item
+  Uses resources in multiple cells simultaneously
+\item
+  Increased backhaul and processing requirements
+\item
+  Adds complexity to power control
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{Handover Decision Process}
+
+\CNchained\CNsubsection{}{WHY}
+
+The network must decide WHEN to handover, to WHICH cell, and ensure the decision is robust against fading and noise. A poorly timed handover causes drops; a well-tuned one is imperceptible to the user.
+
+\CNsubsection{}{WHAT}
+
+The handover decision in LTE is based on:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{UE Measurement Reports} — periodic or event-triggered
+\item
+  \textbf{Measurement Events} — conditions that trigger the report
+\item
+  \textbf{Hysteresis and Time-to-Trigger} — filtering to avoid false triggers
+\item
+  \textbf{Network decision} — eNB evaluates report and decides
+\end{enumerate}
+
+\Needspace{11\baselineskip}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.1}{Measurement Reports (RSRP and RSRQ)}
+
+\CNchained\CNsubsubsection{WHAT}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2286}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Metric} & \CNth{Full Name} & \CNth{Range} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{RSRP} & Reference Signal Received Power & -140 to -44~dBm & Signal strength (coverage) \\
+\textbf{RSRQ} & Reference Signal Received Quality & -20 to -3~dB & Signal quality (accounts for interference + noise) \\
+\textbf{SINR} & Signal-to-Interference-plus-Noise Ratio & -23 to 40~dB & Overall link quality \\
+\end{longtable}
+}
+
+\CNsubsubsection{HOW}
+
+\CNdisplay{\mathrm{RSRP} = \text{power of one resource element carrying the reference signal}}
+
+\CNdisplay{\mathrm{RSRQ} = \frac{N \times \mathrm{RSRP}}{\mathrm{RSSI}}}
+
+where $N$ is the number of RBs and RSSI is the total received wideband power.
+
+\begin{itemize}
+\tightlist
+\item
+  RSRP answers “how strong is \textbf{my} cell’s signal?”
+\item
+  RSRQ answers “how good is \textbf{my} cell’s signal relative to everything else I hear?”
+\end{itemize}
+
+\textbf{When to use which}:
+
+\begin{itemize}
+\tightlist
+\item
+  RSRP-based handover: Good for coverage-limited scenarios (rural)
+\item
+  RSRQ-based handover: Good for interference-limited scenarios (dense urban)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{5.2}{LTE Measurement Events (A1–A6)}
+
+\CNchained\CNsubsubsection{WHAT}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3929}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Event} & \CNth{Condition} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{A1} & Serving \textgreater{} Threshold & Stop inter-freq measurements (serving is good enough) \\
+\textbf{A2} & Serving \textless{} Threshold & Start inter-freq/\allowbreak{}inter-RAT measurements \\
+\textbf{A3} & Neighbor \textgreater{} Serving + Offset & \textbf{Primary intra-freq handover trigger} \\
+\textbf{A4} & Neighbor \textgreater{} Threshold & Inter-frequency handover \\
+\textbf{A5} & Serving \textless{} Thresh1 AND Neighbor \textgreater{} Thresh2 & Inter-freq/\allowbreak{}inter-RAT handover \\
+\textbf{A6} & Neighbor \textgreater{} SCell + Offset & Secondary cell (CA) change \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsubsection{Event B (Inter-RAT):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3929}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Event} & \CNth{Condition} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{B1} & Inter-RAT neighbor \textgreater{} Threshold & Redirect to other RAT \\
+\textbf{B2} & Serving \textless{} Thresh1 AND Inter-RAT \textgreater{} Thresh2 & Fallback (e.g., LTE\ensuremath{\to}3G) \\
+\end{longtable}
+}
+
+\Needspace{23\baselineskip}
+
+\CNsubsubsection{HOW — Event A3 in Detail (Most Important)}
+
+Event A3 entering condition:\CNdisplay{\mathrm{Mn} + \mathrm{Ofn} + \mathrm{Ocn} - \mathrm{Hys} > \mathrm{Ms} + \mathrm{Ofs} + \mathrm{Ocs} + \mathrm{Off}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Symbol} & \CNth{Meaning} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Mn & Measurement of the neighbour cell (RSRP or RSRQ) \\
+Ms & Measurement of the serving cell \\
+Ofn & Frequency-specific offset for the neighbour \\
+Ofs & Frequency-specific offset for the serving cell \\
+Ocn & Cell-specific offset for the neighbour \\
+Ocs & Cell-specific offset for the serving cell \\
+Hys & Hysteresis (positive value) \\
+Off & A3 offset (the main tunable parameter) \\
+\end{longtable}
+}
+
+Simplified (same frequency, no cell-specific offsets):\CNdisplay{\mathrm{RSRP}_{\mathrm{neighbour}} - \mathrm{Hysteresis} > \mathrm{RSRP}_{\mathrm{serving}} + \mathrm{A3\_Offset}}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{5.3}{Hysteresis and Time-to-Trigger}
+
+\CNchained\CNsubsubsection{WHY}
+
+Radio signals fluctuate due to fading. Without filtering, the network would trigger handovers on every temporary fade, causing excessive signaling and ping-pong.
+
+\Needspace{13\baselineskip}
+
+\CNsubsubsection{WHAT}
+
+Two mechanisms prevent false triggering:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3056}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2778}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4167}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Function} & \CNth{Typical Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Hysteresis (Hys)} & Signal must exceed threshold by this margin & 1–3~dB \\
+\textbf{Time-to-Trigger (TTT)} & Condition must be sustained for this duration & 40–640~ms \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-a3-visual}{2}
+
+\CNsubsubsection{HOW — Visualization}
+
+\CNfigure{m04-a3-visual}{Event A3: entry threshold, hysteresis and time-to-trigger}
+
+\textbf{Combined effect}:
+
+\begin{itemize}
+\tightlist
+\item
+  Hysteresis provides amplitude filtering (dB domain)
+\item
+  TTT provides time filtering (time domain)
+\item
+  Together they provide robust handover triggering
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Engineering Trade-off}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink} & \CNth{Low Hys + Short TTT} & \CNth{High Hys + Long TTT} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Handover speed & Fast handover & Slow handover \\
+Main risk & Ping-pong & Too-late HO \\
+Good for & Slow users & Fast users \\
+Signalling & More signalling & Less signalling \\
+Typical setting & Urban: Hys = 2~dB, TTT = 160~ms & Highway: Hys = 3~dB, TTT = 80~ms \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{5.4}{Handover Margin}
+
+\CNchained\CNsubsubsection{WHAT}
+
+The \textbf{total handover margin} is the combined effect of A3 offset, hysteresis, and TTT that determines how much better a neighbor must be before handover occurs.
+
+\CNdisplay{\text{Effective HO margin} \approx \mathrm{A3\_Offset} + \mathrm{Hysteresis} + \underbrace{\left(\text{UE speed} \times \mathrm{TTT}\right)}_{\text{signal change during TTT}}}
+
+\CNsubsubsection{Example Calculation}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Given:
+  A3 Offset = 3 dB
+  Hysteresis = 2 dB  
+  TTT = 320 ms
+  UE speed = 50 km/h → path loss changes ~0.5 dB during TTT
+
+Effective margin = 3 + 2 + 0.5 = 5.5 dB
+
+Meaning: Neighbor must be 5.5 dB better than serving 
+         before handover is triggered
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{Handover Procedure — LTE X2 Handover}
+
+\CNchained\CNsubsection{}{WHY}
+
+The X2-based handover is the \textbf{preferred} handover mechanism in LTE because it enables direct eNB-to-eNB communication without routing through the core network (MME), reducing latency and signaling load.
+
+\CNsubsection{}{WHAT}
+
+\begin{itemize}
+\tightlist
+\item
+  Flat architecture: eNBs communicate directly via X2 interface
+\item
+  UE-assisted, network-controlled: UE measures, eNB decides
+\item
+  Preparation phase ensures target has resources BEFORE handover command
+\item
+  Total interruption time: \textbf{20–50~ms} (imperceptible for most applications)
+\end{itemize}
+
+\CNkeepfig{m04-x2-handover}{3}
+
+\CNsubsection{}{HOW — X2 Handover Sequence}
+
+\CNfigure{m04-x2-handover}{LTE X2 handover: preparation, execution and completion}
+
+\Needspace{11\baselineskip}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{}{Phase-by-Phase Breakdown}
+
+\CNchained\CNsubsubsection{Phase 1: Preparation (\textasciitilde{}50–200~ms)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Message} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Measurement Report & UE informs source about neighbor quality \\
+2 & HO Decision & Source eNB runs algorithm based on report \\
+3 & Handover Request (X2) & Source asks target to prepare resources \\
+4 & Admission Control & Target checks if it can accept the UE \\
+5 & HO Request Ack (X2) & Target confirms, provides HO command \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Phase 2: Execution (\textasciitilde{}20–50~ms interruption)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Message} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+6 & RRC Reconfiguration & Source commands UE to handover \\
+7 & SN Status Transfer & Ensures no data loss (PDCP SN alignment) \\
+8 & Data Forwarding & Buffered data forwarded to target \\
+9 & Random Access & UE synchronizes to target cell \\
+10 & Reconfig Complete & UE confirms successful handover \\
+\end{longtable}
+}
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{Phase 3: Completion (\textasciitilde{}20–100~ms)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Message} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+11 & Path Switch Request & Informs MME/\allowbreak{}S-GW of new location \\
+12 & Path Switch Ack & Core confirms path update \\
+13 & UE Context Release & Source releases resources \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Key Timing Values}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Typical Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Total preparation time & 50–200~ms \\
+\textbf{User-plane interruption} & \textbf{20–50~ms} \\
+Path switch completion & 20–100~ms \\
+Total end-to-end & 100–350~ms \\
+RACH preamble & Dedicated (no contention) or contention-based \\
+\end{longtable}
+}
+
+\CNsubsection{}{S1-based Handover (Fallback)}
+
+When X2 interface is NOT available (no direct connection between eNBs):
+
+\begin{itemize}
+\tightlist
+\item
+  All messages route through MME
+\item
+  Longer preparation time (\textasciitilde{}100–500~ms)
+\item
+  Used for inter-eNB handover without X2, or inter-MME handover
+\item
+  Same UE experience but higher network latency
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{Handover Failures}
+
+\CNchained\CNsubsection{}{WHY}
+
+Handover failures directly impact user experience — dropped calls, interrupted video, lost data. Understanding failure modes is essential for network optimization.
+
+\CNsubsection{}{WHAT}
+
+Four primary failure modes exist, each with distinct causes and solutions:
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{7.1}{Too-Late Handover}
+
+\CNchained\CNsubsubsection{WHY it happens}
+
+The UE moves too fast or the handover margin is too large, so the serving cell signal drops below usable level BEFORE the handover completes.
+
+\CNkeepfig{m04-too-late}{2}
+
+\CNsubsubsection{WHAT happens}
+
+\CNfigure{m04-too-late}{Too-late handover: the serving link fails before the handover}
+
+\CNsubsubsection{Indicators}
+
+\begin{itemize}
+\tightlist
+\item
+  Radio Link Failure (RLF) in source cell BEFORE HO command received
+\item
+  High RLF counter on source cell
+\item
+  RLF report shows strong neighbor at time of failure
+\end{itemize}
+
+\CNsubsubsection{Mitigation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Decrease} A3 offset (trigger HO earlier)
+\item
+  \textbf{Decrease} TTT (react faster)
+\item
+  \textbf{Decrease} hysteresis
+\item
+  Add early measurement reporting (A2 event with lower threshold)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{7.2}{Too-Early Handover}
+
+\CNchained\CNsubsubsection{WHY it happens}
+
+Handover triggers too quickly (parameters too aggressive). UE is handed to a cell that is not yet strong enough to sustain the connection.
+
+\CNkeepfig{m04-too-early}{2}
+
+\CNsubsubsection{WHAT happens}
+
+\CNfigure{m04-too-early}{Too-early handover: the target cell cannot yet sustain the link}
+
+\CNsubsubsection{Indicators}
+
+\begin{itemize}
+\tightlist
+\item
+  RLF occurs at TARGET cell shortly after handover completion
+\item
+  UE attempts re-establishment back at source cell
+\item
+  Short time between HO completion and RLF
+\end{itemize}
+
+\CNsubsubsection{Mitigation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Increase} A3 offset (require bigger difference)
+\item
+  \textbf{Increase} TTT (wait longer)
+\item
+  \textbf{Increase} hysteresis
+\item
+  Verify neighbor cell coverage footprint
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{7.3}{Ping-Pong Effect}
+
+\CNchained\CNsubsubsection{WHY it happens}
+
+Two cells have similar signal strength in an overlap area. With aggressive handover parameters, the UE bounces repeatedly between them.
+
+\CNkeepfig{m04-ping-pong}{2}
+
+\CNsubsubsection{WHAT happens}
+
+\CNfigure{m04-ping-pong}{Ping-pong: repeated handovers between two similar cells}
+
+\CNsubsubsection{Impact}
+
+\begin{itemize}
+\tightlist
+\item
+  Excessive signaling load
+\item
+  Interrupted user data (each HO = 20-50~ms break)
+\item
+  Wasted radio resources for HO preparation
+\item
+  Poor QoE for the user
+\end{itemize}
+
+\CNsubsubsection{Indicators}
+
+\begin{itemize}
+\tightlist
+\item
+  Same UE performing multiple handovers between same cell pair within short time
+\item
+  High handover rate with low mobility
+\item
+  A\ensuremath{\to}B followed by B\ensuremath{\to}A within seconds
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Mitigation}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Strategy} & \CNth{How it helps} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Increase hysteresis} & Larger margin needed to trigger \ensuremath{\to} fewer triggers \\
+\textbf{Increase TTT} & Must sustain longer \ensuremath{\to} transient fluctuations filtered \\
+\textbf{Cell-Individual Offset (CIO)} & Bias one cell to be preferred in overlap \\
+\textbf{Increase A3 offset} & Neighbor must be significantly better \\
+\textbf{Antenna tilt optimization} & Reduce overlap zone size \\
+\end{longtable}
+}
+
+\textbf{Rule of thumb}: If \textgreater{}30\% of handovers between a cell pair are ping-pong (HO back within 5s), increase TTT or hysteresis for that pair.
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{7.4}{Handover to Wrong Cell}
+
+\CNchained\CNsubsubsection{WHY it happens}
+
+The best target cell is not the one selected. This can occur due to:
+
+\begin{itemize}
+\tightlist
+\item
+  Missing neighbor relation (target not in neighbor list)
+\item
+  Measurement report doesn’t include the actual best cell
+\item
+  Propagation anomaly (signal from far cell momentarily strong)
+\end{itemize}
+
+\CNsubsubsection{WHAT happens}
+
+\begin{itemize}
+\tightlist
+\item
+  UE is handed to Cell X, but Cell Y would have been the correct target
+\item
+  UE quickly experiences poor signal at Cell X
+\item
+  May trigger another handover (to Cell Y) or RLF
+\end{itemize}
+
+\CNsubsubsection{Mitigation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Automatic Neighbor Relation (ANR)}: Automatically discover and add neighbors
+\item
+  \textbf{Comprehensive neighbor lists}: Ensure all potential targets are configured
+\item
+  \textbf{Cell-specific offsets}: Deprioritize cells known to cause issues
+\item
+  \textbf{Layer-3 filtering}: Average measurements to reduce anomalies
+\end{itemize}
+
+\CNkeepfig{m04-ho-failure-states}{3}
+
+\CNsubsection{7.5}{Handover Failure State Diagram}
+
+\CNfigure{m04-ho-failure-states}{Handover states and failure modes}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{Evolution of Handover: 2G \ensuremath{\to} 3G \ensuremath{\to} LTE \ensuremath{\to} 5G}
+
+\CNchained\CNsubsection{}{WHY}
+
+Each generation improved handover mechanisms to support higher speeds, lower latency, and more complex network architectures. Understanding evolution reveals the design rationale.
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m04-gsm-ho-arch}{5}
+
+\CNsubsection{8.1}{GSM (2G): Hard Handover, BSC-Controlled}
+
+\CNchained\CNsubsubsection{Architecture}
+
+\CNfigure{m04-gsm-ho-arch}{GSM: hard handover decided by the BSC}
+
+\Needspace{19\baselineskip}
+
+\CNsubsubsection{Characteristics}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{2G GSM} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Handover type & \textbf{Hard only} (break-before-make) \\
+Decision maker & \textbf{BSC} (Base Station Controller) \\
+Measurements & MS measures up to 6 neighbors (BCCH carriers) \\
+Measurement rate & Every SACCH period (480~ms) \\
+Interruption & 100–200~ms \\
+Criteria & RXLEV (signal strength), RXQUAL (BER-based quality) \\
+Power control & Combined with handover decision \\
+\end{longtable}
+}
+
+\CNsubsubsection{How it worked}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  MS continuously measures serving + 6 strongest neighbors (from BA list)
+\item
+  MS reports measurements every 480~ms via SACCH
+\item
+  BSC applies averaging (HREQAVE, HREQT parameters)
+\item
+  BSC decides based on multiple criteria:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Power budget (PBGT) \ensuremath{\to} coverage-based
+  \item
+    RXQUAL \ensuremath{\to} quality-based (interference)
+  \item
+    RXLEV \ensuremath{\to} level-based (signal too weak/\allowbreak{}strong)
+  \item
+    Distance \ensuremath{\to} timing advance too large
+  \item
+    Traffic \ensuremath{\to} congestion relief
+  \end{itemize}
+\end{enumerate}
+
+\CNsubsubsection{Limitations}
+
+\begin{itemize}
+\tightlist
+\item
+  Hard handover: audible click on voice calls
+\item
+  BSC-controlled: all intelligence in network, slow adaptation
+\item
+  Limited measurements: only 6 neighbors, slow reporting
+\item
+  No soft handover: no diversity gain at cell edge
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m04-umts-ho-arch}{5}
+
+\CNsubsection{8.2}{UMTS (3G): Soft Handover, RNC-Controlled}
+
+\CNchained\CNsubsubsection{Architecture}
+
+\CNfigure{m04-umts-ho-arch}{UMTS: handover decided by the RNC}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{Characteristics}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{3G UMTS} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Handover type & \textbf{Soft + Softer + Hard} \\
+Decision maker & \textbf{RNC} (Radio Network Controller) \\
+Measurements & CPICH Ec/\allowbreak{}No, RSCP \\
+Active Set & Up to 3–6 cells simultaneously \\
+Interruption & \textbf{0~ms} (soft HO), 20–50~ms (hard HO) \\
+Criteria & Events 1A–1C (active set), 2A–2F (inter-freq/\allowbreak{}RAT) \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-soft-ho-mech}{2}
+
+\CNsubsubsection{Soft Handover Mechanism}
+
+\CNfigure{m04-soft-ho-mech}{Soft handover: two radio legs combined in the RNC}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Active Set Management}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Event 1A: $\mathrm{Pilot} > \mathrm{Best\_Pilot} - \mathrm{Reporting\_Range} + \mathrm{Hysteresis}$ \ensuremath{\to} ADD cell
+  \item
+    Event 1B: $\mathrm{Pilot} < \mathrm{Best\_Pilot} - \mathrm{Reporting\_Range} - \mathrm{Hysteresis}$ \ensuremath{\to} REMOVE cell
+  \item
+    Event 1C: New pilot \textgreater{} Worst\_\allowbreak{}in\_\allowbreak{}ActiveSet + Hysteresis \ensuremath{\to} REPLACE cell
+  \end{itemize}
+\item
+  \textbf{Macro-diversity gain}: 2–3~dB at cell edge
+\item
+  \textbf{20–40\%} of connections in soft handover in typical network
+\end{itemize}
+
+\CNsubsubsection{Key Innovation}
+
+Soft handover enabled seamless mobility but at the cost of:
+
+\begin{itemize}
+\tightlist
+\item
+  Multiple Channelization Codes consumed (one per active set member)
+\item
+  Increased Iub backhaul bandwidth
+\item
+  Complex power control (must satisfy all links)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m04-lte-ho-arch}{5}
+
+\CNsubsection{8.3}{LTE (4G): Hard Handover, UE-Assisted Network-Controlled, X2-Based}
+
+\CNchained\CNsubsubsection{Architecture}
+
+\CNfigure{m04-lte-ho-arch}{LTE: flat architecture, the eNB decides and uses X2}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{Characteristics}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{4G LTE} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Handover type & \textbf{Hard only} (break-before-make) \\
+Decision maker & \textbf{Source eNB} (distributed decision) \\
+Measurements & RSRP, RSRQ (events A1–A6, B1–B2) \\
+Interruption & \textbf{20–50~ms} \\
+Interface & \textbf{X2} (direct eNB-to-eNB) \\
+Key feature & UE-assisted, network-controlled \\
+\end{longtable}
+}
+
+\CNsubsubsection{Why LTE Dropped Soft Handover}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{OFDMA} (not CDMA): Different cells use different subcarriers \ensuremath{\to} cannot combine same signal from multiple cells
+\item
+  \textbf{Flat architecture}: No central RNC to perform combining
+\item
+  \textbf{Hard HO is fast enough}: 20–50~ms interruption is acceptable for data
+\item
+  \textbf{Simplicity}: Significantly simpler than managing Active Sets
+\item
+  \textbf{Efficiency}: No wasted resources for multiple simultaneous links
+\end{enumerate}
+
+\CNsubsubsection{Key Innovations in LTE}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{X2 interface}: Direct eNB-eNB \ensuremath{\to} fast preparation, data forwarding
+\item
+  \textbf{Event-based reporting}: Only report when conditions met (less signaling)
+\item
+  \textbf{Layer-3 filtering}: Configurable averaging to smooth measurements
+\item
+  \textbf{Automatic Neighbor Relations (ANR)}: Self-configuring neighbor lists
+\item
+  \textbf{Mobility Robustness Optimization (MRO)}: Self-healing handover parameters
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m04-nr-ho-arch}{5}
+
+\CNsubsection{8.4}{5G NR: Conditional Handover, DAPS, Dual Connectivity}
+
+\CNchained\CNsubsubsection{Architecture}
+
+\CNfigure{m04-nr-ho-arch}{5G NR: Xn handover and dual connectivity}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Characteristics}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{5G NR} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Handover type & Hard, \textbf{Conditional}, DAPS \\
+Decision maker & Source gNB (+ CPC for conditional) \\
+Measurements & SS-RSRP, SS-RSRQ, SS-SINR, CSI-RS based \\
+Interruption & 0~ms (DAPS), \textasciitilde{}0~ms (DC), 20~ms (hard) \\
+Key features & CHO, DAPS, Dual Connectivity, MR-DC \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-cho-compare}{6}
+
+\CNsubsubsection{Conditional Handover (CHO) — 5G Innovation}
+
+\textbf{WHY}: In legacy LTE, the eNB must wait for measurement report, make decision, prepare target, then send command. If radio conditions degrade quickly (high speed, mmWave), this is too slow.
+
+\textbf{WHAT}: Network \textbf{pre-prepares} multiple target cells and gives the UE conditions to trigger the handover \textbf{autonomously}.
+
+\CNfigure{m04-cho-compare}{Traditional versus conditional handover}
+
+\textbf{HOW}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Network configures CHO: ``If Event A3 for Cell X OR Cell Y, execute HO to that cell''
+\item
+  Target cells are pre-prepared (resources reserved)
+\item
+  UE monitors conditions
+\item
+  When condition met \ensuremath{\to} UE immediately executes (no round-trip to network)
+\item
+  \textbf{Benefit}: Eliminates handover preparation delay \ensuremath{\to} fewer failures at high speed
+\end{enumerate}
+
+\CNkeepfig{m04-daps}{6}
+
+\CNsubsubsection{Dual Active Protocol Stack (DAPS) — 0~ms Interruption}
+
+\textbf{WHY}: Even 20~ms interruption matters for URLLC (Ultra-Reliable Low-Latency Communication).
+
+\textbf{WHAT}: UE maintains connection to BOTH source and target simultaneously during handover — similar concept to 3G soft handover but implemented differently.
+
+\CNfigure{m04-daps}{DAPS handover: make before break}
+
+\textbf{HOW}:
+
+\begin{itemize}
+\tightlist
+\item
+  UE has two active protocol stacks (hence the name)
+\item
+  Data is sent/\allowbreak{}received through both paths during transition
+\item
+  Once target confirms successful connection, source is released
+\item
+  \textbf{Trade-off}: Increased UE complexity and power consumption
+\end{itemize}
+
+\CNsubsubsection{Dual Connectivity (MR-DC) — Multi-RAT}
+
+\textbf{WHAT}: UE simultaneously connected to two different nodes:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{EN-DC} (E-UTRA-NR Dual Connectivity): LTE master + NR secondary
+\item
+  \textbf{NR-DC}: NR master + NR secondary
+\item
+  \textbf{NE-DC}: NR master + LTE secondary
+\end{itemize}
+
+\CNfigure{m04-dual-connectivity}{Dual connectivity: two radio links at the same time}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{8.5}{Generation Comparison Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2195}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1951}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2195}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1951}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1707}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{2G GSM} & \CNth{3G UMTS} & \CNth{4G LTE} & \CNth{5G NR} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+HO Type & Hard & Soft + Hard & Hard & Hard + CHO + DAPS \\
+Controller & BSC & RNC & eNB & gNB \\
+Interruption & 100-200~ms & 0~ms (soft) & 20-50~ms & 0~ms (DAPS/\allowbreak{}DC) \\
+Measurement & RXLEV, RXQUAL & CPICH RSCP, Ec/\allowbreak{}No & RSRP, RSRQ & SS-RSRP, CSI-RS \\
+Intelligence & Network-only & Network-only & UE-assisted & UE-autonomous (CHO) \\
+Architecture & Hierarchical & Hierarchical & Flat & Flat + DC \\
+Self-optimization & Manual & Manual & SON (MRO) & AI/\allowbreak{}ML-based \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNsection{9}{Engineering Examples with Typical Parameter Values}
+
+\CNchained\CNsubsection{9.1}{Example: Urban Macro Network — LTE Handover Optimization}
+
+\CNchained\CNsubsubsection{Scenario}
+
+\begin{itemize}
+\tightlist
+\item
+  Dense urban area, 500m inter-site distance
+\item
+  Users: mix of pedestrians (3 km/\allowbreak{}h) and vehicles (50 km/\allowbreak{}h)
+\item
+  Problem: 5\% handover failure rate, excessive ping-pong
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{Initial Parameters (before optimization)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Value} & \CNth{Issue} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+A3 Offset & 2~dB & Too aggressive \ensuremath{\to} too-early HO \\
+Hysteresis & 1~dB & Not enough filtering \\
+TTT & 100~ms & Too short \ensuremath{\to} ping-pong \\
+Layer-3 filter (k) & 1 & Not enough averaging \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Optimized Parameters}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{New Value} & \CNth{Rationale} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+A3 Offset & 3~dB & More margin before triggering \\
+Hysteresis & 2~dB & Better fading resistance \\
+TTT & 256~ms & Eliminates most ping-pong for pedestrians \\
+Layer-3 filter (k) & 4 & Smooths fast fading (\textasciitilde{}200~ms averaging) \\
+CIO (cell pair with ping-pong) & +3~dB & Biases HO for known problem pair \\
+\end{longtable}
+}
+
+\CNsubsubsection{Result}
+
+\begin{itemize}
+\tightlist
+\item
+  Handover failure rate: 5\% \ensuremath{\to} 1.5\%
+\item
+  Ping-pong rate: 12\% \ensuremath{\to} 3\%
+\item
+  Trade-off: Mean HO delay increased by \textasciitilde{}150~ms (acceptable)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.2}{Example: High-Speed Rail — 350 km/\allowbreak{}h}
+
+\CNchained\CNsubsubsection{Challenge}
+
+At 350 km/\allowbreak{}h, the UE crosses a cell (1~km coverage) in \textasciitilde{}10 seconds. Standard parameters are too slow.
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Parameter Tuning}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Standard} & \CNth{High-Speed} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+A3 Offset & 3~dB & 2~dB \\
+Hysteresis & 2~dB & 1~dB \\
+TTT & 256~ms & 40~ms \\
+Layer-3 filter (k) & 4 & 1 \\
+A2 threshold & -120~dBm & -110~dBm \\
+\end{longtable}
+}
+
+\CNsubsubsection{Additional Measures}
+
+\begin{itemize}
+\tightlist
+\item
+  Dedicated RF planning along rail corridor
+\item
+  Directional antennas pointing along track
+\item
+  Cell overlap zone: 200–300~m minimum
+\item
+  Consider \textbf{Conditional Handover (5G)} for this scenario
+\end{itemize}
+
+\CNsubsubsection{Speed Sensitivity Calculation}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+At 350 km/h = 97 m/s
+Path loss change rate ≈ 0.3 dB per 10 ms (at 2 GHz, Hata model)
+
+With TTT = 256 ms: Signal changes by ~7.5 dB during TTT!
+→ This is unacceptable — must reduce TTT
+
+With TTT = 40 ms: Signal changes by ~1.2 dB during TTT
+→ Acceptable margin
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3}{Example: Inter-RAT Handover — LTE to 3G CSFB}
+
+\CNchained\CNsubsubsection{Scenario}
+
+VoLTE not deployed; voice calls require CS Fallback to 3G.
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Configuration}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4074}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Value} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+B2 Threshold1 (serving LTE) & -110~dBm RSRP & Trigger when LTE weak \\
+B2 Threshold2 (UMTS target) & -95~dBm RSCP & Only if 3G is adequate \\
+TTT (B2) & 640~ms & Avoid unnecessary fallback \\
+A2 Threshold (start measuring 3G) & -105~dBm RSRP & Begin inter-RAT measurements \\
+IRAT measurement gap & 6~ms /\allowbreak{} 40~ms & Gap pattern for measuring UMTS \\
+\end{longtable}
+}
+
+\CNsubsubsection{Procedure}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE on LTE, RSRP drops below -105~dBm \ensuremath{\to} A2 event \ensuremath{\to} start measuring UMTS
+\item
+  LTE RSRP drops below -110~dBm AND UMTS RSCP \textgreater{} -95~dBm for 640~ms \ensuremath{\to} B2 event
+\item
+  eNB triggers inter-RAT handover to UMTS
+\item
+  UE performs hard handover to 3G, establishes CS domain connection
+\item
+  Voice call proceeds on 3G circuit-switched
+\item
+  After call ends: UE returns to LTE (fast return /\allowbreak{} redirection)
+\end{enumerate}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.4}{Example: Measurement Event Configuration (Complete)}
+
+\CNchained\CNsubsubsection{Full A3 Event Configuration for Intra-Frequency HO}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+RRC Connection Reconfiguration (measurement config):
+{
+  measObjectEUTRA: {
+    carrierFreq: 1850 (EARFCN for Band 3, 1800 MHz)
+    allowedMeasBandwidth: 50 RBs
+    neighCellConfig: 01 (partial measurement)
+    offsetFreq: 0 dB
+  }
+  
+  reportConfigEUTRA: {
+    triggerType: event
+    eventId: A3
+    a3-Offset: 3 dB (= 6 in IE, 0.5 dB steps)
+    hysteresis: 2 dB (= 4 in IE, 0.5 dB steps)
+    timeToTrigger: 256 ms
+    triggerQuantity: RSRP
+    reportQuantity: both (RSRP + RSRQ)
+    maxReportCells: 4
+    reportInterval: 480 ms
+    reportAmount: infinity
+  }
+  
+  measIdToAddList: {
+    measId: 1
+    measObjectId: 1
+    reportConfigId: 1
+  }
+  
+  quantityConfig: {
+    filterCoefficientRSRP: 4 (k=4, ~200ms averaging)
+    filterCoefficientRSRQ: 4
+  }
+}
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNsubsubsection{Layer-3 Filtering Formula}
+
+\CNdisplay{F_n = (1 - a)\,F_{n-1} + a\,M_n, \qquad a = \left(\tfrac{1}{2}\right)^{k/4}}
+
+where $k$ is the filterCoefficient (0, 1, 2, …, 8, …):
+
+\begin{itemize}
+\tightlist
+\item
+  $k = 0$: $a = 1.0$ \ensuremath{\to} no filtering (raw measurement used)
+\item
+  $k = 4$: $a = 0.5$ \ensuremath{\to} 50\% new + 50\% old \ensuremath{\to} about 200~ms memory
+\item
+  $k = 8$: $a = 0.25$ \ensuremath{\to} 25\% new + 75\% old \ensuremath{\to} about 400~ms memory
+\end{itemize}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{9.5}{Typical Handover KPIs (Operator Benchmarks)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{KPI} & \CNth{Target} & \CNth{Good} & \CNth{Poor} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Handover Success Rate & \textgreater{}98\% & \textgreater{}99\% & \textless{}95\% \\
+Ping-pong Rate & \textless{}5\% & \textless{}2\% & \textgreater{}10\% \\
+RLF Rate (HO-related) & \textless{}1\% & \textless{}0.5\% & \textgreater{}3\% \\
+Mean Interruption Time & \textless{}50~ms & \textless{}30~ms & \textgreater{}100~ms \\
+Too-early HO ratio & \textless{}1\% & \textless{}0.5\% & \textgreater{}3\% \\
+Too-late HO ratio & \textless{}2\% & \textless{}1\% & \textgreater{}5\% \\
+Unnecessary HO (ping-pong + wrong cell) & \textless{}5\% & \textless{}3\% & \textgreater{}10\% \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m04-a3-trigger}{8}
+
+\CNsection{10}{Summary Diagrams}
+
+\CNchained\CNsubsection{}{Measurement Event A3 Triggering — With Hysteresis and TTT}
+
+\CNfigure{m04-a3-trigger}{Event A3 triggering with hysteresis and time-to-trigger}
+
+\CNkeepfig{m04-ho-states}{3}
+
+\CNsubsection{}{Handover States — Complete Flow}
+
+\CNfigure{m04-ho-states}{Complete handover state flow}
+
+\CNkeepfig{m04-param-tree}{3}
+
+\CNsubsection{}{LTE Handover Parameters — Decision Tree}
+
+\CNfigure{m04-param-tree}{Handover parameter optimisation decision tree}
+
+\Needspace{24\baselineskip}
+
+\CNsection{}{Key Formulas Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3600}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4400}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Formula} & \CNth{Expression} & \CNth{Use} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+A3 Entry & Mn - Hys \textgreater{} Ms + A3\_\allowbreak{}Off & Intra-freq HO trigger \\
+A3 Leave & Mn + Hys \textless{} Ms + A3\_\allowbreak{}Off & Cancel pending report \\
+Cell Ranking (Rs) & Qmeas,s + QHyst & Serving cell reselection rank \\
+Cell Ranking (Rn) & Qmeas,n - Qoffset & Neighbor reselection rank \\
+S-criterion & $S_{\mathrm{rxlev}} = Q_{\mathrm{rxlevmeas}} - Q_{\mathrm{rxlevmin}} > 0$ & Cell suitability \\
+L3 Filter & $F_n = (1-a)\,F_{n-1} + a\,M_n$ & Measurement smoothing \\
+RSRQ & N \ensuremath{\times} RSRP /\allowbreak{} RSSI & Signal quality metric \\
+HO Margin & A3\_\allowbreak{}Off + Hys + speed\ensuremath{\times}TTT & Effective trigger margin \\
+\end{longtable}
+}
+
+\CNboxsection{Review Questions}
+
+\begin{CNbox}[unbreakable]{q}{Review Questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Explain} why LTE uses hard handover instead of soft handover like 3G.
+\item
+  \textbf{Calculate} the effective handover margin for: A3 offset = 4~dB, Hys = 2~dB, TTT = 320~ms, UE speed = 120 km/\allowbreak{}h.
+\item
+  \textbf{Draw} the timeline of a too-late handover and identify which parameter to adjust.
+\item
+  \textbf{Compare} Tracking Areas (LTE) with Location Areas (2G). What is the advantage of Tracking Area Lists?
+\item
+  \textbf{Design} handover parameters for a highway scenario (130 km/\allowbreak{}h). Justify each choice.
+\item
+  \textbf{Explain} how Conditional Handover in 5G solves the high-mobility problem that LTE struggles with.
+\item
+  \textbf{Analyze} a scenario where ping-pong rate is 15\% between two cells. List three mitigation strategies in order of preference.
+\item
+  \textbf{Describe} the X2 handover procedure and identify where data loss could occur without SN Status Transfer.
+\end{enumerate}
+
+\emph{Module 4 complete. Next: Module 5 — Radio Resource Management and Scheduling}
+
+\end{CNbox}

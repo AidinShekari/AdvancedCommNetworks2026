@@ -1,0 +1,12 @@
+% Module 26 — non-terrestrial network platforms by altitude
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNlink, ->, line width=1.1pt] (0,-0.2) -- (0,9.4) node[above, CNtiny] {\CNL{altitude}{ارتفاع}};
+\foreach \y/\alt/\name/\items/\c in {8.6/36\,000 km/{GEO \CNL{satellites (geostationary)}{ماهواره‌های (زمین‌ثابت)}}/{\CNL{large coverage (continental)}{پوشش گسترده (قاره‌ای)} \textbullet{} \CNL{high latency ($\sim$600 ms RTT)}{تأخیر زیاد ($\sim$\lr{600 ms RTT})} \textbullet{} \CNL{fixed position}{موقعیت ثابت}}/CNviolet,
+    6.5/8\,000 km/{MEO \CNL{satellites}{ماهواره‌های}}/{\CNL{medium coverage, medium latency ($\sim$100--200 ms)}{پوشش و تأخیر متوسط ($\sim$\lr{100--200 ms})}}/CNcyan,
+    4.4/600 km/{LEO \CNL{satellites (Starlink, OneWeb, …)}{ماهواره‌های (\lr{Starlink}، \lr{OneWeb}، …)}}/{\CNL{smaller coverage per satellite}{پوشش کمتر برای هر ماهواره} \textbullet{} \CNL{low latency ($\sim$20--40 ms RTT)}{تأخیر کم ($\sim$\lr{20--40 ms RTT})} \textbullet{} \CNL{moving rapidly $\rightarrow$ frequent handover}{حرکت سریع $\rightarrow$ تحویل مکرر}}/CNsig,
+    2.3/20 km/{HAPS \CNL{(high-altitude platforms)}{(سکوهای ارتفاع بالا)}}/{\CNL{quasi-stationary}{شبه‌ثابت} \textbullet{} \CNL{regional coverage ($\sim$50--200 km radius)}{پوشش منطقه‌ای (شعاع $\sim$\lr{50--200 km})} \textbullet{} \CNL{moderate latency ($\sim$1--2 ms)}{تأخیر متوسط ($\sim$\lr{1--2 ms})}}/CNamber,
+    0.4/0 km/{\CNL{Terrestrial network}{شبکه زمینی}}/{}/CNgreen}{
+  \fill[\c] (0,\y) circle (0.12);
+  \node[CNtiny, anchor=east, font=\sffamily\scriptsize\bfseries] at (-0.25,\y) {\alt};
+  \node[draw=\c, fill=\c!10, rounded corners=2pt, anchor=west, text width=11.6cm, align=left, font=\sffamily\small, inner sep=4pt] at (0.45,\y) {\textbf{\name}\ifx\relax\items\relax\else\\{\scriptsize \items}\fi};}
+\end{tikzpicture}

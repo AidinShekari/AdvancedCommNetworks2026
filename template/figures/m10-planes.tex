@@ -1,0 +1,10 @@
+% Module 10 — Diameter belongs to the control plane only
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.4,-5.9) rectangle (13.4,0.9);
+\node[CNgrouplabel, font=\sffamily\small\bfseries, text=CNink] at (6.5,0.55) {\CNL{LTE protocol planes}{صفحه‌های پروتکل \lr{LTE}}};
+\node[CNcp, text width=5.6cm, align=left, anchor=north] (cp) at (3.2,0) {\textbf{\CNL{CONTROL PLANE (signalling)}{صفحه کنترل (سیگنالینگ)}}\\[2pt]{\small
+  \textbullet{} Diameter (S6a, Gx, Gy, Rx, S13)\\\textbullet{} GTP-C (S11, S5)\\\textbullet{} NAS (MME $\leftrightarrow$ UE)\\\textbullet{} S1-AP (MME $\leftrightarrow$ eNB)\\\textbullet{} X2-AP (eNB $\leftrightarrow$ eNB)}};
+\node[CNup, text width=5.6cm, align=left, anchor=north] (up) at (9.8,0) {\textbf{\CNL{USER PLANE (data)}{صفحه کاربر (داده)}}\\[2pt]{\small
+  \textbullet{} GTP-U (GPRS Tunnelling Protocol -- user plane)\\\textbullet{} \CNL{carries the actual IP packets}{بسته‌های واقعی \lr{IP} را حمل می‌کند}\\\textbullet{} \CNL{YouTube, web, voice RTP, etc.}{یوتیوب، وب، \lr{RTP} صوتی و غیره}}};
+\node[CNnote, anchor=north, text width=12.4cm, font=\sffamily\small] at (6.5,-3.55) {\CNLP{\textbf{Diameter NEVER carries user data!} It only decides WHO can connect, WHAT QoS they get and HOW MUCH they are charged.}{\textbf{\lr{Diameter} هرگز داده کاربر را حمل نمی‌کند!} فقط تعیین می‌کند چه کسی می‌تواند متصل شود، چه \lr{QoS} دریافت می‌کند و چه مقدار هزینه پرداخت می‌کند.}};
+\end{tikzpicture}

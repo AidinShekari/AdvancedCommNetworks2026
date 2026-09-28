@@ -1,0 +1,1439 @@
+\Needspace{14\baselineskip}
+
+\CNsection{5.1}{Why LTE Was Developed}
+
+\CNchained\CNsubsection{}{Limitations of 3G (UMTS/\allowbreak{}HSPA)}
+
+The 3rd Generation Partnership Project (3GPP) initiated the Long Term Evolution (LTE) project in 2004 to address fundamental limitations in 3G networks:
+
+\textbf{Architectural Complexity:}
+
+\begin{itemize}
+\tightlist
+\item
+  3G UTRAN required a hierarchical structure: UE \ensuremath{\to} NodeB \ensuremath{\to} RNC \ensuremath{\to} CN
+\item
+  The Radio Network Controller (RNC) was a single point of failure and bottleneck
+\item
+  Complex protocol stacks between NodeB and RNC (Iub interface) added processing overhead
+\item
+  Soft handover required coordination between multiple NodeBs via the RNC
+\end{itemize}
+
+\textbf{Latency Issues:}
+
+\begin{itemize}
+\tightlist
+\item
+  3G round-trip times (RTT): 50–100~ms typical, 150+ ms under load
+\item
+  The RNC added processing hops in both control and user planes
+\item
+  Circuit-switched voice added further complexity and delay
+\item
+  Real-time applications (gaming, video calls) suffered noticeably
+\end{itemize}
+
+\textbf{Spectrum Efficiency:}
+
+\begin{itemize}
+\tightlist
+\item
+  WCDMA/\allowbreak{}HSPA approaching theoretical limits
+\item
+  Demand for mobile data growing exponentially (smartphones era beginning)
+\item
+  Need for flexible bandwidth: 1.4~MHz to 20~MHz channel widths
+\end{itemize}
+
+\textbf{All-IP Target:}
+
+\begin{itemize}
+\tightlist
+\item
+  3G still maintained circuit-switched domain for voice (MSC, MGW)
+\item
+  Dual-stack (CS + PS) increased OPEX and complexity
+\item
+  Industry consensus: everything must converge to IP
+\end{itemize}
+
+\textbf{Performance Targets for LTE (3GPP Release 8):}\CNbr{}\textbar{} Parameter \textbar{} Target \textbar{}\CNbr{}\textbar{}———–\textbar{}——–\textbar{}\CNbr{}\textbar{} Peak DL rate \textbar{} 100~Mbps (20~MHz) \textbar{}\CNbr{}\textbar{} Peak UL rate \textbar{} 50~Mbps (20~MHz) \textbar{}\CNbr{}\textbar{} User plane latency \textbar{} \textless{} 5~ms \textbar{}\CNbr{}\textbar{} Control plane latency \textbar{} \textless{} 100~ms (idle\ensuremath{\to}active) \textbar{}\CNbr{}\textbar{} Spectrum efficiency \textbar{} 3–4x improvement over HSPA \textbar{}\CNbr{}\textbar{} Mobility \textbar{} Up to 350 km/\allowbreak{}h \textbar{}
+
+\CNsection{5.2}{LTE Design Principles}
+
+LTE was designed from scratch with these guiding principles:
+
+\CNsubsection{}{Flat Architecture}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Eliminate the RNC} — distribute its functions to the eNodeB and core network
+\item
+  Fewer network nodes = fewer hops = lower latency
+\item
+  Each eNodeB connects directly to the core network (EPC)
+\end{itemize}
+
+\CNsubsection{}{All-Packet (No Circuit Switching)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pure packet-switched network} — no circuit-switched domain
+\item
+  Voice handled via VoLTE (Voice over LTE) using IMS
+\item
+  Single protocol stack simplifies operations
+\end{itemize}
+
+\CNsubsection{}{No Soft Handover}
+
+\begin{itemize}
+\tightlist
+\item
+  3G soft handover required simultaneous connections to multiple NodeBs
+\item
+  LTE uses \textbf{hard handover} only — simpler, more spectrum-efficient
+\item
+  Handover is fast enough (\textasciitilde{}20–50~ms interruption) to be imperceptible
+\end{itemize}
+
+\CNsubsection{}{Simplified Protocol Stack}
+
+\begin{itemize}
+\tightlist
+\item
+  Fewer layers, cleaner separation of concerns
+\item
+  User plane: PDCP \ensuremath{\to} RLC \ensuremath{\to} MAC \ensuremath{\to} PHY
+\item
+  Control plane: NAS (between UE and MME) + RRC (between UE and eNB)
+\end{itemize}
+
+\CNsubsection{}{Shared Channel Access}
+
+\begin{itemize}
+\tightlist
+\item
+  No dedicated channels — all resources shared dynamically
+\item
+  Scheduler in eNodeB makes 1~ms TTI decisions
+\item
+  Enables statistical multiplexing gains
+\end{itemize}
+
+\CNsubsection{}{Self-Organizing Network (SON) Features}
+
+\begin{itemize}
+\tightlist
+\item
+  Automatic neighbor relations (ANR)
+\item
+  Self-configuration of new eNodeBs
+\item
+  Self-optimization and self-healing capabilities
+\end{itemize}
+
+\CNsection{5.3}{LTE Architecture Overview}
+
+LTE architecture consists of two main domains:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{E-UTRAN} (Evolved UTRAN) — the radio access network
+\item
+  \textbf{EPC} (Evolved Packet Core) — the core network
+\end{enumerate}
+
+\CNfigure{m05-lte-architecture}{LTE architecture: UE, E-UTRAN, EPC and external networks}
+
+\CNsubsection{}{E-UTRAN: The Radio Access Network}
+
+\begin{CNinsight}
+
+\textbf{Key insight: E-UTRAN consists of eNodeBs only — there is NO RNC!}
+
+\end{CNinsight}
+
+\begin{itemize}
+\tightlist
+\item
+  The eNodeB handles ALL radio-related functions previously split between NodeB and RNC
+\item
+  eNodeBs connect directly to the EPC via the S1 interface
+\item
+  eNodeBs connect to each other via the X2 interface for handover and load balancing
+\item
+  This is the ``flat architecture'' — one node type in the RAN
+\end{itemize}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{}{EPC: The Evolved Packet Core}
+
+The EPC is a pure packet core with separated control and user planes:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Element} & \CNth{Primary Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{MME} & Control plane — signaling, mobility, security \\
+\textbf{S-GW} & User plane anchor within E-UTRAN \\
+\textbf{P-GW} & User plane anchor to external networks \\
+\textbf{HSS} & Subscriber database and authentication \\
+\textbf{PCRF} & Policy and charging rules \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5.4}{Network Elements — Detailed}
+
+\CNchained\CNsubsection{5.4.1}{UE (User Equipment)}
+
+\textbf{Purpose:} The mobile device that communicates over the LTE air interface.
+
+\textbf{Components:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ME (Mobile Equipment):} The physical device (phone, tablet, modem)
+\item
+  \textbf{USIM (Universal Subscriber Identity Module):} Stores subscriber identity (IMSI), security keys (K), and authentication algorithms
+\end{itemize}
+
+\Needspace{23\baselineskip}
+
+\textbf{UE Categories (3GPP Release 8–12):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}ccccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Category} & \CNth{Max DL (Mbps)} & \CNth{Max UL (Mbps)} & \CNth{DL MIMO} & \CNth{Notes} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Cat 1 & 10 & 5 & None & IoT, basic \\
+Cat 2 & 51 & 25 & 2\ensuremath{\times}2 & Entry smartphones \\
+Cat 3 & 100 & 50 & 2\ensuremath{\times}2 & Mainstream \\
+Cat 4 & 150 & 50 & 2\ensuremath{\times}2 & High-end \\
+Cat 5 & 300 & 75 & 4\ensuremath{\times}4 & Flagship \\
+Cat 6 & 300 & 50 & 2\ensuremath{\times}2 & Carrier Aggregation \\
+Cat 9 & 450 & 50 & 2\ensuremath{\times}2 & 3CC CA \\
+Cat 12 & 600 & 100 & 4\ensuremath{\times}4 & Advanced \\
+Cat 16 & 980 & 150 & 4\ensuremath{\times}4 & LTE-Advanced Pro \\
+\end{longtable}
+}
+
+\textbf{Key UE Capabilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  Carrier Aggregation (CA): combine multiple component carriers
+\item
+  MIMO support (2\ensuremath{\times}2 or 4\ensuremath{\times}4 antenna configurations)
+\item
+  VoLTE support (IMS registration, SIP signaling)
+\item
+  Dual connectivity (connect to two eNodeBs simultaneously — Release 12+)
+\end{itemize}
+
+\CNsubsection{5.4.2}{eNodeB (Evolved NodeB)}
+
+\textbf{Purpose:} The single RAN node that handles ALL radio access functions — replaces both NodeB AND RNC from 3G.
+
+\textbf{Problem it solves:} Eliminates the RNC bottleneck, reduces latency by one hop, enables faster scheduling decisions.
+
+\textbf{Functions absorbed from 3G RNC:}
+
+\begin{itemize}
+\tightlist
+\item
+  Radio Resource Management (RRM) — scheduling, admission control
+\item
+  Radio Bearer Control — setup, maintenance, release of bearers
+\item
+  Connection Mobility Control — handover decisions
+\item
+  Dynamic Resource Allocation (Scheduler) — 1~ms TTI granularity
+\item
+  Inter-cell Interference Coordination (ICIC)
+\item
+  Header compression (ROHC via PDCP)
+\item
+  Encryption and integrity protection (PDCP layer)
+\item
+  Segmentation and reassembly (RLC layer)
+\end{itemize}
+
+\textbf{Functions unique to eNodeB:}
+
+\begin{itemize}
+\tightlist
+\item
+  S1 interface termination (to MME and S-GW)
+\item
+  X2 interface termination (to neighboring eNodeBs)
+\item
+  Paging message distribution
+\item
+  Broadcast information (SIBs)
+\item
+  Measurement configuration and reporting
+\end{itemize}
+
+\textbf{Scheduler — The Brain of eNodeB:}
+
+\begin{itemize}
+\tightlist
+\item
+  Makes resource allocation decisions every 1~ms (TTI)
+\item
+  Assigns Resource Blocks (RBs) to UEs based on:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Channel quality (CQI reports from UEs)
+  \item
+    QoS requirements (GBR vs non-GBR bearers)
+  \item
+    Fairness algorithms (Proportional Fair, Round Robin, Max Throughput)
+  \item
+    Buffer status and priority
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{5.4.3}{MME (Mobility Management Entity)}
+
+\textbf{Purpose:} The control plane anchor of the EPC — handles all signaling and control functions, touches NO user data.
+
+\Needspace{26\baselineskip}
+
+\textbf{Problem it solves:} Separates control from user plane, enabling independent scaling. Centralizes mobility and security management.
+
+\textbf{Key Functions:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+NAS Signaling & Manages Non-Access Stratum protocols (EMM, ESM) between UE and MME \\
+Authentication & Generates authentication vectors with HSS (EPS-AKA) \\
+Security & NAS encryption/\allowbreak{}integrity; derives keys for AS security \\
+Mobility Management & Tracks UE location (Tracking Areas), handles TAU \\
+Bearer Management & Establishes, modifies, releases EPS bearers \\
+Paging & Initiates paging when downlink data arrives for idle UE \\
+S-GW Selection & Selects appropriate Serving Gateway for UE \\
+P-GW Selection & Selects PDN Gateway (during initial attach or new PDN connection) \\
+Handover Control & Inter-eNB and inter-MME handover signaling \\
+Idle Mode & Manages UE state transitions (connected \ensuremath{\leftrightarrow} idle) \\
+\end{longtable}
+}
+
+\textbf{NAS Procedures:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Attach:} UE registers with the network (identity, authentication, bearer setup)
+\item
+  \textbf{Detach:} UE deregisters (voluntary or network-initiated)
+\item
+  \textbf{TAU (Tracking Area Update):} UE reports new location when crossing TA boundary
+\item
+  \textbf{Service Request:} Idle UE requests to become active (for data transfer)
+\end{itemize}
+
+\CNsubsection{5.4.4}{S-GW (Serving Gateway)}
+
+\textbf{Purpose:} The user plane anchor within the E-UTRAN — all user data passes through S-GW.
+
+\textbf{Problem it solves:} Provides a stable user plane anchor point during intra-LTE mobility (handover between eNodeBs). Only one tunnel switch needed at S-GW during handover instead of rerouting through external networks.
+
+\textbf{Key Functions:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Local mobility anchor:} During inter-eNB handover, only the S1-U tunnel is switched at S-GW
+\item
+  \textbf{Packet routing and forwarding:} Routes packets between eNB and P-GW
+\item
+  \textbf{Data buffering during handover:} Buffers DL packets while handover completes
+\item
+  \textbf{Downlink data notification:} Triggers paging via MME when DL data arrives for idle UE
+\item
+  \textbf{Lawful intercept:} Interface for legal interception of user traffic
+\item
+  \textbf{Charging data collection:} Usage data for offline charging (CDRs)
+\item
+  \textbf{Transport level marking:} DSCP marking for QoS in transport network
+\item
+  \textbf{Idle mode buffering:} Buffers first DL packet and notifies MME for paging
+\end{itemize}
+
+\textbf{Deployment Note:} In many networks, S-GW and P-GW are combined into a single node (SAE-GW) for simplicity.
+
+\CNsubsection{5.4.5}{P-GW (PDN Gateway)}
+
+\textbf{Purpose:} The point of connection to external packet data networks (Internet, IMS, enterprise VPNs). Allocates IP addresses and enforces policy.
+
+\textbf{Problem it solves:} Provides a single, stable IP anchor point for the UE regardless of mobility. The UE keeps the same IP address even when moving between S-GWs.
+
+\textbf{Key Functions:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{IP address allocation:} Assigns IPv4 and/\allowbreak{}or IPv6 addresses to UEs (via DHCPv4, SLAAC, or static)
+\item
+  \textbf{Policy enforcement:} Applies QoS rules received from PCRF (via Gx interface)
+\item
+  \textbf{Charging:} Online charging (Gy to OCS) and offline charging (Gz to OFCS)
+\item
+  \textbf{Packet filtering:} Deep packet inspection, TFT (Traffic Flow Template) enforcement
+\item
+  \textbf{Per-SDF (Service Data Flow) treatment:} Apply different QoS/\allowbreak{}charging per traffic flow
+\item
+  \textbf{Inter-operator mobility anchor:} When roaming, P-GW remains in home network (home-routed) or visited network (local breakout)
+\item
+  \textbf{NAT (if needed):} Network Address Translation for IPv4
+\item
+  \textbf{GTP/\allowbreak{}PMIP anchor:} Terminates S5/\allowbreak{}S8 tunnel from S-GW
+\end{itemize}
+
+\textbf{APN (Access Point Name):}
+
+\begin{itemize}
+\tightlist
+\item
+  Each PDN connection is identified by an APN
+\item
+  P-GW selection based on APN (e.g., ``internet'', ``ims'', ``enterprise.vpn'')
+\item
+  Multiple simultaneous PDN connections possible (e.g., Internet + IMS for VoLTE)
+\end{itemize}
+
+\CNsubsection{5.4.6}{HSS (Home Subscriber Server)}
+
+\textbf{Purpose:} The central database containing all subscriber information and security credentials. Evolution of 3G HLR/\allowbreak{}AuC.
+
+\textbf{Problem it solves:} Centralizes subscriber management, provides authentication vectors, and stores subscription data (allowed APNs, QoS profiles, roaming permissions).
+
+\textbf{Key Functions:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Subscriber data storage:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    IMSI (permanent identity)
+  \item
+    MSISDN (phone number)
+  \item
+    Subscribed APNs and associated QoS profiles
+  \item
+    Roaming restrictions
+  \item
+    Subscribed Tracking Areas
+  \end{itemize}
+\item
+  \textbf{Authentication vector generation:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Stores permanent key K (shared with USIM)
+  \item
+    Generates authentication vectors (RAND, AUTN, XRES, \ensuremath{K_{\mathrm{ASME}}}) using EPS-AKA
+  \item
+    Provides vectors to MME for UE authentication
+  \end{itemize}
+\item
+  \textbf{Location management:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Stores current serving MME for each subscriber
+  \item
+    Used for terminating calls/\allowbreak{}sessions (where to page the UE)
+  \end{itemize}
+\item
+  \textbf{Authorization:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Determines which services a subscriber can access
+  \item
+    Enforces subscription limits (max bitrate, allowed APNs)
+  \end{itemize}
+\end{itemize}
+
+\textbf{Interfaces:}
+
+\begin{itemize}
+\tightlist
+\item
+  S6a to MME (Diameter protocol)
+\item
+  Cx/\allowbreak{}Dx to IMS (for VoLTE subscriber data)
+\item
+  Sh to Application Servers
+\end{itemize}
+
+\CNsubsection{5.4.7}{PCRF (Policy and Charging Rules Function)}
+
+\textbf{Purpose:} The policy brain of the network — makes real-time decisions about QoS and charging rules applied to each data flow.
+
+\textbf{Problem it solves:} Enables dynamic, per-flow QoS (e.g., guarantee bandwidth for a VoLTE call while best-effort for web browsing). Enables flexible charging models (zero-rating, tiered plans, sponsored data).
+
+\textbf{Key Functions:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Policy decision:} Determines QoS parameters (QCI, ARP, MBR, GBR) for each service data flow
+\item
+  \textbf{Charging rules:} Specifies how each flow is charged (rating group, metering method)
+\item
+  \textbf{PCC (Policy and Charging Control) rules:} Combined policy + charging instructions sent to P-GW
+\item
+  \textbf{Dynamic policy updates:} Can modify rules in real-time (e.g., when user starts a video call)
+\item
+  \textbf{Subscription-based policy:} Considers user’s subscription tier
+\item
+  \textbf{Network-condition-based policy:} Can throttle based on congestion
+\end{itemize}
+
+\textbf{Example PCC Rule:}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Rule: "VoLTE_Voice"
+  - Service Data Flow: SIP/RTP traffic to IMS
+  - QCI: 1 (Conversational Voice)
+  - GBR: 40 kbps UL / 40 kbps DL
+  - ARP: Priority 1, pre-emption capable
+  - Charging: Included in voice plan (no data deduction)
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{Interfaces:}
+
+\begin{itemize}
+\tightlist
+\item
+  Gx to P-GW (installs/\allowbreak{}modifies PCC rules)
+\item
+  Rx from IMS/\allowbreak{}AF (receives session info, triggers policy)
+\item
+  Sp to SPR (Subscription Profile Repository)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m05-interface-map}{8}
+
+\CNsection{5.5}{LTE Interfaces — Reference Points}
+
+\CNchained\CNsubsection{}{Interface Map}
+
+\CNfigure{m05-interface-map}{LTE interface map with the protocol of each reference point}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.1}{S1-MME Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & eNodeB \ensuremath{\leftrightarrow} MME \\
+\textbf{Plane} & Control Plane \\
+\textbf{Protocol Stack} & S1AP /\allowbreak{} SCTP /\allowbreak{} IP \\
+\textbf{Purpose} & All control signaling between RAN and core \\
+\end{longtable}
+}
+
+\textbf{What flows over S1-MME:}
+
+\begin{itemize}
+\tightlist
+\item
+  Initial UE messages (Attach, TAU, Service Request)
+\item
+  UE context setup/\allowbreak{}release
+\item
+  Handover preparation and execution (inter-eNB via MME)
+\item
+  Paging requests from MME to eNB
+\item
+  Bearer setup/\allowbreak{}modification/\allowbreak{}release commands
+\item
+  NAS message transport (MME\ensuremath{\leftrightarrow}UE via eNB as relay)
+\item
+  Reset and error indication procedures
+\end{itemize}
+
+\textbf{Why SCTP (not TCP):}
+
+\begin{itemize}
+\tightlist
+\item
+  Multi-homing: survives link failures without session drop
+\item
+  Multi-streaming: avoids head-of-line blocking
+\item
+  Message-oriented (not byte-stream): natural fit for signaling
+\item
+  Built-in heartbeat for connection monitoring
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.2}{S1-U Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & eNodeB \ensuremath{\leftrightarrow} S-GW \\
+\textbf{Plane} & User Plane \\
+\textbf{Protocol Stack} & GTP-U /\allowbreak{} UDP /\allowbreak{} IP \\
+\textbf{Purpose} & Carries user IP packets in GTP tunnels \\
+\end{longtable}
+}
+
+\textbf{What flows over S1-U:}
+
+\begin{itemize}
+\tightlist
+\item
+  All user data (encapsulated in GTP-U tunnels)
+\item
+  One GTP tunnel per EPS bearer per UE
+\item
+  End marker packets during handover (signals last packet from old path)
+\end{itemize}
+
+\textbf{GTP-U Tunnel Identification:}
+
+\begin{itemize}
+\tightlist
+\item
+  Each tunnel identified by TEID (Tunnel Endpoint Identifier) + IP address
+\item
+  TEIDs allocated independently at each end
+\item
+  Enables multiplexing many UE bearers over single transport connection
+\end{itemize}
+
+\textbf{Why GTP-U (not plain IP):}
+
+\begin{itemize}
+\tightlist
+\item
+  Tunneling allows mobility transparency (IP address doesn’t change)
+\item
+  Per-bearer QoS enforcement
+\item
+  Simple encapsulation: GTP-U header (8+ bytes) + inner IP packet
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.3}{X2 Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & eNodeB \ensuremath{\leftrightarrow} eNodeB \\
+\textbf{Plane} & Control + User Plane \\
+\textbf{Protocol Stack} & X2AP/\allowbreak{}SCTP (control) + GTP-U/\allowbreak{}UDP (user) \\
+\textbf{Purpose} & Direct inter-eNB handover and load management \\
+\end{longtable}
+}
+
+\textbf{Control Plane (X2AP) Functions:}
+
+\begin{itemize}
+\tightlist
+\item
+  Handover preparation (request, acknowledge, cancel)
+\item
+  SN (Sequence Number) status transfer
+\item
+  Load indication (exchange load information between eNBs)
+\item
+  Resource status reporting
+\item
+  Inter-cell interference coordination (ICIC) information exchange
+\end{itemize}
+
+\textbf{User Plane (GTP-U) Functions:}
+
+\begin{itemize}
+\tightlist
+\item
+  Forward DL data from source eNB to target eNB during handover
+\item
+  Prevents data loss during handover gap
+\item
+  Temporary tunnel — torn down after handover completes
+\end{itemize}
+
+\textbf{X2 Handover Advantage:}
+
+\begin{itemize}
+\tightlist
+\item
+  Direct eNB-to-eNB signaling — no need to involve MME for preparation
+\item
+  Only MME notified after handover completes (path switch)
+\item
+  Faster than S1-based handover (used when X2 is available)
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.4}{S5/\allowbreak{}S8 Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & S-GW \ensuremath{\leftrightarrow} P-GW \\
+\textbf{Plane} & User + Control Plane \\
+\textbf{Protocol Stack} & GTP-C + GTP-U (or PMIP alternative) \\
+\textbf{Purpose} & Connects serving gateway to PDN gateway \\
+\end{longtable}
+}
+
+\textbf{S5 vs S8:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{S5:} When S-GW and P-GW are in the \textbf{same} PLMN (non-roaming or home-routed)
+\item
+  \textbf{S8:} When S-GW and P-GW are in \textbf{different} PLMNs (roaming scenario)
+\item
+  Technically identical protocol, different name indicates inter-PLMN boundary
+\end{itemize}
+
+\textbf{Functions:}
+
+\begin{itemize}
+\tightlist
+\item
+  Tunnel management (create, update, delete sessions)
+\item
+  Per-bearer GTP tunnels for user plane
+\item
+  Triggered by MME (via S11) during attach or bearer modification
+\item
+  GTP-C handles session/\allowbreak{}bearer management signaling
+\item
+  GTP-U carries encapsulated user data
+\end{itemize}
+
+\textbf{Protocol Options:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{GTP-based S5/\allowbreak{}S8:} Full GTP-C signaling + GTP-U tunnels (most common)
+\item
+  \textbf{PMIP-based S5/\allowbreak{}S8:} Proxy Mobile IPv6 signaling (rare in practice)
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.5}{S6a Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & MME \ensuremath{\leftrightarrow} HSS \\
+\textbf{Plane} & Control Plane \\
+\textbf{Protocol Stack} & Diameter /\allowbreak{} SCTP (or TCP) /\allowbreak{} IP \\
+\textbf{Purpose} & Subscriber authentication and data retrieval \\
+\end{longtable}
+}
+
+\Needspace{21\baselineskip}
+
+\textbf{Diameter Commands on S6a:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3793}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Command} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Authentication-Information-Request (AIR) & MME\ensuremath{\to}HSS & Request auth vectors \\
+Authentication-Information-Answer (AIA) & HSS\ensuremath{\to}MME & Return auth vectors (RAND, AUTN, XRES, \ensuremath{K_{\mathrm{ASME}}}) \\
+Update-Location-Request (ULR) & MME\ensuremath{\to}HSS & Register MME as serving node \\
+Update-Location-Answer (ULA) & HSS\ensuremath{\to}MME & Return subscription data \\
+Cancel-Location-Request (CLR) & HSS\ensuremath{\to}MME & Deregister UE from old MME \\
+Insert-Subscriber-Data-Request (IDR) & HSS\ensuremath{\to}MME & Push updated subscription data \\
+Delete-Subscriber-Data-Request (DSR) & HSS\ensuremath{\to}MME & Remove subscription data \\
+Purge-UE-Request (PUR) & MME\ensuremath{\to}HSS & Inform HSS that UE is unreachable \\
+\end{longtable}
+}
+
+\textbf{Why Diameter (not SS7/\allowbreak{}MAP):}
+
+\begin{itemize}
+\tightlist
+\item
+  IP-native (aligns with all-IP architecture)
+\item
+  Extensible via AVPs (Attribute-Value Pairs)
+\item
+  Better security (TLS/\allowbreak{}IPsec support)
+\item
+  Larger message sizes (supports complex subscription data)
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.6}{S11 Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & MME \ensuremath{\leftrightarrow} S-GW \\
+\textbf{Plane} & Control Plane \\
+\textbf{Protocol Stack} & GTP-C v2 /\allowbreak{} UDP /\allowbreak{} IP \\
+\textbf{Purpose} & EPS bearer/\allowbreak{}session management between MME and S-GW \\
+\end{longtable}
+}
+
+\textbf{Key Messages:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Create Session Request/\allowbreak{}Response:} During attach — establishes default bearer
+\item
+  \textbf{Modify Bearer Request/\allowbreak{}Response:} During handover — updates S1-U tunnel info
+\item
+  \textbf{Delete Session Request/\allowbreak{}Response:} During detach — tears down bearers
+\item
+  \textbf{Create Bearer Request/\allowbreak{}Response:} MME-initiated dedicated bearer setup
+\item
+  \textbf{Release Access Bearers:} When UE goes idle (release S1-U but keep S5/\allowbreak{}S8)
+\item
+  \textbf{Downlink Data Notification:} S-GW tells MME that data arrived for idle UE \ensuremath{\to} triggers paging
+\end{itemize}
+
+\textbf{Why GTP-C v2:}
+
+\begin{itemize}
+\tightlist
+\item
+  Already proven in GPRS/\allowbreak{}3G (GTP-C v1)
+\item
+  Efficient binary encoding
+\item
+  Built-in TEID-based message routing
+\item
+  Supports piggybacking (multiple IEs in one message)
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.7}{SGi Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & P-GW \ensuremath{\leftrightarrow} External Networks (Internet, IMS, Enterprise) \\
+\textbf{Plane} & User Plane \\
+\textbf{Protocol Stack} & IP (standard Internet protocols) \\
+\textbf{Purpose} & Connects LTE network to the outside world \\
+\end{longtable}
+}
+
+\textbf{Characteristics:}
+
+\begin{itemize}
+\tightlist
+\item
+  Equivalent to the Gi interface in 2G/\allowbreak{}3G GPRS
+\item
+  Standard IP interface — no GTP or mobile-specific protocols
+\item
+  P-GW performs NAT here (if needed) or routes native IPv6
+\item
+  This is where the UE’s IP address is ``visible'' to the internet
+\item
+  Firewall, DPI, and value-added services typically deployed here
+\end{itemize}
+
+\textbf{Connected Networks:}
+
+\begin{itemize}
+\tightlist
+\item
+  Public Internet
+\item
+  IMS core (for VoLTE, VoWiFi)
+\item
+  Enterprise VPNs (via APN-based routing)
+\item
+  Content Delivery Networks (CDNs)
+\item
+  Walled garden services
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.8}{Gx Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5882}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4118}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & PCRF \ensuremath{\leftrightarrow} P-GW \\
+\textbf{Plane} & Control Plane \\
+\textbf{Protocol Stack} & Diameter /\allowbreak{} SCTP or TCP /\allowbreak{} IP \\
+\textbf{Purpose} & Install, modify, remove PCC (Policy and Charging Control) rules \\
+\end{longtable}
+}
+
+\textbf{How it works:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  P-GW contacts PCRF when a new IP-CAN session is established (UE attaches)
+\item
+  PCRF evaluates subscription data + network policy + application input
+\item
+  PCRF sends PCC rules to P-GW specifying per-flow QoS and charging
+\item
+  PCRF can push updated rules at any time (e.g., when VoLTE call starts)
+\end{enumerate}
+
+\textbf{Diameter Commands:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{CC-Request/\allowbreak{}Answer (CCR/\allowbreak{}CCA):} P-GW reports events, PCRF responds with rules
+\item
+  \textbf{Re-Auth-Request/\allowbreak{}Answer (RAR/\allowbreak{}RAA):} PCRF pushes new rules to P-GW
+\end{itemize}
+
+\textbf{PCC Rule Contents:}
+
+\begin{itemize}
+\tightlist
+\item
+  Service Data Flow (SDF) filter (5-tuple: src/\allowbreak{}dst IP, ports, protocol)
+\item
+  QoS parameters (QCI, ARP, MBR, GBR)
+\item
+  Charging key (rating group)
+\item
+  Metering method (volume, time, event)
+\item
+  Gate status (open/\allowbreak{}close a flow)
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.5.9}{Gy Interface}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Endpoints} & P-GW \ensuremath{\leftrightarrow} OCS (Online Charging System) \\
+\textbf{Plane} & Control Plane (charging signaling) \\
+\textbf{Protocol Stack} & Diameter /\allowbreak{} SCTP or TCP /\allowbreak{} IP \\
+\textbf{Purpose} & Real-time credit control for prepaid/\allowbreak{}online charging \\
+\end{longtable}
+}
+
+\textbf{How it works:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  When a prepaid user starts a data session, P-GW requests quota from OCS
+\item
+  OCS grants units (bytes, seconds, or events)
+\item
+  P-GW meters usage against granted quota
+\item
+  When quota runs low, P-GW requests more (or session is terminated)
+\item
+  Enables real-time balance deduction and spend limits
+\end{enumerate}
+
+\textbf{Diameter Commands:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Credit-Control-Request (CCR):} P-GW requests/\allowbreak{}reports usage
+
+  \begin{itemize}
+  \tightlist
+  \item
+    INITIAL: Session start, request first quota
+  \item
+    UPDATE: Quota running low, request more
+  \item
+    TERMINATION: Session end, report final usage
+  \end{itemize}
+\item
+  \textbf{Credit-Control-Answer (CCA):} OCS grants quota or denies
+\end{itemize}
+
+\textbf{Use Cases:}
+
+\begin{itemize}
+\tightlist
+\item
+  Prepaid data plans with real-time balance
+\item
+  Fair usage policies (throttle after threshold)
+\item
+  Sponsored data (third party pays)
+\item
+  Zero-rating specific applications
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5.6}{IMS Overview (IP Multimedia Subsystem)}
+
+\CNchained\CNsubsection{}{Why VoLTE Needs IMS}
+
+LTE is a \textbf{pure packet network} — there is no circuit-switched domain for voice. Without IMS:
+
+\begin{itemize}
+\tightlist
+\item
+  Voice calls would fall back to 2G/\allowbreak{}3G (CSFB — Circuit-Switched Fallback)
+\item
+  CSFB adds 2–4 seconds call setup delay and drops LTE data temporarily
+\item
+  No way to provide rich communication services (video calls, messaging)
+\end{itemize}
+
+\textbf{IMS provides the session control layer that makes VoLTE possible.}
+
+\CNkeepfig{m05-ims-arch}{3}
+
+\CNsubsection{}{IMS Basic Architecture}
+
+\CNfigure{m05-ims-arch}{IMS signalling path from the UE to the application servers}
+
+\textbf{Key IMS Elements:}\CNbr{}\textbar{} Element \textbar{} Role \textbar{}\CNbr{}\textbar{}———\textbar{}——\textbar{}\CNbr{}\textbar{} \textbf{P-CSCF} (Proxy-CSCF) \textbar{} First contact point; SIP proxy in visited network; provides security (IPsec) \textbar{}\CNbr{}\textbar{} \textbf{I-CSCF} (Interrogating-CSCF) \textbar{} Entry point in home network; queries HSS for S-CSCF assignment \textbar{}\CNbr{}\textbar{} \textbf{S-CSCF} (Serving-CSCF) \textbar{} Core SIP registrar and session controller; applies service logic \textbar{}\CNbr{}\textbar{} \textbf{Application Servers} \textbar{} VoLTE TAS (Telephony AS), conference, messaging services \textbar{}\CNbr{}\textbar{} \textbf{MGCF/\allowbreak{}MGW} \textbar{} Media Gateway — interworks with PSTN for legacy calls \textbar{}
+
+\CNsubsection{}{VoLTE Call Flow (Simplified)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE registers with IMS via SIP REGISTER (through P-CSCF \ensuremath{\to} S-CSCF)
+\item
+  UE initiates call via SIP INVITE
+\item
+  IMS signals PCRF (via Rx interface) to request dedicated bearer
+\item
+  PCRF instructs P-GW (via Gx) to create GBR bearer (QCI=1 for voice)
+\item
+  MME/\allowbreak{}eNB establish dedicated bearer with guaranteed bitrate
+\item
+  RTP media flows over the dedicated bearer
+\item
+  Result: HD voice with guaranteed QoS, \textasciitilde{}100~ms end-to-end
+\end{enumerate}
+
+\CNsubsection{}{IMS Integration with LTE}
+
+\begin{itemize}
+\tightlist
+\item
+  P-CSCF discovered by UE during PDN connection to IMS APN
+\item
+  UE maintains two PDN connections: Internet APN + IMS APN
+\item
+  Rx interface: IMS \ensuremath{\to} PCRF (triggers dedicated bearer for voice/\allowbreak{}video)
+\item
+  VoLTE requires: UE support + IMS core + PCRF + dedicated bearers
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m05-cups}{10}
+
+\CNsection{5.7}{Control Plane vs User Plane Separation (CUPS)}
+
+\CNchained\CNsubsection{}{The Concept}
+
+CUPS (3GPP Release 14, TS 23.214) separates the control and user plane functions of S-GW and P-GW into independent entities that can be scaled and deployed independently.
+
+\CNfigure{m05-cups}{Combined gateways versus CUPS (control/\allowbreak{}user plane separation)}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Why CUPS Matters}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4062}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3438}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Without CUPS} & \CNth{With CUPS} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Scaling & Scale entire gateway (wasteful) & Scale UP and CP independently \\
+Deployment & GW in central DC only & UP at edge, CP centralized \\
+Latency & All traffic through central GW & UP at edge = lower latency \\
+Cost & Expensive combined HW & Cheaper, commodity UP hardware \\
+Evolution & Monolithic & Direct path to 5G UPF architecture \\
+\end{longtable}
+}
+
+\CNsubsection{}{CUPS Interface: Sx (PFCP)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Protocol:} PFCP (Packet Forwarding Control Protocol)
+\item
+  \textbf{Sxa:} SGW-C \ensuremath{\leftrightarrow} SGW-U
+\item
+  \textbf{Sxb:} PGW-C \ensuremath{\leftrightarrow} PGW-U
+\item
+  \textbf{Sxc:} TDF-C \ensuremath{\leftrightarrow} TDF-U
+\item
+  CP installs forwarding rules (PDRs, FARs, QERs, URRs) into UP
+\item
+  UP executes packet forwarding based on installed rules
+\end{itemize}
+
+\CNsubsection{}{CUPS as Bridge to 5G}
+
+CUPS is the architectural precursor to 5G’s fully separated architecture:
+
+\begin{itemize}
+\tightlist
+\item
+  SGW-C + PGW-C \ensuremath{\to} 5G SMF (Session Management Function)
+\item
+  SGW-U + PGW-U \ensuremath{\to} 5G UPF (User Plane Function)
+\item
+  PFCP protocol reused in 5G (N4 interface = Sx evolution)
+\end{itemize}
+
+\Needspace{28\baselineskip}
+
+\CNsection{5.8}{Key Differences from 3G}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2759}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4483}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2759}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{3G UMTS/\allowbreak{}HSPA} & \CNth{4G LTE} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{RAN Architecture} & Hierarchical: NodeB \ensuremath{\to} RNC & Flat: eNodeB only \\
+\textbf{RAN Controller} & RNC (centralized) & None — functions in eNodeB \\
+\textbf{Core Network} & CS domain + PS domain & EPC (PS only, all-IP) \\
+\textbf{Voice} & Circuit-switched (MSC) & VoLTE via IMS (packet) \\
+\textbf{Handover} & Soft handover (macro diversity) & Hard handover only \\
+\textbf{Air Interface} & WCDMA /\allowbreak{} HSPA & OFDMA (DL) /\allowbreak{} SC-FDMA (UL) \\
+\textbf{Channel Type} & Dedicated + shared & All shared (no dedicated channels) \\
+\textbf{Scheduling} & 2~ms TTI (HSPA) & 1~ms TTI \\
+\textbf{Bearer Concept} & RAB + PDP Context & EPS Bearer (unified) \\
+\textbf{Max Bandwidth} & 5~MHz fixed & 1.4–20~MHz flexible \\
+\textbf{Peak Rate} & 42~Mbps (HSPA+) & 300+ Mbps (Cat 5+) \\
+\textbf{Latency (RTT)} & 50–100~ms & 10–20~ms \\
+\textbf{Duplexing} & FDD only (most) & FDD + TDD \\
+\textbf{Mobility Anchor} & SGSN (control+user) & MME (control) + S-GW (user) — separated \\
+\textbf{Subscriber DB} & HLR (SS7/\allowbreak{}MAP) & HSS (Diameter) \\
+\textbf{Policy Control} & Limited (PCRF later addition) & Native PCRF (PCC from day one) \\
+\end{longtable}
+}
+
+\CNkeepfig{m05-3g-vs-4g}{3}
+
+\CNsubsection{}{Architecture Comparison Diagram}
+
+\CNfigure{m05-3g-vs-4g}{3G UMTS versus 4G LTE architecture}
+
+\CNsubsection{}{Key Architectural Wins}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Elimination of RNC:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Removed single point of failure
+  \item
+    Reduced latency by one hop
+  \item
+    Enabled distributed scheduling (faster response)
+  \item
+    Simplified RAN planning and scaling
+  \end{itemize}
+\item
+  \textbf{All-IP /\allowbreak{} No Circuit Switching:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Single protocol stack to manage
+  \item
+    Reduced OPEX (no MSC, MGW, VLR infrastructure)
+  \item
+    Statistical multiplexing for voice (VoLTE more efficient)
+  \item
+    Unified charging and policy for all services
+  \end{itemize}
+\item
+  \textbf{EPS Bearer Model:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Unified bearer from UE to P-GW (end-to-end QoS)
+  \item
+    Replaces fragmented 3G model (RAB + PDP Context + separate QoS at each interface)
+  \item
+    Default bearer always on (always connected experience)
+  \item
+    Dedicated bearers for specific QoS needs (VoLTE, video)
+  \end{itemize}
+\item
+  \textbf{Separation of Control and User Planes:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    MME handles only signaling (scales with number of UEs)
+  \item
+    S-GW handles only data (scales with traffic volume)
+  \item
+    Independent evolution and scaling
+  \end{itemize}
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m05-cp-attach}{8}
+
+\CNsection{5.9}{Control Plane vs User Plane Paths}
+
+\CNchained\CNsubsection{}{Control Plane Path}
+
+\CNfigure{m05-cp-attach}{Control-plane path: the simplified attach procedure}
+
+\CNkeepfig{m05-up-path}{3}
+
+\CNsubsection{}{User Plane Path}
+
+\CNfigure{m05-up-path}{User-plane path from the UE to the Internet}
+
+\CNkeepfig{m05-up-stack}{2}
+
+\textbf{User Plane Protocol Stack:}
+
+\CNfigure{m05-up-stack}{User-plane protocol stack of an LTE packet}
+
+\Needspace{28\baselineskip}
+
+\CNsection{5.10}{Interface Summary Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2292}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2292}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1458}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2083}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1875}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Endpoints} & \CNth{Plane} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Uu} & UE \ensuremath{\leftrightarrow} eNodeB & Control + User & LTE-Uu (OFDMA/\allowbreak{}SC-FDMA) & Air interface — radio communication \\
+\textbf{S1-MME} & eNodeB \ensuremath{\leftrightarrow} MME & Control & S1AP /\allowbreak{} SCTP & RAN-Core control signaling (NAS relay, handover, bearer mgmt) \\
+\textbf{S1-U} & eNodeB \ensuremath{\leftrightarrow} S-GW & User & GTP-U /\allowbreak{} UDP /\allowbreak{} IP & User data tunneling between RAN and core \\
+\textbf{X2} & eNodeB \ensuremath{\leftrightarrow} eNodeB & Control + User & X2AP/\allowbreak{}SCTP + GTP-U/\allowbreak{}UDP & Inter-eNB handover signaling and data forwarding \\
+\textbf{S5/\allowbreak{}S8} & S-GW \ensuremath{\leftrightarrow} P-GW & Control + User & GTP-C + GTP-U (or PMIP) & Session/\allowbreak{}bearer management and user data between gateways \\
+\textbf{S6a} & MME \ensuremath{\leftrightarrow} HSS & Control & Diameter /\allowbreak{} SCTP & Authentication vectors and subscriber data retrieval \\
+\textbf{S11} & MME \ensuremath{\leftrightarrow} S-GW & Control & GTP-C v2 /\allowbreak{} UDP & Bearer/\allowbreak{}session lifecycle management \\
+\textbf{SGi} & P-GW \ensuremath{\leftrightarrow} Internet/\allowbreak{}IMS & User & IP (native) & External PDN connectivity — UE traffic exits here \\
+\textbf{Gx} & PCRF \ensuremath{\leftrightarrow} P-GW & Control & Diameter & Policy and charging rule installation/\allowbreak{}modification \\
+\textbf{Gy} & P-GW \ensuremath{\leftrightarrow} OCS & Control & Diameter & Online/\allowbreak{}real-time credit control (prepaid charging) \\
+\textbf{Rx} & IMS/\allowbreak{}AF \ensuremath{\leftrightarrow} PCRF & Control & Diameter & Application-triggered QoS/\allowbreak{}policy requests \\
+\textbf{S10} & MME \ensuremath{\leftrightarrow} MME & Control & GTP-C v2 & Inter-MME handover (UE context transfer) \\
+\textbf{S3} & MME \ensuremath{\leftrightarrow} SGSN & Control & GTP-C v2 & 3G/\allowbreak{}4G inter-RAT mobility \\
+\textbf{SBc} & MME \ensuremath{\leftrightarrow} CBC & Control & SBc-AP /\allowbreak{} SCTP & Cell broadcast (emergency alerts, CMAS/\allowbreak{}ETWS) \\
+\end{longtable}
+}
+
+\CNboxsection{Key Takeaways}
+
+\begin{CNbox}[unbreakable]{sum}{Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{LTE = Flat RAN + All-IP Core} — simplicity drives performance
+\item
+  \textbf{eNodeB is the only RAN node} — absorbed all RNC functions
+\item
+  \textbf{EPC separates control (MME) from user plane (S-GW/\allowbreak{}P-GW)} — independent scaling
+\item
+  \textbf{Every interface has a clear, single purpose} — modular, replaceable
+\item
+  \textbf{GTP tunnels provide mobility transparency} — IP address never changes regardless of movement
+\item
+  \textbf{PCRF enables dynamic QoS} — different treatment per application flow
+\item
+  \textbf{IMS replaces circuit-switched voice} — VoLTE = SIP + dedicated bearer
+\item
+  \textbf{CUPS is the bridge to 5G} — same separation philosophy, evolved into 5G SBA
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{References}
+
+\begin{itemize}
+\tightlist
+\item
+  3GPP TS 23.401: ``GPRS Enhancements for E-UTRAN Access'' (EPC architecture)
+\item
+  3GPP TS 36.300: ``E-UTRA and E-UTRAN; Overall Description'' (RAN architecture)
+\item
+  3GPP TS 23.214: ``Architecture Enhancements for CUPS''
+\item
+  3GPP TS 29.274: ``GTPv2-C'' (S11, S5/\allowbreak{}S8 control)
+\item
+  3GPP TS 29.281: ``GTP-U'' (S1-U, S5/\allowbreak{}S8 user)
+\item
+  3GPP TS 36.413: ``S1AP'' (S1-MME interface)
+\item
+  3GPP TS 36.423: ``X2AP'' (X2 interface)
+\item
+  3GPP TS 29.272: ``S6a/\allowbreak{}S6d'' (MME-HSS Diameter interface)
+\item
+  3GPP TS 29.212: ``Gx'' (PCRF-PCEF Diameter interface)
+\end{itemize}
+
+\emph{Module 5 Complete — Next: Module 6: 5G NR Architecture}

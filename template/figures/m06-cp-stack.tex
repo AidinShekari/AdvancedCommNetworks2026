@@ -1,0 +1,14 @@
+% Module 6 — LTE control-plane protocol stack (UE, eNodeB, MME)
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle] at (0,0.75) {UE}; \node[CNtitle] at (5.2,0.75) {eNodeB}; \node[CNtitle] at (10.4,0.75) {MME};
+\CNstack{u}{0}{0}{1.7cm}{NAS/CNcpL, RRC/CNcpL, PDCP/{}, RLC/{}, MAC/{}, PHY/CNphyL}
+\CNstack{e}{4.3}{-0.66}{1.7cm}{RRC/CNcpL, PDCP/{}, RLC/{}, MAC/{}, PHY/CNphyL}
+\CNstack{s}{6.1}{-0.66}{1.7cm}{S1AP/CNcpL, SCTP/{}, IP/{}, L2/{}, L1/CNphyL}
+\CNstack{m}{10.4}{0}{1.7cm}{NAS/CNcpL, S1AP/CNcpL, SCTP/{}, IP/{}, L2/{}, L1/CNphyL}
+\draw[CNsigl, <->] (u-1.east) -- (m-1.west);
+\foreach \i/\j in {2/1, 3/2, 4/3, 5/4}{\draw[CNlink, <->, CNinkL!70] (u-\i.east) -- (e-\j.west);}
+\draw[CNdata, <->] (u-6.east) -- node[CNelab, below=2pt, fill=none] {Uu (\CNL{air}{هوا})} (e-5.west);
+\draw[CNsigl, <->] (s-1.east) -- node[CNelab, above=1pt, fill=none] {S1AP} (m-2.west);
+\draw[CNlink, <->, CNinkL!70] (s-2.east) -- (m-3.west);
+\draw[CNlink, CNinkL!70] (s-5.east) -- node[CNelab, below=2pt, fill=none] {S1-MME} (m-6.west);
+\end{tikzpicture}

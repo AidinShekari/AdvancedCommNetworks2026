@@ -1,0 +1,1139 @@
+\CNsection{1}{5G Core Overview}
+
+The 5G Core (5GC) network is defined in \textbf{3GPP TS 23.501} and represents a fundamental redesign of the mobile core network. Unlike the 4G EPC which used point-to-point interfaces between monolithic network elements, the 5GC adopts a \textbf{Service-Based Architecture (SBA)} where Network Functions (NFs) expose services via RESTful APIs over HTTP/\allowbreak{}2.
+
+\CNsubsection{}{Key Design Principles}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Service-Based Architecture (SBA):} NFs communicate via service-based interfaces (SBI) using HTTP/\allowbreak{}2 and JSON
+\item
+  \textbf{Control and User Plane Separation (CUPS):} Complete decoupling of CP and UP
+\item
+  \textbf{Stateless NF Design:} State stored externally (UDSF) enabling horizontal scaling
+\item
+  \textbf{Network Slicing Native:} Built-in support for multiple logical networks on shared infrastructure
+\item
+  \textbf{Cloud-Native:} Designed for containerized, microservice-based deployment
+\item
+  \textbf{Registration-Based NF Discovery:} NFs register with NRF and discover peers dynamically
+\end{itemize}
+
+\CNkeepfig{m19-sbi-view}{12}
+
+\CNsection{2}{Reference Architecture}
+
+The 5GC architecture has two equivalent representations defined in TS 23.501:
+
+\CNsubsection{2.1}{Service-Based Interface (SBI) Representation}
+
+In this view, all control-plane NFs connect to a common service bus and expose/\allowbreak{}consume services.
+
+\CNfigure{m19-sbi-view}{5G core in the service-based representation}
+
+\CNkeepfig{m19-reference-points}{5}
+
+\CNsubsection{2.2}{Reference Point Representation}
+
+In this view, explicit point-to-point reference points are shown between NFs.
+
+\CNfigure{m19-reference-points}{5G core in the reference-point representation}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{Network Functions in Detail}
+
+\CNchained\CNsubsection{3.1}{Access and Mobility Management Function (AMF)}
+
+The AMF is the single point of contact for all UE-related signaling from the RAN. It terminates the N1 (NAS) and N2 (NGAP) interfaces.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{NAS Termination:} All NAS messages (Registration, Service Request, PDU Session Establishment) terminate at AMF
+\item
+  \textbf{Registration Management:} Handles UE registration, deregistration, and periodic registration updates
+\item
+  \textbf{Connection Management:} Manages RRC signaling context via N2 toward gNB
+\item
+  \textbf{Mobility Management:} Handover signaling, tracking area management, paging coordination
+\item
+  \textbf{Security:} Initiates authentication (delegates to AUSF), manages NAS security context (ciphering + integrity)
+\item
+  \textbf{Slice Selection:} Interacts with NSSF to determine the appropriate network slice
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\textbf{Key Identifiers:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Identifier} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{GUAMI} & Globally Unique AMF Identifier = MCC + MNC + AMF Region ID + AMF Set ID + AMF Pointer \\
+\textbf{5G-GUTI} & 5G Globally Unique Temporary Identifier = GUAMI + 5G-TMSI (assigned to UE by AMF) \\
+\textbf{AMF Region ID} & 8~bits — identifies a region within a PLMN \\
+\textbf{AMF Set ID} & 10~bits — identifies an AMF Set within a region \\
+\textbf{AMF Pointer} & 6~bits — identifies a specific AMF within a set \\
+\end{longtable}
+}
+
+\textbf{Interfaces:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{N1:} UE \ensuremath{\leftrightarrow} AMF (NAS signaling, carried transparently over RAN)
+\item
+  \textbf{N2:} RAN \ensuremath{\leftrightarrow} AMF (NGAP protocol over SCTP)
+\item
+  \textbf{N8:} AMF \ensuremath{\leftrightarrow} UDM (subscription data retrieval)
+\item
+  \textbf{N11:} AMF \ensuremath{\leftrightarrow} SMF (session management messages)
+\item
+  \textbf{N12:} AMF \ensuremath{\leftrightarrow} AUSF (authentication procedures)
+\item
+  \textbf{N14:} AMF \ensuremath{\leftrightarrow} AMF (UE mobility between AMFs)
+\item
+  \textbf{N15:} AMF \ensuremath{\leftrightarrow} PCF (access and mobility policy)
+\item
+  \textbf{N22:} AMF \ensuremath{\leftrightarrow} NSSF (slice selection)
+\end{itemize}
+
+\textbf{Registration Area:}
+
+\begin{itemize}
+\tightlist
+\item
+  Composed of one or more Tracking Areas (TAs)
+\item
+  UE only performs Registration Update when moving outside its Registration Area
+\item
+  Larger registration areas \ensuremath{\to} less signaling, more paging load
+\item
+  AMF allocates the Registration Area based on UE mobility pattern
+\end{itemize}
+
+\CNsubsection{3.2}{Session Management Function (SMF)}
+
+The SMF manages PDU sessions end-to-end. It selects and controls the UPF(s) that form the user plane path.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PDU Session Management:} Establishment, modification, and release of PDU sessions
+\item
+  \textbf{UPF Selection and Control:} Selects appropriate UPF(s), programs forwarding rules via N4/\allowbreak{}PFCP
+\item
+  \textbf{IP Address Allocation:} Assigns IPv4/\allowbreak{}IPv6 addresses to UEs (or delegates to external DHCP)
+\item
+  \textbf{QoS Enforcement:} Installs QoS rules in UPF based on PCF policies
+\item
+  \textbf{Roaming:} Handles home-routed and local breakout scenarios
+\item
+  \textbf{Downlink Data Notification:} Triggers paging via AMF when downlink data arrives for idle UE
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\textbf{PDU Session Types:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Type} & \CNth{Description} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{IPv4} & Traditional IPv4 connectivity & Legacy internet access \\
+\textbf{IPv6} & IPv6-only connectivity & IoT, modern networks \\
+\textbf{IPv4v6} & Dual-stack IPv4 + IPv6 & Default smartphone access \\
+\textbf{Ethernet} & Layer-2 Ethernet frames & Industrial LAN extension, TSN \\
+\textbf{Unstructured} & Raw IP or non-IP data & IoT sensors, point-to-point tunnels \\
+\end{longtable}
+}
+
+\textbf{N4 Interface and PFCP:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{N4} connects SMF to UPF using \textbf{PFCP (Packet Forwarding Control Protocol)} — 3GPP TS 29.244
+\item
+  PFCP is a UDP-based protocol (port 8805) with:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Session Establishment:} Create forwarding context in UPF
+  \item
+    \textbf{Session Modification:} Update rules (e.g., handover, QoS change)
+  \item
+    \textbf{Session Deletion:} Remove forwarding context
+  \item
+    \textbf{Heartbeat:} Detect UPF failure
+  \end{itemize}
+\end{itemize}
+
+\textbf{Session Anchor:}
+
+\begin{itemize}
+\tightlist
+\item
+  The \textbf{PDU Session Anchor (PSA)} is the UPF that maintains a stable point of attachment to the Data Network
+\item
+  Provides IP address continuity during UE mobility
+\item
+  Does NOT change during handover (unlike intermediate UPFs)
+\item
+  SMF may insert Intermediate UPFs (I-UPF) for local routing while keeping PSA stable
+\end{itemize}
+
+\CNsubsection{3.3}{User Plane Function (UPF)}
+
+The UPF is the \textbf{only user-plane NF} in the 5G Core. It handles all packet processing, forwarding, and policy enforcement for user data.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Packet Routing and Forwarding:} Routes packets between RAN and Data Network
+\item
+  \textbf{Traffic Detection and Reporting:} Performs DPI for application identification
+\item
+  \textbf{QoS Handling:} Enforces per-flow QoS (marking, policing, shaping)
+\item
+  \textbf{Usage Reporting:} Measures traffic volume/\allowbreak{}duration for charging
+\item
+  \textbf{Uplink Classifier (UL-CL):} Steers traffic to different data networks based on traffic matching
+\item
+  \textbf{Branching Point:} Supports multi-homed PDU sessions
+\item
+  \textbf{Buffering:} Buffers downlink packets for idle UEs, triggers DDN to SMF
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\textbf{Interfaces:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Connection} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{N3} & gNB \ensuremath{\leftrightarrow} UPF & GTP-U over UDP & User plane tunnel from RAN \\
+\textbf{N6} & UPF \ensuremath{\leftrightarrow} DN & IP /\allowbreak{} Ethernet & Exit point to Data Network \\
+\textbf{N9} & UPF \ensuremath{\leftrightarrow} UPF & GTP-U over UDP & Inter-UPF forwarding (chaining) \\
+\textbf{N4} & SMF \ensuremath{\leftrightarrow} UPF & PFCP over UDP & Control of UPF from SMF \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\textbf{PFCP Rules (programmed by SMF via N4):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Rule} & \CNth{Full Name} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{PDR} & Packet Detection Rule & Matches incoming packets (source interface, IP filters, GTP TEID, QFI) \\
+\textbf{FAR} & Forwarding Action Rule & Defines what to do (forward, drop, buffer, duplicate); specifies destination \\
+\textbf{QER} & QoS Enforcement Rule & Rate limiting (MBR/\allowbreak{}GBR), gating (open/\allowbreak{}close), reflective QoS \\
+\textbf{URR} & Usage Reporting Rule & Volume/\allowbreak{}time/\allowbreak{}event-based measurement triggers for charging \\
+\textbf{BAR} & Buffering Action Rule & Controls buffering behavior, notification parameters \\
+\end{longtable}
+}
+
+\textbf{Traffic Detection Methods:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SDF Filter:} 5-tuple IP filter (src/\allowbreak{}dst IP, src/\allowbreak{}dst port, protocol)
+\item
+  \textbf{Application ID:} Pre-configured or dynamically learned via DPI
+\item
+  \textbf{GTP-U TEID:} Identifies specific GTP tunnels
+\item
+  \textbf{QFI (QoS Flow Identifier):} Maps to specific QoS flows
+\end{itemize}
+
+\CNsubsection{3.4}{Unified Data Management (UDM)}
+
+The UDM provides subscriber data management, authentication credential handling, and subscription authorization. It is the 5G equivalent of the HSS.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SUPI Storage:} Stores and manages the Subscription Permanent Identifier (SUPI = IMSI or NAI format)
+\item
+  \textbf{Authentication Credential Computation:} Generates authentication vectors (AV) using subscriber’s long-term key (K) and operator parameters (OP/\allowbreak{}OPc)
+\item
+  \textbf{Subscription Profile Management:} Maintains subscribed services, DNN authorizations, QoS profiles
+\item
+  \textbf{Registration Management:} Tracks serving AMF/\allowbreak{}SMF per subscriber (NF registration)
+\item
+  \textbf{DNN Authorization:} Validates whether a UE is authorized to access a specific DNN/\allowbreak{}slice combination
+\item
+  \textbf{SUCI De-concealment:} Resolves SUCI back to SUPI (using SIDF — Subscription Identifier De-concealing Function)
+\end{itemize}
+
+\textbf{Key Data Stored:}
+
+\begin{itemize}
+\tightlist
+\item
+  SUPI, SUCI resolution keys
+\item
+  Subscriber authentication credentials (K, OP/\allowbreak{}OPc, SQN)
+\item
+  Subscribed S-NSSAI and DNN list
+\item
+  Default session QoS parameters
+\item
+  Serving NF registrations (AMF, SMF)
+\item
+  Access and mobility subscription data
+\end{itemize}
+
+\textbf{Interfaces:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Nudm:} Service-based interface exposed by UDM
+\item
+  \textbf{N8 (via Nudm):} AMF retrieves subscription/\allowbreak{}mobility data
+\item
+  \textbf{N10 (via Nudm):} SMF retrieves session management subscription data
+\item
+  \textbf{N13 (via Nudm):} AUSF retrieves authentication credentials
+\end{itemize}
+
+\textbf{Relationship to UDR:}
+
+\begin{itemize}
+\tightlist
+\item
+  UDM contains application logic (auth vector computation, SUCI de-concealment)
+\item
+  UDR is the pure data store backend
+\item
+  UDM accesses UDR via \textbf{Nudr} interface
+\end{itemize}
+
+\CNsubsection{3.5}{Authentication Server Function (AUSF)}
+
+The AUSF acts as the authentication server for the 5G network. It executes authentication procedures between the UE and the home network.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Authentication Execution:} Runs 5G-AKA or EAP-AKA’ procedures
+\item
+  \textbf{\ensuremath{K_{\mathrm{AUSF}}} Derivation:} Derives the anchor key (\ensuremath{K_{\mathrm{AUSF}}}) from which all subsequent keys are derived
+\item
+  \textbf{Authentication Result Storage:} Stores authentication status for future reference
+\item
+  \textbf{Home Network Authority:} Ensures authentication decision is made by the home network (even in roaming)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\textbf{Authentication Methods:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Method} & \CNth{Description} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{5G-AKA} & 5G Authentication and Key Agreement — enhanced AKA with home network confirmation & Primary method for USIM-based UEs \\
+\textbf{EAP-AKA’} & Extensible Authentication Protocol with AKA prime — EAP framework-based & Roaming, non-3GPP access, IoT \\
+\end{longtable}
+}
+
+\CNkeepfig{m19-key-hierarchy}{2}
+
+\textbf{Key Hierarchy from AUSF:}
+
+\CNfigure{m19-key-hierarchy}{5G key hierarchy rooted at the AUSF}
+
+\textbf{Interfaces:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Nausf:} Service-based interface exposed by AUSF
+\item
+  \textbf{N12 (via Nausf):} AMF initiates authentication
+\item
+  \textbf{N13 (via Nudm):} AUSF retrieves authentication vectors from UDM
+\end{itemize}
+
+\CNsubsection{3.6}{Policy Control Function (PCF)}
+
+The PCF is the centralized policy engine of the 5GC. It provides policy rules to control network behavior for access, sessions, and UE-specific policies.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PCC Rule Generation:} Creates Policy and Charging Control rules for QoS and charging
+\item
+  \textbf{AM Policy:} Access and Mobility policies (RFSP index, service area restrictions, RAT/\allowbreak{}frequency selection)
+\item
+  \textbf{SM Policy:} Session Management policies (QoS, gating, charging, traffic steering)
+\item
+  \textbf{UE Policy:} Policies delivered to the UE (URSP rules — UE Route Selection Policy, ANDSP)
+\item
+  \textbf{Policy Decision:} Makes real-time policy decisions based on subscription, network conditions, AF requests
+\end{itemize}
+
+\Needspace{12\baselineskip}
+
+\textbf{Policy Types:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Policy} & \CNth{Scope} & \CNth{Delivered To} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{AM Policy} & Access \& Mobility & AMF (N15) & Service area, RFSP, RAT restriction \\
+\textbf{SM Policy} & Session & SMF (N7) & QoS flows, PCC rules, charging \\
+\textbf{UE Policy} & UE behavior & UE (via AMF) & URSP, ANDSP, WLANSP \\
+\end{longtable}
+}
+
+\textbf{PCC Rule Contents:}
+
+\begin{itemize}
+\tightlist
+\item
+  Rule identifier and precedence
+\item
+  Traffic flow template (SDF filter or application ID)
+\item
+  QoS parameters (5QI, ARP, MBR, GBR)
+\item
+  Gating status (open/\allowbreak{}close for UL/\allowbreak{}DL)
+\item
+  Charging method (online/\allowbreak{}offline) and rating group
+\item
+  Traffic steering policy
+\end{itemize}
+
+\textbf{Interfaces:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Npcf:} Service-based interface exposed by PCF
+\item
+  \textbf{N7 (via Npcf):} SMF retrieves SM policy decisions
+\item
+  \textbf{N15 (via Npcf):} AMF retrieves AM policy decisions
+\item
+  \textbf{N5 (via Npcf):} AF influences policy via NEF or directly
+\end{itemize}
+
+\CNsubsection{3.7}{Network Slice Selection Function (NSSF)}
+
+The NSSF assists in selecting the appropriate network slice instance and AMF set for a UE.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Allowed NSSAI Determination:} Determines which S-NSSAIs the UE is permitted to use in the serving PLMN
+\item
+  \textbf{S-NSSAI Mapping:} Maps Requested NSSAI to Configured NSSAI (home\ensuremath{\leftrightarrow}serving PLMN mapping in roaming)
+\item
+  \textbf{AMF Redirection:} When the current AMF cannot serve the selected slice, NSSF identifies a target AMF set that can
+\item
+  \textbf{NRF Selection:} Helps select appropriate NRF instance for slice-specific NF discovery
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\textbf{Key Concepts:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Term} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{S-NSSAI} & Single NSSAI = SST (8-bit Slice/\allowbreak{}Service Type) + optional SD (24-bit Slice Differentiator) \\
+\textbf{Requested NSSAI} & S-NSSAIs sent by UE in Registration Request \\
+\textbf{Allowed NSSAI} & S-NSSAIs permitted by network (returned in Registration Accept) \\
+\textbf{Configured NSSAI} & S-NSSAIs provisioned in the UE by the HPLMN/\allowbreak{}VPLMN \\
+\textbf{Subscribed S-NSSAI} & Slice subscription in UDM \\
+\end{longtable}
+}
+
+\textbf{Standard SST Values:}
+
+\begin{itemize}
+\tightlist
+\item
+  SST=1: eMBB (enhanced Mobile Broadband)
+\item
+  SST=2: URLLC (Ultra-Reliable Low-Latency Communications)
+\item
+  SST=3: MIoT (Massive IoT)
+\item
+  SST=4: V2X (Vehicle-to-Everything)
+\end{itemize}
+
+\CNsubsection{3.8}{Network Repository Function (NRF)}
+
+The NRF is the central registry for all NF instances in the 5GC. It enables service discovery and authorization.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{NF Registration:} NFs register their profiles (type, capacity, supported services, PLMN, slice, location)
+\item
+  \textbf{NF Discovery:} Consumer NFs query NRF to find producer NFs matching criteria
+\item
+  \textbf{NF Status Notification:} Notifies subscribed NFs about NF status changes (registered, deregistered, suspended)
+\item
+  \textbf{OAuth2 Token Issuance:} Issues access tokens for service-based interface authorization
+\end{itemize}
+
+\textbf{NF Profile Contents:}
+
+\begin{itemize}
+\tightlist
+\item
+  NF Instance ID (UUID)
+\item
+  NF Type (AMF, SMF, UPF, etc.)
+\item
+  NF Status (REGISTERED, SUSPENDED, UNDISCOVERABLE)
+\item
+  PLMN ID(s) served
+\item
+  S-NSSAI(s) supported
+\item
+  FQDN or IP addresses
+\item
+  Supported services and versions
+\item
+  Capacity, priority, load information
+\item
+  Geographic locality
+\end{itemize}
+
+\textbf{Discovery Query Parameters:}
+
+\begin{itemize}
+\tightlist
+\item
+  Target NF Type
+\item
+  Requester NF Type
+\item
+  Service names
+\item
+  Target PLMN, S-NSSAI, DNN
+\item
+  Preferred locality
+\end{itemize}
+
+\textbf{OAuth2 in 5GC:}
+
+\begin{itemize}
+\tightlist
+\item
+  NRF acts as OAuth2 Authorization Server
+\item
+  Consumer NF requests token with target NF type and services
+\item
+  Token included in SBI requests (Authorization header)
+\item
+  Producer NF validates token before serving the request
+\end{itemize}
+
+\CNsubsection{3.9}{Network Exposure Function (NEF)}
+
+The NEF provides a secure framework for exposing 5GC capabilities and events to external Application Functions (AFs).
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Exposure Framework:} Exposes network capabilities to 3rd-party AFs via standardized APIs
+\item
+  \textbf{Traffic Influence:} AF can request specific traffic routing (e.g., route traffic to local edge server)
+\item
+  \textbf{Monitoring Events:} AF subscribes to UE events (reachability, location, connectivity status)
+\item
+  \textbf{Parameter Provisioning:} AF provisions expected UE behavior, background data transfer policies
+\item
+  \textbf{Translation:} Maps between external identifiers (GPSI, external group ID) and internal identifiers (SUPI)
+\item
+  \textbf{Security Gateway:} Prevents direct AF access to internal NFs
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\textbf{Key Exposure Capabilities:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Capability} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Monitoring Events} & UE reachability, location reporting, loss of connectivity, roaming status \\
+\textbf{Traffic Influence} & Request traffic routing to local Data Network (edge computing) \\
+\textbf{Analytics Exposure} & Expose NWDAF analytics to external AFs \\
+\textbf{Parameter Provisioning} & Expected UE behavior, background data transfer \\
+\textbf{Device Triggering} & Trigger specific action on IoT device \\
+\textbf{NIDD} & Non-IP Data Delivery for IoT \\
+\end{longtable}
+}
+
+\CNsubsection{3.10}{Unified Data Repository (UDR)}
+
+The UDR is the backend data store for subscriber, policy, and exposure data. It is accessed by UDM, PCF, and NEF.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Subscription Data Storage:} Stores subscriber profiles accessed by UDM
+\item
+  \textbf{Policy Data Storage:} Stores policy data (PCC rules, AM/\allowbreak{}SM policies) accessed by PCF
+\item
+  \textbf{Exposure Data Storage:} Stores exposure subscriptions and data accessed by NEF
+\item
+  \textbf{Application Data Storage:} Stores AF-provided data (e.g., PFDs — Packet Flow Descriptions)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\textbf{Data Categories:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Data Type} & \CNth{Consumer NF} & \CNth{Examples} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Subscription Data} & UDM & Authentication credentials, subscribed S-NSSAI, DNN configs \\
+\textbf{Policy Data} & PCF & PCC rule templates, sponsored data policies \\
+\textbf{Exposure Data} & NEF & Monitoring subscriptions, AF influence requests \\
+\textbf{Application Data} & NEF/\allowbreak{}PCF & PFDs, background data transfer policies \\
+\end{longtable}
+}
+
+\textbf{Interface:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Nudr:} Service-based interface (the only interface of UDR)
+\item
+  Accessed by UDM (Nudr\_\allowbreak{}DataManagement), PCF (Nudr\_\allowbreak{}DataManagement), NEF (Nudr\_\allowbreak{}DataManagement)
+\end{itemize}
+
+\CNsubsection{3.11}{Unstructured Data Storage Function (UDSF)}
+
+The UDSF enables stateless design of NFs by providing external storage for NF context data.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Unstructured Data Storage:} Stores arbitrary NF context/\allowbreak{}state as opaque data blocks
+\item
+  \textbf{Stateless NF Support:} NFs can recover state after restart or load-balance across instances
+\item
+  \textbf{CRUD Operations:} Create, Read, Update, Delete operations on stored records
+\end{itemize}
+
+\textbf{Why UDSF Matters:}
+
+\begin{itemize}
+\tightlist
+\item
+  Without UDSF, each NF instance holds session state in memory
+\item
+  With UDSF, any NF instance can serve any request by retrieving state from UDSF
+\item
+  Enables true horizontal scaling, failover, and cloud-native deployment
+\item
+  Each NF type may have its own UDSF instance
+\end{itemize}
+
+\textbf{Interface:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Nudsf:} Service-based interface for storing/\allowbreak{}retrieving unstructured data
+\end{itemize}
+
+\CNsubsection{3.12}{Service Communication Proxy (SCP)}
+
+The SCP is a routing and load-balancing element placed in the SBI communication path between NFs. Defined in TS 23.501 Release 16+.
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Indirect Communication:} NFs send requests to SCP instead of directly to the target NF
+\item
+  \textbf{Load Balancing:} Distributes requests across multiple NF instances
+\item
+  \textbf{Message Routing:} Routes messages based on discovery parameters without consumer NF needing full discovery
+\item
+  \textbf{Topology Hiding:} Hides internal NF topology from external networks (roaming)
+\item
+  \textbf{Overload Control:} Implements congestion handling and request throttling
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\textbf{Communication Models:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Model} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Model A (Direct)} & NF consumer discovers target via NRF, communicates directly \\
+\textbf{Model B (Indirect w/\allowbreak{}o delegated discovery)} & NF discovers target via NRF, routes via SCP \\
+\textbf{Model C (Indirect w/\allowbreak{} delegated discovery)} & NF sends to SCP, SCP performs discovery and routing \\
+\textbf{Model D (Indirect w/\allowbreak{} delegated discovery + selection)} & SCP handles everything: discovery, selection, routing \\
+\end{longtable}
+}
+
+\textbf{Benefits:}
+
+\begin{itemize}
+\tightlist
+\item
+  Simplifies NF implementation (NFs don’t need complex discovery/\allowbreak{}retry logic)
+\item
+  Centralized observability and telemetry
+\item
+  Easier deployment of cross-cutting concerns (mTLS termination, tracing)
+\item
+  Enables seamless NF scaling without reconfiguration
+\end{itemize}
+
+\CNsection{4}{Control Plane vs User Plane in 5G Core}
+
+The 5GC enforces a strict separation between Control Plane (CP) and User Plane (UP), known as CUPS (Control and User Plane Separation).
+
+\CNsubsection{}{Control Plane (CP)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{All NFs except UPF} operate in the control plane
+\item
+  Communication via \textbf{Service-Based Interfaces (SBI)} using HTTP/\allowbreak{}2 + JSON
+\item
+  Protocol stack: HTTP/\allowbreak{}2 \ensuremath{\to} TCP \ensuremath{\to} IP (or via SCP)
+\item
+  Functions: signaling, policy, authentication, registration, session management, discovery
+\item
+  Deployed centrally or regionally depending on latency requirements
+\item
+  AMF and SMF are the primary CP anchors for UE signaling and session management
+\end{itemize}
+
+\CNsubsection{}{User Plane (UP)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Only UPF} operates in the user plane
+\item
+  Programmed by SMF via \textbf{N4 /\allowbreak{} PFCP} (control interface)
+\item
+  User data protocol stack: App Data \ensuremath{\to} PDU Layer \ensuremath{\to} GTP-U \ensuremath{\to} UDP \ensuremath{\to} IP
+\item
+  Functions: packet forwarding, QoS enforcement, traffic detection, usage measurement, buffering
+\item
+  Can be deployed at edge, regional, or central locations depending on latency and data locality needs
+\item
+  Multiple UPFs can be chained (via N9) for service function chaining or local breakout
+\end{itemize}
+
+\CNkeepfig{m19-cp-up}{3}
+
+\CNsubsection{}{CP/\allowbreak{}UP Interaction Summary}
+
+\CNfigure{m19-cp-up}{Control plane (SBI) and user plane of the 5G core}
+
+\Needspace{28\baselineskip}
+
+\CNsection{5}{Major Comparison: 4G EPC vs 5G Core}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{4G EPC} & \CNth{5G Core (5GC)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Architecture Style} & Point-to-point interfaces between monolithic NEs & Service-Based Architecture (SBA), microservices \\
+\textbf{Signaling Protocol} & GTP-C (v2), Diameter & HTTP/\allowbreak{}2 + JSON (RESTful APIs) \\
+\textbf{User Plane} & S-GW + P-GW (combined or separated) & UPF (single user-plane NF) \\
+\textbf{Subscriber Database} & HSS (Diameter-based) & UDM + UDR (SBI-based, separated logic/\allowbreak{}storage) \\
+\textbf{Authentication} & EPS-AKA via HSS & 5G-AKA /\allowbreak{} EAP-AKA’ via AUSF + UDM \\
+\textbf{Policy} & PCRF (Gx, Rx, Sd interfaces) & PCF (Npcf SBI, AM/\allowbreak{}SM/\allowbreak{}UE policies) \\
+\textbf{Session Management} & MME + S-GW + P-GW combined & SMF (dedicated NF, decoupled from mobility) \\
+\textbf{Mobility Management} & MME (combined with session signaling) & AMF (pure mobility/\allowbreak{}access, no session logic) \\
+\textbf{Network Slicing} & Not natively supported & Native support (S-NSSAI, NSSF, per-slice NF instances) \\
+\textbf{Interface Style} & Fixed reference points (S1, S5, S6a, S11…) & SBI services + reference points for UP \\
+\textbf{State Management} & Stateful NEs & Stateless NFs + UDSF for external state \\
+\textbf{Deployment} & Appliance-based, monolithic & Cloud-native, containerized, microservices \\
+\textbf{Discovery} & Preconfigured or DNS-based & Dynamic via NRF (registration + discovery + OAuth2) \\
+\textbf{Edge Computing} & Difficult (LIPA/\allowbreak{}SIPTO limited) & Native (distributed UPF, LADN, MEC integration) \\
+\end{longtable}
+}
+
+\CNkeepfig{m19-4g-to-5g}{3}
+
+\CNsubsection{}{4G to 5G Network Function Mapping}
+
+\CNfigure{m19-4g-to-5g}{How the EPC functions map to 5G core network functions}
+
+\Needspace{33\baselineskip}
+
+\CNsection{6}{Reference Points}
+
+Reference points define the interfaces between specific NF pairs. While SBI is used for CP-to-CP communication, reference points remain important for understanding protocol specifics.
+
+\CNsubsection{}{Complete Reference Point Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Reference Point} & \CNth{Connection} & \CNth{Protocol/\allowbreak{}Transport} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{N1} & UE \ensuremath{\leftrightarrow} AMF & NAS over RRC (via gNB) & NAS signaling (registration, session mgmt requests) \\
+\textbf{N2} & RAN \ensuremath{\leftrightarrow} AMF & NGAP over SCTP & RAN-CN signaling (context setup, handover, paging) \\
+\textbf{N3} & RAN \ensuremath{\leftrightarrow} UPF & GTP-U over UDP/\allowbreak{}IP & User plane tunnel carrying PDU session data \\
+\textbf{N4} & SMF \ensuremath{\leftrightarrow} UPF & PFCP over UDP (port 8805) & UPF programming (PDR, FAR, QER, URR rules) \\
+\textbf{N6} & UPF \ensuremath{\leftrightarrow} DN & IP /\allowbreak{} Ethernet & User traffic exit to Data Network \\
+\textbf{N7} & SMF \ensuremath{\leftrightarrow} PCF & SBI (HTTP/\allowbreak{}2) & SM policy (PCC rules, QoS decisions) \\
+\textbf{N8} & AMF \ensuremath{\leftrightarrow} UDM & SBI (HTTP/\allowbreak{}2) & Access/\allowbreak{}mobility subscription data \\
+\textbf{N9} & UPF \ensuremath{\leftrightarrow} UPF & GTP-U over UDP/\allowbreak{}IP & Inter-UPF user plane forwarding \\
+\textbf{N10} & SMF \ensuremath{\leftrightarrow} UDM & SBI (HTTP/\allowbreak{}2) & Session management subscription data \\
+\textbf{N11} & AMF \ensuremath{\leftrightarrow} SMF & SBI (HTTP/\allowbreak{}2) & PDU session lifecycle management \\
+\textbf{N12} & AMF \ensuremath{\leftrightarrow} AUSF & SBI (HTTP/\allowbreak{}2) & Authentication initiation \\
+\textbf{N13} & AUSF \ensuremath{\leftrightarrow} UDM & SBI (HTTP/\allowbreak{}2) & Authentication vector retrieval \\
+\textbf{N14} & AMF \ensuremath{\leftrightarrow} AMF & SBI (HTTP/\allowbreak{}2) & Inter-AMF mobility (UE context transfer) \\
+\textbf{N15} & AMF \ensuremath{\leftrightarrow} PCF & SBI (HTTP/\allowbreak{}2) & AM policy (access/\allowbreak{}mobility restrictions) \\
+\textbf{N22} & AMF \ensuremath{\leftrightarrow} NSSF & SBI (HTTP/\allowbreak{}2) & Slice selection assistance \\
+\textbf{N27} & NRF \ensuremath{\leftrightarrow} NRF & SBI (HTTP/\allowbreak{}2) & Inter-PLMN NF discovery (via SEPP) \\
+\textbf{N32} & SEPP \ensuremath{\leftrightarrow} SEPP & PRINS /\allowbreak{} TLS & Inter-PLMN security (roaming) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Key Reference Point Details}
+
+\textbf{N1 (UE \ensuremath{\leftrightarrow} AMF):}
+
+\begin{itemize}
+\tightlist
+\item
+  Carries NAS PDUs (Registration Request/\allowbreak{}Accept, Authentication, Security Mode, PDU Session Establishment)
+\item
+  NAS messages are transparently relayed by gNB (encapsulated in NGAP on N2)
+\item
+  Supports NAS security (integrity + ciphering) after security activation
+\end{itemize}
+
+\textbf{N2 (RAN \ensuremath{\leftrightarrow} AMF):}
+
+\begin{itemize}
+\tightlist
+\item
+  NGAP protocol over SCTP
+\item
+  Procedures: Initial UE Message, PDU Session Resource Setup, Handover Required/\allowbreak{}Request, Paging
+\item
+  Carries UE-associated and non-UE-associated signaling
+\end{itemize}
+
+\textbf{N3 (RAN \ensuremath{\leftrightarrow} UPF):}
+
+\begin{itemize}
+\tightlist
+\item
+  GTP-U tunnel identified by TEID (Tunnel Endpoint Identifier)
+\item
+  One GTP-U tunnel per PDU session per gNB-UPF pair
+\item
+  QoS Flow Identifier (QFI) carried in GTP-U extension header to map QoS flows
+\end{itemize}
+
+\textbf{N4 (SMF \ensuremath{\leftrightarrow} UPF):}
+
+\begin{itemize}
+\tightlist
+\item
+  PFCP (Packet Forwarding Control Protocol) — 3GPP TS 29.244
+\item
+  Session-level management (Establishment, Modification, Deletion)
+\item
+  Node-level management (Association Setup, Heartbeat)
+\item
+  Reports: Usage Reports, Downlink Data Notification, End Marker
+\end{itemize}
+
+\textbf{N9 (UPF \ensuremath{\leftrightarrow} UPF):}
+
+\begin{itemize}
+\tightlist
+\item
+  GTP-U tunnel for multi-hop user plane paths
+\item
+  Used in UL-CL (Uplink Classifier) and branching point scenarios
+\item
+  Enables service function chaining and distributed UPF deployment
+\end{itemize}
+
+\CNsection{7}{Deployment Options}
+
+The 5GC’s modular architecture allows flexible deployment topologies based on service requirements.
+
+\CNsubsection{7.1}{Centralized Deployment}
+
+All NFs (including UPF) deployed in a central data center.
+
+\textbf{Characteristics:}
+
+\begin{itemize}
+\tightlist
+\item
+  Simple operations, single site
+\item
+  Higher latency for user plane (all traffic traverses central site)
+\item
+  Suitable for wide-area coverage with relaxed latency requirements
+\item
+  Lower infrastructure cost
+\end{itemize}
+
+\CNsubsection{7.2}{Distributed Deployment}
+
+Control plane centralized, user plane distributed closer to users.
+
+\textbf{Characteristics:}
+
+\begin{itemize}
+\tightlist
+\item
+  CP NFs (AMF, SMF, PCF, etc.) in regional/\allowbreak{}central DC
+\item
+  UPF deployed at regional aggregation points
+\item
+  Reduced user-plane latency
+\item
+  SMF manages multiple UPF instances across locations
+\end{itemize}
+
+\CNsubsection{7.3}{Edge UPF Deployment (MEC Integration)}
+
+UPF instances deployed at the network edge (cell site or local aggregation point) for ultra-low latency.
+
+\textbf{Characteristics:}
+
+\begin{itemize}
+\tightlist
+\item
+  Local breakout of traffic at the edge
+\item
+  Enables Multi-access Edge Computing (MEC) — ETSI MEC framework
+\item
+  SMF can insert/\allowbreak{}remove edge UPFs dynamically based on UE location
+\item
+  \textbf{UL-CL (Uplink Classifier):} Steers specific traffic flows to edge UPF while rest goes to central UPF
+\item
+  \textbf{Local Area Data Network (LADN):} Data Network available only in specific geographic area
+\item
+  Typical use cases: AR/\allowbreak{}VR, autonomous driving, industrial automation, cloud gaming
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Deployment Architecture Comparison}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1860}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2791}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3023}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2326}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Centralized} & \CNth{Distributed} & \CNth{Edge UPF} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{CP Location} & Central DC & Central/\allowbreak{}Regional DC & Central/\allowbreak{}Regional DC \\
+\textbf{UP Location} & Central DC & Regional PoP & Cell site /\allowbreak{} Edge DC \\
+\textbf{User Plane Latency} & High (10-50ms) & Medium (5-20ms) & Ultra-low (1-5ms) \\
+\textbf{Complexity} & Low & Medium & High \\
+\textbf{Use Cases} & General broadband & Regional services & URLLC, MEC, V2X \\
+\textbf{UPF Count} & Few & Moderate & Many \\
+\end{longtable}
+}
+
+\CNkeepfig{m19-pdu-path}{3}
+
+\CNsubsection{}{PDU Session User Plane Path}
+
+\CNfigure{m19-pdu-path}{User-plane path of a PDU session with an intermediate UPF}
+
+\textbf{PDU Session Establishment Flow (simplified):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE \ensuremath{\to} AMF: NAS PDU Session Establishment Request (via N1)
+\item
+  AMF \ensuremath{\to} SMF: Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}CreateSMContext (via N11)
+\item
+  SMF selects UPF, allocates IP address
+\item
+  SMF \ensuremath{\to} UPF: PFCP Session Establishment (via N4) — installs PDR/\allowbreak{}FAR/\allowbreak{}QER
+\item
+  SMF \ensuremath{\to} AMF: N1N2MessageTransfer (contains NAS accept + N2 info)
+\item
+  AMF \ensuremath{\to} gNB: PDU Session Resource Setup Request (via N2)
+\item
+  gNB \ensuremath{\to} UPF: GTP-U tunnel established (N3)
+\item
+  UE receives PDU Session Establishment Accept with QoS rules
+\end{enumerate}
+
+\CNsection{}{Summary}
+
+The 5G Core represents a paradigm shift from the 4G EPC:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SBA replaces point-to-point interfaces} — enabling flexibility, reusability, and independent NF evolution
+\item
+  \textbf{Complete CUPS} — UPF is the only user-plane entity, programmable via PFCP
+\item
+  \textbf{Cloud-native by design} — stateless NFs, UDSF, NRF-based discovery, containerization
+\item
+  \textbf{Native slicing} — S-NSSAI, NSSF, per-slice NF selection from the ground up
+\item
+  \textbf{Security enhanced} — SUCI concealment, home-network-controlled authentication, SBI OAuth2
+\item
+  \textbf{Edge-ready} — distributed UPF, UL-CL, LADN for ultra-low-latency services
+\end{itemize}
+
+\emph{References: 3GPP TS 23.501 (System Architecture), TS 23.502 (Procedures), TS 29.244 (PFCP), TS 33.501 (Security Architecture)}

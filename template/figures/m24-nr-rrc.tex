@@ -1,0 +1,9 @@
+% Module 24 — the three NR RRC states
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNbox, text width=3.6cm, align=left, anchor=north] (i) at (0,0) {\textbf{RRC\_IDLE}\\[2pt]{\scriptsize\textbullet{} \CNL{no UE context in the RAN}{بدون زمینه \lr{UE} در \lr{RAN}}\\\textbullet{} \CNL{core: RM registered}{هسته: ثبت‌شده در \lr{RM}}\\\textbullet{} \CNL{CN paging}{صفحه‌بندی \lr{CN}}}};
+\node[CNhl, text width=3.6cm, align=left, anchor=north] (n) at (5.4,0) {\textbf{RRC\_INACTIVE} {\scriptsize (\CNL{NEW in 5G}{جدید در \lr{5G}})}\\[2pt]{\scriptsize\textbullet{} \CNL{UE context stored in the gNB + core}{زمینه \lr{UE} ذخیره در \lr{gNB +} هسته}\\\textbullet{} \CNL{fast resume}{ازسرگیری سریع}\\\textbullet{} \CNL{RAN paging}{صفحه‌بندی \lr{RAN}}\\\textbullet{} \CNL{RNA (RAN-based notification area)}{\lr{RNA} (ناحیه اعلان مبتنی بر \lr{RAN})}}};
+\node[CNok, text width=3.6cm, align=left, anchor=north] (c) at (10.8,0) {\textbf{RRC\_CONNECTED}\\[2pt]{\scriptsize\textbullet{} \CNL{full connection}{اتصال کامل}\\\textbullet{} \CNL{active data}{داده فعال}\\\textbullet{} \CNL{measurements}{اندازه‌گیری‌ها}\\\textbullet{} \CNL{handover}{تحویل}}};
+\foreach \k/\y/\a/\b/\t/\dir in {1/-4.0/i/n/Setup/->, 2/-4.5/n/c/Resume/->, 3/-5.0/c/n/Suspend/->, 4/-5.5/n/i/Release/->, 5/-6.0/c/i/Release/->, 6/-6.5/i/c/Setup/->}{
+  \draw[CNlink, \dir] (\a |- 0,\y) -- node[CNelab, fill=white, font=\sffamily\scriptsize] {\t} (\b |- 0,\y);}
+\foreach \s in {i,n,c}{\draw[CNline, line width=0.8pt] (\s.south) -- (\s |- 0,-6.75);}
+\end{tikzpicture}

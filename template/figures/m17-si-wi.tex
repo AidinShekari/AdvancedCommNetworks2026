@@ -1,0 +1,6 @@
+% Module 17 — study item versus work item
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNbox, text width=4.4cm, align=left] (si) at (0,0) {\textbf{Study Item (SI)}\\[2pt]{\small\textbullet{} \CNL{Feasibility}{امکان‌سنجی}\\\textbullet{} \CNL{Gap analysis}{تحلیل شکاف}\\\textbullet{} \CNL{Solution options}{گزینه‌های راه‌حل}\\\textbullet{} \CNL{Output: TR}{خروجی: \lr{TR}}}};
+\node[CNcp, text width=4.4cm, align=left] (wi) at (8,0) {\textbf{Work Item (WI)}\\[2pt]{\small\textbullet{} \CNL{Specification creation/update}{ایجاد/به‌روزرسانی مشخصه}\\\textbullet{} \CNL{Normative text}{متن الزامی}\\\textbullet{} \CNL{Output: TS}{خروجی: \lr{TS}}\\\phantom{x}}};
+\draw[CNlink, ->, line width=1.3pt] (si) -- node[CNelab, above=2pt, fill=none] {\CNL{approval}{تصویب}} (wi);
+\end{tikzpicture}

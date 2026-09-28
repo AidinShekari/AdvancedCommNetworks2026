@@ -1,0 +1,8 @@
+% Module 24 — how the signalling protocols stack on transport protocols
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, L/.style={CNlayer, minimum height=0.85cm, anchor=west}]
+\node[L, fill=CNsig!10, minimum width=13cm, text width=12.6cm, align=center] at (0,0) {\textbf{\CNL{APPLICATION PROTOCOLS}{پروتکل‌های کاربرد}}\\MAP \,|\, RANAP \,|\, S1AP \,|\, NGAP \,|\, GTP-C \,|\, Diameter \,|\, HTTP/2 SBI};
+\node[L, fill=CNpaper, minimum width=13cm] at (0,-1.0) {\textbf{\CNL{TRANSPORT PROTOCOLS}{پروتکل‌های انتقال}}};
+\node[L, fill=CNcyan!10, minimum width=4.33cm] at (0,-1.85) {SCTP}; \node[L, fill=CNcyan!10, minimum width=4.34cm] at (4.33,-1.85) {TCP}; \node[L, fill=CNcyan!10, minimum width=4.33cm] at (8.67,-1.85) {UDP};
+\node[L, fill=white, minimum width=13cm] at (0,-2.7) {IP};
+\node[L, fill=CNpaper, minimum width=13cm] at (0,-3.55) {L2 / L1 (Ethernet, \CNL{etc.}{و غیره})};
+\end{tikzpicture}

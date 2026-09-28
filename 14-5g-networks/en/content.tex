@@ -1,0 +1,848 @@
+\CNsection{1}{Why 5G? — Limitations of LTE/\allowbreak{}4G}
+
+Despite the success of LTE (4G), several fundamental limitations drove the need for a new generation:
+
+\CNsubsection{1.1}{Latency Floor (\textasciitilde{}10~ms)}
+
+\begin{itemize}
+\tightlist
+\item
+  LTE’s Transmission Time Interval (TTI) is fixed at \textbf{1~ms} subframe
+\item
+  With scheduling, HARQ, and processing delays, the practical \textbf{round-trip latency floor is \textasciitilde{}10~ms}
+\item
+  This is insufficient for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Autonomous vehicle control (requires \textless{} 5~ms)
+  \item
+    Remote surgery /\allowbreak{} haptic feedback (requires \textasciitilde{}1~ms)
+  \item
+    Industrial real-time control loops
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{1.2}{Capacity Ceiling}
+
+\begin{itemize}
+\tightlist
+\item
+  LTE peak: \textasciitilde{}1~Gbps (Cat-16, 3CA, 4\ensuremath{\times}4 MIMO, 256-QAM) — theoretical
+\item
+  Practical throughput: 100–300~Mbps in ideal conditions
+\item
+  Spectrum below 6~GHz is congested; limited bandwidth per carrier (20~MHz max)
+\item
+  4\ensuremath{\times}4 MIMO is the practical antenna limit in LTE form factors
+\end{itemize}
+
+\CNsubsection{1.3}{IoT Scale}
+
+\begin{itemize}
+\tightlist
+\item
+  LTE was designed for \textbf{human-centric} broadband communication
+\item
+  LTE-M /\allowbreak{} NB-IoT added IoT support, but:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Connection density limited to \textasciitilde{}10\textsuperscript{4} devices/\allowbreak{}km\textsuperscript{2}
+  \item
+    Not natively designed for \textbf{10\textsuperscript{6} devices/\allowbreak{}km\textsuperscript{2}} required for smart city/\allowbreak{}industrial IoT
+  \item
+    Signaling overhead per device is too high for massive deployments
+  \end{itemize}
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{1.4}{Summary of LTE Limitations}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{LTE Capability} & \CNth{5G Target} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Peak data rate (DL) & \textasciitilde{}1~Gbps & 20~Gbps \\
+User-plane latency & \textasciitilde{}10~ms & 1~ms \\
+Connection density & \textasciitilde{}10\textsuperscript{4}/\allowbreak{}km\textsuperscript{2} & 10\textsuperscript{6}/\allowbreak{}km\textsuperscript{2} \\
+Spectral efficiency & 30 bps/\allowbreak{}Hz & 90 bps/\allowbreak{}Hz \\
+Mobility & 350 km/\allowbreak{}h & 500 km/\allowbreak{}h \\
+\end{longtable}
+}
+
+\CNsection{2}{5G Requirements — ITU IMT-2020 Targets}
+
+The International Telecommunication Union (ITU) defined \textbf{IMT-2020} as the framework for 5G with the following key performance indicators (KPIs):
+
+\CNsubsection{2.1}{Peak Data Rate}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Downlink}: 20~Gbps
+\item
+  \textbf{Uplink}: 10~Gbps
+\item
+  Achieved through wider bandwidth (up to 400~MHz per carrier) + higher-order MIMO + 256-QAM
+\end{itemize}
+
+\CNsubsection{2.2}{Latency}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{User-plane latency}: \textbf{1~ms} (URLLC scenario)
+\item
+  \textbf{Control-plane latency}: 20~ms (idle to connected)
+\item
+  Enables real-time control applications previously impossible on cellular
+\end{itemize}
+
+\CNsubsection{2.3}{Connection Density}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{10\textsuperscript{6} devices per km\textsuperscript{2}} (mMTC scenario)
+\item
+  100\ensuremath{\times} improvement over LTE
+\item
+  Support for sensors, actuators, meters with minimal overhead
+\end{itemize}
+
+\CNsubsection{2.4}{User-Experienced Data Rate}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{100~Mbps} available everywhere (cell edge, dense urban)
+\item
+  \textbf{50~Mbps UL} everywhere
+\item
+  Represents the ``guaranteed minimum'' user experience
+\end{itemize}
+
+\CNsubsection{2.5}{Reliability}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{99.999\%} (five nines) for URLLC
+\item
+  Packet delivery within latency budget with 10\textsuperscript{-5} error probability
+\item
+  Critical for safety-of-life applications
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{2.6}{Additional IMT-2020 Targets}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{KPI} & \CNth{Target} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Area traffic capacity & 10 Mbps/\allowbreak{}m\textsuperscript{2} \\
+Network energy efficiency & 100\ensuremath{\times} improvement \\
+Spectrum efficiency & 3\ensuremath{\times} over IMT-Advanced \\
+Mobility & 500 km/\allowbreak{}h \\
+\end{longtable}
+}
+
+\CNkeepfig{m14-usage-triangle}{10}
+
+\CNsection{3}{Three Pillars — 5G Use Cases}
+
+5G is defined by three fundamental service categories (use-case pillars):
+
+\CNsubsection{}{5G Use Case Triangle}
+
+\CNfigure{m14-usage-triangle}{The 5G usage scenarios of ITU IMT-2020}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{3.1}{eMBB — Enhanced Mobile Broadband}
+
+\textbf{Focus}: High data rates, capacity, coverage
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Characteristic} & \CNth{Details} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Peak rate & 20~Gbps DL /\allowbreak{} 10~Gbps UL \\
+User experience & 100~Mbps everywhere \\
+Key tech & Massive MIMO, mmWave, CA \\
+\end{longtable}
+}
+
+\textbf{Applications}:
+
+\begin{itemize}
+\tightlist
+\item
+  Virtual Reality (VR) /\allowbreak{} Augmented Reality (AR) — requires \textgreater{}100~Mbps, \textless{}20~ms
+\item
+  4K/\allowbreak{}8K video streaming
+\item
+  High-density event venues (stadiums: 100k+ users)
+\item
+  Fixed Wireless Access (FWA) as fiber replacement
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{3.2}{URLLC — Ultra-Reliable Low Latency Communications}
+
+\textbf{Focus}: Deterministic latency, extreme reliability
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Characteristic} & \CNth{Details} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Latency & 1~ms (user plane, one way) \\
+Reliability & 99.999\% (10\textsuperscript{-5} BLER) \\
+Key tech & Mini-slots, pre-emption, redundancy \\
+\end{longtable}
+}
+
+\textbf{Applications}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Autonomous driving}: V2X communication, cooperative perception
+\item
+  \textbf{Remote surgery}: Haptic feedback over cellular
+\item
+  \textbf{Industry 4.0}: Real-time robotic control, motion control
+\item
+  \textbf{Smart grid}: Protection and fault isolation
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{3.3}{mMTC — Massive Machine-Type Communications}
+
+\textbf{Focus}: Scalability, energy efficiency, low cost
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Characteristic} & \CNth{Details} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Density & 10\textsuperscript{6} devices/\allowbreak{}km\textsuperscript{2} \\
+Battery life & 10–15 years on coin cell \\
+Key tech & Grant-free access, NOMA, deep coverage \\
+\end{longtable}
+}
+
+\textbf{Applications}:
+
+\begin{itemize}
+\tightlist
+\item
+  IoT sensor networks (environmental, agricultural)
+\item
+  Smart city infrastructure (parking, waste, lighting)
+\item
+  Smart metering (electricity, water, gas)
+\item
+  Asset tracking and logistics
+\item
+  Wearables
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsection{4}{5G NR (New Radio) — Physical Layer}
+
+5G NR is the radio access technology defined in 3GPP Release 15+, designed from the ground up for flexibility.
+
+\CNsubsection{4.1}{Flexible Numerology}
+
+Unlike LTE (fixed 15~kHz SCS, 1~ms TTI), NR supports \textbf{multiple subcarrier spacings (SCS)}:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\begin{minipage}[b]{\linewidth}\centering
+\CNth{Numerology ($\mu$)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{SCS (kHz)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Slot Duration}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{CP Type}
+\end{minipage} & \CNth{Typical Use} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 15 & 1~ms & Normal & FR1, eMBB (low freq) \\
+1 & 30 & 0.5~ms & Normal & FR1, typical deployment \\
+2 & 60 & 0.25~ms & Normal/\allowbreak{}Extended & FR1/\allowbreak{}FR2, URLLC \\
+3 & 120 & 0.125~ms & Normal & FR2 (mmWave) \\
+4 & 240 & 62.5~\ensuremath{\mu}s & Normal & FR2 (SSB only) \\
+\end{longtable}
+}
+
+\textbf{Key relationships}:
+
+\begin{itemize}
+\tightlist
+\item
+  Slot duration = $1\ \mathrm{ms}/2^{\mu}$
+\item
+  Symbols per slot = 14 (normal CP) or 12 (extended CP)
+\item
+  Higher SCS \ensuremath{\to} shorter slot \ensuremath{\to} lower latency (but wider subcarrier \ensuremath{\to} more phase noise tolerance needed for mmWave)
+\end{itemize}
+
+\Needspace{12\baselineskip}
+
+\CNsubsection{4.2}{Frequency Ranges}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}ccccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Range} & \CNth{Band} & \CNth{Frequencies} & \CNth{Max BW/\allowbreak{}carrier} & \CNth{Typical SCS} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{FR1} & Sub-7~GHz & 410~MHz – 7.125~GHz & 100~MHz & 15/\allowbreak{}30/\allowbreak{}60~kHz \\
+\textbf{FR2} & mmWave & 24.25 – 52.6~GHz & 400~MHz & 60/\allowbreak{}120/\allowbreak{}240~kHz \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FR1} provides coverage and capacity (n77, n78 = C-band 3.3–4.2~GHz)
+\item
+  \textbf{FR2} provides extreme capacity in short range (n257 = 28~GHz, n258 = 26~GHz, n260 = 39~GHz, n261 = 28~GHz)
+\item
+  3GPP Rel-17 introduced \textbf{FR2-2}: 52.6–71~GHz
+\end{itemize}
+
+\CNsubsection{4.3}{Bandwidth Parts (BWP)}
+
+\begin{itemize}
+\tightlist
+\item
+  A \textbf{Bandwidth Part} is a contiguous subset of the carrier bandwidth
+\item
+  UE can be configured with up to \textbf{4 BWPs per serving cell} (1 active at a time)
+\item
+  Allows UE power saving: narrow BWP for monitoring, wide BWP for data
+\item
+  Each BWP can have its own numerology (SCS, CP)
+\end{itemize}
+
+\CNsubsection{4.4}{Mini-Slots}
+
+\begin{itemize}
+\tightlist
+\item
+  Standard NR slot = 14 symbols
+\item
+  \textbf{Mini-slot} = 2, 4, or 7 OFDM symbols
+\item
+  Enables sub-slot scheduling for \textbf{URLLC} without waiting for slot boundary
+\item
+  Can \textbf{pre-empt} ongoing eMBB transmissions for urgent URLLC traffic
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{4.5}{Massive MIMO and Beamforming}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4286}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2381}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{LTE} & \CNth{5G NR} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Max antenna ports & 16 (Rel-13 FD-MIMO) & 256+ \\
+Beamforming & Fixed /\allowbreak{} semi-static & Dynamic, per-slot beam management \\
+Beam management & N/\allowbreak{}A & SSB beams, CSI-RS, beam tracking \\
+Panel architecture & Single panel & Multi-panel (FR2) \\
+\end{longtable}
+}
+
+\textbf{5G NR beam management procedures}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{P1}: Initial beam acquisition (SSB sweep)
+\item
+  \textbf{P2}: gNB Tx beam refinement (CSI-RS)
+\item
+  \textbf{P3}: UE Rx beam refinement
+\item
+  \textbf{Beam failure recovery}: Detect failure \ensuremath{\to} select new candidate \ensuremath{\to} RACH-based recovery
+\end{enumerate}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{4.6}{Key Differences from LTE PHY}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{LTE} & \CNth{5G NR} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Subcarrier spacing & Fixed 15~kHz & 15/\allowbreak{}30/\allowbreak{}60/\allowbreak{}120/\allowbreak{}240~kHz \\
+Max bandwidth & 20~MHz & 100~MHz (FR1) /\allowbreak{} 400~MHz (FR2) \\
+Waveform DL & OFDMA & CP-OFDMA \\
+Waveform UL & SC-FDMA & CP-OFDMA (+ DFT-s-OFDMA) \\
+Reference signals & CRS always-on & No CRS; on-demand DMRS/\allowbreak{}CSI-RS \\
+HARQ timing & Fixed (8~ms RTT) & Flexible, configurable \\
+Scheduling & Slot-based only & Slot + mini-slot \\
+Duplex & FDD or TDD (fixed) & Dynamic TDD, self-contained slot \\
+Control channel & PDCCH in first 1-3 symbols & CORESET (flexible in time/\allowbreak{}freq) \\
+DC subcarrier & Yes (LTE center) & No DC subcarrier \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{5G NSA vs SA — Deployment Strategies}
+
+\CNchained\CNsubsection{5.1}{Non-Standalone (NSA) — Option 3/\allowbreak{}3a/\allowbreak{}3x}
+
+\textbf{Architecture}: NR radio (gNB) + \textbf{LTE core (EPC)}
+
+\begin{itemize}
+\tightlist
+\item
+  The LTE eNB acts as the \textbf{master node} (anchor)
+\item
+  NR gNB is the \textbf{secondary node} (adds capacity)
+\item
+  Control plane goes through LTE (eNB \ensuremath{\to} EPC)
+\item
+  User plane can be split or switched
+\end{itemize}
+
+\textbf{Sub-options}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Option 3}: User plane through eNB (split at eNB)
+\item
+  \textbf{Option 3a}: User plane directly from gNB to EPC
+\item
+  \textbf{Option 3x}: User plane split at gNB (gNB handles NR data + some LTE data)
+\end{itemize}
+
+\CNsubsection{5.2}{Standalone (SA) — Option 2}
+
+\textbf{Architecture}: NR radio (gNB) + \textbf{5G Core (5GC)}
+
+\begin{itemize}
+\tightlist
+\item
+  gNB connects directly to 5G Core via \textbf{NG interface}
+\item
+  Full 5G functionality available
+\item
+  No dependency on LTE infrastructure
+\end{itemize}
+
+\CNsubsection{5.3}{Why NSA Was Deployed First}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Faster time-to-market}: Reuse existing EPC infrastructure
+\item
+  \textbf{Lower CAPEX}: No need to deploy 5G Core immediately
+\item
+  \textbf{Coverage anchor}: LTE provides ubiquitous coverage; NR adds throughput
+\item
+  \textbf{Proven core}: EPC is mature, well-understood
+\item
+  \textbf{Spectrum strategy}: Early NR deployments in limited bands
+\end{enumerate}
+
+\CNsubsection{5.4}{Why SA Is the Target}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Network Slicing}: Requires 5G Core SBA
+\item
+  \textbf{URLLC}: End-to-end low latency needs 5GC + MEC
+\item
+  \textbf{mMTC}: Native 5GC support for IoT optimizations
+\item
+  \textbf{Edge Computing}: UPF placement flexibility
+\item
+  \textbf{Independence}: No LTE dependency, cleaner architecture
+\item
+  \textbf{Service-Based Architecture}: Enables rapid service creation
+\end{enumerate}
+
+\CNkeepfig{m14-nsa-vs-sa}{3}
+
+\CNsubsection{5.5}{NSA vs SA Architecture Comparison}
+
+\CNfigure{m14-nsa-vs-sa}{NSA Option 3x versus SA Option 2}
+
+\CNkeepfig{m14-deployment-options}{3}
+
+\CNsubsection{5.6}{Deployment Options Overview}
+
+\CNfigure{m14-deployment-options}{3GPP deployment options and migration paths}
+
+\textbf{Migration path}: Most operators follow \textbf{Option 3 \ensuremath{\to} Option 7 \ensuremath{\to} Option 2} or directly \textbf{Option 3 \ensuremath{\to} Option 2}.
+
+\Needspace{14\baselineskip}
+
+\Needspace{18\baselineskip}
+
+\CNsection{6}{5G Architecture Overview}
+
+\CNchained\CNsubsection{6.1}{NG-RAN (Next Generation Radio Access Network)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Node} & \CNth{Full Name} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{gNB} & Next Generation Node B & 5G NR base station (SA) \\
+\textbf{en-gNB} & E-UTRA-NR gNB & NR node in NSA (secondary to eNB) \\
+\textbf{ng-eNB} & Next Generation eNB & LTE node connected to 5GC \\
+\end{longtable}
+}
+
+\textbf{Interfaces}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Xn}: Between gNBs (and ng-eNBs) — handover, dual connectivity
+\item
+  \textbf{NG}: Between gNB and 5G Core (NG-C to AMF, NG-U to UPF)
+\item
+  \textbf{F1}: Internal gNB split (CU \ensuremath{\leftrightarrow} DU)
+\item
+  \textbf{E1}: CU-CP \ensuremath{\leftrightarrow} CU-UP
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{6.2}{5G Core — Service-Based Architecture (SBA)}
+
+The 5G Core replaces the monolithic EPC with \textbf{microservices}:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.7391}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.2609}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Network Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{AMF} (Access \& Mobility Mgmt) & Registration, connection, mobility, NAS security \\
+\textbf{SMF} (Session Management) & PDU session establishment, QoS, UPF selection \\
+\textbf{UPF} (User Plane Function) & Packet routing, inspection, QoS enforcement \\
+\textbf{AUSF} (Authentication Server) & Authentication procedures \\
+\textbf{UDM} (Unified Data Mgmt) & Subscription data, similar to HSS \\
+\textbf{PCF} (Policy Control) & Policy rules, replaces PCRF \\
+\textbf{NSSF} (Network Slice Selection) & Slice selection and management \\
+\textbf{NEF} (Network Exposure) & API exposure to external applications \\
+\textbf{NRF} (NF Repository) & Service discovery and registration \\
+\end{longtable}
+}
+
+\textbf{Key SBA principles}:
+
+\begin{itemize}
+\tightlist
+\item
+  NFs communicate via \textbf{HTTP/\allowbreak{}2 REST APIs} (service-based interfaces)
+\item
+  \textbf{Stateless} design: compute and storage separated
+\item
+  \textbf{Cloud-native}: containerized, horizontally scalable
+\item
+  \textbf{Service discovery}: NRF enables dynamic NF registration
+\end{itemize}
+
+\CNsubsection{6.3}{Separation of Radio Technology from Network Architecture}
+
+A critical 5G design principle:
+
+\CNdisplay{\text{Radio Access Technology (RAT)} \;\neq\; \text{Core Network Architecture}}
+
+\begin{itemize}
+\tightlist
+\item
+  LTE radio can connect to 5G Core (ng-eNB \ensuremath{\to} Option 5/\allowbreak{}7)
+\item
+  NR radio can connect to EPC (en-gNB \ensuremath{\to} Option 3)
+\item
+  \textbf{Decoupling} enables flexible migration and coexistence
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{7}{gNB Architecture — CU/\allowbreak{}DU Split}
+
+\CNchained\CNsubsection{7.1}{Functional Split}
+
+The gNB can be decomposed into:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Component} & \CNth{Function} & \CNth{Location} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{CU} (Central Unit) & RRC, SDAP, PDCP & Centralized (edge DC) \\
+\textbf{DU} (Distributed Unit) & RLC, MAC, High-PHY & Near antenna site \\
+\textbf{RU} (Radio Unit) & Low-PHY, RF & At antenna \\
+\end{longtable}
+}
+
+\CNsubsection{7.2}{CU-CP /\allowbreak{} CU-UP Split}
+
+The CU is further split:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{CU-CP} (Control Plane): RRC + control part of PDCP
+\item
+  \textbf{CU-UP} (User Plane): SDAP + user part of PDCP
+\end{itemize}
+
+This enables:
+
+\begin{itemize}
+\tightlist
+\item
+  Independent scaling of control and user plane
+\item
+  Multiple CU-UPs per CU-CP
+\item
+  Flexible placement (CU-UP closer to edge for low latency)
+\end{itemize}
+
+\CNkeepfig{m14-cu-du-split}{3}
+
+\CNsubsection{7.3}{gNB CU/\allowbreak{}DU Split Architecture}
+
+\CNfigure{m14-cu-du-split}{Disaggregated gNB: CU-CP, CU-UP, DU and RU}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{7.4}{Interface Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2683}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2683}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2439}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2195}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Endpoints} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{NG-C (N2)} & gNB \ensuremath{\leftrightarrow} AMF & NGAP/\allowbreak{}SCTP & Control plane signaling \\
+\textbf{NG-U (N3)} & gNB \ensuremath{\leftrightarrow} UPF & GTP-U/\allowbreak{}UDP & User data transport \\
+\textbf{Xn-C} & gNB \ensuremath{\leftrightarrow} gNB & XnAP/\allowbreak{}SCTP & Handover, dual connectivity \\
+\textbf{Xn-U} & gNB \ensuremath{\leftrightarrow} gNB & GTP-U/\allowbreak{}UDP & Data forwarding during HO \\
+\textbf{F1-C} & CU-CP \ensuremath{\leftrightarrow} DU & F1AP/\allowbreak{}SCTP & RRC message transport, UE context \\
+\textbf{F1-U} & CU-UP \ensuremath{\leftrightarrow} DU & GTP-U/\allowbreak{}UDP & User data between CU-UP and DU \\
+\textbf{E1} & CU-CP \ensuremath{\leftrightarrow} CU-UP & E1AP/\allowbreak{}SCTP & Bearer context management \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{7.5}{Deployment Scenarios}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1754}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2281}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2281}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1930}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1754}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Scenario} & \CNth{CU Location} & \CNth{DU Location} & \CNth{Fronthaul} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Co-located} & Cell site & Cell site & Internal & Rural, simple \\
+\textbf{Centralized CU} & Edge DC & Cell site & Midhaul (F1) & Urban, pooling \\
+\textbf{Full disaggregation} & Regional DC & Aggregation & Mid + Fronthaul & Cloud RAN, O-RAN \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{8}{Timeline — 3GPP Releases}
+
+\CNchained\CNsubsection{8.1}{Release Overview}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3429}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Release} & \CNth{Freeze Date} & \CNth{Key Features} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Rel-15} & 2018 (Late Drop: 2019) & First 5G NR specification; NSA \& SA; eMBB focus \\
+\textbf{Rel-16} & 2020 (Q3) & URLLC enhancements; V2X; NR-U (unlicensed); IIoT; NR positioning \\
+\textbf{Rel-17} & 2022 (Q1) & FR2-2 (52-71~GHz); RedCap (reduced capability); NTN (satellite); NR sidelink; MBS \\
+\textbf{Rel-18} & 2024 (Q1) & 5G-Advanced; AI/\allowbreak{}ML for air interface; XR optimization; duplex evolution; network energy saving \\
+\end{longtable}
+}
+
+\CNkeepfig{m14-releases}{3}
+
+\CNsubsection{8.2}{Evolution Path}
+
+\CNfigure{m14-releases}{Evolution path from Release 15 to Release 18}
+
+\CNsubsection{8.3}{Key Milestones}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Dec 2017}: Rel-15 NSA (Option 3) specification completed (early drop)
+\item
+  \textbf{Jun 2018}: Rel-15 SA (Option 2) specification completed
+\item
+  \textbf{Apr 2019}: First commercial 5G NSA networks launched (South Korea, US)
+\item
+  \textbf{2020}: First 5G SA commercial deployments (T-Mobile US, China operators)
+\item
+  \textbf{2022}: Rel-17 freeze; RedCap enables mid-tier IoT on NR
+\item
+  \textbf{2024}: Rel-18 (5G-Advanced) freeze; bridge to 6G research
+\end{itemize}
+
+\CNsection{}{Summary — Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{5G addresses three fundamental LTE limitations}: latency, capacity, and IoT scale
+\item
+  \textbf{IMT-2020 targets} define quantitative goals: 20~Gbps, 1~ms, 10\textsuperscript{6} devices/\allowbreak{}km\textsuperscript{2}
+\item
+  \textbf{Three pillars} (eMBB/\allowbreak{}URLLC/\allowbreak{}mMTC) serve different verticals with different KPIs
+\item
+  \textbf{5G NR} introduces flexible numerology, mmWave support, and dynamic beamforming
+\item
+  \textbf{NSA enables quick deployment} by reusing LTE/\allowbreak{}EPC; \textbf{SA unlocks full 5G} potential
+\item
+  \textbf{SBA-based 5G Core} is cloud-native, microservice-based, enabling slicing and edge
+\item
+  \textbf{gNB disaggregation} (CU/\allowbreak{}DU/\allowbreak{}RU) enables flexible, scalable deployments
+\item
+  \textbf{3GPP releases} progressively add features: 15\ensuremath{\to}basic, 16\ensuremath{\to}URLLC, 17\ensuremath{\to}expansion, 18\ensuremath{\to}5G-Advanced
+\end{enumerate}
+
+\CNsection{}{References}
+
+\begin{itemize}
+\tightlist
+\item
+  3GPP TS 38.300: NR and NG-RAN Overall Description
+\item
+  3GPP TS 38.401: NG-RAN Architecture Description
+\item
+  3GPP TS 23.501: System Architecture for 5G System
+\item
+  ITU-R M.2083: IMT Vision — Framework and Overall Objectives of the Future Development of IMT for 2020 and Beyond
+\item
+  3GPP TS 38.211: NR Physical Channels and Modulation
+\item
+  3GPP TS 38.104: NR Base Station Radio Transmission and Reception
+\end{itemize}
+
+\emph{Module 14 — Advanced Communication Networks Course}\CNbr{}\emph{Last updated: August 2026}

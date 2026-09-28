@@ -1,0 +1,11 @@
+% Module 26 — transparent versus regenerative satellite payload
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle, anchor=west] at (0,0.8) {\CNL{Transparent payload}{محموله شفاف}};
+\node[CNue] (a1) at (0.5,0) {UE}; \node[CNhl] (a2) at (2.8,0) {\CNL{Satellite}{ماهواره}}; \node[CNran] (a3) at (5.3,0) {Gateway}; \node[CNcp] (a4) at (7.4,0) {CN};
+\draw[CNlink, ->] (a1) -- (a2); \draw[CNlink, ->] (a2) -- (a3); \draw[CNlink, ->] (a3) -- (a4);
+\node[CNtiny, anchor=north west, align=left] at (0,-0.6) {(\CNL{satellite = “bent pipe”}{ماهواره = «لوله خمیده»})\\\CNL{simpler, R17 baseline}{ساده‌تر، مبنای \lr{R17}}};
+\node[CNtitle, anchor=west] at (9.2,0.8) {\CNL{Regenerative payload}{محموله بازتولیدی}};
+\node[CNue] (b1) at (9.7,0) {UE}; \node[CNhl] (b2) at (12.5,0) {\CNL{Satellite (has gNB)}{ماهواره (دارای \lr{gNB})}}; \node[CNcp] (b3) at (15.2,0) {CN};
+\draw[CNlink, ->] (b1) -- (b2); \draw[CNlink, ->] (b2) -- (b3);
+\node[CNtiny, anchor=north west, align=left] at (9.2,-0.6) {(\CNL{on-board processing}{پردازش روی ماهواره})\\\CNL{more complex, R19+ study}{پیچیده‌تر، مطالعه \lr{R19+}}};
+\end{tikzpicture}

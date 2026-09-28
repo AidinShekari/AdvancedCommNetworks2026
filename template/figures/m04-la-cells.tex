@@ -1,0 +1,7 @@
+% Module 4 — a Location Area groups many cells
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.6,-0.75) rectangle (8.4,1.5);
+\node[CNgrouplabel, anchor=north west, font=\sffamily\small\bfseries, text=CNink] at (-0.55,1.45) {Location Area (LA)};
+\foreach \i in {1,2,3}{\node[CNran, minimum width=1.7cm] at ({(\i-1)*2.2+0.4},0) {Cell \i};}
+\node[font=\sffamily\large, text=CNmuted] at (7.2,0) {$\cdots$};
+\end{tikzpicture}

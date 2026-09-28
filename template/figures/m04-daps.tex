@@ -1,0 +1,10 @@
+% Module 4 — DAPS handover: make before break
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNok, minimum width=7.2cm] (b) at (0,0) {\CNL{Source + target active simultaneously}{مبدأ و مقصد همزمان فعال}};
+\node[CNran, minimum width=3.4cm] (r) at (5.6,0) {\CNL{Release source}{آزادسازی مبدأ}};
+\draw[CNlink, ->, line width=1.1pt] (-3.8,-0.8) -- node[pos=0.97, below, CNtiny] {\CNL{time}{زمان}} (7.8,-0.8);
+\node[CNnote, anchor=north] (h1) at (-3.2,-1.3) {\CNL{HO command received}{دریافت فرمان تحویل}};
+\node[CNnote, anchor=north] (h2) at (3.9,-1.3) {\CNL{HO complete}{پایان تحویل}};
+\draw[CNsig, ->] (h1.north) -- (-3.2,-0.45); \draw[CNsig, ->] (h2.north) -- (3.9,-0.45);
+\node[font=\sffamily\small\bfseries, text=CNgreen] at (1.8,-2.35) {\CNL{Zero interruption — data flows through both paths}{وقفه صفر — داده از هر دو مسیر عبور می‌کند}};
+\end{tikzpicture}

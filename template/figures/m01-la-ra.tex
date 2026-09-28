@@ -1,0 +1,11 @@
+% Module 1 — a Location Area contains Routing Areas, each a group of cells (BTSs)
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.4,-0.55) rectangle (11.4,3.15);
+\node[CNgrouplabel, anchor=north west, font=\sffamily\small\bfseries, text=CNink] at (-0.35,3.1) {Location Area (LA)};
+\foreach \i/\x in {1/0.3, 2/6.1}{
+  \draw[draw=CNcyan, line width=0.9pt, fill=CNcyan!7, rounded corners=4pt] (\x,-0.15) rectangle (\x+4.6,2.3);
+  \node[CNgrouplabel, anchor=north west, text=CNcyanD] at (\x+0.05,2.25) {Routing Area \i\ (RA\i)};
+  \node[CNran, minimum width=1.5cm] at (\x+1.25,0.75) {BTS};
+  \node[CNran, minimum width=1.5cm] at (\x+3.35,0.75) {BTS};
+}
+\end{tikzpicture}

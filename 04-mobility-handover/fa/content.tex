@@ -1,0 +1,1839 @@
+\begin{CNbox}[unbreakable]{obj}{اهداف یادگیری}
+
+در پایان این ماژول، شما قادر خواهید بود:
+
+\begin{itemize}
+\tightlist
+\item
+  توضیح دهید چرا مدیریت تحرک در شبکه‌های سلولی ضروری است
+\item
+  بین نواحی مکانی، نواحی مسیریابی و نواحی ردیابی تمایز قایل شوید
+\item
+  سازوکارهای انتخاب مجدد سلول در حالت بیکار را توصیف کنید
+\item
+  انواع تحویل را در نسل‌های مختلف طبقه‌بندی و مقایسه کنید
+\item
+  فرآیند تصمیم تحویل را با استفاده از رویدادهای اندازه‌گیری تحلیل کنید
+\item
+  رویه تحویل \lr{\mbox{X2}} در \lr{\mbox{LTE}} را گام‌به‌گام دنبال کنید
+\item
+  شکست‌های تحویل و راهبردهای کاهش آن‌ها را شناسایی کنید
+\item
+  تحول تحرک را از \lr{\mbox{2G}} تا \lr{\mbox{5G}} مقایسه کنید
+\end{itemize}
+
+\end{CNbox}
+
+\Needspace{14\baselineskip}
+
+\CNsection{1}{چرا مدیریت تحرک لازم است}
+
+\CNchained\CNsubsection{}{چرا}
+
+کاربران متحرک هستند \lr{—} راه می‌روند، رانندگی می‌کنند و سفر می‌کنند در حالی که انتظار تماس‌های صوتی، پخش جریانی ویدیو و نشست‌های داده بدون وقفه دارند. بدون مدیریت تحرک، کاربری که از مرز یک سلول عبور می‌کند، قطعی فوری سرویس را تجربه می‌کند.
+
+\CNsubsection{}{چه چیزی}
+
+مدیریت تحرک مجموعه‌ای از رویه‌های شبکه است که:
+
+\begin{itemize}
+\tightlist
+\item
+  مکان کاربر را \textbf{ردیابی} می‌کند (تا شبکه برای تماس‌ها/\allowbreak{}داده‌های ورودی به او دسترسی یابد)
+\item
+  تداوم سرویس را هنگام جابه‌جایی کاربر بین سلول‌ها \textbf{حفظ} می‌کند (تحویل)
+\item
+  با اتصال کاربران به بهترین سلول خدمات‌دهنده، استفاده از منابع رادیویی را \textbf{بهینه} می‌کند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{}{چگونه}
+
+شبکه این کار را از طریق دو سازوکار مکمل انجام می‌دهد:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4074}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{حالت} & \CNth{سازوکار} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{حالت بیکار} & انتخاب مجدد سلول + به‌روزرسانی‌های مکان/\allowbreak{}ردیابی & شبکه مکان تقریبی کاربر را می‌داند \\
+\textbf{حالت متصل} & تحویل & انتقال بی‌وقفه اتصال فعال \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-lu-tradeoff}{3}
+
+\CNsubsection{}{مبادله بنیادی}
+
+\CNfigure{m04-lu-tradeoff}{بده‌بستان به‌روزرسانی مکان: دقت صفحه‌بندی در برابر بار سیگنالینگ}
+
+شبکه باید توازن برقرار کند بین:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{بار سیگنالینگ} (به‌روزرسانی‌ها منابع رادیویی مصرف می‌کنند)
+\item
+  \textbf{بار صفحه‌بندی} (نواحی بزرگ‌تر = سلول‌های بیشتر برای صفحه‌بندی)
+\item
+  \textbf{تأخیر سرویس} (زمان دسترسی به کاربر برای خدمات ورودی)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{مدیریت مکان: \lr{\mbox{LA}} در برابر \lr{\mbox{RA}} در برابر \lr{\mbox{TA}}}
+
+\CNchained\CNsubsection{}{چرا}
+
+شبکه باید بداند کاربر (تقریباً) کجاست تا تماس‌ها یا داده‌های ورودی را تحویل دهد. نسل‌های مختلف راهبردهای گروه‌بندی متفاوتی برای توازن بین سیگنالینگ و کارایی صفحه‌بندی استفاده می‌کنند.
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{چه چیزی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2292}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2708}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2083}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2917}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسل} & \CNth{مفهوم ناحیه} & \CNth{مورد استفاده برای} & \CNth{اندازه معمول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{2G (GSM)}} & \textbf{ناحیه مکانی \lr{\mbox{(LA)}}} & خدمات سوییچینگ مداری & \lr{\mbox{20–100}} سلول \\
+\lr{2.5G (GPRS)} & \textbf{ناحیه مسیریابی \lr{\mbox{(RA)}}} & خدمات سوییچینگ بسته‌ای & زیرمجموعه \lr{\mbox{LA}}، \lr{\mbox{10–50}} سلول \\
+\lr{\mbox{4G (LTE)}} & \textbf{ناحیه ردیابی \lr{\mbox{(TA)}}} & تمام خدمات (تمام-\lr{\mbox{IP}}) & \lr{\mbox{30–80}} سلول \\
+\lr{\mbox{5G (NR)}} & \textbf{ناحیه ردیابی} + \lr{\mbox{RNA}} & تمام خدمات + سطح \lr{\mbox{RAN}} & قابل پیکربندی در هر \lr{\mbox{UE}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-la-cells}{3}
+
+\CNsubsection{}{چگونه \lr{—} ناحیه مکانی \lr{\mbox{(2G)}}}
+
+\CNfigure{m04-la-cells}{یک ناحیه مکانی چندین سلول را در بر می‌گیرد}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} هنگام عبور از مرز \lr{\mbox{LA}} \textbf{به‌روزرسانی ناحیه مکانی \lr{\mbox{(LAU)}}} را انجام می‌دهد
+\item
+  شبکه برای تماس ورودی، تمام سلول‌های \lr{\mbox{LA}} را صفحه‌بندی می‌کند
+\item
+  توسط \lr{MSC/\allowbreak{}VLR} مدیریت می‌شود
+\end{itemize}
+
+\CNsubsection{}{چگونه \lr{—} ناحیه مسیریابی \lr{\mbox{(GPRS)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{RA}} یک \textbf{زیرمجموعه} از یک \lr{\mbox{LA}} است (یک \lr{\mbox{LA}} شامل چندین \lr{\mbox{RA}} است)
+\item
+  \lr{\mbox{UE}} برای خدمات بسته‌ای \textbf{به‌روزرسانی ناحیه مسیریابی \lr{\mbox{(RAU)}}} را انجام می‌دهد
+\item
+  توسط \lr{\mbox{SGSN}} مدیریت می‌شود
+\item
+  امکان مکان دقیق‌تر برای کاربران داده را فراهم می‌کند
+\end{itemize}
+
+\CNsubsection{}{چگونه \lr{—} ناحیه ردیابی \lr{(LTE/\allowbreak{}5G)}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{فهرست ناحیه ردیابی \lr{\mbox{(TAL)}}}: به \lr{\mbox{UE}} یک فهرست از \lr{\mbox{TA}}ها تخصیص می‌یابد \lr{—} هنگام جابه‌جایی درون فهرست نیازی به به‌روزرسانی نیست
+\item
+  سیگنالینگ را برای کاربران پرتحرک کاهش می‌دهد (\lr{\mbox{TAL}} بزرگ‌تر)
+\item
+  کاربران کم‌تحرک \lr{\mbox{TAL}} کوچک‌تری می‌گیرند تا ناحیه صفحه‌بندی کاهش یابد
+\end{itemize}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+UE TAL = {TA1, TA2, TA3, TA4}
+
+Moving TA1→TA2→TA3→TA4: NO update needed
+Moving TA4→TA5 (outside TAL): Tracking Area Update triggered
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNsubsection{}{بهبود \lr{\mbox{5G}}: ناحیه اعلان مبتنی بر \lr{RAN (RNA)}}
+
+\begin{itemize}
+\tightlist
+\item
+  در حالت \lr{\textbf{\lr{RRC\_\allowbreak{}INACTIVE}}} (جدید در \lr{\mbox{5G}})، \lr{\mbox{gNB}} یک \lr{\mbox{RNA}} کوچک‌تر را مدیریت می‌کند
+\item
+  سیگنالینگ شبکه هسته را کاهش می‌دهد
+\item
+  تحرک دو-سطحی: \lr{\mbox{RNA}} (مدیریت‌شده توسط \lr{\mbox{RAN}}) + \lr{\mbox{TA}} (مدیریت‌شده توسط هسته)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{انتخاب مجدد سلول (تحرک حالت بیکار)}
+
+\CNchained\CNsubsection{}{چرا}
+
+حتی وقتی در تماس/\allowbreak{}نشست فعال نیست، \lr{\mbox{UE}} باید روی بهترین سلول اردو بزند تا:
+
+\begin{itemize}
+\tightlist
+\item
+  پیام‌های صفحه‌بندی را به‌طور کارآمد دریافت کند
+\item
+  هنگام نیاز به اتصال، کیفیت سیگنال خوبی داشته باشد
+\item
+  از به‌روزرسانی‌های غیرضروری مکان اجتناب کند
+\end{itemize}
+
+\CNsubsection{}{چه چیزی}
+
+انتخاب مجدد سلول، فرآیند \textbf{خودمختار \lr{\mbox{UE}}} برای انتخاب سلول جدید جهت اردو زدن در حالت بیکار است. شبکه پارامترها را از طریق پخش اطلاعات سیستم (\lr{\mbox{SIB}}ها) فراهم می‌کند، اما \lr{\mbox{UE}} تصمیم را به‌صورت مستقل می‌گیرد.
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{چگونه \lr{—} معیارهای انتخاب مجدد سلول}
+
+\CNchained\CNsubsubsection{معیار رتبه‌بندی (معیار \lr{\mbox{S}})}
+
+یک سلول برای اردو زدن مناسب است اگر معیار \lr{\mbox{S}} را برآورده کند:
+
+\CNdisplay{
+\begin{aligned}
+S_{\mathrm{rxlev}} &= Q_{\mathrm{rxlevmeas}} - \left(Q_{\mathrm{rxlevmin}} + Q_{\mathrm{rxlevminoffset}}\right) - P_{\mathrm{compensation}} > 0\\
+S_{\mathrm{qual}} &= Q_{\mathrm{qualmeas}} - \left(Q_{\mathrm{qualmin}} + Q_{\mathrm{qualminoffset}}\right) > 0
+\end{aligned}
+}
+
+که در آن:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\CNcode{Qrxlevmeas}: RSRP} اندازه‌گیری‌شده \lr{\mbox{(dBm)}}
+\item
+  \lr{\CNcode{Qrxlevmin}: RSRP} حداقل مورد نیاز (-124 تا \lr{\mbox{-44 dBm}}، معمول: \lr{\mbox{-124~dBm}})
+\item
+  \lr{\CNcode{Qqualmeas}: RSRQ} اندازه‌گیری‌شده \lr{\mbox{(dB)}}
+\item
+  \lr{\CNcode{Qqualmin}: RSRQ} حداقل مورد نیاز (-20 تا \lr{\mbox{-3 dB}}، معمول: \lr{\mbox{-20~dB}})
+\end{itemize}
+
+\CNsubsubsection{رتبه‌بندی سلول (معیار \lr{\mbox{R}})}
+
+برای انتخاب مجدد درون-فرکانسی، سلول‌ها رتبه‌بندی می‌شوند:
+
+\CNdisplay{
+\begin{aligned}
+R_s &= Q_{\mathrm{meas},s} + Q_{\mathrm{Hyst}} &&\text{\rl{(سلول خدمت‌دهنده)}}\\
+R_n &= Q_{\mathrm{meas},n} - Q_{\mathrm{offset}} &&\text{\rl{(سلول همسایه)}}
+\end{aligned}
+}
+
+اگر رابطه \lr{$R_n > R_s$} به مدت \lr{$T_{\mathrm{reselection}}$} برقرار بماند، انتخاب مجدد به سلول همسایه انجام می‌شود.
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{انتخاب مجدد مبتنی بر اولویت (بین-فرکانسی/\allowbreak{}بین-\lr{\mbox{RAT}})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5556}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4444}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{اولویت} & \CNth{اقدام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+لایه با اولویت بالاتر & در صورت برآورده‌شدن \lr{\mbox{ThreshX,High}} توسط همسایه، انتخاب مجدد کن \\
+لایه با اولویت برابر & از رتبه‌بندی (معیار \lr{\mbox{R}}) استفاده کن \\
+لایه با اولویت پایین‌تر & فقط اگر \lr{serving \textless{} ThreshServing,Low} و همسایه \lr{\textgreater{}} \lr{\mbox{ThreshX,Low}} باشد، انتخاب مجدد کن \\
+\end{longtable}
+}
+
+\CNsubsection{}{چگونه \lr{—} هیسترزیس و تایمرها}
+
+\textbf{هیسترزیس \lr{\mbox{(QHyst)}}} از انتخاب مجدد پینگ-پونگ جلوگیری می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  مقادیر معمول: \lr{\mbox{2–6~dB}}
+\item
+  به سلول خدمات‌دهنده «چسبندگی» اضافه می‌کند
+\end{itemize}
+
+\textbf{تایمر \lr{\mbox{Treselection}}} (معمولاً \lr{\mbox{1–4}} ثانیه):
+
+\begin{itemize}
+\tightlist
+\item
+  همسایه باید برای این مدت بهتر بماند تا انتخاب مجدد رخ دهد
+\item
+  از انتخاب مجدد ناشی از محو شدن لحظه‌ای جلوگیری می‌کند
+\end{itemize}
+
+\CNfigure{m04-reselection}{انتخاب مجدد سلول: همسایه باید به مدت \lr{\mbox{Treselection}} بالاتر از خدمت‌دهنده + \lr{\mbox{QHyst}} بماند}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{پارامترهای معمول انتخاب مجدد سلول}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3235}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4118}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2647}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{مقدار معمول} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{QHyst}} & \lr{\mbox{4~dB}} & هیسترزیس سلول خدمات‌دهنده \\
+\lr{\mbox{Treselection}} & \lr{\mbox{2~s}} & تایمر پایداری \\
+\lr{\mbox{Qrxlevmin}} & \lr{\mbox{-124~dBm}} & حداقل \lr{\mbox{RSRP}} برای انتخاب سلول \\
+\lr{\mbox{Qqualmin}} & \lr{\mbox{-20~dB}} & حداقل \lr{\mbox{RSRQ}} برای انتخاب سلول \\
+\lr{ThreshServing,Low} & \lr{4 (= 4~dB)} & آستانه ترک سلول خدمات‌دهنده (به اولویت پایین‌تر) \\
+\lr{\mbox{ThreshX,High}} & \lr{8 (= 8~dB)} & آستانه ورود به لایه با اولویت بالاتر \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{انواع تحویل}
+
+\CNchained\CNsubsection{}{چرا}
+
+سناریوهای تحرک مختلف نیازمند راهبردهای تحویل متفاوتی هستند. کاربری که بین سلول‌های هم‌کانال راه می‌رود، به سازوکار متفاوتی نسبت به کاربری در قطار پرسرعت که بین نواحی پوشش \lr{\mbox{LTE}} و \lr{\mbox{3G}} عبور می‌کند نیاز دارد.
+
+\CNkeepfig{m04-ho-types}{3}
+
+\CNsubsection{}{چه چیزی \lr{—} مرور طبقه‌بندی}
+
+\CNfigure{m04-ho-types}{طبقه‌بندی انواع تحویل}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.1}{تحویل درون-فرکانسی}
+
+\CNchained\CNsubsubsection{چرا}
+
+رایج‌ترین تحویل \lr{—} زمانی رخ می‌دهد که کاربر بین سلول‌های فعال روی \textbf{همان فرکانس حامل} جابه‌جا می‌شود. این سناریوی معمول در استقرارهای شهری متراکم است.
+
+\CNsubsubsection{چه چیزی}
+
+\begin{itemize}
+\tightlist
+\item
+  سلول مبدأ و مقصد از همان فرکانس استفاده می‌کنند (مثلاً هر دو روی \lr{\mbox{1800~MHz}} باند 3)
+\item
+  \lr{\mbox{UE}} می‌تواند همسایه‌ها را \textbf{بدون شکاف‌های اندازه‌گیری} اندازه بگیرد
+\item
+  سریع‌ترین و ساده‌ترین نوع تحویل
+\end{itemize}
+
+\CNsubsubsection{چگونه}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} به‌طور پیوسته \lr{RSRP/\allowbreak{}RSRQ} سلول خدمات‌دهنده و همسایه‌های درون-فرکانسی را اندازه می‌گیرد
+\item
+  نیازی به وقفه در اندازه‌گیری نیست (فرکانس یکسان = می‌توان در حین دریافت اندازه گرفت)
+\item
+  توسط رویداد \lr{\mbox{A3}} فعال می‌شود: همسایه با آفست بهتر از خدمات‌دهنده می‌شود
+\end{itemize}
+
+\textbf{سناریوی معمول}: راه رفتن بین سلول‌های مجاور در یک مرکز خرید (تمام سلول‌ها روی فرکانس یکسان)
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.2}{تحویل بین-فرکانسی}
+
+\CNchained\CNsubsubsection{چرا}
+
+شبکه‌ها چندین لایه فرکانسی برای ظرفیت مستقر می‌کنند (مثلاً ماکرو روی \lr{\mbox{800~MHz}} برای پوشش، سلول‌های کوچک روی \lr{\mbox{2600~MHz}} برای ظرفیت). کاربران باید بین این لایه‌ها جابه‌جا شوند.
+
+\CNsubsubsection{چه چیزی}
+
+\begin{itemize}
+\tightlist
+\item
+  سلول مبدأ و مقصد روی \textbf{فرکانس‌های حامل متفاوت} کار می‌کنند
+\item
+  \lr{\mbox{UE}} برای تنظیم گیرنده خود روی فرکانس‌های دیگر نیازمند \textbf{شکاف‌های اندازه‌گیری} است
+\item
+  وقفه کمی طولانی‌تر از درون-فرکانسی
+\end{itemize}
+
+\CNsubsubsection{چگونه}
+
+\begin{itemize}
+\tightlist
+\item
+  شبکه شکاف‌های اندازه‌گیری را پیکربندی می‌کند (\lr{\mbox{6~ms}} در هر 40 یا \lr{\mbox{80~ms}})
+\item
+  \lr{\mbox{UE}} در حین شکاف‌ها همسایه‌های بین-فرکانسی را اندازه می‌گیرد
+\item
+  توسط رویداد \lr{\mbox{A4}} (همسایه روی فرکانس دیگر بهتر از آستانه می‌شود) یا \lr{\mbox{A5}} (خدمات‌دهنده افت می‌کند و همسایه خوب است) فعال می‌شود
+\end{itemize}
+
+\textbf{سناریوی معمول}: کاربر از سلول کوچک داخلی \lr{(2600~MHz)} به ماکرو بیرونی \lr{(800~MHz)} می‌رود
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.3}{تحویل بین-\lr{\mbox{RAT}}}
+
+\CNchained\CNsubsubsection{چرا}
+
+همه نواحی پوشش \lr{LTE/\allowbreak{}5G} را ندارند. وقتی سیگنال \lr{\mbox{LTE}} افت می‌کند، \lr{\mbox{UE}} ممکن است برای حفظ سرویس نیاز به بازگشت به \lr{3G (UMTS)} یا حتی \lr{\mbox{2G (GSM)}} داشته باشد. همچنین برای بازگشت \lr{\mbox{CS}} (تماس‌های صوتی) استفاده می‌شود.
+
+\CNsubsubsection{چه چیزی}
+
+\begin{itemize}
+\tightlist
+\item
+  تحویل بین فناوری‌های دسترسی رادیویی مختلف
+\item
+  مثال‌ها: \lr{LTE \ensuremath{\to} UMTS}، \lr{LTE \ensuremath{\to} GSM}، \lr{\mbox{NR \ensuremath{\to} LTE}}
+\item
+  پیچیده‌ترین نوع \lr{—} پروتکل‌های مختلف، شبکه‌های هسته مختلف
+\end{itemize}
+
+\CNsubsubsection{چگونه}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} در حین شکاف‌های اندازه‌گیری همسایه‌های بین-\lr{\mbox{RAT}} را اندازه می‌گیرد
+\item
+  توسط رویداد \lr{\mbox{B1}} (همسایه بین-\lr{\mbox{RAT}} بالای آستانه) یا \lr{\mbox{B2}} (خدمات‌دهنده زیر آستانه و بین-\lr{\mbox{RAT}} بالای آستانه) فعال می‌شود
+\item
+  نیازمند هماهنگی بین-\lr{\mbox{RAT}} بین \lr{\mbox{eNB}} و \lr{RNC/\allowbreak{}BSC} است
+\end{itemize}
+
+\textbf{سناریوی معمول}:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{VoLTE}} در دسترس نیست \ensuremath{\leftarrow} بازگشت \lr{\mbox{CS}} به \lr{\mbox{3G}} برای تماس صوتی
+\item
+  کاربر به ناحیه روستایی با پوشش فقط \lr{\mbox{3G}} رانندگی می‌کند
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.4}{تحویل سخت (قطع-پیش-از-وصل)}
+
+\CNchained\CNsubsubsection{چرا}
+
+وقتی اتصال همزمان به دو سلول ممکن نیست (فرکانس‌های مختلف، فناوری‌های مختلف، یا انتخاب طراحی سیستم)، اتصال قدیمی باید پیش از برقراری اتصال جدید آزاد شود.
+
+\CNsubsubsection{چه چیزی}
+
+\begin{itemize}
+\tightlist
+\item
+  اتصال به سلول مبدأ \textbf{آزاد می‌شود} پیش از اتصال به مقصد
+\item
+  وقفه کوتاه در سرویس (معمولاً \lr{\mbox{20–50~ms}} در \lr{\mbox{LTE}})
+\item
+  مورد استفاده در: \lr{\mbox{GSM}}، \lr{\mbox{LTE}}، \lr{\mbox{5G NR}}
+\end{itemize}
+
+\CNkeepfig{m04-hard-ho-gap}{2}
+
+\CNsubsubsection{چگونه}
+
+\CNfigure{m04-hard-ho-gap}{تحویل سخت: ابتدا قطع، سپس اتصال}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مزیت}: ساده‌تر، بدون نیاز به ترکیب/\allowbreak{}تقسیم
+\item
+  \textbf{عیب}: وقفه کوتاه (قابل قبول برای داده، قابل توجه برای صدا در \lr{\mbox{2G}})
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{4.5}{تحویل نرم (وصل-پیش-از-قطع) \lr{—} مختص \lr{\mbox{3G UMTS}}}
+
+\CNchained\CNsubsubsection{چرا}
+
+سیستم‌های \lr{\mbox{3G}} مبتنی بر \lr{\mbox{CDMA}} می‌توانند همان سیگنال را از چندین سلول به‌طور همزمان دریافت کنند (فرکانس یکسان، تقسیم کد). این امکان تحویل بی‌وقفه بدون هیچ وقفه‌ای را فراهم می‌کند.
+
+\CNsubsubsection{چه چیزی}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} به \textbf{چندین سلول به‌طور همزمان} متصل است (مجموعه فعال)
+\item
+  سیگنال‌ها از چندین سلول برای بهره تنوع \textbf{ترکیب} می‌شوند
+\item
+  منحصر به \lr{CDMA/\allowbreak{}WCDMA (3G)} \lr{—} در \lr{\mbox{LTE}} یا \lr{\mbox{5G}} استفاده \textbf{نمی‌شود}
+\end{itemize}
+
+\CNsubsubsection{چگونه \lr{—} مدیریت مجموعه فعال}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Active Set Events (3GPP UMTS):
+- Event 1A: Add cell to Active Set (neighbor strong enough)
+- Event 1B: Remove cell from Active Set (cell too weak)
+- Event 1C: Replace cell in Active Set (better candidate found)
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNfigure{m04-soft-ho-region}{ناحیه تحویل نرم: \lr{\mbox{UE}} به هر دو سلول متصل است}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مجموعه فعال}: مجموعه سلول‌هایی که در حال حاضر به \lr{\mbox{UE}} خدمات می‌دهند (حداکثر \lr{\mbox{3–6}} سلول)
+\item
+  \textbf{تحویل نرم}: بین سلول‌های یک \lr{\mbox{Node B}} یا \lr{\mbox{Node B}}های مختلف، فرکانس یکسان
+\item
+  \textbf{تحویل نرم‌تر}: بین سکتورهای \textbf{همان} \lr{\mbox{Node B}} (ترکیب \lr{\mbox{MRC}} در \lr{\mbox{Node B}})
+\end{itemize}
+
+\textbf{مزایا}:
+
+\begin{itemize}
+\tightlist
+\item
+  بدون وقفه
+\item
+  بهره تنوع بزرگ \lr{\mbox{(2–3~dB)}}
+\item
+  کاهش پینگ-پونگ
+\end{itemize}
+
+\textbf{معایب}:
+
+\begin{itemize}
+\tightlist
+\item
+  استفاده از منابع در چندین سلول به‌طور همزمان
+\item
+  افزایش نیازمندی‌های بک‌هال و پردازش
+\item
+  افزودن پیچیدگی به کنترل توان
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{فرآیند تصمیم تحویل}
+
+\CNchained\CNsubsection{}{چرا}
+
+شبکه باید تصمیم بگیرد چه زمانی تحویل دهد، به کدام سلول، و تضمین کند که تصمیم در برابر محو شدن و نویز مقاوم است. تحویلی که زمان‌بندی ضعیفی داشته باشد باعث قطع می‌شود؛ تحویل خوب-تنظیم‌شده برای کاربر نامحسوس است.
+
+\CNsubsection{}{چه چیزی}
+
+تصمیم تحویل در \lr{\mbox{LTE}} بر اساس موارد زیر است:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{گزارش‌های اندازه‌گیری \lr{\mbox{UE}}} \lr{—} دوره‌ای یا محرک-رویداد
+\item
+  \textbf{رویدادهای اندازه‌گیری} \lr{—} شرایطی که گزارش را فعال می‌کنند
+\item
+  \textbf{هیسترزیس و زمان-تا-فعال‌سازی} \lr{—} فیلترکردن برای اجتناب از محرک‌های کاذب
+\item
+  \textbf{تصمیم شبکه} \lr{—} \lr{\mbox{eNB}} گزارش را ارزیابی و تصمیم می‌گیرد
+\end{enumerate}
+
+\Needspace{11\baselineskip}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.1}{گزارش‌های اندازه‌گیری (\lr{\mbox{RSRP}} و \lr{\mbox{RSRQ}})}
+
+\CNchained\CNsubsubsection{چه چیزی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2286}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{متریک} & \CNth{نام کامل} & \CNth{محدوده} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{RSRP}}}}} & توان دریافتی سیگنال مرجع & -140 تا \lr{\mbox{-44~dBm}} & قدرت سیگنال (پوشش) \\
+\lr{\mbox{\textbf{\lr{\mbox{RSRQ}}}}} & کیفیت دریافتی سیگنال مرجع & -20 تا \lr{\mbox{-3~dB}} & کیفیت سیگنال (تداخل + نویز را در نظر می‌گیرد) \\
+\lr{\mbox{\textbf{\lr{\mbox{SINR}}}}} & نسبت سیگنال به تداخل به‌علاوه نویز & -23 تا \lr{\mbox{40~dB}} & کیفیت کلی پیوند \\
+\end{longtable}
+}
+
+\CNsubsubsection{چگونه}
+
+\CNdisplay{\mathrm{RSRP} = \text{\rl{توان یک عنصر منبع حامل سیگنال مرجع}}}
+
+\CNdisplay{\mathrm{RSRQ} = \frac{N \times \mathrm{RSRP}}{\mathrm{RSSI}}}
+
+که در آن \lr{$N$} تعداد \lr{\mbox{RB}}ها و \lr{\mbox{RSSI}} کل توان دریافتی پهن‌باند است.
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{RSRP}} پاسخ می‌دهد: «سیگنال سلول \textbf{من} چقدر قوی است؟»
+\item
+  \lr{\mbox{RSRQ}} پاسخ می‌دهد: «سیگنال سلول \textbf{من} در مقایسه با هر آنچه می‌شنوم چقدر خوب است؟»
+\end{itemize}
+
+\textbf{چه زمانی از کدام استفاده شود}:
+
+\begin{itemize}
+\tightlist
+\item
+  تحویل مبتنی بر \lr{\mbox{RSRP}}: خوب برای سناریوهای محدود-پوشش (روستایی)
+\item
+  تحویل مبتنی بر \lr{\mbox{RSRQ}}: خوب برای سناریوهای محدود-تداخل (شهری متراکم)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{5.2}{رویدادهای اندازه‌گیری \lr{LTE (A1–A6)}}
+
+\CNchained\CNsubsubsection{چه چیزی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3929}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویداد} & \CNth{شرط} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{A1}}}}} & خدمات‌دهنده \lr{\textgreater{}} آستانه & توقف اندازه‌گیری‌های بین-فرکانسی (خدمات‌دهنده به‌اندازه کافی خوب است) \\
+\lr{\mbox{\textbf{\lr{\mbox{A2}}}}} & خدمات‌دهنده \lr{\textless{}} آستانه & شروع اندازه‌گیری‌های بین-فرکانسی/\allowbreak{}بین-\lr{\mbox{RAT}} \\
+\lr{\mbox{\textbf{\lr{\mbox{A3}}}}} & همسایه \lr{\textgreater{}} خدمات‌دهنده + آفست & \textbf{محرک اصلی تحویل درون-فرکانسی} \\
+\lr{\mbox{\textbf{\lr{\mbox{A4}}}}} & همسایه \lr{\textgreater{}} آستانه & تحویل بین-فرکانسی \\
+\lr{\mbox{\textbf{\lr{\mbox{A5}}}}} & خدمات‌دهنده \lr{\textless{}} \lr{\mbox{Thresh1}} و همسایه \lr{\textgreater{}} \lr{\mbox{Thresh2}} & تحویل بین-فرکانسی/\allowbreak{}بین-\lr{\mbox{RAT}} \\
+\lr{\mbox{\textbf{\lr{\mbox{A6}}}}} & همسایه \lr{\textgreater{}} \lr{\mbox{SCell}} + آفست & تغییر سلول ثانویه \lr{\mbox{(CA)}} \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsubsection{رویداد \lr{\mbox{B}} (بین-\lr{\mbox{RAT}}):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3929}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویداد} & \CNth{شرط} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{B1}}}}} & همسایه بین-\lr{\mbox{RAT}} \lr{\textgreater{}} آستانه & تغییر مسیر به \lr{\mbox{RAT}} دیگر \\
+\lr{\mbox{\textbf{\lr{\mbox{B2}}}}} & خدمات‌دهنده \lr{\textless{}} \lr{\mbox{Thresh1}} و بین-\lr{RAT \textgreater{} Thresh2} & بازگشت (مثلاً \lr{\mbox{LTE\ensuremath{\to}3G}}) \\
+\end{longtable}
+}
+
+\Needspace{23\baselineskip}
+
+\CNsubsubsection{چگونه \lr{—} رویداد \lr{\mbox{A3}} به‌تفصیل (مهم‌ترین)}
+
+شرط ورود رویداد \lr{\mbox{A3}}:\CNdisplay{\mathrm{Mn} + \mathrm{Ofn} + \mathrm{Ocn} - \mathrm{Hys} > \mathrm{Ms} + \mathrm{Ofs} + \mathrm{Ocs} + \mathrm{Off}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نماد} & \CNth{معنا} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{Mn}} & اندازه‌گیری سلول همسایه (\lr{\mbox{RSRP}} یا \lr{\mbox{RSRQ}}) \\
+\lr{\mbox{Ms}} & اندازه‌گیری سلول خدمت‌دهنده \\
+\lr{\mbox{Ofn}} & آفست وابسته به فرکانس برای همسایه \\
+\lr{\mbox{Ofs}} & آفست وابسته به فرکانس برای خدمت‌دهنده \\
+\lr{\mbox{Ocn}} & آفست وابسته به سلول برای همسایه \\
+\lr{\mbox{Ocs}} & آفست وابسته به سلول برای خدمت‌دهنده \\
+\lr{\mbox{Hys}} & پسماند (مقدار مثبت) \\
+\lr{\mbox{Off}} & آفست \lr{\mbox{A3}} (پارامتر اصلی قابل تنظیم) \\
+\end{longtable}
+}
+
+ساده‌شده (فرکانس یکسان، بدون آفست‌های مختص سلول):\CNdisplay{\mathrm{RSRP}_{\mathrm{neighbour}} - \mathrm{Hysteresis} > \mathrm{RSRP}_{\mathrm{serving}} + \mathrm{A3\_Offset}}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{5.3}{هیسترزیس و زمان-تا-فعال‌سازی}
+
+\CNchained\CNsubsubsection{چرا}
+
+سیگنال‌های رادیویی به دلیل محو شدن نوسان می‌کنند. بدون فیلترکردن، شبکه در هر محو شدن موقت تحویل را فعال می‌کند و باعث سیگنالینگ بیش‌ازحد و پینگ-پونگ می‌شود.
+
+\Needspace{13\baselineskip}
+
+\CNsubsubsection{چه چیزی}
+
+دو سازوکار از فعال‌سازی کاذب جلوگیری می‌کنند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3056}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2778}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4167}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{عملکرد} & \CNth{مقدار معمول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هیسترزیس \lr{\mbox{(Hys)}}} & سیگنال باید با این حاشیه از آستانه فراتر رود & \lr{\mbox{1–3~dB}} \\
+\textbf{زمان-تا-فعال‌سازی \lr{\mbox{(TTT)}}} & شرط باید برای این مدت پایدار بماند & \lr{40–640~ms} \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-a3-visual}{2}
+
+\CNsubsubsection{چگونه \lr{—} تجسم}
+
+\CNfigure{m04-a3-visual}{رویداد \lr{\mbox{A3}}: آستانه ورود، پسماند و زمان تا راه‌اندازی}
+
+\textbf{اثر ترکیبی}:
+
+\begin{itemize}
+\tightlist
+\item
+  هیسترزیس فیلترکردن دامنه را فراهم می‌کند (دامنه \lr{\mbox{dB}})
+\item
+  \lr{\mbox{TTT}} فیلترکردن زمان را فراهم می‌کند (دامنه زمان)
+\item
+  با هم فعال‌سازی مقاوم تحویل را فراهم می‌کنند
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{مبادله مهندسی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink} & \CNth{\lr{\mbox{Hys}} کم + \lr{\mbox{TTT}} کوتاه} & \CNth{\lr{\mbox{Hys}} زیاد + \lr{\mbox{TTT}} بلند} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+سرعت تحویل & تحویل سریع & تحویل کند \\
+ریسک اصلی & پینگ‌پنگ & تحویل دیرهنگام \\
+مناسب برای & کاربران کندرو & کاربران سریع \\
+سیگنالینگ & سیگنالینگ بیشتر & سیگنالینگ کمتر \\
+تنظیم معمول & شهری: \lr{Hys = 2 dB}، \lr{TTT = 160~ms} & بزرگراه: \lr{Hys = 3 dB}، \lr{TTT = 80~ms} \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{5.4}{حاشیه تحویل}
+
+\CNchained\CNsubsubsection{چه چیزی}
+
+\textbf{حاشیه کل تحویل} اثر ترکیبی آفست \lr{\mbox{A3}}، هیسترزیس و \lr{\mbox{TTT}} است که تعیین می‌کند همسایه باید چقدر بهتر باشد تا تحویل رخ دهد.
+
+\CNdisplay{\text{\rl{حاشیه مؤثر تحویل}} \approx \mathrm{A3\_Offset} + \mathrm{Hysteresis} + \underbrace{\left(\text{\rl{سرعت UE}} \times \mathrm{TTT}\right)}_{\text{\rl{تغییر سیگنال در طول TTT}}}}
+
+\CNsubsubsection{مثال محاسبه}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Given:
+  A3 Offset = 3 dB
+  Hysteresis = 2 dB  
+  TTT = 320 ms
+  UE speed = 50 km/h → path loss changes ~0.5 dB during TTT
+
+Effective margin = 3 + 2 + 0.5 = 5.5 dB
+
+Meaning: Neighbor must be 5.5 dB better than serving 
+         before handover is triggered
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{رویه تحویل \lr{—} تحویل \lr{\mbox{X2}} در \lr{\mbox{LTE}}}
+
+\CNchained\CNsubsection{}{چرا}
+
+تحویل مبتنی بر \lr{\mbox{X2}} سازوکار تحویل \textbf{ترجیحی} در \lr{\mbox{LTE}} است زیرا ارتباط مستقیم \lr{\mbox{eNB}}-به-\lr{\mbox{eNB}} را بدون مسیریابی از طریق شبکه هسته \lr{\mbox{(MME)}} ممکن می‌سازد و تأخیر و بار سیگنالینگ را کاهش می‌دهد.
+
+\CNsubsection{}{چه چیزی}
+
+\begin{itemize}
+\tightlist
+\item
+  معماری مسطح: \lr{\mbox{eNB}}ها به‌طور مستقیم از طریق واسط \lr{\mbox{X2}} ارتباط برقرار می‌کنند
+\item
+  کمک‌شده توسط \lr{\mbox{UE}}، کنترل‌شده توسط شبکه: \lr{\mbox{UE}} اندازه می‌گیرد، \lr{\mbox{eNB}} تصمیم می‌گیرد
+\item
+  فاز آماده‌سازی تضمین می‌کند که مقصد \textbf{پیش از} فرمان تحویل منابع داشته باشد
+\item
+  زمان کل وقفه: \lr{\mbox{\textbf{\lr{\mbox{20–50~ms}}}}} (برای اکثر کاربردها نامحسوس)
+\end{itemize}
+
+\CNkeepfig{m04-x2-handover}{3}
+
+\CNsubsection{}{چگونه \lr{—} توالی تحویل \lr{\mbox{X2}}}
+
+\CNfigure{m04-x2-handover}{تحویل \lr{\mbox{X2}} در \lr{\mbox{LTE}}: آماده‌سازی، اجرا و تکمیل}
+
+\Needspace{11\baselineskip}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{}{تفکیک فاز-به-فاز}
+
+\CNchained\CNsubsubsection{فاز 1: آماده‌سازی (حدود \lr{50–200~ms})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3750}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{پیام} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & گزارش اندازه‌گیری & \lr{\mbox{UE}} مبدأ را از کیفیت همسایه مطلع می‌کند \\
+2 & تصمیم تحویل & \lr{\mbox{eNB}} مبدأ الگوریتم را بر اساس گزارش اجرا می‌کند \\
+3 & درخواست تحویل \lr{\mbox{(X2)}} & مبدأ از مقصد می‌خواهد منابع را آماده کند \\
+4 & کنترل پذیرش & مقصد بررسی می‌کند که آیا می‌تواند \lr{\mbox{UE}} را بپذیرد \\
+5 & تأیید درخواست تحویل \lr{\mbox{(X2)}} & مقصد تأیید می‌کند، فرمان تحویل را فراهم می‌کند \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{فاز 2: اجرا (وقفه حدود \lr{\mbox{20–50~ms}})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{پیام} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+6 & پیکربندی مجدد \lr{\mbox{RRC}} & مبدأ به \lr{\mbox{UE}} فرمان تحویل می‌دهد \\
+7 & انتقال وضعیت \lr{\mbox{SN}} & تضمین عدم از دست رفتن داده (هم‌ترازی \lr{\mbox{PDCP SN}}) \\
+8 & ارسال داده & داده بافر‌شده به مقصد ارسال می‌شود \\
+9 & دسترسی تصادفی & \lr{\mbox{UE}} با سلول مقصد همگام می‌شود \\
+10 & تکمیل پیکربندی مجدد & \lr{\mbox{UE}} تحویل موفق را تأیید می‌کند \\
+\end{longtable}
+}
+
+\Needspace{12\baselineskip}
+
+\CNsubsubsection{فاز 3: تکمیل (حدود \lr{20–100~ms})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{پیام} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+11 & درخواست تغییر مسیر & \lr{MME/\allowbreak{}S-GW} را از مکان جدید مطلع می‌کند \\
+12 & تأیید تغییر مسیر & هسته به‌روزرسانی مسیر را تأیید می‌کند \\
+13 & آزادسازی زمینه \lr{\mbox{UE}} & مبدأ منابع را آزاد می‌کند \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{مقادیر زمان‌بندی کلیدی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{مقدار معمول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+زمان کل آماده‌سازی & \lr{50–200~ms} \\
+\textbf{وقفه صفحه کاربر} & \lr{\mbox{\textbf{\lr{\mbox{20–50~ms}}}}} \\
+تکمیل تغییر مسیر & \lr{20–100~ms} \\
+کل سرتاسری & \lr{100–350~ms} \\
+پیشوند \lr{\mbox{RACH}} & اختصاصی (بدون رقابت) یا مبتنی بر رقابت \\
+\end{longtable}
+}
+
+\CNsubsection{}{تحویل مبتنی بر \lr{\mbox{S1}} (بازگشت)}
+
+وقتی واسط \lr{\mbox{X2}} در دسترس \textbf{نیست} (بدون اتصال مستقیم بین \lr{\mbox{eNB}}ها):
+
+\begin{itemize}
+\tightlist
+\item
+  تمام پیام‌ها از \lr{\mbox{MME}} مسیریابی می‌شوند
+\item
+  زمان آماده‌سازی طولانی‌تر (حدود \lr{100–500~ms})
+\item
+  برای تحویل بین-\lr{\mbox{eNB}} بدون \lr{\mbox{X2}}، یا تحویل بین-\lr{\mbox{MME}} استفاده می‌شود
+\item
+  تجربه \lr{\mbox{UE}} یکسان اما تأخیر شبکه بالاتر
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{شکست‌های تحویل}
+
+\CNchained\CNsubsection{}{چرا}
+
+شکست‌های تحویل مستقیماً بر تجربه کاربر تأثیر می‌گذارند \lr{—} قطع تماس، وقفه ویدیو، از دست رفتن داده. درک حالت‌های شکست برای بهینه‌سازی شبکه ضروری است.
+
+\CNsubsection{}{چه چیزی}
+
+چهار حالت اصلی شکست وجود دارد که هر یک علل و راه‌حل‌های متمایزی دارند:
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{7.1}{تحویل دیر-هنگام}
+
+\CNchained\CNsubsubsection{چرا رخ می‌دهد}
+
+\lr{\mbox{UE}} خیلی سریع حرکت می‌کند یا حاشیه تحویل خیلی بزرگ است، بنابراین سیگنال سلول خدمات‌دهنده \textbf{پیش از} تکمیل تحویل به زیر سطح قابل استفاده می‌افتد.
+
+\CNkeepfig{m04-too-late}{2}
+
+\CNsubsubsection{چه اتفاقی می‌افتد}
+
+\CNfigure{m04-too-late}{تحویل دیرهنگام: پیوند خدمت‌دهنده پیش از تحویل از دست می‌رود}
+
+\CNsubsubsection{نشانگرها}
+
+\begin{itemize}
+\tightlist
+\item
+  شکست لینک رادیویی \lr{\mbox{(RLF)}} در سلول مبدأ \textbf{پیش از} دریافت فرمان تحویل
+\item
+  شمارنده \lr{\mbox{RLF}} بالا در سلول مبدأ
+\item
+  گزارش \lr{\mbox{RLF}} همسایه قوی را در زمان شکست نشان می‌دهد
+\end{itemize}
+
+\CNsubsubsection{کاهش}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{کاهش} آفست \lr{\mbox{A3}} (فعال‌سازی تحویل زودتر)
+\item
+  \textbf{کاهش} \lr{\mbox{TTT}} (واکنش سریع‌تر)
+\item
+  \textbf{کاهش} هیسترزیس
+\item
+  افزودن گزارش‌دهی اندازه‌گیری زودهنگام (رویداد \lr{\mbox{A2}} با آستانه پایین‌تر)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{7.2}{تحویل زود-هنگام}
+
+\CNchained\CNsubsubsection{چرا رخ می‌دهد}
+
+تحویل خیلی سریع فعال می‌شود (پارامترها بیش از حد تهاجمی). \lr{\mbox{UE}} به سلولی تحویل داده می‌شود که هنوز به‌اندازه کافی قوی نیست تا اتصال را حفظ کند.
+
+\CNkeepfig{m04-too-early}{2}
+
+\CNsubsubsection{چه اتفاقی می‌افتد}
+
+\CNfigure{m04-too-early}{تحویل زودهنگام: سلول مقصد هنوز توان حفظ پیوند را ندارد}
+
+\CNsubsubsection{نشانگرها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{RLF}} در سلول مقصد مدت کوتاهی پس از تکمیل تحویل رخ می‌دهد
+\item
+  \lr{\mbox{UE}} تلاش می‌کند به سلول مبدأ بازگردد و دوباره برقرار کند
+\item
+  زمان کوتاه بین تکمیل تحویل و \lr{\mbox{RLF}}
+\end{itemize}
+
+\CNsubsubsection{کاهش}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{افزایش} آفست \lr{\mbox{A3}} (نیاز به تفاوت بزرگ‌تر)
+\item
+  \textbf{افزایش} \lr{\mbox{TTT}} (انتظار طولانی‌تر)
+\item
+  \textbf{افزایش} هیسترزیس
+\item
+  تأیید ردپای پوشش سلول همسایه
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{7.3}{اثر پینگ-پونگ}
+
+\CNchained\CNsubsubsection{چرا رخ می‌دهد}
+
+دو سلول قدرت سیگنال مشابهی در ناحیه همپوشانی دارند. با پارامترهای تحویل تهاجمی، \lr{\mbox{UE}} به‌طور مکرر بین آن‌ها نوسان می‌کند.
+
+\CNkeepfig{m04-ping-pong}{2}
+
+\CNsubsubsection{چه اتفاقی می‌افتد}
+
+\CNfigure{m04-ping-pong}{پینگ‌پنگ: تحویل‌های مکرر بین دو سلول مشابه}
+
+\CNsubsubsection{تأثیر}
+
+\begin{itemize}
+\tightlist
+\item
+  بار سیگنالینگ بیش‌ازحد
+\item
+  داده کاربر قطع می‌شود (هر تحویل = \lr{\mbox{20-50~ms}} وقفه)
+\item
+  منابع رادیویی برای آماده‌سازی تحویل هدر می‌رود
+\item
+  کیفیت تجربه \lr{\mbox{(QoE)}} ضعیف برای کاربر
+\end{itemize}
+
+\CNsubsubsection{نشانگرها}
+
+\begin{itemize}
+\tightlist
+\item
+  همان \lr{\mbox{UE}} تحویل‌های متعدد بین همان جفت سلول را در زمان کوتاه انجام می‌دهد
+\item
+  نرخ تحویل بالا با تحرک پایین
+\item
+  \lr{\mbox{A\ensuremath{\to}B}} به‌دنبال آن \lr{\mbox{B\ensuremath{\to}A}} در عرض چند ثانیه
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{کاهش}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{راهبرد} & \CNth{چگونه کمک می‌کند} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{افزایش هیسترزیس} & حاشیه بزرگ‌تری برای فعال‌سازی لازم است \ensuremath{\leftarrow} محرک‌های کمتر \\
+\textbf{افزایش \lr{\mbox{TTT}}} & باید طولانی‌تر پایدار بماند \ensuremath{\leftarrow} نوسانات گذرا فیلتر می‌شوند \\
+\textbf{آفست مختص سلول \lr{\mbox{(CIO)}}} & یک سلول را در همپوشانی ترجیح می‌دهد \\
+\textbf{افزایش آفست \lr{\mbox{A3}}} & همسایه باید به‌طور قابل توجهی بهتر باشد \\
+\textbf{بهینه‌سازی شیب آنتن} & اندازه ناحیه همپوشانی را کاهش می‌دهد \\
+\end{longtable}
+}
+
+\textbf{قاعده سرانگشتی}: اگر بیش از 30\% تحویل‌ها بین یک جفت سلول پینگ-پونگ باشند (بازگشت در عرض 5 ثانیه)، \lr{\mbox{TTT}} یا هیسترزیس آن جفت را افزایش دهید.
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{7.4}{تحویل به سلول اشتباه}
+
+\CNchained\CNsubsubsection{چرا رخ می‌دهد}
+
+بهترین سلول مقصد، سلولی نیست که انتخاب شده است. این می‌تواند به دلایل زیر رخ دهد:
+
+\begin{itemize}
+\tightlist
+\item
+  رابطه همسایگی گمشده (مقصد در فهرست همسایه نیست)
+\item
+  گزارش اندازه‌گیری بهترین سلول واقعی را شامل نمی‌شود
+\item
+  ناهنجاری انتشار (سیگنال از سلول دور به‌طور لحظه‌ای قوی است)
+\end{itemize}
+
+\CNsubsubsection{چه اتفاقی می‌افتد}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} به سلول \lr{\mbox{X}} تحویل داده می‌شود، اما سلول \lr{\mbox{Y}} مقصد صحیح بود
+\item
+  \lr{\mbox{UE}} به‌سرعت سیگنال ضعیفی در سلول \lr{\mbox{X}} تجربه می‌کند
+\item
+  ممکن است تحویل دیگری (به سلول \lr{\mbox{Y}}) یا \lr{\mbox{RLF}} را فعال کند
+\end{itemize}
+
+\CNsubsubsection{کاهش}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{رابطه همسایگی خودکار \lr{\mbox{(ANR)}}}: کشف و افزودن خودکار همسایه‌ها
+\item
+  \textbf{فهرست‌های جامع همسایه}: اطمینان از پیکربندی تمام مقاصد بالقوه
+\item
+  \textbf{آفست‌های مختص سلول}: کاهش اولویت سلول‌هایی که می‌دانیم مشکل ایجاد می‌کنند
+\item
+  \textbf{فیلترکردن لایه-3}: میانگین‌گیری اندازه‌گیری‌ها برای کاهش ناهنجاری‌ها
+\end{itemize}
+
+\CNkeepfig{m04-ho-failure-states}{3}
+
+\CNsubsection{7.5}{نمودار حالت شکست تحویل}
+
+\CNfigure{m04-ho-failure-states}{حالت‌های تحویل و حالت‌های شکست}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{تحول تحویل: \lr{2G \ensuremath{\to} 3G \ensuremath{\to} LTE \ensuremath{\to} 5G}}
+
+\CNchained\CNsubsection{}{چرا}
+
+هر نسل سازوکارهای تحویل را برای پشتیبانی از سرعت‌های بالاتر، تأخیر کمتر و معماری‌های شبکه پیچیده‌تر بهبود داد. درک تحول، منطق طراحی را آشکار می‌کند.
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m04-gsm-ho-arch}{5}
+
+\CNsubsection{8.1}{\lr{\mbox{GSM (2G)}}: تحویل سخت، کنترل‌شده توسط \lr{\mbox{BSC}}}
+
+\CNchained\CNsubsubsection{معماری}
+
+\CNfigure{m04-gsm-ho-arch}{\lr{\mbox{GSM}}: تحویل سخت با تصمیم \lr{\mbox{BSC}}}
+
+\Needspace{19\baselineskip}
+
+\CNsubsubsection{ویژگی‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{2G GSM}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نوع تحویل & \textbf{فقط سخت} (قطع-پیش-از-وصل) \\
+تصمیم‌گیرنده & \lr{\mbox{\textbf{\lr{\mbox{BSC}}}}} (کنترلر ایستگاه پایه) \\
+اندازه‌گیری‌ها & \lr{\mbox{MS}} تا 6 همسایه (حامل‌های \lr{\mbox{BCCH}}) را اندازه می‌گیرد \\
+نرخ اندازه‌گیری & هر دوره \lr{SACCH (480~ms)} \\
+وقفه & \lr{100–200~ms} \\
+معیارها & \lr{\mbox{RXLEV}} (قدرت سیگنال)، \lr{\mbox{RXQUAL}} (کیفیت مبتنی بر \lr{\mbox{BER}}) \\
+کنترل توان & ترکیب‌شده با تصمیم تحویل \\
+\end{longtable}
+}
+
+\CNsubsubsection{چگونه کار می‌کرد}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{MS}} به‌طور پیوسته سلول خدمات‌دهنده + 6 همسایه قوی‌تر را اندازه می‌گیرد (از فهرست \lr{\mbox{BA}})
+\item
+  \lr{\mbox{MS}} هر \lr{\mbox{480~ms}} از طریق \lr{\mbox{SACCH}} اندازه‌گیری‌ها را گزارش می‌دهد
+\item
+  \lr{\mbox{BSC}} میانگین‌گیری را اعمال می‌کند (پارامترهای \lr{\mbox{HREQAVE}}، \lr{\mbox{HREQT}})
+\item
+  \lr{\mbox{BSC}} بر اساس معیارهای متعدد تصمیم می‌گیرد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    بودجه توان \lr{\mbox{(PBGT)}} \ensuremath{\leftarrow} مبتنی بر پوشش
+  \item
+    \lr{\mbox{RXQUAL}} \ensuremath{\leftarrow} مبتنی بر کیفیت (تداخل)
+  \item
+    \lr{\mbox{RXLEV}} \ensuremath{\leftarrow} مبتنی بر سطح (سیگنال خیلی ضعیف/\allowbreak{}قوی)
+  \item
+    فاصله \ensuremath{\leftarrow} پیشروی زمانی خیلی بزرگ
+  \item
+    ترافیک \ensuremath{\leftarrow} کاهش ازدحام
+  \end{itemize}
+\end{enumerate}
+
+\CNsubsubsection{محدودیت‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  تحویل سخت: کلیک قابل شنیدن در تماس‌های صوتی
+\item
+  کنترل‌شده توسط \lr{\mbox{BSC}}: تمام هوش در شبکه، تطبیق کند
+\item
+  اندازه‌گیری‌های محدود: فقط 6 همسایه، گزارش‌دهی کند
+\item
+  بدون تحویل نرم: بدون بهره تنوع در لبه سلول
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m04-umts-ho-arch}{5}
+
+\CNsubsection{8.2}{\lr{UMTS (3G)}: تحویل نرم، کنترل‌شده توسط \lr{\mbox{RNC}}}
+
+\CNchained\CNsubsubsection{معماری}
+
+\CNfigure{m04-umts-ho-arch}{\lr{\mbox{UMTS}}: تحویل با تصمیم \lr{\mbox{RNC}}}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{ویژگی‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{3G UMTS}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نوع تحویل & \textbf{نرم + نرم‌تر + سخت} \\
+تصمیم‌گیرنده & \lr{\mbox{\textbf{\lr{\mbox{RNC}}}}} (کنترلر شبکه رادیویی) \\
+اندازه‌گیری‌ها & \lr{CPICH Ec/\allowbreak{}No}، \lr{\mbox{RSCP}} \\
+مجموعه فعال & تا \lr{\mbox{3–6}} سلول به‌طور همزمان \\
+وقفه & \lr{\mbox{\textbf{\lr{\mbox{0~ms}}}}} (تحویل نرم)، \lr{\mbox{20–50~ms}} (تحویل سخت) \\
+معیارها & رویدادهای \lr{\mbox{1A–1C}} (مجموعه فعال)، \lr{\mbox{2A–2F}} (بین-فرکانسی/\allowbreak{}\lr{\mbox{RAT}}) \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-soft-ho-mech}{2}
+
+\CNsubsubsection{سازوکار تحویل نرم}
+
+\CNfigure{m04-soft-ho-mech}{تحویل نرم: دو شاخه رادیویی در \lr{\mbox{RNC}} ترکیب می‌شوند}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مدیریت مجموعه فعال}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    رویداد \lr{\mbox{1A}}: \lr{$\mathrm{Pilot} > \mathrm{Best\_Pilot} - \mathrm{Reporting\_Range} + \mathrm{Hysteresis}$} \ensuremath{\leftarrow} افزودن سلول
+  \item
+    رویداد \lr{\mbox{1B}}: \lr{$\mathrm{Pilot} < \mathrm{Best\_Pilot} - \mathrm{Reporting\_Range} - \mathrm{Hysteresis}$} \ensuremath{\leftarrow} حذف سلول
+  \item
+    رویداد \lr{\mbox{1C}}: \lr{New pilot \textgreater{} Worst\_\allowbreak{}in\_\allowbreak{}ActiveSet + Hysteresis} \ensuremath{\leftarrow} جایگزینی سلول
+  \end{itemize}
+\item
+  \textbf{بهره تنوع بزرگ}: \lr{\mbox{2–3~dB}} در لبه سلول
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{20–40\%}}}}} اتصالات در تحویل نرم در شبکه معمول
+\end{itemize}
+
+\CNsubsubsection{نوآوری کلیدی}
+
+تحویل نرم تحرک بی‌وقفه را ممکن ساخت اما به قیمت:
+
+\begin{itemize}
+\tightlist
+\item
+  مصرف چندین کد کانال‌سازی (یکی برای هر عضو مجموعه فعال)
+\item
+  افزایش پهنای باند بک‌هال \lr{\mbox{Iub}}
+\item
+  کنترل توان پیچیده (باید تمام پیوندها را برآورده کند)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m04-lte-ho-arch}{5}
+
+\CNsubsection{8.3}{\lr{\mbox{LTE (4G)}}: تحویل سخت، کمک‌شده توسط \lr{\mbox{UE}} و کنترل‌شده توسط شبکه، مبتنی بر \lr{\mbox{X2}}}
+
+\CNchained\CNsubsubsection{معماری}
+
+\CNfigure{m04-lte-ho-arch}{\lr{\mbox{LTE}}: معماری مسطح؛ \lr{\mbox{eNB}} تصمیم می‌گیرد و از \lr{\mbox{X2}} استفاده می‌کند}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{ویژگی‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{4G LTE}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نوع تحویل & \textbf{فقط سخت} (قطع-پیش-از-وصل) \\
+تصمیم‌گیرنده & \textbf{\lr{\mbox{eNB}} مبدأ} (تصمیم توزیع‌شده) \\
+اندازه‌گیری‌ها & \lr{\mbox{RSRP}}، \lr{\mbox{RSRQ}} (رویدادهای \lr{\mbox{A1–A6}}، \lr{\mbox{B1–B2}}) \\
+وقفه & \lr{\mbox{\textbf{\lr{\mbox{20–50~ms}}}}} \\
+واسط & \lr{\mbox{\textbf{\lr{\mbox{X2}}}}} (\lr{\mbox{eNB}}-به-\lr{\mbox{eNB}} مستقیم) \\
+ویژگی کلیدی & کمک‌شده توسط \lr{\mbox{UE}}، کنترل‌شده توسط شبکه \\
+\end{longtable}
+}
+
+\CNsubsubsection{چرا \lr{\mbox{LTE}} تحویل نرم را حذف کرد}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{OFDMA}}}}} (نه \lr{\mbox{CDMA}}): سلول‌های مختلف از زیرحامل‌های مختلف استفاده می‌کنند \ensuremath{\leftarrow} نمی‌توان همان سیگنال را از چندین سلول ترکیب کرد
+\item
+  \textbf{معماری مسطح}: بدون \lr{\mbox{RNC}} مرکزی برای انجام ترکیب
+\item
+  \textbf{تحویل سخت به‌اندازه کافی سریع است}: وقفه \lr{\mbox{20–50~ms}} برای داده قابل قبول است
+\item
+  \textbf{سادگی}: به‌طور قابل توجهی ساده‌تر از مدیریت مجموعه‌های فعال
+\item
+  \textbf{کارایی}: بدون منابع هدررفته برای چندین پیوند همزمان
+\end{enumerate}
+
+\CNsubsubsection{نوآوری‌های کلیدی در \lr{\mbox{LTE}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{واسط \lr{\mbox{X2}}}: \lr{\mbox{eNB-eNB}} مستقیم \ensuremath{\leftarrow} آماده‌سازی سریع، ارسال داده
+\item
+  \textbf{گزارش‌دهی مبتنی بر رویداد}: فقط هنگام برآورده‌شدن شرایط گزارش بده (سیگنالینگ کمتر)
+\item
+  \textbf{فیلترکردن لایه-3}: میانگین‌گیری قابل پیکربندی برای هموارسازی اندازه‌گیری‌ها
+\item
+  \textbf{روابط همسایگی خودکار \lr{\mbox{(ANR)}}}: فهرست‌های همسایه خود-پیکربندی
+\item
+  \textbf{بهینه‌سازی استحکام تحرک \lr{\mbox{(MRO)}}}: پارامترهای تحویل خود-ترمیم
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNkeepfig{m04-nr-ho-arch}{5}
+
+\CNsubsection{8.4}{\lr{\mbox{5G NR}}: تحویل شرطی، \lr{\mbox{DAPS}}، اتصال دوگانه}
+
+\CNchained\CNsubsubsection{معماری}
+
+\CNfigure{m04-nr-ho-arch}{\lr{\mbox{5G NR}}: تحویل \lr{\mbox{Xn}} و اتصال دوگانه}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{ویژگی‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{5G NR}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نوع تحویل & سخت، \textbf{شرطی}، \lr{\mbox{DAPS}} \\
+تصمیم‌گیرنده & \lr{\mbox{gNB}} مبدأ (+ \lr{\mbox{CPC}} برای شرطی) \\
+اندازه‌گیری‌ها & \lr{\mbox{SS-RSRP}}، \lr{\mbox{SS-RSRQ}}، \lr{\mbox{SS-SINR}}، مبتنی بر \lr{\mbox{CSI-RS}} \\
+وقفه & \lr{0~ms (DAPS)}، حدود \lr{0~ms (DC)}، \lr{\mbox{20~ms}} (سخت) \\
+ویژگی‌های کلیدی & \lr{\mbox{CHO}}، \lr{\mbox{DAPS}}، اتصال دوگانه، \lr{\mbox{MR-DC}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m04-cho-compare}{6}
+
+\CNsubsubsection{تحویل شرطی \lr{\mbox{(CHO)}} \lr{—} نوآوری \lr{\mbox{5G}}}
+
+\textbf{چرا}: در \lr{\mbox{LTE}} قدیمی، \lr{\mbox{eNB}} باید منتظر گزارش اندازه‌گیری بماند، تصمیم بگیرد، مقصد را آماده کند، سپس فرمان بفرستد. اگر شرایط رادیویی به‌سرعت افت کند (سرعت بالا، \lr{\mbox{mmWave}})، این خیلی کند است.
+
+\textbf{چه چیزی}: شبکه \textbf{چندین سلول مقصد را پیش-آماده} می‌کند و به \lr{\mbox{UE}} شرایطی می‌دهد تا تحویل را \textbf{به‌صورت خودمختار} فعال کند.
+
+\CNfigure{m04-cho-compare}{تحویل سنتی در برابر تحویل شرطی}
+
+\textbf{چگونه}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  شبکه \lr{\mbox{CHO}} را پیکربندی می‌کند: «اگر رویداد \lr{\mbox{A3}} برای سلول \lr{\mbox{X}} یا سلول \lr{\mbox{Y}}، تحویل به آن سلول را اجرا کن»
+\item
+  سلول‌های مقصد پیش-آماده می‌شوند (منابع رزرو می‌شوند)
+\item
+  \lr{\mbox{UE}} شرایط را پایش می‌کند
+\item
+  وقتی شرط برآورده شد \ensuremath{\leftarrow} \lr{\mbox{UE}} بلافاصله اجرا می‌کند (بدون رفت-و-برگشت به شبکه)
+\item
+  \textbf{مزیت}: تأخیر آماده‌سازی تحویل را حذف می‌کند \ensuremath{\leftarrow} شکست‌های کمتر در سرعت بالا
+\end{enumerate}
+
+\CNkeepfig{m04-daps}{6}
+
+\CNsubsubsection{پشته پروتکل فعال دوگانه \lr{\mbox{(DAPS)}} \lr{—} وقفه \lr{\mbox{0~ms}}}
+
+\textbf{چرا}: حتی وقفه \lr{\mbox{20~ms}} برای \lr{\mbox{URLLC}} (ارتباط فوق‌قابل اعتماد کم-تأخیر) مهم است.
+
+\textbf{چه چیزی}: \lr{\mbox{UE}} در حین تحویل اتصال به \textbf{هر دو} مبدأ و مقصد را به‌طور همزمان حفظ می‌کند \lr{—} مفهومی مشابه تحویل نرم \lr{\mbox{3G}} اما با پیاده‌سازی متفاوت.
+
+\CNfigure{m04-daps}{تحویل \lr{\mbox{DAPS}}: ابتدا اتصال، سپس قطع}
+
+\textbf{چگونه}:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} دو پشته پروتکل فعال دارد (از این رو نام آن)
+\item
+  داده در حین انتقال از طریق هر دو مسیر ارسال/\allowbreak{}دریافت می‌شود
+\item
+  پس از تأیید اتصال موفق توسط مقصد، مبدأ آزاد می‌شود
+\item
+  \textbf{مبادله}: افزایش پیچیدگی و مصرف توان \lr{\mbox{UE}}
+\end{itemize}
+
+\CNsubsubsection{اتصال دوگانه \lr{\mbox{(MR-DC)}} \lr{—} چند-\lr{\mbox{RAT}}}
+
+\textbf{چه چیزی}: \lr{\mbox{UE}} به‌طور همزمان به دو گره مختلف متصل است:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{EN-DC}}}}} (اتصال دوگانه \lr{E-UTRA-NR}): \lr{\mbox{LTE}} اصلی + \lr{\mbox{NR}} ثانویه
+\item
+  \lr{\textbf{\lr{\mbox{NR-DC}}}: NR} اصلی + \lr{\mbox{NR}} ثانویه
+\item
+  \lr{\textbf{\lr{\mbox{NE-DC}}}: NR} اصلی + \lr{\mbox{LTE}} ثانویه
+\end{itemize}
+
+\CNfigure{m04-dual-connectivity}{اتصال دوگانه: دو پیوند رادیویی همزمان}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{8.5}{خلاصه مقایسه نسل‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2195}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1951}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2195}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1951}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1707}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{\lr{\mbox{2G GSM}}} & \CNth{\lr{\mbox{3G UMTS}}} & \CNth{\lr{\mbox{4G LTE}}} & \CNth{\lr{\mbox{5G NR}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نوع تحویل & سخت & نرم + سخت & سخت & سخت + \lr{CHO + DAPS} \\
+کنترلر & \lr{\mbox{BSC}} & \lr{\mbox{RNC}} & \lr{\mbox{eNB}} & \lr{\mbox{gNB}} \\
+وقفه & \lr{100-200~ms} & \lr{\mbox{0~ms}} (نرم) & \lr{\mbox{20-50~ms}} & \lr{0~ms (DAPS/\allowbreak{}DC)} \\
+اندازه‌گیری & \lr{\mbox{RXLEV}}، \lr{\mbox{RXQUAL}} & \lr{CPICH RSCP}، \lr{Ec/\allowbreak{}No} & \lr{\mbox{RSRP}}، \lr{\mbox{RSRQ}} & \lr{\mbox{SS-RSRP}}، \lr{\mbox{CSI-RS}} \\
+هوش & فقط شبکه & فقط شبکه & کمک‌شده توسط \lr{\mbox{UE}} & خودمختار \lr{\mbox{UE (CHO)}} \\
+معماری & سلسله‌مراتبی & سلسله‌مراتبی & مسطح & مسطح + \lr{\mbox{DC}} \\
+خود-بهینه‌سازی & دستی & دستی & \lr{SON (MRO)} & مبتنی بر \lr{AI/\allowbreak{}ML} \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNsection{9}{مثال‌های مهندسی با مقادیر معمول پارامترها}
+
+\CNchained\CNsubsection{9.1}{مثال: شبکه ماکرو شهری \lr{—} بهینه‌سازی تحویل \lr{\mbox{LTE}}}
+
+\CNchained\CNsubsubsection{سناریو}
+
+\begin{itemize}
+\tightlist
+\item
+  ناحیه شهری متراکم، فاصله بین-سایت \lr{\mbox{500m}}
+\item
+  کاربران: ترکیبی از عابران پیاده \lr{(3 km/\allowbreak{}h)} و خودروها \lr{(50 km/\allowbreak{}h)}
+\item
+  مشکل: نرخ شکست تحویل 5\%، پینگ-پونگ بیش‌ازحد
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{پارامترهای اولیه (پیش از بهینه‌سازی)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{مقدار} & \CNth{مسیله} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+آفست \lr{\mbox{A3}} & \lr{\mbox{2~dB}} & خیلی تهاجمی \ensuremath{\leftarrow} تحویل زود-هنگام \\
+هیسترزیس & \lr{\mbox{1~dB}} & فیلترکردن ناکافی \\
+\lr{\mbox{TTT}} & \lr{\mbox{100~ms}} & خیلی کوتاه \ensuremath{\leftarrow} پینگ-پونگ \\
+فیلتر لایه-\lr{\mbox{3 (k)}} & 1 & میانگین‌گیری ناکافی \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{پارامترهای بهینه‌شده}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{مقدار جدید} & \CNth{منطق} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+آفست \lr{\mbox{A3}} & \lr{\mbox{3~dB}} & حاشیه بیشتر پیش از فعال‌سازی \\
+هیسترزیس & \lr{\mbox{2~dB}} & مقاومت بهتر در برابر محو شدن \\
+\lr{\mbox{TTT}} & \lr{\mbox{256~ms}} & بیشتر پینگ-پونگ را برای عابران پیاده حذف می‌کند \\
+فیلتر لایه-\lr{\mbox{3 (k)}} & 4 & محو شدن سریع را هموار می‌کند (میانگین‌گیری حدود \lr{\mbox{200~ms}}) \\
+\lr{\mbox{CIO}} (جفت سلول با پینگ-پونگ) & \lr{\mbox{+3~dB}} & تحویل را برای جفت مشکل‌دار مشخص سوگیری می‌کند \\
+\end{longtable}
+}
+
+\CNsubsubsection{نتیجه}
+
+\begin{itemize}
+\tightlist
+\item
+  نرخ شکست تحویل: 5\% \ensuremath{\to} \CNnum{1.5\%}
+\item
+  نرخ پینگ-پونگ: 12\% \ensuremath{\to} 3\%
+\item
+  مبادله: تأخیر متوسط تحویل حدود \lr{\mbox{150~ms}} افزایش یافت (قابل قبول)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.2}{مثال: ریل پرسرعت \lr{—} \lr{350 km/\allowbreak{}h}}
+
+\CNchained\CNsubsubsection{چالش}
+
+در \lr{350 km/\allowbreak{}h}، \lr{\mbox{UE}} یک سلول (پوشش \lr{\mbox{1~km}}) را در حدود 10 ثانیه می‌پیماید. پارامترهای استاندارد خیلی کند هستند.
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{تنظیم پارامترها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{استاندارد} & \CNth{پرسرعت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+آفست \lr{\mbox{A3}} & \lr{\mbox{3~dB}} & \lr{\mbox{2~dB}} \\
+هیسترزیس & \lr{\mbox{2~dB}} & \lr{\mbox{1~dB}} \\
+\lr{\mbox{TTT}} & \lr{\mbox{256~ms}} & \lr{\mbox{40~ms}} \\
+فیلتر لایه-\lr{\mbox{3 (k)}} & 4 & 1 \\
+آستانه \lr{\mbox{A2}} & \lr{\mbox{-120~dBm}} & \lr{\mbox{-110~dBm}} \\
+\end{longtable}
+}
+
+\CNsubsubsection{اقدامات اضافی}
+
+\begin{itemize}
+\tightlist
+\item
+  برنامه‌ریزی \lr{\mbox{RF}} اختصاصی در طول کریدور ریلی
+\item
+  آنتن‌های جهت‌دار در امتداد ریل
+\item
+  ناحیه همپوشانی سلول: حداقل \lr{200–300~m}
+\item
+  در نظر گرفتن \textbf{تحویل شرطی \lr{\mbox{(5G)}}} برای این سناریو
+\end{itemize}
+
+\CNsubsubsection{محاسبه حساسیت سرعت}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+At 350 km/h = 97 m/s
+Path loss change rate ≈ 0.3 dB per 10 ms (at 2 GHz, Hata model)
+
+With TTT = 256 ms: Signal changes by ~7.5 dB during TTT!
+→ This is unacceptable — must reduce TTT
+
+With TTT = 40 ms: Signal changes by ~1.2 dB during TTT
+→ Acceptable margin
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3}{مثال: تحویل بین-\lr{RAT — CSFB} از \lr{\mbox{LTE}} به \lr{\mbox{3G}}}
+
+\CNchained\CNsubsubsection{سناریو}
+
+\lr{\mbox{VoLTE}} مستقر نشده است؛ تماس‌های صوتی نیازمند بازگشت \lr{\mbox{CS}} به \lr{\mbox{3G}} هستند.
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{پیکربندی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4074}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{مقدار} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+آستانه \lr{\mbox{1 B2}} (\lr{\mbox{LTE}} خدمات‌دهنده) & \lr{-110~dBm RSRP} & هنگام ضعیف‌شدن \lr{\mbox{LTE}} فعال کن \\
+آستانه \lr{\mbox{2 B2}} (مقصد \lr{\mbox{UMTS}}) & \lr{-95~dBm RSCP} & فقط اگر \lr{\mbox{3G}} کافی باشد \\
+\lr{\mbox{TTT (B2)}} & \lr{\mbox{640~ms}} & از بازگشت غیرضروری اجتناب کن \\
+آستانه \lr{\mbox{A2}} (شروع اندازه‌گیری \lr{\mbox{3G}}) & \lr{-105~dBm RSRP} & اندازه‌گیری‌های بین-\lr{\mbox{RAT}} را آغاز کن \\
+شکاف اندازه‌گیری \lr{\mbox{IRAT}} & \lr{6~ms /\allowbreak{} 40~ms} & الگوی شکاف برای اندازه‌گیری \lr{\mbox{UMTS}} \\
+\end{longtable}
+}
+
+\CNsubsubsection{رویه}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE}} روی \lr{\mbox{LTE}}، \lr{\mbox{RSRP}} به زیر \lr{\mbox{-105~dBm}} می‌افتد \ensuremath{\leftarrow} رویداد \lr{\mbox{A2}} \ensuremath{\leftarrow} شروع اندازه‌گیری \lr{\mbox{UMTS}}
+\item
+  \lr{\mbox{RSRP}} در \lr{\mbox{LTE}} به زیر \lr{\mbox{-110~dBm}} می‌افتد و \lr{\mbox{RSCP}} در \lr{\mbox{UMTS}} برای \lr{\mbox{640~ms}} بیش از \lr{\mbox{-95~dBm}} است \ensuremath{\leftarrow} رویداد \lr{\mbox{B2}}
+\item
+  \lr{\mbox{eNB}} تحویل بین-\lr{\mbox{RAT}} به \lr{\mbox{UMTS}} را فعال می‌کند
+\item
+  \lr{\mbox{UE}} تحویل سخت به \lr{\mbox{3G}} انجام می‌دهد، اتصال دامنه \lr{\mbox{CS}} را برقرار می‌کند
+\item
+  تماس صوتی روی \lr{\mbox{3G}} سوییچینگ مداری ادامه می‌یابد
+\item
+  پس از پایان تماس: \lr{\mbox{UE}} به \lr{\mbox{LTE}} بازمی‌گردد (بازگشت سریع /\allowbreak{} تغییر مسیر)
+\end{enumerate}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.4}{مثال: پیکربندی رویداد اندازه‌گیری (کامل)}
+
+\CNchained\CNsubsubsection{پیکربندی کامل رویداد \lr{\mbox{A3}} برای تحویل درون-فرکانسی}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+RRC Connection Reconfiguration (measurement config):
+{
+  measObjectEUTRA: {
+    carrierFreq: 1850 (EARFCN for Band 3, 1800 MHz)
+    allowedMeasBandwidth: 50 RBs
+    neighCellConfig: 01 (partial measurement)
+    offsetFreq: 0 dB
+  }
+  
+  reportConfigEUTRA: {
+    triggerType: event
+    eventId: A3
+    a3-Offset: 3 dB (= 6 in IE, 0.5 dB steps)
+    hysteresis: 2 dB (= 4 in IE, 0.5 dB steps)
+    timeToTrigger: 256 ms
+    triggerQuantity: RSRP
+    reportQuantity: both (RSRP + RSRQ)
+    maxReportCells: 4
+    reportInterval: 480 ms
+    reportAmount: infinity
+  }
+  
+  measIdToAddList: {
+    measId: 1
+    measObjectId: 1
+    reportConfigId: 1
+  }
+  
+  quantityConfig: {
+    filterCoefficientRSRP: 4 (k=4, ~200ms averaging)
+    filterCoefficientRSRQ: 4
+  }
+}
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNsubsubsection{فرمول فیلترکردن لایه-3}
+
+\CNdisplay{F_n = (1 - a)\,F_{n-1} + a\,M_n, \qquad a = \left(\tfrac{1}{2}\right)^{k/4}}
+
+که در آن \lr{$k$} ضریب فیلتر \lr{(filterCoefficient)} است (0، 1، 2، \lr{…}، 8، \lr{…}):
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{$k = 0$: $a = 1.0$} \ensuremath{\leftarrow} بدون فیلتر (استفاده از اندازه‌گیری خام)
+\item
+  \lr{$k = 4$: $a = 0.5$} \ensuremath{\leftarrow} ۵۰٪ جدید + ۵۰٪ قدیم \ensuremath{\leftarrow} حافظه حدود \lr{\mbox{200~ms}}
+\item
+  \lr{$k = 8$: $a = 0.25$} \ensuremath{\leftarrow} ۲۵٪ جدید + ۷۵٪ قدیم \ensuremath{\leftarrow} حافظه حدود \lr{\mbox{400~ms}}
+\end{itemize}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{9.5}{\lr{\mbox{KPI}}های معمول تحویل (نقاط مرجع اپراتور)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{KPI}}} & \CNth{هدف} & \CNth{خوب} & \CNth{ضعیف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نرخ موفقیت تحویل & \lr{\mbox{\textgreater{}98\%}} & \lr{\mbox{\textgreater{}99\%}} & \lr{\mbox{\textless{}95\%}} \\
+نرخ پینگ-پونگ & \lr{\mbox{\textless{}5\%}} & \lr{\mbox{\textless{}2\%}} & \lr{\mbox{\textgreater{}10\%}} \\
+نرخ \lr{\mbox{RLF}} (مرتبط با تحویل) & \lr{\mbox{\textless{}1\%}} & \lr{\mbox{\textless{}0.5\%}} & \lr{\mbox{\textgreater{}3\%}} \\
+زمان متوسط وقفه & \lr{\mbox{\textless{}50~ms}} & \lr{\mbox{\textless{}30~ms}} & \lr{\mbox{\textgreater{}100~ms}} \\
+نسبت تحویل زود-هنگام & \lr{\mbox{\textless{}1\%}} & \lr{\mbox{\textless{}0.5\%}} & \lr{\mbox{\textgreater{}3\%}} \\
+نسبت تحویل دیر-هنگام & \lr{\mbox{\textless{}2\%}} & \lr{\mbox{\textless{}1\%}} & \lr{\mbox{\textgreater{}5\%}} \\
+تحویل غیرضروری (پینگ-پونگ + سلول اشتباه) & \lr{\mbox{\textless{}5\%}} & \lr{\mbox{\textless{}3\%}} & \lr{\mbox{\textgreater{}10\%}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m04-a3-trigger}{8}
+
+\CNsection{10}{نمودارهای خلاصه}
+
+\CNchained\CNsubsection{}{فعال‌سازی رویداد اندازه‌گیری \lr{\mbox{A3}} \lr{—} با هیسترزیس و \lr{\mbox{TTT}}}
+
+\CNfigure{m04-a3-trigger}{راه‌اندازی رویداد \lr{\mbox{A3}} با پسماند و زمان تا راه‌اندازی}
+
+\CNkeepfig{m04-ho-states}{3}
+
+\CNsubsection{}{حالت‌های تحویل \lr{—} جریان کامل}
+
+\CNfigure{m04-ho-states}{جریان کامل حالت‌های تحویل}
+
+\CNkeepfig{m04-param-tree}{3}
+
+\CNsubsection{}{پارامترهای تحویل \lr{\mbox{LTE}} \lr{—} درخت تصمیم}
+
+\CNfigure{m04-param-tree}{درخت تصمیم بهینه‌سازی پارامترهای تحویل}
+
+\Needspace{24\baselineskip}
+
+\CNsection{}{خلاصه فرمول‌های کلیدی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3600}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4400}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فرمول} & \CNth{بیان} & \CNth{کاربرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ورود \lr{\mbox{A3}} & \lr{Mn - Hys \textgreater{} Ms + A3\_\allowbreak{}Off} & محرک تحویل درون-فرکانسی \\
+خروج \lr{\mbox{A3}} & \lr{Mn + Hys \textless{} Ms + A3\_\allowbreak{}Off} & لغو گزارش در انتظار \\
+رتبه‌بندی سلول \lr{\mbox{(Rs)}} & \lr{Qmeas,s + QHyst} & رتبه انتخاب مجدد سلول خدمات‌دهنده \\
+رتبه‌بندی سلول \lr{\mbox{(Rn)}} & \lr{Qmeas,n - Qoffset} & رتبه انتخاب مجدد همسایه \\
+معیار \lr{\mbox{S}} & \lr{$S_{\mathrm{rxlev}} = Q_{\mathrm{rxlevmeas}} - Q_{\mathrm{rxlevmin}} > 0$} & مناسب‌بودن سلول \\
+فیلتر \lr{\mbox{L3}} & \lr{$F_n = (1-a)\,F_{n-1} + a\,M_n$} & هموارسازی اندازه‌گیری \\
+\lr{\mbox{RSRQ}} & \lr{N \ensuremath{\times} RSRP /\allowbreak{} RSSI} & متریک کیفیت سیگنال \\
+حاشیه تحویل & \lr{A3\_\allowbreak{}Off + Hys + speed\ensuremath{\times}TTT} & حاشیه فعال‌سازی مؤثر \\
+\end{longtable}
+}
+
+\CNboxsection{پرسش‌های مرور}
+
+\begin{CNbox}[unbreakable]{q}{پرسش‌های مرور}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{توضیح دهید} چرا \lr{\mbox{LTE}} از تحویل سخت به‌جای تحویل نرم مانند \lr{\mbox{3G}} استفاده می‌کند.
+\item
+  \textbf{محاسبه کنید} حاشیه تحویل مؤثر را برای: آفست \lr{A3 = 4 dB}، \lr{Hys = 2 dB}، \lr{TTT = 320 ms}، سرعت \lr{UE = 120 km/\allowbreak{}h}.
+\item
+  \textbf{خط زمانی} یک تحویل دیر-هنگام را رسم کنید و شناسایی کنید کدام پارامتر باید تنظیم شود.
+\item
+  \textbf{مقایسه کنید} نواحی ردیابی \lr{\mbox{(LTE)}} را با نواحی مکانی \lr{\mbox{(2G)}}. مزیت فهرست‌های ناحیه ردیابی چیست؟
+\item
+  \textbf{طراحی کنید} پارامترهای تحویل را برای سناریوی بزرگراه \lr{(130 km/\allowbreak{}h)}. هر انتخاب را توجیه کنید.
+\item
+  \textbf{توضیح دهید} چگونه تحویل شرطی در \lr{\mbox{5G}} مشکل تحرک بالا را که \lr{\mbox{LTE}} با آن دست‌وپنجه نرم می‌کند حل می‌کند.
+\item
+  \textbf{تحلیل کنید} سناریویی که نرخ پینگ-پونگ بین دو سلول 15\% است. سه راهبرد کاهش را به ترتیب ترجیح فهرست کنید.
+\item
+  \textbf{توصیف کنید} رویه تحویل \lr{\mbox{X2}} را و شناسایی کنید که بدون انتقال وضعیت \lr{\mbox{SN}} کجا از دست رفتن داده می‌تواند رخ دهد.
+\end{enumerate}
+
+\emph{ماژول 4 کامل شد. بعدی: ماژول 5 \lr{—} مدیریت منابع رادیویی و زمان‌بندی}
+
+\end{CNbox}

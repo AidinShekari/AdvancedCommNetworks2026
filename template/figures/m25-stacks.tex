@@ -1,0 +1,6 @@
+% Module 25 — user-plane protocol stack of each generation
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \g/\x/\l/\phy/\c in {2G/0/{SNDCP/LLC}/{GSM PHY (TDMA)}/CNbox, 3G/3.9/PDCP/{WCDMA PHY (CDMA)}/CNran, 4G/7.8/PDCP/{OFDMA PHY}/CNcp, 5G/11.7/{SDAP/PDCP}/{NR PHY {\scriptsize(\CNL{flex. num.}{عددشناسی متغیر})}}/CNup}{
+  \node[CNdark, minimum width=3.5cm] at (\x,0.75) {\g};
+  \CNstack{s\g}{\x}{0}{3.5cm}{App/CNphyL, {TCP/IP}/CNupL, {\l}/CNcpL, RLC/{}, MAC/{}, {\phy}/CNphyL}}
+\end{tikzpicture}

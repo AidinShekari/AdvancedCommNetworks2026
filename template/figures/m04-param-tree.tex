@@ -1,0 +1,11 @@
+% Module 4 — handover parameter optimisation decision tree
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNdark, minimum width=4.6cm] (root) at (0,0) {\CNL{Handover parameter optimisation}{بهینه‌سازی پارامترهای تحویل}};
+\foreach \k/\x/\t in {l/-5.2/{\CNL{Too-late HO}{تحویل دیرهنگام}}, p/0/{\CNL{Ping-pong}{پینگ‌پنگ}}, e/5.2/{\CNL{Too-early HO}{تحویل زودهنگام}}}{
+  \node[CNbad, minimum width=3.0cm] (\k) at (\x,-1.7) {\t};
+  \draw[CNlink, ->] (root.south) -- ++(0,-0.35) -| (\k.north);}
+\node[CNbox, text width=3.9cm, align=left, anchor=north] (L) at (-5.2,-2.7) {\textbf{\CNL{Decrease:}{کاهش:}}\\\textbullet{} A3 Offset\\\textbullet{} Hysteresis\\\textbullet{} TTT\\\textbf{\CNL{Increase:}{افزایش:}}\\\textbullet{} L3 filter k \CNL{(smoothing)}{(هموارسازی)}};
+\node[CNbox, text width=3.9cm, align=left, anchor=north] (P) at (0,-2.7) {\textbf{\CNL{Increase:}{افزایش:}}\\\textbullet{} Hys\\\textbullet{} TTT\\\textbullet{} CIO\\\textbullet{} L3 k};
+\node[CNbox, text width=3.9cm, align=left, anchor=north] (E) at (5.2,-2.7) {\textbf{\CNL{Increase:}{افزایش:}}\\\textbullet{} A3 Offset\\\textbullet{} Hysteresis\\\textbullet{} TTT\\\textbf{\CNL{Check:}{بررسی:}}\\\textbullet{} \CNL{coverage gap}{شکاف پوشش}\\\textbullet{} \CNL{antenna tilt}{شیب آنتن}};
+\foreach \a/\b in {l/L, p/P, e/E}{\draw[CNlink, ->] (\a) -- (\b);}
+\end{tikzpicture}

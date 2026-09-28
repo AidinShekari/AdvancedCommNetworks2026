@@ -1,0 +1,6 @@
+% Module 16 — traditional approach: one proprietary appliance per function
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \f/\v [count=\k from 0] in {{\CNL{Firewall appliance}{تجهیز دیواره آتش}}/A, {\CNL{Load balancer}{متعادل‌کننده بار}}/B, {\CNL{DPI appliance}{تجهیز \lr{DPI}}}/C}{
+  \node[CNbad, text width=3.2cm, minimum height=1.6cm] (a\k) at ({\k*4.2},0) {\CNL{Dedicated}{اختصاصی}\\\textbf{\f}\\{\scriptsize (Vendor \v)}};
+  \node[CNtiny, anchor=north] at (a\k.south) {\CNL{proprietary HW}{سخت‌افزار اختصاصی}};}
+\end{tikzpicture}

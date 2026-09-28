@@ -1,0 +1,13 @@
+% Module 4 — traditional versus conditional handover
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle] at (0,0.8) {\CNL{Traditional HO}{تحویل سنتی}};
+\foreach \t [count=\i] in {Report, Decision, Prepare, Command, Execute}{
+  \node[CNcp, minimum width=2.4cm, minimum height=0.7cm] (t\i) at (0,-\i*0.95+0.95) {\t};}
+\foreach \a/\b in {1/2,2/3,3/4,4/5}{\draw[CNlink, ->] (t\a) -- (t\b);}
+\node[CNbad, text width=3.6cm, anchor=north] at (0,-4.55) {\CNL{UE waits for the network}{\lr{UE} منتظر شبکه می‌ماند}\\$\sim$100--200 ms \CNL{delay}{تأخیر}};
+\node[CNtitle] at (7,0.8) {\CNL{Conditional HO}{تحویل شرطی}};
+\node[CNran, text width=4.6cm] (c1) at (7,-0.3) {\CNL{Network prepares targets}{شبکه اهداف را از قبل}\\\CNL{in advance}{آماده می‌کند}};
+\node[CNran, text width=4.6cm] (c2) at (7,-2.2) {\CNL{UE executes autonomously}{\lr{UE} هنگام برقراری شرط}\\\CNL{when the condition is met}{به‌طور خودکار اجرا می‌کند}};
+\draw[CNlink, ->] (c1) -- (c2);
+\node[CNok, text width=3.9cm, anchor=north] at (7,-4.55) {\CNL{UE decides WHEN to execute}{\lr{UE} تعیین می‌کند چه زمانی اجرا شود}\\\CNL{near-zero decision delay}{تأخیر تصمیم تقریباً صفر}};
+\end{tikzpicture}

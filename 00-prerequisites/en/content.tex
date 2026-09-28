@@ -1,0 +1,399 @@
+This document reviews foundational concepts assumed as prior knowledge. Use it as a refresher before diving into the course modules.
+
+\Needspace{21\baselineskip}
+
+\CNsection{1}{OSI Model Review (Telecom Focus)}
+
+The OSI 7-layer model provides the reference framework. In mobile/\allowbreak{}telecom networks, the most relevant layers are:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2188}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1875}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5938}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Layer} & \CNth{Name} & \CNth{Telecom Relevance} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \textbf{Physical} & RF transmission, modulation, antenna design, channel coding \\
+2 & \textbf{Data Link} & MAC scheduling, ARQ/\allowbreak{}HARQ, radio resource management \\
+3 & \textbf{Network} & IP routing, GTP tunneling, mobility management \\
+4 & \textbf{Transport} & TCP/\allowbreak{}UDP for end-to-end delivery, SCTP in signaling \\
+7 & \textbf{Application} & IMS/\allowbreak{}SIP for voice, HTTP/\allowbreak{}2 in 5G SBA interfaces \\
+\end{longtable}
+}
+
+\textbf{Key points to remember:}
+
+\begin{itemize}
+\tightlist
+\item
+  Layers 1–2 are where most wireless-specific innovation happens (PHY/\allowbreak{}MAC).
+\item
+  The ``user plane'' carries data (Layer 3+), while the ``control plane'' manages signaling.
+\item
+  In 5G, the protocol stack is split: CU (PDCP and above) vs. DU (RLC/\allowbreak{}MAC) vs. RU (PHY).
+\item
+  GTP-U tunnels encapsulate user IP packets between base station and core.
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{Basic RF Concepts}
+
+\CNchained\CNsubsection{}{Frequency \& Bandwidth}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Frequency (f):} Number of oscillations per second (Hz). Mobile bands range from 700~MHz to 100~GHz.
+\item
+  \textbf{Wavelength:} $\lambda = c/f$. Higher frequency \ensuremath{\to} shorter wavelength \ensuremath{\to} smaller antennas but higher path loss.
+\item
+  \textbf{Bandwidth (BW):} Range of frequencies occupied by a signal. More bandwidth \ensuremath{\to} higher data rate (Shannon).
+\end{itemize}
+
+\CNsubsection{}{Modulation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Purpose:} Map digital bits onto analog carrier signals.
+\item
+  \textbf{Common schemes:} BPSK, QPSK, 16-QAM, 64-QAM, 256-QAM.
+\item
+  Higher-order modulation = more bits/\allowbreak{}symbol but requires better SNR.
+\end{itemize}
+
+\CNsubsection{}{Signal-to-Noise Ratio (SNR)}
+
+\begin{itemize}
+\tightlist
+\item
+  $\mathrm{SNR} = P_{\mathrm{signal}}/P_{\mathrm{noise}}$ (linear) or $10\log_{10}(P_{\mathrm{signal}}/P_{\mathrm{noise}})$ in dB.
+\item
+  Shannon capacity: $C = \mathrm{BW}\cdot\log_2(1+\mathrm{SNR})$ [bits/\allowbreak{}s].
+\item
+  Determines which modulation and coding scheme (MCS) can be used.
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{Quick Reference}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Modulation} & \CNth{Bits/\allowbreak{}symbol} & \CNth{Typical use} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+QPSK & 2 & Robust, used at the cell edge \\
+64-QAM & 6 & High throughput, needs high SNR \\
+256-QAM & 8 & Peak rates, very close to the base station \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{Digital Communications Basics}
+
+\CNchained\CNsubsection{}{Bit Error Rate (BER)}
+
+\begin{itemize}
+\tightlist
+\item
+  Probability that a received bit differs from the transmitted bit.
+\item
+  Depends on SNR, modulation order, and coding.
+\item
+  Typical targets: 10\textsuperscript{-3} (voice), 10\textsuperscript{-6} (data before ARQ).
+\end{itemize}
+
+\CNsubsection{}{Channel Coding}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Purpose:} Add redundancy to detect/\allowbreak{}correct errors.
+\item
+  \textbf{Turbo codes:} Used in 3G/\allowbreak{}4G for data channels.
+\item
+  \textbf{LDPC codes:} Used in 5G NR for data (eMBB).
+\item
+  \textbf{Polar codes:} Used in 5G NR for control channels.
+\item
+  \textbf{Code rate (R):} Ratio of information bits to total bits. $R = k/n$ (e.g., $R = 1/2$ means 50\% redundancy).
+\end{itemize}
+
+\CNsubsection{}{OFDM Concept}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Problem:} Wideband channels suffer frequency-selective fading.
+\item
+  \CNsolution{} Divide wideband channel into many narrow subcarriers, each experiencing flat fading.
+\item
+  \textbf{Key parameters:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Subcarrier spacing ($\Delta f$): 15~kHz (LTE), 15/\allowbreak{}30/\allowbreak{}60/\allowbreak{}120/\allowbreak{}240~kHz (5G NR).
+  \item
+    FFT size: determines number of subcarriers.
+  \item
+    Cyclic prefix (CP): guard interval to combat inter-symbol interference (ISI).
+  \end{itemize}
+\item
+  \textbf{Advantages:} Simple equalization (1-tap per subcarrier), flexible resource allocation.
+\item
+  \textbf{OFDMA:} Multiple users share subcarriers \ensuremath{\to} basis of LTE \& 5G downlink.
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{IP Networking Fundamentals}
+
+\CNchained\CNsubsection{}{Addressing}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{IPv4:} 32-bit addresses (e.g., 192.168.1.1), NAT common in mobile networks.
+\item
+  \textbf{IPv6:} 128-bit addresses, increasingly used in 5G (avoids NAT).
+\item
+  \textbf{Subnetting:} CIDR notation (e.g., 10.0.0.0/\allowbreak{}24 = 256 addresses).
+\end{itemize}
+
+\CNsubsection{}{Routing}
+
+\begin{itemize}
+\tightlist
+\item
+  Mobile core networks use IP routing between network functions.
+\item
+  \textbf{Static routes} for simple topologies; \textbf{BGP/\allowbreak{}OSPF} in carrier networks.
+\item
+  \textbf{GTP tunneling:} Encapsulates subscriber IP packets inside GTP/\allowbreak{}UDP/\allowbreak{}IP between gNB and UPF.
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{Transport Protocols}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2703}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2973}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4324}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Protocol} & \CNth{Properties} & \CNth{Use in Telecom} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{TCP} & Reliable, ordered, congestion-controlled & HTTP/\allowbreak{}2 (5G SBA), web traffic \\
+\textbf{UDP} & Unreliable, low-latency & VoIP/\allowbreak{}RTP, GTP-U user plane \\
+\textbf{SCTP} & Multi-homing, message-oriented & S1AP/\allowbreak{}NGAP signaling (4G/\allowbreak{}5G) \\
+\end{longtable}
+}
+
+\CNsubsection{}{DNS \& NAT}
+
+\begin{itemize}
+\tightlist
+\item
+  UEs obtain IP via PDN/\allowbreak{}PDU session establishment (not DHCP directly).
+\item
+  DNS resolution for service discovery in 5G SBA (NRF).
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{Basic Probability}
+
+\CNchained\CNsubsection{}{Why Probability in Telecom?}
+
+\begin{itemize}
+\tightlist
+\item
+  Random access (RACH): collision probability with multiple users.
+\item
+  Scheduling: modeling traffic arrivals (Poisson process).
+\item
+  Fading: Rayleigh/\allowbreak{}Rician distributions model multipath.
+\item
+  BER analysis: Q-function, error probability calculations.
+\end{itemize}
+
+\CNsubsection{}{Key Concepts}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Random variable (X):} Outcome of a random experiment.
+\item
+  \textbf{PDF /\allowbreak{} PMF:} Probability density/\allowbreak{}mass function.
+\item
+  \textbf{Expected value:} $E[X] = \sum_i x_i\,P(x_i)$ — average outcome.
+\item
+  \textbf{Variance:} $\operatorname{Var}(X) = E[(X-\mu)^2]$ — spread around the mean.
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Distributions You’ll Encounter}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Distribution} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Uniform} & Random backoff timers \\
+\textbf{Exponential} & Inter-arrival times (memoryless) \\
+\textbf{Poisson} & Number of arrivals in a time window \\
+\textbf{Rayleigh} & Envelope of multipath fading (NLOS) \\
+\textbf{Gaussian (Normal)} & Noise modeling (AWGN) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Useful Formula}
+
+\begin{itemize}
+\tightlist
+\item
+  Collision probability in slotted ALOHA with $n$ users, 1 slot: $P(\text{collision}) = 1 - (1 - 1/K)^n \approx 1 - e^{-n/K}$ for large $K$.
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{Decibel Math}
+
+\CNchained\CNsubsection{}{Why Decibels?}
+
+Wireless signals span enormous dynamic ranges (pW to W). Decibels compress this into manageable numbers and turn multiplications into additions.
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{Definitions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3462}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4231}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Unit} & \CNth{Formula} & \CNth{Reference} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{dB} & $10\log_{10}(P_1/P_2)$ & Ratio (dimensionless) \\
+\textbf{dBm} & $10\log_{10}(P / 1\,\mathrm{mW})$ & Absolute power ref. to 1~mW \\
+\textbf{dBW} & $10\log_{10}(P / 1\,\mathrm{W})$ & Absolute power ref. to 1~W \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Common Conversions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Linear} & \CNth{dB} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\ensuremath{\times}2 & +3~dB \\
+\ensuremath{\times}10 & +10~dB \\
+\ensuremath{\times}100 & +20~dB \\
+\ensuremath{\times}1000 & +30~dB \\
+\ensuremath{\times}0.5 & \ensuremath{-}3~dB \\
+\ensuremath{\times}0.1 & \ensuremath{-}10~dB \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Quick Reference Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Power} & \CNth{dBm} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1~mW & 0~dBm \\
+10~mW & 10~dBm \\
+100~mW & 20~dBm \\
+1~W & 30~dBm \\
+20~W (macro BS) & 43~dBm \\
+\end{longtable}
+}
+
+\CNsubsection{}{Link Budget (Preview)}
+
+\CNdisplay{P_{\mathrm{Rx}}\,[\mathrm{dBm}] = P_{\mathrm{Tx}}\,[\mathrm{dBm}] + G_{\mathrm{Tx}}\,[\mathrm{dBi}] - L_{\mathrm{path}}\,[\mathrm{dB}] + G_{\mathrm{Rx}}\,[\mathrm{dBi}]}
+
+(received power = transmit power + transmit-antenna gain \ensuremath{-} path loss + receive-antenna gain)
+
+\CNsubsection{}{Practice Problems}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A transmitter outputs 2~W. Express in dBm. \ensuremath{\to} $10\log_{10}(2000) = 33$ dBm.
+\item
+  Path loss is 130~dB, Tx = 43~dBm, antenna gains total 18~dBi. Rx power? \ensuremath{\to} $43 + 18 - 130 = -69$ dBm.
+\item
+  SNR = 20~dB. What is the linear ratio? \ensuremath{\to} $10^{20/10} = 100$.
+\end{enumerate}
+
+\CNboxsection{Summary Checklist}
+
+\begin{CNbox}[unbreakable]{sum}{Summary Checklist}
+
+Before starting Module 2, verify you can:
+
+\begin{itemize}
+\tightlist
+\item
+  \CNcheckbox{} Identify which OSI layers handle PHY, MAC, and IP functions
+\item
+  \CNcheckbox{} Convert between linear power and dBm
+\item
+  \CNcheckbox{} Explain why OFDM combats frequency-selective fading
+\item
+  \CNcheckbox{} Calculate Shannon capacity given BW and SNR
+\item
+  \CNcheckbox{} Describe the difference between TCP and UDP and where each is used
+\item
+  \CNcheckbox{} Compute simple collision probabilities for random access
+\end{itemize}
+
+If any topic feels unfamiliar, review the referenced sections or consult the recommended textbooks in the syllabus.
+
+\emph{Last updated: August 2026}
+
+\end{CNbox}

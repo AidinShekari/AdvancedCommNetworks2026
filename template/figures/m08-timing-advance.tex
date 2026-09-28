@@ -1,0 +1,17 @@
+% Module 8 — why timing advance is needed
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, sig/.style={draw=#1, fill=#1!15, line width=0.8pt, minimum height=0.45cm, minimum width=3cm, font=\sffamily\scriptsize}]
+\node[CNtitle, anchor=west] at (-0.2,1.0) {\CNL{Without TA}{بدون \lr{TA}}};
+\node[CNtiny, anchor=east] at (1.2,0.3) {UE\textsubscript{near}}; \node[sig=CNcyan, anchor=west] at (1.4,0.3) {signal};
+\node[CNtiny, anchor=east] at (1.2,-0.4) {UE\textsubscript{far}}; \node[sig=CNsig, anchor=west] at (3.2,-0.4) {signal};
+\node[CNtiny, anchor=west, align=left] at (6.6,0.3) {\CNL{arrives early}{زود می‌رسد}};
+\node[CNtiny, anchor=west, align=left] at (6.6,-0.4) {\CNL{arrives late (propagation delay)}{دیر می‌رسد (تأخیر انتشار)}};
+\node[CNbad, anchor=west, font=\sffamily\scriptsize] at (1.4,-1.25) {\CNL{signals overlap into adjacent symbols $\rightarrow$ ISI/ICI}{سیگنال‌ها با نمادهای مجاور همپوشانی دارند $\leftarrow$ \lr{ISI/ICI}}};
+\begin{scope}[yshift=-3.3cm]
+\node[CNtitle, anchor=west] at (-0.2,1.0) {\CNL{With TA}{با \lr{TA}}};
+\node[CNtiny, anchor=east] at (1.2,0.3) {UE\textsubscript{near}}; \node[sig=CNcyan, anchor=west] at (2.3,0.3) {signal};
+\node[CNtiny, anchor=east] at (1.2,-0.4) {UE\textsubscript{far}}; \node[sig=CNsig, anchor=west] at (1.4,-0.4) {signal};
+\node[CNtiny, anchor=west, align=left] at (6.6,0.3) {\CNL{transmits later}{دیرتر ارسال می‌کند}};
+\node[CNtiny, anchor=west, align=left] at (6.6,-0.4) {\CNL{transmits earlier}{زودتر ارسال می‌کند}};
+\node[CNok, anchor=west, font=\sffamily\scriptsize] at (1.4,-1.25) {\CNL{all signals arrive aligned at the eNB receiver}{همه سیگنال‌ها هم‌تراز به گیرنده \lr{eNB} می‌رسند}};
+\end{scope}
+\end{tikzpicture}

@@ -1,0 +1,12 @@
+% Module 22 — AMBR hierarchy: UE-AMBR above Session-AMBR, GBR flows exempt
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, fl/.style={draw=#1, fill=#1!12, line width=0.7pt, minimum width=1.1cm, minimum height=0.9cm, font=\sffamily\scriptsize, align=center, rounded corners=2pt}]
+\draw[CNsig, line width=0.9pt, fill=CNsig!4, rounded corners=5pt] (0,0) rectangle (12.4,-7.0);
+\node[CNtiny, anchor=north west, align=left, font=\sffamily\small] at (0.2,-0.15) {\textbf{UE-AMBR} (\CNL{per UE}{برای هر \lr{UE}})\\{\scriptsize \CNL{aggregate cap across ALL non-GBR QoS flows of all PDU sessions}{سقف تجمعی برای همه جریان‌های \lr{Non-GBR} در همه نشست‌های \lr{PDU}}}\\{\scriptsize \CNL{example: UE-AMBR = 100 Mbps DL / 50 Mbps UL (stored in subscription data)}{مثال: \lr{UE-AMBR = 100 Mbps DL / 50 Mbps UL} (در داده اشتراک)}}};
+\foreach \x/\s/\r/\fl/\cap in {0.5/1/{50 Mbps DL / 25 UL}/{F1/Non-GBR/CNcyan, F2/Non-GBR/CNcyan, F3/GBR/CNgreen}/{F1+F2 (\CNL{not}{نه} F3)},
+                              6.5/2/{30 Mbps DL / 15 UL}/{F4/Non-GBR/CNcyan, F5/GBR/CNgreen}/{F4 (\CNL{not}{نه} F5)}}{
+  \draw[CNcyan, line width=0.8pt, fill=white, rounded corners=4pt] (\x,-1.9) rectangle (\x+5.4,-5.4);
+  \node[CNtiny, anchor=north west, align=left, font=\sffamily\small] at (\x+0.1,-1.95) {\textbf{Session-AMBR} (Sess\s)\\{\scriptsize \r}};
+  \foreach \f/\t/\c [count=\k from 0] in \fl {\node[fl=\c] at ({\x+0.9+\k*1.3},-3.55) {\textbf{\f}\\\t};}
+  \node[CNtiny, anchor=south west] at (\x+0.1,-5.35) {\CNL{Session-AMBR caps}{سقف \lr{Session-AMBR}:}\ \cap};}
+\node[CNnote, anchor=north, text width=11.8cm] at (6.2,-5.6) {\CNL{UE-AMBR caps F1+F2+F4 (all non-GBR flows across sessions)}{\lr{UE-AMBR} سقف \lr{F1+F2+F4} است (همه جریان‌های \lr{Non-GBR} در نشست‌ها)}\\\CNL{GBR flows (F3, F5) are NOT limited by AMBR}{جریان‌های \lr{GBR} (\lr{F3}، \lr{F5}) با \lr{AMBR} محدود نمی‌شوند}};
+\end{tikzpicture}

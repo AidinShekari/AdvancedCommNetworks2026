@@ -1,0 +1,791 @@
+\begin{CNbox}[unbreakable]{obj}{Learning Objectives}
+
+By the end of this module, you will be able to:
+
+\begin{itemize}
+\tightlist
+\item
+  Explain why 5G abandoned EPC’s point-to-point interface model
+\item
+  Describe SBA design principles and the role of HTTP/\allowbreak{}2, JSON, and REST
+\item
+  Identify all 5G Core Network Functions and their services
+\item
+  Explain the NRF’s critical role in service discovery
+\item
+  Compare direct vs indirect (SCP) communication models
+\item
+  Contrast EPC architecture with 5G SBA
+\end{itemize}
+
+\end{CNbox}
+
+\Needspace{14\baselineskip}
+
+\Needspace{24\baselineskip}
+
+\CNsection{1}{Why 5G Moved Away from EPC Point-to-Point Interfaces}
+
+\CNchained\CNsubsection{1.1}{The EPC Problem}
+
+In 4G/\allowbreak{}LTE, the Evolved Packet Core (EPC) uses \textbf{point-to-point reference points} between network elements:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Element Pair} & \CNth{Interface} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MME \ensuremath{\leftrightarrow} S-GW & S11 \\
+MME \ensuremath{\leftrightarrow} HSS & S6a \\
+S-GW \ensuremath{\leftrightarrow} P-GW & S5/\allowbreak{}S8 \\
+MME \ensuremath{\leftrightarrow} eNB & S1-MME \\
+P-GW \ensuremath{\leftrightarrow} PCRF & Gx \\
+\end{longtable}
+}
+
+\textbf{The scaling problem:}
+
+\begin{itemize}
+\tightlist
+\item
+  With N network elements, you need up to \textbf{N\ensuremath{\times}(N-1)/\allowbreak{}2} unique reference points
+\item
+  Each interface has its own protocol specification (Diameter, GTP-C, etc.)
+\item
+  Adding a new network element requires defining new interfaces to every existing element
+\item
+  Rigid coupling makes evolution extremely difficult
+\item
+  Vendor interoperability requires testing every interface combination
+\end{itemize}
+
+\textbf{Example:} EPC with 6 core elements \ensuremath{\to} up to 15 unique interfaces, each with its own protocol, message formats, and procedures.
+
+\CNsubsection{1.2}{The SBA Solution}
+
+5G introduces \textbf{Service-Based Architecture} where:
+
+\begin{itemize}
+\tightlist
+\item
+  Network Functions (NFs) expose \textbf{services} via a common interface framework
+\item
+  Any NF can \textbf{discover and consume} any other NF’s services
+\item
+  Adding a new NF only requires registering its services — no new interfaces needed
+\item
+  Common protocol stack (HTTP/\allowbreak{}2 + JSON) for all control plane communication
+\end{itemize}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{1.3}{Cloud-Native Principles}
+
+SBA embraces cloud-native design:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Principle} & \CNth{Implementation in 5G SBA} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Microservices} & Each NF is decomposed into independent services \\
+\textbf{Stateless} & NF instances don’t store session state locally (externalized to data stores) \\
+\textbf{Horizontal scaling} & Add more NF instances behind load balancers \\
+\textbf{Containerization} & NFs deployed as containers in Kubernetes \\
+\textbf{CI/\allowbreak{}CD} & Independent NF lifecycle management \\
+\textbf{Service mesh} & SCP provides routing, load balancing, observability \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m18-refpoint-vs-sbi}{8}
+
+\CNsection{2}{SBA Design Principles}
+
+\CNchained\CNsubsection{2.1}{Service-Based Interfaces (SBI) vs Reference Points}
+
+\CNfigure{m18-refpoint-vs-sbi}{EPC reference points versus the 5G service-based bus}
+
+\textbf{Reference Points (4G):} Each line is a unique protocol/\allowbreak{}interface specification\CNbr{}\textbf{Service-Based Interfaces (5G):} All NFs connect to a common bus using the same protocol framework
+
+\CNsubsection{2.2}{NF Service Interaction Models}
+
+NFs communicate using two patterns:
+
+\textbf{1. Request-Response (Synchronous)}
+
+\begin{itemize}
+\tightlist
+\item
+  NF Consumer sends a request to NF Producer
+\item
+  Producer processes and returns a response
+\item
+  Example: AMF queries UDM for subscriber data
+\end{itemize}
+
+\textbf{2. Subscribe-Notify (Asynchronous)}
+
+\begin{itemize}
+\tightlist
+\item
+  NF Consumer subscribes to events from NF Producer
+\item
+  Producer sends notifications when events occur
+\item
+  Example: AMF subscribes to UDM for subscription data changes
+\end{itemize}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{2.3}{HTTP/\allowbreak{}2 as Transport Protocol}
+
+5G SBA chose HTTP/\allowbreak{}2 over HTTP/\allowbreak{}1.1 for critical reasons:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{Benefit for 5G} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Multiplexing} & Multiple requests/\allowbreak{}responses over single TCP connection — reduces latency \\
+\textbf{Header compression (HPACK)} & Reduces overhead for repetitive signaling headers \\
+\textbf{Server push} & Enables efficient notification delivery \\
+\textbf{Binary framing} & More efficient parsing than text-based HTTP/\allowbreak{}1.1 \\
+\textbf{Stream prioritization} & Critical signaling (e.g., emergency calls) gets priority \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{2.4}{JSON as Data Format}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Reason} & \CNth{Explanation} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Human-readable} & Easy debugging, logging, troubleshooting \\
+\textbf{Web-native} & Leverages massive web ecosystem tooling \\
+\textbf{Tooling} & Validators, editors, parsers available in every language \\
+\textbf{Schema support} & OpenAPI/\allowbreak{}JSON Schema for API definition \\
+\textbf{Lightweight} & Less verbose than XML (used in older 3GPP specs) \\
+\end{longtable}
+}
+
+\CNsubsection{2.5}{REST API Design Principles}
+
+5G SBA APIs follow RESTful conventions:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Resources} identified by URIs: \CNcode{https:/}\allowbreak{}\CNcode{/}\allowbreak{}\CNcode{\{nfInstanceId\}.}\allowbreak{}\CNcode{5gc.}\allowbreak{}\CNcode{mnc\{MNC\}.}\allowbreak{}\CNcode{mcc\{MCC\}/}\allowbreak{}\CNcode{nsmf-pdusession/}\allowbreak{}\CNcode{v1/}\allowbreak{}\CNcode{sm-contexts}
+\item
+  \textbf{HTTP methods} map to operations: GET (read), POST (create), PUT (update), DELETE (remove), PATCH (partial update)
+\item
+  \textbf{Stateless} requests — each request contains all necessary context
+\item
+  \textbf{HATEOAS} — responses include links to related resources
+\item
+  \textbf{API versioning} — version in URI path (v1, v2)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m18-sba}{8}
+
+\CNsection{3}{5G Core Network Functions}
+
+\CNchained\CNsubsection{}{SBA Architecture Diagram}
+
+\CNfigure{m18-sba}{5G service-based architecture around the SBI}
+
+\CNsubsection{3.1}{AMF — Access and Mobility Management Function}
+
+\textbf{Purpose:} Handles all access and mobility-related signaling for the UE.
+
+\textbf{Service Interface:} \CNcode{Namf}
+
+\textbf{Key Services:}\CNbr{}\textbar{} Service \textbar{} Description \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{Namf\_Communication} \textbar{} N1/\allowbreak{}N2 message transport, UE-specific signaling \textbar{}\CNbr{}\textbar{} \CNcode{Namf\_EventExposure} \textbar{} Expose mobility events (location, reachability) \textbar{}\CNbr{}\textbar{} \CNcode{Namf\_MT} \textbar{} Mobile-terminated message delivery \textbar{}\CNbr{}\textbar{} \CNcode{Namf\_Location} \textbar{} UE location services \textbar{}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  UE registration and deregistration
+\item
+  Connection management (idle \ensuremath{\leftrightarrow} connected)
+\item
+  Mobility management (handover, tracking area updates)
+\item
+  Security context management (NAS encryption/\allowbreak{}integrity)
+\item
+  Relay NAS-SM messages between UE and SMF
+\end{itemize}
+
+\CNsubsection{3.2}{SMF — Session Management Function}
+
+\textbf{Purpose:} Manages PDU (data) sessions between UE and Data Network.
+
+\textbf{Service Interface:} \CNcode{Nsmf}
+
+\textbf{Key Services:}\CNbr{}\textbar{} Service \textbar{} Description \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{Nsmf\_PDUSession} \textbar{} Create, modify, release PDU sessions \textbar{}\CNbr{}\textbar{} \CNcode{Nsmf\_EventExposure} \textbar{} PDU session events (e.g., IP address change) \textbar{}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  PDU session establishment, modification, release
+\item
+  UE IP address allocation and management
+\item
+  UPF selection and control (via N4/\allowbreak{}PFCP)
+\item
+  QoS flow management and enforcement
+\item
+  Downlink data notification
+\item
+  Traffic steering and routing configuration
+\end{itemize}
+
+\CNsubsection{3.3}{UPF — User Plane Function}
+
+\textbf{Purpose:} Forwards user data packets between RAN and Data Networks.
+
+\textbf{\CNwarn{} Note:} UPF does NOT use SBI. It uses reference points:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{N3} — between RAN and UPF (GTP-U tunnel)
+\item
+  \textbf{N4} — between SMF and UPF (PFCP protocol)
+\item
+  \textbf{N6} — between UPF and Data Network (IP traffic)
+\item
+  \textbf{N9} — between UPFs (inter-UPF GTP-U tunnel)
+\end{itemize}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  Packet routing and forwarding
+\item
+  QoS handling (marking, policing, shaping)
+\item
+  Traffic usage reporting
+\item
+  Uplink traffic verification
+\item
+  Lawful intercept (user plane)
+\item
+  Buffering of downlink packets (UE in idle mode)
+\end{itemize}
+
+\CNsubsection{3.4}{UDM — Unified Data Management}
+
+\textbf{Purpose:} Manages subscriber data and computes authentication credentials.
+
+\textbf{Service Interface:} \CNcode{Nudm}
+
+\textbf{Key Services:}\CNbr{}\textbar{} Service \textbar{} Description \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{Nudm\_}\allowbreak{}\CNcode{SubscriberDataManagement} \textbar{} Retrieve/\allowbreak{}update subscription data \textbar{}\CNbr{}\textbar{} \CNcode{Nudm\_}\allowbreak{}\CNcode{UEContextManagement} \textbar{} Track which AMF/\allowbreak{}SMF serves a UE \textbar{}\CNbr{}\textbar{} \CNcode{Nudm\_}\allowbreak{}\CNcode{UEAuthentication} \textbar{} Generate authentication vectors \textbar{}\CNbr{}\textbar{} \CNcode{Nudm\_EventExposure} \textbar{} Subscription data change notifications \textbar{}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  Stores subscription data (authorized slices, QoS profiles, DNN permissions)
+\item
+  Computes authentication credentials (using SUPI, K, OPc)
+\item
+  Manages UE context registration (serving AMF, serving SMF)
+\item
+  De-concealment of SUCI \ensuremath{\to} SUPI
+\end{itemize}
+
+\CNsubsection{3.5}{AUSF — Authentication Server Function}
+
+\textbf{Purpose:} Executes the authentication procedure for UEs.
+
+\textbf{Service Interface:} \CNcode{Nausf}
+
+\textbf{Key Services:}\CNbr{}\textbar{} Service \textbar{} Description \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{Nausf\_}\allowbreak{}\CNcode{UEAuthentication} \textbar{} Perform 5G-AKA or EAP-AKA’ authentication \textbar{}\CNbr{}\textbar{} \CNcode{Nausf\_}\allowbreak{}\CNcode{SoRProtection} \textbar{} Steering of Roaming security \textbar{}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  Authenticates UEs during registration
+\item
+  Supports 5G-AKA and EAP-AKA’ methods
+\item
+  Stores intermediate key material (\ensuremath{K_{\mathrm{AUSF}}})
+\item
+  Interfaces with UDM for authentication vectors
+\end{itemize}
+
+\CNsubsection{3.6}{PCF — Policy Control Function}
+
+\textbf{Purpose:} Provides policy rules governing network behavior and QoS.
+
+\textbf{Service Interface:} \CNcode{Npcf}
+
+\textbf{Key Services:}\CNbr{}\textbar{} Service \textbar{} Description \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{Npcf\_}\allowbreak{}\CNcode{SMPolicyControl} \textbar{} Session-level policies (QoS, charging, gating) \textbar{}\CNbr{}\textbar{} \CNcode{Npcf\_}\allowbreak{}\CNcode{AMPolicyControl} \textbar{} Access and mobility policies (RFSP, service area) \textbar{}\CNbr{}\textbar{} \CNcode{Npcf\_}\allowbreak{}\CNcode{PolicyAuthorization} \textbar{} AF-triggered policy (e.g., IMS requests QoS) \textbar{}\CNbr{}\textbar{} \CNcode{Npcf\_}\allowbreak{}\CNcode{BDTPolicyControl} \textbar{} Background data transfer policies \textbar{}\CNbr{}\textbar{} \CNcode{Npcf\_EventExposure} \textbar{} Policy-related event notifications \textbar{}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  QoS policy decisions
+\item
+  Charging policy rules
+\item
+  Access control and gating decisions
+\item
+  Network slicing policies
+\item
+  Usage monitoring control
+\end{itemize}
+
+\CNsubsection{3.7}{NRF — Network Repository Function}
+
+\textbf{Purpose:} The \textbf{central registry} of all NF instances and their services — the backbone of SBA.
+
+\textbf{Service Interface:} \CNcode{Nnrf}
+
+\textbf{Key Services:}\CNbr{}\textbar{} Service \textbar{} Description \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{Nnrf\_NFManagement} \textbar{} NF registration, update, deregistration \textbar{}\CNbr{}\textbar{} \CNcode{Nnrf\_NFDiscovery} \textbar{} Query available NFs by type, slice, location \textbar{}\CNbr{}\textbar{} \CNcode{Nnrf\_AccessToken} \textbar{} Issue OAuth2.0 tokens for NF-to-NF authorization \textbar{}
+
+\begin{CNquote}
+
+\CNstar{} \textbf{NRF is the critical enabler of SBA} — without it, NFs cannot discover each other and the service-based model collapses back to static configuration.
+
+\end{CNquote}
+
+\CNsubsection{3.8}{NSSF — Network Slice Selection Function}
+
+\textbf{Purpose:} Selects the appropriate network slice instance for a UE.
+
+\textbf{Service Interface:} \CNcode{Nnssf}
+
+\textbf{Key Services:}\CNbr{}\textbar{} Service \textbar{} Description \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{Nnssf\_NSSelection} \textbar{} Determine allowed slices and target AMF set \textbar{}\CNbr{}\textbar{} \CNcode{Nnssf\_}\allowbreak{}\CNcode{NSSAIAvailability} \textbar{} Manage NSSAI availability per tracking area \textbar{}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  Determines the Allowed NSSAI for UE registration
+\item
+  Selects target AMF Set/\allowbreak{}AMF based on requested slices
+\item
+  Manages per-TA NSSAI availability information
+\end{itemize}
+
+\CNsubsection{3.9}{NEF — Network Exposure Function}
+
+\textbf{Purpose:} Securely exposes 5G network capabilities to external applications.
+
+\textbf{Service Interface:} \CNcode{Nnef}
+
+\textbf{Key Services:}\CNbr{}\textbar{} Service \textbar{} Description \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{Nnef\_EventExposure} \textbar{} Expose network events to AFs \textbar{}\CNbr{}\textbar{} \CNcode{Nnef\_PFDManagement} \textbar{} Packet Flow Description management \textbar{}\CNbr{}\textbar{} \CNcode{Nnef\_}\allowbreak{}\CNcode{TrafficInfluence} \textbar{} Allow AF to influence traffic routing \textbar{}\CNbr{}\textbar{} \CNcode{Nnef\_}\allowbreak{}\CNcode{ParameterProvision} \textbar{} Provision expected UE behavior \textbar{}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  API gateway between 5G core and external world
+\item
+  Translates internal 5GC information to external representations
+\item
+  Enforces security policies on external access
+\item
+  Rate limiting and API management
+\end{itemize}
+
+\CNsubsection{3.10}{AF — Application Function}
+
+\textbf{Purpose:} Represents third-party applications that interact with the 5G core.
+
+\textbf{Service Interface:} \CNcode{Naf}
+
+\textbf{Key Responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  Requests QoS for application flows (e.g., video streaming)
+\item
+  Influences traffic routing (e.g., edge computing)
+\item
+  Subscribes to network events (e.g., UE location)
+\item
+  Can access 5GC directly (trusted) or via NEF (untrusted)
+\end{itemize}
+
+\textbf{Examples:} IMS (VoNR), streaming platforms, enterprise applications, MEC orchestrators.
+
+\CNsection{4}{NRF — The Key Enabler of SBA}
+
+The NRF is the \textbf{most critical component} that makes SBA work. Without NRF, 5G would revert to static, pre-configured connections like EPC.
+
+\CNsubsection{4.1}{NF Registration}
+
+When an NF instance starts, it \textbf{registers} with the NRF by providing its \textbf{NF Profile}:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"nfInstanceId"}\FunctionTok{:} \StringTok{"3fa85f64{-}5717{-}4562{-}b3fc{-}2c963f66afa6"}\FunctionTok{,}
+  \DataTypeTok{"nfType"}\FunctionTok{:} \StringTok{"SMF"}\FunctionTok{,}
+  \DataTypeTok{"nfStatus"}\FunctionTok{:} \StringTok{"REGISTERED"}\FunctionTok{,}
+  \DataTypeTok{"heartBeatTimer"}\FunctionTok{:} \DecValTok{30}\FunctionTok{,}
+  \DataTypeTok{"plmnList"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"mcc"}\FunctionTok{:} \StringTok{"310"}\FunctionTok{,} \DataTypeTok{"mnc"}\FunctionTok{:} \StringTok{"014"}\FunctionTok{\}}\OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"sNssais"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"sst"}\FunctionTok{:} \DecValTok{1}\FunctionTok{,} \DataTypeTok{"sd"}\FunctionTok{:} \StringTok{"000001"}\FunctionTok{\}}\OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"fqdn"}\FunctionTok{:} \StringTok{"smf1.5gc.mnc014.mcc310.3gppnetwork.org"}\FunctionTok{,}
+  \DataTypeTok{"ipv4Addresses"}\FunctionTok{:} \OtherTok{[}\StringTok{"10.10.10.5"}\OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"nfServices"}\FunctionTok{:} \OtherTok{[}
+    \FunctionTok{\{}
+      \DataTypeTok{"serviceInstanceId"}\FunctionTok{:} \StringTok{"nsmf{-}pdusession{-}01"}\FunctionTok{,}
+      \DataTypeTok{"serviceName"}\FunctionTok{:} \StringTok{"nsmf{-}pdusession"}\FunctionTok{,}
+      \DataTypeTok{"versions"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"apiVersionInUri"}\FunctionTok{:} \StringTok{"v1"}\FunctionTok{,} \DataTypeTok{"apiFullVersion"}\FunctionTok{:} \StringTok{"1.2.0"}\FunctionTok{\}}\OtherTok{]}\FunctionTok{,}
+      \DataTypeTok{"scheme"}\FunctionTok{:} \StringTok{"https"}\FunctionTok{,}
+      \DataTypeTok{"nfServiceStatus"}\FunctionTok{:} \StringTok{"REGISTERED"}\FunctionTok{,}
+      \DataTypeTok{"capacity"}\FunctionTok{:} \DecValTok{100}\FunctionTok{,}
+      \DataTypeTok{"load"}\FunctionTok{:} \DecValTok{25}\FunctionTok{,}
+      \DataTypeTok{"priority"}\FunctionTok{:} \DecValTok{1}
+    \FunctionTok{\}}
+  \OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"smfInfo"}\FunctionTok{:} \FunctionTok{\{}
+    \DataTypeTok{"sNssaiSmfInfoList"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"sNssai"}\FunctionTok{:} \FunctionTok{\{}\DataTypeTok{"sst"}\FunctionTok{:} \DecValTok{1}\FunctionTok{\},} \DataTypeTok{"dnnSmfInfoList"}\FunctionTok{:} \OtherTok{[}\FunctionTok{\{}\DataTypeTok{"dnn"}\FunctionTok{:} \StringTok{"internet"}\FunctionTok{\}}\OtherTok{]}\FunctionTok{\}}\OtherTok{]}
+  \FunctionTok{\},}
+  \DataTypeTok{"capacity"}\FunctionTok{:} \DecValTok{100}\FunctionTok{,}
+  \DataTypeTok{"load"}\FunctionTok{:} \DecValTok{25}\FunctionTok{,}
+  \DataTypeTok{"locality"}\FunctionTok{:} \StringTok{"DC{-}East{-}1"}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{NF Profile contains:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{NF Type} — what kind of NF (AMF, SMF, PCF, etc.)
+\item
+  \textbf{Services offered} — list of service names and versions
+\item
+  \textbf{Capacity} — relative capacity for load balancing (0-65535)
+\item
+  \textbf{Load} — current load percentage (0-100)
+\item
+  \textbf{Locality} — geographic/\allowbreak{}data center location for proximity-based selection
+\item
+  \textbf{PLMN} — which networks this NF serves
+\item
+  \textbf{S-NSSAI} — which slices this NF supports
+\item
+  \textbf{IP/\allowbreak{}FQDN} — how to reach this NF
+\end{itemize}
+
+\CNsubsection{4.2}{NF Discovery}
+
+When an NF needs a service, it queries the NRF:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+GET /nnrf-disc/v1/nf-instances?target-nf-type=SMF&requester-nf-type=AMF&snssai={"sst":1,"sd":"000001"}&dnn=internet
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{Discovery query parameters:}\CNbr{}\textbar{} Parameter \textbar{} Purpose \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} \CNcode{target-nf-type} \textbar{} Type of NF being searched (mandatory) \textbar{}\CNbr{}\textbar{} \CNcode{requester-nf-type} \textbar{} Type of the requesting NF (mandatory) \textbar{}\CNbr{}\textbar{} \CNcode{service-names} \textbar{} Specific services needed \textbar{}\CNbr{}\textbar{} \CNcode{snssai} \textbar{} Network slice filter \textbar{}\CNbr{}\textbar{} \CNcode{dnn} \textbar{} Data Network Name filter \textbar{}\CNbr{}\textbar{} \CNcode{tai} \textbar{} Tracking area for locality \textbar{}\CNbr{}\textbar{} \CNcode{preferred-locality} \textbar{} Prefer NFs in same data center \textbar{}
+
+\textbf{NRF returns:} Ranked list of matching NF instances with endpoints and load information.
+
+\CNsubsection{4.3}{NF Status Notification}
+
+NFs can \textbf{subscribe} to NRF for status events:
+
+\begin{itemize}
+\tightlist
+\item
+  NF registered /\allowbreak{} deregistered
+\item
+  NF profile changed (load, capacity)
+\item
+  NF service status changed
+\end{itemize}
+
+This enables:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{AMF} to be notified when new SMFs become available
+\item
+  \textbf{Load balancers} to update routing when NF load changes
+\item
+  \textbf{Fault detection} when NF heartbeat expires
+\end{itemize}
+
+\CNkeepfig{m18-nrf-discovery}{3}
+
+\CNsubsection{}{NF Discovery Flow Diagram}
+
+\CNfigure{m18-nrf-discovery}{NF registration, discovery and subscription through the NRF}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{Service Discovery and Communication Flow}
+
+\CNchained\CNsubsection{5.1}{Direct Communication}
+
+In the \textbf{direct model}, NF-A communicates directly with NF-B after discovery:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+1. NF-A → NRF: "Find me an SMF for slice 1, DNN internet"
+2. NRF → NF-A: "Here are 3 SMFs: SMF-1 (load=20%), SMF-2 (load=45%), SMF-3 (load=80%)"
+3. NF-A selects SMF-1 (lowest load)
+4. NF-A → SMF-1: Direct service request
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{Advantages:} Low latency (no intermediate hop), simple\CNbr{}\textbf{Disadvantages:} NF-A must handle load balancing, retries, failover logic
+
+\CNkeepfig{m18-scp}{5}
+
+\CNsubsection{5.2}{Indirect Communication via SCP}
+
+The \textbf{Service Communication Proxy (SCP)} acts as an intermediary:
+
+\CNfigure{m18-scp}{Indirect communication through the SCP}
+
+\textbf{SCP provides:}
+
+\begin{itemize}
+\tightlist
+\item
+  Delegated discovery (SCP queries NRF on behalf of NF-A)
+\item
+  Load balancing across NF-B instances
+\item
+  Message routing and topology hiding
+\item
+  Retry and failover logic
+\item
+  Monitoring and observability
+\item
+  Connection pooling
+\end{itemize}
+
+\textbf{Communication Models (3GPP TS 23.501):}\CNbr{}\textbar{} Model \textbar{} Discovery \textbar{} Routing \textbar{}\CNbr{}\textbar{}—\textbar{}—\textbar{}—\textbar{}\CNbr{}\textbar{} Model A \textbar{} NF-A via NRF \textbar{} Direct NF-A \ensuremath{\to} NF-B \textbar{}\CNbr{}\textbar{} Model B \textbar{} NF-A via NRF \textbar{} Via SCP (NF-A \ensuremath{\to} SCP \ensuremath{\to} NF-B) \textbar{}\CNbr{}\textbar{} Model C \textbar{} Delegated to SCP \textbar{} Via SCP (NF-A \ensuremath{\to} SCP \ensuremath{\to} NF-B) \textbar{}\CNbr{}\textbar{} Model D \textbar{} Delegated to SCP \textbar{} Direct NF-A \ensuremath{\to} NF-B \textbar{}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m18-sbi-stack}{8}
+
+\CNsection{6}{SBI Protocol Stack}
+
+\CNchained\CNsubsection{}{Complete Protocol Stack}
+
+\CNfigure{m18-sbi-stack}{SBI protocol stack}
+
+\CNsubsection{}{OAuth 2.0 for NF Authorization}
+
+Before NF-A can call NF-B’s service, it must obtain an \textbf{access token} from the NRF:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+1. NF-A → NRF: POST /oauth2/token
+   {
+     "grant_type": "client_credentials",
+     "nfInstanceId": "{NF-A ID}",
+     "nfType": "AMF",
+     "targetNfType": "SMF",
+     "scope": "nsmf-pdusession"
+   }
+   
+2. NRF → NF-A: Access Token (JWT)
+   {
+     "access_token": "eyJ...",
+     "token_type": "Bearer",
+     "expires_in": 3600,
+     "scope": "nsmf-pdusession"
+   }
+
+3. NF-A → NF-B: Service Request + Authorization: Bearer eyJ...
+4. NF-B validates the token (signature, expiry, scope)
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m18-epc-vs-sba}{8}
+
+\CNsection{7}{Comparison: EPC Interfaces vs 5G SBA}
+
+\CNchained\CNsubsection{}{EPC vs SBA Comparison Diagram}
+
+\CNfigure{m18-epc-vs-sba}{Point-to-point EPC interfaces versus the SBA bus}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Detailed Comparison Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{4G EPC} & \CNth{5G SBA} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Architecture} & Point-to-point reference points & Service-based interfaces on common bus \\
+\textbf{Protocols} & Diameter, GTP-C, S1AP (multiple) & HTTP/\allowbreak{}2 + JSON (unified) \\
+\textbf{Coupling} & Tight — each pair has unique interface & Loose — common framework for all \\
+\textbf{Adding new NF} & Define new interfaces to all peers & Register services with NRF \\
+\textbf{Discovery} & Static configuration & Dynamic via NRF \\
+\textbf{Scaling} & Scale entire monolithic element & Scale individual NF services independently \\
+\textbf{Deployment} & Hardware appliances /\allowbreak{} VMs & Cloud-native containers (Kubernetes) \\
+\textbf{State} & Stateful network elements & Stateless NFs (externalized state) \\
+\textbf{Redundancy} & Active-standby pairs & Horizontal scaling + NRF re-selection \\
+\textbf{Load balancing} & DNS-based or static & NRF-based (capacity, load, locality) \\
+\textbf{Authorization} & Hop-by-hop TLS & End-to-end OAuth 2.0 tokens \\
+\textbf{API definition} & 3GPP-specific ASN.1/\allowbreak{}XML & OpenAPI 3.0 (industry standard) \\
+\textbf{Extensibility} & New release = new interfaces & New services registered dynamically \\
+\textbf{Vendor ecosystem} & Telecom-specific vendors & Cloud/\allowbreak{}IT vendors can participate \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{Functional Mapping: EPC \ensuremath{\to} 5G}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{EPC Element} & \CNth{5G Equivalent} & \CNth{Key Difference} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MME & AMF + SMF & Separated access/\allowbreak{}mobility from session mgmt \\
+S-GW + P-GW & UPF & Simplified to single user plane element \\
+HSS & UDM + AUSF & Separated data storage from authentication \\
+PCRF & PCF & Same role, now on SBI \\
+— (new) & NRF & Service registry (no EPC equivalent!) \\
+— (new) & NSSF & Slice selection (no slicing in 4G) \\
+— (new) & NEF & Replaces SCEF with richer API exposure \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsection{}{Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Concept} & \CNth{Key Takeaway} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{SBA motivation} & EPC’s N\ensuremath{\times}(N-1)/\allowbreak{}2 interfaces don’t scale; SBA uses a common bus \\
+\textbf{Design principles} & HTTP/\allowbreak{}2, JSON, REST, microservices, stateless \\
+\textbf{NRF} & Heart of SBA — registration, discovery, authorization \\
+\textbf{Communication} & Direct (NF\ensuremath{\to}NF) or Indirect (via SCP) \\
+\textbf{Security} & mTLS + OAuth 2.0 tokens from NRF \\
+\textbf{Key difference} & EPC = static, rigid, monolithic; SBA = dynamic, flexible, cloud-native \\
+\end{longtable}
+}
+
+\CNboxsection{Review Questions}
+
+\begin{CNbox}[unbreakable]{q}{Review Questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Calculate how many unique interfaces are needed for 8 EPC elements. How does SBA solve this?
+\item
+  Why was HTTP/\allowbreak{}2 chosen over HTTP/\allowbreak{}1.1 for SBI?
+\item
+  What information is included in an NF Profile during NRF registration?
+\item
+  Why is the UPF not connected to the SBI bus?
+\item
+  Compare SCP communication Models B and C — when would you use each?
+\item
+  How does OAuth 2.0 work in the 5G SBA context? What role does NRF play?
+\item
+  An operator wants to add a new Analytics NF (NWDAF). Compare the effort in EPC vs SBA architecture.
+\item
+  Why is NRF considered the ``single most critical'' component of SBA?
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{References}
+
+\begin{itemize}
+\tightlist
+\item
+  3GPP TS 23.501 — System Architecture for the 5G System (Stage 2)
+\item
+  3GPP TS 23.502 — Procedures for the 5G System (Stage 2)
+\item
+  3GPP TS 29.510 — NRF Services (Stage 3)
+\item
+  3GPP TS 29.500 — Technical Realization of Service-Based Architecture
+\item
+  3GPP TS 33.501 — Security Architecture and Procedures for 5G System
+\end{itemize}

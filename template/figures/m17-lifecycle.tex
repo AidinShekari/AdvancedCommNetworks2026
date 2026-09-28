@@ -1,0 +1,10 @@
+% Module 17 — life cycle of a 3GPP release
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \t/\d/\st [count=\k from 0] in {{\CNL{Study phase}{مرحله مطالعه}}/{(TR \CNL{out}{منتشر می‌شود})}/CNbox,
+   {\CNL{Work item approval}{تصویب قلم کاری}}/{(\CNL{TS work begins}{کار روی \lr{TS} آغاز می‌شود})}/CNran,
+   {\CNL{Functional freeze}{انجماد عملکردی}}/{(\CNL{feature complete}{ویژگی‌ها کامل})}/CNcp,
+   {\CNL{ASN.1 / protocol freeze}{انجماد \lr{ASN.1} / پروتکل}}/{(\CNL{encoding/protocol final}{کدگذاری/پروتکل نهایی})}/CNhl,
+   {\CNL{Maintenance phase}{مرحله نگهداری}}/{(\CNL{CRs only}{فقط \lr{CR}ها})}/CNok}{
+  \node[\st, text width=2.35cm, minimum height=1.55cm] (p\k) at ({\k*3.15},0) {\textbf{\t}\\{\scriptsize \d}};}
+\foreach \a/\b in {0/1,1/2,2/3,3/4}{\draw[CNlink, ->, line width=1.1pt] (p\a) -- (p\b);}
+\end{tikzpicture}

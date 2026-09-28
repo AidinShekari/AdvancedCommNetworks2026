@@ -1,0 +1,788 @@
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{1}{چرا \lr{\mbox{Diameter}} معرفی شد}
+
+\CNchained\CNsubsection{}{محدودیت‌های \lr{\mbox{RADIUS}}}
+
+\lr{\mbox{RADIUS}} (سرویس کاربر شماره‌گیری از راه دور احراز هویت) در دهه 1990 برای دسترسی شماره‌گیری طراحی شد. با تحول شبکه‌ها به‌سمت \lr{3G/\allowbreak{}4G}، \lr{\mbox{RADIUS}} نمی‌توانست نیازمندی‌های مدرن را برآورده کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5789}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4211}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{محدودیت} & \CNth{تأثیر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{انتقال \lr{\mbox{UDP}} (غیرقابل اعتماد)} & پیام‌ها می‌توانند بی‌صدا گم شوند؛ بدون بازارسال داخلی \\
+\textbf{بدون پیام‌های با شروع سرور} & سرور نمی‌تواند تغییرات سیاست را ارسال کند یا کاربران را فعالانه قطع کند \\
+\textbf{فضای محدود \lr{\mbox{AVP}}} & فیلد نوع صفت 8 بیتی = حداکثر 255 نوع صفت \\
+\textbf{بدون \lr{\mbox{ACK}} در لایه کاربرد} & نمی‌توان تحویل پیام را در سطح کاربرد تأیید کرد \\
+\textbf{مدل امنیتی ضعیف} & فقط راز مشترک + \lr{\mbox{MD5}}؛ بدون \lr{\mbox{TLS}} گام-به-گام داخلی \\
+\textbf{بدون مذاکره قابلیت} & همتاها نمی‌توانند ویژگی‌های پشتیبانی‌شده را کشف کنند \\
+\textbf{فقط کارخواه-کارساز} & بدون همتا-به-همتا؛ بدون معماری عامل/\allowbreak{}رله \\
+\end{longtable}
+}
+
+\CNsubsection{}{پاسخ \lr{\mbox{Diameter}}}
+
+\lr{\mbox{Diameter}} (نام آن به معنای «دو برابر \lr{\mbox{RADIUS}}») در \lr{\mbox{\textbf{\lr{\mbox{RFC 6733}}}}} برای رفع تمام این محدودیت‌ها تعریف شد:
+
+\begin{itemize}
+\tightlist
+\item
+  انتقال قابل اعتماد \lr{(TCP/\allowbreak{}SCTP)}
+\item
+  پیام‌های با شروع سرور (مدل ارسال)
+\item
+  فضای کد \lr{\mbox{AVP 32}} بیتی (بیش از 4 میلیارد نوع صفت)
+\item
+  تبادل قابلیت و مدیریت خطای داخلی
+\item
+  معماری عامل برای مسیریابی مقیاس‌پذیر
+\item
+  پشتیبانی بومی \lr{TLS/\allowbreak{}DTLS}
+\end{itemize}
+
+\begin{CNquote}
+
+\lr{\mbox{\CNwarn{}}} \textbf{مفهوم کلیدی}: \lr{\mbox{Diameter}} فقط یک پروتکل \textbf{صفحه کنترل} است. سیگنالینگ را حمل می‌کند (احراز هویت، مجوزدهی، حسابداری، سیاست) \lr{—} هرگز ترافیک داده کاربر.
+
+\end{CNquote}
+
+\Needspace{28\baselineskip}
+
+\CNsection{2}{مقایسه \lr{\mbox{Diameter}} با \lr{\mbox{RADIUS}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2963}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3704}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{\lr{\mbox{RADIUS}}} & \CNth{\lr{\mbox{Diameter}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{RFC}}}}} & \lr{RFC 2865/\allowbreak{}2866} & \lr{\mbox{RFC 6733}} \\
+\textbf{انتقال} & \lr{\mbox{UDP}} (غیرقابل اعتماد) & \lr{TCP/\allowbreak{}SCTP} (قابل اعتماد) \\
+\textbf{پورت} & \lr{1812/\allowbreak{}1813} & 3868 \\
+\textbf{اتصال} & در هر درخواست & اتصالات همتای پایدار \\
+\textbf{جهت} & فقط کارخواه\ensuremath{\leftarrow}کارساز & همتا-به-همتا (هر دو می‌توانند آغاز کنند) \\
+\textbf{فضای کد \lr{\mbox{AVP}}} & 8 بیتی (حداکثر 255) & 32 بیتی (بیش از 4 میلیارد) \\
+\textbf{امنیت} & راز مشترک + \lr{\mbox{MD5}} & \lr{TLS/\allowbreak{}DTLS}، \lr{\mbox{IPsec}} \\
+\textbf{حداکثر اندازه پیام} & 4096 بایت & \lr{\mbox{16~MB}} (طول 24 بیتی) \\
+\textbf{تغییر مسیر} & وابسته به کاربرد & داخلی (تشخیص در سطح انتقال) \\
+\textbf{مذاکره قابلیت} & ندارد & تبادل \lr{CER/\allowbreak{}CEA} \\
+\textbf{با شروع سرور} & خیر & بله (مثلاً \lr{\mbox{RAR}}، \lr{\mbox{ASR}}) \\
+\textbf{پشتیبانی عامل} & محدود (پروکسی) & رله، پروکسی، تغییر مسیر، ترجمه \\
+\textbf{حسابداری} & فقط به‌روزرسانی‌های موقت & بلادرنگ با تحویل تضمین‌شده \\
+\textbf{\lr{\mbox{AVP}}های سازنده} & محدود & پشتیبانی بومی شناسه سازنده \\
+\textbf{مورد استفاده در} & \lr{\mbox{Wi-Fi}}، \lr{\mbox{VPN}}، \lr{\mbox{ISP}} & هسته \lr{LTE/\allowbreak{}4G}، \lr{\mbox{IMS}}، \lr{\mbox{VoLTE}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{18\baselineskip}
+
+\CNsection{3}{معماری \lr{\mbox{Diameter}}}
+
+\CNchained\CNsubsection{3.1}{گره‌های \lr{\mbox{Diameter}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6471}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3529}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع گره} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{کارخواه \lr{\mbox{Diameter}}} & درخواست‌ها را تولید می‌کند (مثلاً \lr{\mbox{MME}}، \lr{\mbox{P-GW}}) \\
+\textbf{کارساز \lr{\mbox{Diameter}}} & درخواست‌ها را پردازش و پاسخ‌ها را بازمی‌گرداند (مثلاً \lr{\mbox{HSS}}، \lr{\mbox{PCRF}}، \lr{\mbox{OCS}}) \\
+\textbf{عامل \lr{\mbox{Diameter}}} & واسطه‌ای که پیام‌ها را مسیریابی/\allowbreak{}پردازش می‌کند \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{انواع عامل}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4118}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5882}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عامل} & \CNth{عملکرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{رله} & پیام‌ها را بر اساس \lr{\mbox{realm}} مسیریابی می‌کند؛ \lr{\mbox{AVP}}ها را تغییر \textbf{نمی‌دهد} \\
+\textbf{پروکسی} & پیام‌ها را مسیریابی \textbf{و} ممکن است \lr{\mbox{AVP}}ها را تغییر دهد (اجرای سیاست) \\
+\textbf{تغییر مسیر} & اطلاعات مسیریابی را به فرستنده بازمی‌گرداند (ارسال نمی‌کند) \\
+\textbf{ترجمه} & بین \lr{\mbox{Diameter}} و سایر پروتکل‌ها ترجمه می‌کند (مثلاً \lr{RADIUS\ensuremath{\leftrightarrow}Diameter}) \\
+\end{longtable}
+}
+
+\CNsubsection{3.2}{اتصالات همتا}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{انتقال}: \lr{\mbox{TCP}} (پیش‌فرض) یا \lr{\mbox{SCTP}} (ترجیحی برای چند-میزبانی)
+\item
+  \textbf{پورت}: 3868 (متن ساده) یا \lr{5868 (TLS)}
+\item
+  \textbf{پایدار}: اتصال برقرار می‌ماند؛ با نگهبان \lr{(DWR/\allowbreak{}DWA)} پایش می‌شود
+\item
+  \textbf{همتا-به-همتا}: هر دو نقطه انتهایی می‌توانند پیام آغاز کنند
+\item
+  \textbf{تبادل قابلیت}: \lr{CER/\allowbreak{}CEA} باید پیش از پیام‌های کاربرد موفق شود
+\end{itemize}
+
+\CNsubsection{3.3}{مسیریابی مبتنی بر \lr{\mbox{Realm}}}
+
+\lr{\mbox{Diameter}} پیام‌ها را بر اساس \textbf{\lr{\mbox{realm}}ها} (شناسه‌های شبه-دامنه) مسیریابی می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  هر گره با یک \lr{\mbox{realm}} پیکربندی می‌شود (مثلاً \lr{\CNcode{epc.}\allowbreak{}\CNcode{mnc001.}\allowbreak{}\CNcode{mcc208.}\allowbreak{}\CNcode{3gppnetwork.}\allowbreak{}\CNcode{org}})
+\item
+  جدول مسیریابی \lr{\mbox{realm}}ها را به اتصالات همتا نگاشت می‌کند
+\item
+  عامل‌ها از \lr{AVP \CNcode{Destination-Realm}} برای تعیین گام بعدی استفاده می‌کنند
+\item
+  سناریوهای چند-اپراتوری و رومینگ را ممکن می‌سازد
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m10-header}{8}
+
+\CNsection{4}{ساختار پیام \lr{\mbox{Diameter}}}
+
+\CNchained\CNsubsection{4.1}{سرآیند پیام (20 بایت ثابت)}
+
+\CNfigure{m10-header}{سرآیند پیام \lr{\mbox{Diameter}} (۲۰ بایت)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2692}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فیلد} & \CNth{اندازه} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{Version}}}}} & 1 بایت & همیشه \lr{\mbox{\CNcode{1}}} \\
+\lr{\textbf{\lr{Message Length}}} & 3 بایت & طول کل پیام شامل سرآیند \\
+\lr{\mbox{\textbf{\lr{\mbox{Flags}}}}} & 1 بایت & \lr{\mbox{R=Request}}، \lr{\mbox{P=Proxiable}}، \lr{\mbox{E=Error}}، \lr{\mbox{T=Retransmit}} \\
+\lr{\textbf{\lr{Command Code}}} & 3 بایت & فرمان را شناسایی می‌کند (مثلاً \lr{318 = AIR}) \\
+\lr{\textbf{\lr{Application-ID}}} & 4 بایت & کاربرد را شناسایی می‌کند (مثلاً \lr{16777251 = S6a}) \\
+\lr{\textbf{\lr{Hop-by-Hop ID}}} & 4 بایت & درخواست/\allowbreak{}پاسخ را در یک گام تطبیق می‌دهد (یکتا در هر اتصال) \\
+\lr{\textbf{\lr{End-to-End ID}}} & 4 بایت & درخواست/\allowbreak{}پاسخ را سرتاسری تطبیق می‌دهد (یکتا در سطح جهانی) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{پرچم‌های سرآیند}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پرچم} & \CNth{بیت} & \CNth{معنا} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{R}}}}} & 0 & درخواست (1) یا پاسخ (0) \\
+\lr{\mbox{\textbf{\lr{\mbox{P}}}}} & 1 & قابل پروکسی \lr{—} می‌تواند رله/\allowbreak{}پروکسی شود \\
+\lr{\mbox{\textbf{\lr{\mbox{E}}}}} & 2 & خطا \lr{—} پاسخ شامل خطا است \\
+\lr{\mbox{\textbf{\lr{\mbox{T}}}}} & 3 & پیام دوباره ارسال‌شده \\
+\end{longtable}
+}
+
+\CNkeepfig{m10-avp}{3}
+
+\CNsubsection{4.2}{ساختار \lr{\mbox{AVP}} (جفت صفت-مقدار)}
+
+\CNfigure{m10-avp}{ساختار \lr{\mbox{AVP}} در \lr{\mbox{Diameter}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فیلد} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{AVP Code}}}}} & شناسه 32 بیتی برای صفت \\
+\textbf{پرچم \lr{\mbox{V}}} & مختص سازنده \lr{—} فیلد \lr{Vendor-ID} وجود دارد \\
+\textbf{پرچم \lr{\mbox{M}}} & اجباری \lr{—} گیرنده \textbf{باید} این \lr{\mbox{AVP}} را بفهمد \\
+\textbf{پرچم \lr{\mbox{P}}} & محافظت‌شده \lr{—} رمزنگاری سرتاسری لازم است \\
+\lr{\textbf{\lr{AVP Length}}} & طول کل \lr{\mbox{AVP}} (سرآیند + داده) \\
+\lr{\textbf{\lr{Vendor-ID}}} & شناسه سازنده 32 بیتی (فقط اگر \lr{\mbox{V=1}} باشد وجود دارد) \\
+\lr{\mbox{\textbf{\lr{\mbox{Data}}}}} & مقدار واقعی (انواع مختلف) \\
+\end{longtable}
+}
+
+\Needspace{21\baselineskip}
+
+\CNsubsubsection{انواع داده \lr{\mbox{AVP}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{توضیح} & \CNth{مثال} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{OctetString}} & بایت‌های خام & \lr{\mbox{RAND}}، \lr{\mbox{AUTN}} \\
+\lr{\mbox{UTF8String}} & رشته متنی & \lr{User-Name} \\
+\lr{\mbox{Unsigned32}} & عدد صحیح بدون علامت 32 بیتی & \lr{Result-Code} \\
+\lr{\mbox{Unsigned64}} & عدد صحیح بدون علامت 64 بیتی & شمارنده‌های حسابداری \\
+\lr{\mbox{Address}} & آدرس \lr{IP (IPv4/\allowbreak{}IPv6)} & \lr{Framed-IP-Address} \\
+\lr{\mbox{Time}} & ثانیه از 1 ژانویه 1900 & \lr{Event-Timestamp} \\
+\lr{\mbox{Enumerated}} & مقادیر صحیح نام‌دار & \lr{Auth-Session-State} \\
+\lr{\mbox{Grouped}} & شامل \lr{\mbox{AVP}}های دیگر & \lr{Subscription-Data} \\
+\end{longtable}
+}
+
+\CNsubsection{4.3}{\lr{\mbox{AVP}}های گروهی}
+
+\lr{\mbox{AVP}}های گروهی شامل \lr{\mbox{AVP}}های دیگر به‌عنوان داده خود هستند \lr{—} که ساختارهای سلسله‌مراتبی را ممکن می‌سازند:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Subscription-Data (Grouped AVP)
+├── MSISDN: +33612345678
+├── Access-Restriction-Data: 0x00000000
+├── Subscriber-Status: SERVICE_GRANTED
+├── APN-Configuration-Profile (Grouped)
+│   ├── Context-Identifier: 1
+│   ├── APN-Configuration (Grouped)
+│   │   ├── Service-Selection: "internet"
+│   │   ├── PDN-Type: IPv4v6
+│   │   └── EPS-Subscribed-QoS-Profile (Grouped)
+│   │       ├── QoS-Class-Identifier: 9
+│   │       └── Allocation-Retention-Priority (Grouped)
+│   │           ├── Priority-Level: 15
+│   │           └── Pre-emption-Capability: NOT_PRE_EMPT
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{جدول \lr{\mbox{AVP}}های کلیدی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نام \lr{\mbox{AVP}}} & \CNth{کد} & \CNth{نوع} & \CNth{مورد استفاده در} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Session-Id} & 263 & \lr{\mbox{UTF8String}} & تمام پیام‌ها \\
+\lr{Origin-Host} & 264 & \lr{DiameterIdentity} & تمام پیام‌ها \\
+\lr{Origin-Realm} & 296 & \lr{DiameterIdentity} & تمام پیام‌ها \\
+\lr{Destination-Host} & 293 & \lr{DiameterIdentity} & درخواست‌ها \\
+\lr{Destination-Realm} & 283 & \lr{DiameterIdentity} & درخواست‌ها \\
+\lr{Result-Code} & 268 & \lr{\mbox{Unsigned32}} & تمام پاسخ‌ها \\
+\lr{Auth-Session-State} & 277 & \lr{\mbox{Enumerated}} & پیام‌های احراز هویت \\
+\lr{User-Name} & 1 & \lr{\mbox{UTF8String}} & شناسایی کاربر \lr{\mbox{(IMSI)}} \\
+\lr{Visited-PLMN-Id} & 1407 & \lr{\mbox{OctetString}} & پیام‌های \lr{\mbox{S6a}} \\
+\lr{Subscription-Data} & 1400 & \lr{\mbox{Grouped}} & \lr{S6a (ULA)} \\
+\lr{Charging-Rule-Install} & 1001 & \lr{\mbox{Grouped}} & \lr{\mbox{Gx (CCA)}} \\
+\lr{CC-Request-Type} & 416 & \lr{\mbox{Enumerated}} & \lr{Gy/\allowbreak{}Gx (CCR)} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{فرمان‌های \lr{\mbox{Diameter}}}
+
+\CNchained\CNsubsection{5.1}{قاعده نام‌گذاری}
+
+تمام فرمان‌های \lr{\mbox{Diameter}} از این الگو پیروی می‌کنند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{درخواست}: \lr{\CNcode{X-Request}} (مخفف \lr{\mbox{\CNcode{XR}}}) \lr{—} پرچم \lr{\mbox{R = 1}}
+\item
+  \textbf{پاسخ}: \lr{\mbox{\CNcode{X-Answer}}} (مخفف \lr{\mbox{\CNcode{XA}}}) \lr{—} پرچم \lr{\mbox{R = 0}}
+\end{itemize}
+
+هر درخواست \textbf{باید} دقیقاً یک پاسخ دریافت کند.
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{5.2}{فرمان‌های پروتکل پایه \lr{(Application-ID = 0)}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2368}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1579}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3684}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2368}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فرمان} & \CNth{کد} & \CNth{مخفف} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Capabilities-Exchange-Request} & 257 & \lr{\mbox{CER}} & آغاز اتصال همتا، تبادل قابلیت‌ها \\
+\lr{Capabilities-Exchange-Answer} & 257 & \lr{\mbox{CEA}} & پاسخ با قابلیت‌های خود \\
+\lr{Device-Watchdog-Request} & 280 & \lr{\mbox{DWR}} & ضربان \lr{—} تأیید زنده‌بودن همتا \\
+\lr{Device-Watchdog-Answer} & 280 & \lr{\mbox{DWA}} & تأیید وضعیت زنده \\
+\lr{Disconnect-Peer-Request} & 282 & \lr{\mbox{DPR}} & بستن صحیح اتصال \\
+\lr{Disconnect-Peer-Answer} & 282 & \lr{\mbox{DPA}} & تأیید قطع اتصال \\
+\lr{Accounting-Request} & 271 & \lr{\mbox{ACR}} & ارسال رکورد حسابداری \\
+\lr{Accounting-Answer} & 271 & \lr{\mbox{ACA}} & تأیید رکورد حسابداری \\
+\lr{Abort-Session-Request} & 274 & \lr{\mbox{ASR}} & سرور درخواست خاتمه نشست می‌کند \\
+\lr{Abort-Session-Answer} & 274 & \lr{\mbox{ASA}} & کارخواه خاتمه را تأیید می‌کند \\
+\lr{Re-Auth-Request} & 258 & \lr{\mbox{RAR}} & سرور درخواست احراز هویت مجدد می‌کند \\
+\lr{Re-Auth-Answer} & 258 & \lr{\mbox{RAA}} & کارخواه احراز هویت مجدد را تأیید می‌کند \\
+\end{longtable}
+}
+
+\CNkeepfig{m10-peer-lifecycle}{3}
+
+\CNsubsection{5.3}{جریان تبادل پیام \lr{\mbox{Diameter}}}
+
+\CNfigure{m10-peer-lifecycle}{چرخه حیات همتای \lr{\mbox{Diameter}}: تبادل قابلیت، پیام‌های کاربرد، دیده‌بان و قطع اتصال}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{5.4}{کدهای نتیجه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4286}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کد} & \CNth{نام} & \CNth{معنا} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2001 & \lr{DIAMETER\_\allowbreak{}SUCCESS} & درخواست با موفقیت پردازش شد \\
+\lr{\mbox{3xxx}} & خطاهای پروتکل & تغییر مسیر، عدم توانایی تحویل \\
+\lr{\mbox{4xxx}} & شکست‌های گذرا & تلاش مجدد ممکن است موفق شود (مثلاً \lr{4012 = DIAMETER\_\allowbreak{}UNABLE\_\allowbreak{}TO\_\allowbreak{}COMPLY}) \\
+\lr{\mbox{5xxx}} & شکست‌های دایمی & تلاش مجدد نکن (مثلاً \lr{5001 = DIAMETER\_\allowbreak{}AVP\_\allowbreak{}UNSUPPORTED}) \\
+5004 & \lr{DIAMETER\_\allowbreak{}UNKNOWN\_\allowbreak{}SESSION\_\allowbreak{}ID} & نشست یافت نشد \\
+5012 & \lr{DIAMETER\_\allowbreak{}UNABLE\_\allowbreak{}TO\_\allowbreak{}COMPLY} & شکست دایمی عمومی \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{6}{کاربردهای مهم \lr{\mbox{Diameter}} در \lr{\mbox{LTE}}}
+
+\CNchained\CNsubsection{6.1}{مرور واسط‌های \lr{\mbox{Diameter}} در \lr{\mbox{LTE}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{نقاط انتهایی} & \CNth{\lr{Application-ID}} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{S6a}}}}} & \lr{MME \ensuremath{\leftrightarrow} HSS} & 16777251 & احراز هویت، داده مشترک \\
+\lr{\mbox{\textbf{\lr{\mbox{Gx}}}}} & \lr{PCRF \ensuremath{\leftrightarrow} P-GW} & 16777238 & کنترل سیاست و صورت‌حساب \lr{\mbox{(PCC)}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Gy}}}}} & \lr{OCS \ensuremath{\leftrightarrow} P-GW} & \lr{4 (Credit-Control)} & صورت‌حساب آنلاین \\
+\lr{\mbox{\textbf{\lr{\mbox{Rx}}}}} & \lr{AF \ensuremath{\leftrightarrow} PCRF} & 16777236 & مجوزدهی \lr{\mbox{QoS}}/\allowbreak{}رسانه در سطح کاربرد \\
+\lr{\mbox{\textbf{\lr{\mbox{S13}}}}} & \lr{MME \ensuremath{\leftrightarrow} EIR} & 16777252 & بررسی هویت تجهیزات \lr{\mbox{(IMEI)}} \\
+\lr{\mbox{\textbf{\lr{\mbox{S6d}}}}} & \lr{SGSN \ensuremath{\leftrightarrow} HSS} & 16777251 & احراز هویت \lr{2G/\allowbreak{}3G} از طریق \lr{\mbox{Diameter}} \\
+\lr{\mbox{\textbf{\lr{\mbox{SWx}}}}} & \lr{3GPP AAA \ensuremath{\leftrightarrow} HSS} & 16777265 & احراز هویت دسترسی غیر-\lr{\mbox{3GPP}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Sh}}}}} & \lr{\mbox{AS \ensuremath{\leftrightarrow} HSS}} & 16777217 & داده خدمات \lr{\mbox{IMS}} \\
+\end{longtable}
+}
+
+\Needspace{27\baselineskip}
+
+\CNsubsection{6.2}{واسط \lr{S6a (MME \ensuremath{\leftrightarrow} HSS)}}
+
+حیاتی‌ترین واسط \lr{\mbox{Diameter}} در \lr{\mbox{LTE}} \lr{—} تمام احراز هویت مشترک و مدیریت داده را مدیریت می‌کند.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فرمان} & \CNth{کد} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Authentication-Information-Request} & 318 & \lr{\mbox{MME\ensuremath{\to}HSS}} & درخواست بردارهای احراز هویت \\
+\lr{Authentication-Information-Answer} & 318 & \lr{\mbox{HSS\ensuremath{\to}MME}} & بازگرداندن بردارهای احراز هویت (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{XRES}}، \lr{\mbox{\ensuremath{K_{\mathrm{ASME}}}}}) \\
+\lr{Update-Location-Request} & 316 & \lr{\mbox{MME\ensuremath{\to}HSS}} & ثبت مکان \lr{\mbox{UE}} در \lr{\mbox{MME}} \\
+\lr{Update-Location-Answer} & 316 & \lr{\mbox{HSS\ensuremath{\to}MME}} & بازگرداندن داده اشتراک \\
+\lr{Purge-UE-Request} & 321 & \lr{\mbox{MME\ensuremath{\to}HSS}} & اطلاع به \lr{\mbox{HSS}} که داده \lr{\mbox{UE}} پاک شده است \\
+\lr{Purge-UE-Answer} & 321 & \lr{\mbox{HSS\ensuremath{\to}MME}} & تأیید پاک‌سازی \\
+\lr{Cancel-Location-Request} & 317 & \lr{\mbox{HSS\ensuremath{\to}MME}} & \lr{\mbox{HSS}} به \lr{\mbox{MME}} می‌گوید \lr{\mbox{UE}} را جدا کند \\
+\lr{Cancel-Location-Answer} & 317 & \lr{\mbox{MME\ensuremath{\to}HSS}} & تأیید لغو \\
+\lr{Notify-Request} & 323 & \lr{\mbox{MME\ensuremath{\to}HSS}} & اطلاع‌دادن اطلاعات پایانه به \lr{\mbox{HSS}} \\
+\lr{Notify-Answer} & 323 & \lr{\mbox{HSS\ensuremath{\to}MME}} & تأیید اعلان \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{6.3}{واسط \lr{Gx (PCRF \ensuremath{\leftrightarrow} P-GW)}}
+
+\textbf{کنترل سیاست و صورت‌حساب \lr{\mbox{(PCC)}}} را کنترل می‌کند \lr{—} تصمیم می‌گیرد چه قواعد \lr{\mbox{QoS}} و صورت‌حساب بر هر نشست اعمال شود.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فرمان} & \CNth{کد} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{CC-Request (Initial)} & 272 & \lr{P-GW\ensuremath{\to}PCRF} & نشست جدید \lr{\mbox{IP-CAN}} \lr{—} درخواست قواعد \lr{\mbox{PCC}} \\
+\lr{CC-Answer (Initial)} & 272 & \lr{PCRF\ensuremath{\to}P-GW} & نصب قواعد \lr{\mbox{PCC}} (\lr{\mbox{QoS}}، دروازه‌ها، صورت‌حساب) \\
+\lr{CC-Request (Update)} & 272 & \lr{P-GW\ensuremath{\to}PCRF} & اصلاح نشست (مثلاً حامل جدید) \\
+\lr{CC-Answer (Update)} & 272 & \lr{PCRF\ensuremath{\to}P-GW} & قواعد \lr{\mbox{PCC}} به‌روزشده \\
+\lr{CC-Request (Termination)} & 272 & \lr{P-GW\ensuremath{\to}PCRF} & نشست پایان یافت \\
+\lr{CC-Answer (Termination)} & 272 & \lr{PCRF\ensuremath{\to}P-GW} & تأیید خاتمه \\
+\lr{Re-Auth-Request} & 258 & \lr{PCRF\ensuremath{\to}P-GW} & ارسال قواعد \lr{\mbox{PCC}} جدید در میانه نشست \\
+\lr{Re-Auth-Answer} & 258 & \lr{P-GW\ensuremath{\to}PCRF} & تأیید به‌روزرسانی قاعده \\
+\end{longtable}
+}
+
+\textbf{مقادیر \lr{CC-Request-Type}}: \lr{\mbox{INITIAL(1)}}، \lr{\mbox{UPDATE(2)}}، \lr{\mbox{TERMINATION(3)}}، \lr{\mbox{EVENT(4)}}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{6.4}{واسط \lr{Gy (OCS \ensuremath{\leftrightarrow} P-GW)}}
+
+\textbf{صورت‌حساب آنلاین} را مدیریت می‌کند \lr{—} رزرو و کسر اعتبار به‌صورت بلادرنگ.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فرمان} & \CNth{کد} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{CC-Request (Initial)} & 272 & \lr{\mbox{P-GW\ensuremath{\to}OCS}} & رزرو سهمیه اعتبار اولیه \\
+\lr{CC-Answer (Initial)} & 272 & \lr{\mbox{OCS\ensuremath{\to}P-GW}} & اعطای اعتبار (واحد/\allowbreak{}زمان/\allowbreak{}حجم) \\
+\lr{CC-Request (Update)} & 272 & \lr{\mbox{P-GW\ensuremath{\to}OCS}} & گزارش مصرف، درخواست اعتبار بیشتر \\
+\lr{CC-Answer (Update)} & 272 & \lr{\mbox{OCS\ensuremath{\to}P-GW}} & اعطای اعتبار اضافی یا رد \\
+\lr{CC-Request (Termination)} & 272 & \lr{\mbox{P-GW\ensuremath{\to}OCS}} & گزارش نهایی، آزادسازی رزرو \\
+\lr{CC-Answer (Termination)} & 272 & \lr{\mbox{OCS\ensuremath{\to}P-GW}} & تأیید نهایی \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\lr{\mbox{Gx}} در برابر \lr{\mbox{Gy}}: \lr{\mbox{\textbf{\lr{\mbox{Gx}}}}} = قواعد سیاست (چه \lr{\mbox{QoS}} اعمال شود)، \lr{\mbox{\textbf{\lr{\mbox{Gy}}}}} = صورت‌حساب (چقدر اعتبار باقی است)
+
+\end{CNquote}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{6.5}{واسط \lr{Rx (AF \ensuremath{\leftrightarrow} PCRF)}}
+
+به توابع کاربرد (مثلاً \lr{\mbox{P-CSCF}} در \lr{\mbox{IMS}} برای \lr{\mbox{VoLTE}}) امکان می‌دهد \lr{\mbox{QoS}} مشخصی از شبکه درخواست کنند.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فرمان} & \CNth{کد} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{AA-Request} & 265 & \lr{\mbox{AF\ensuremath{\to}PCRF}} & درخواست مجوز رسانه (اطلاعات \lr{\mbox{SDP}}) \\
+\lr{AA-Answer} & 265 & \lr{\mbox{PCRF\ensuremath{\to}AF}} & تأیید مجوز نشست رسانه \\
+\lr{Session-Termination-Request} & 275 & \lr{\mbox{AF\ensuremath{\to}PCRF}} & نشست رسانه پایان یافت \\
+\lr{Session-Termination-Answer} & 275 & \lr{\mbox{PCRF\ensuremath{\to}AF}} & تأیید \\
+\lr{Re-Auth-Request} & 258 & \lr{\mbox{PCRF\ensuremath{\to}AF}} & اطلاع به \lr{\mbox{AF}} درباره تغییرات حامل \\
+\lr{Abort-Session-Request} & 274 & \lr{\mbox{PCRF\ensuremath{\to}AF}} & \lr{\mbox{PCRF}} نشست رسانه را لغو می‌کند \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{6.6}{واسط \lr{S13 (MME \ensuremath{\leftrightarrow} EIR)}}
+
+بررسی هویت تجهیزات \lr{—} \lr{\mbox{IMEI}} را در برابر فهرست سیاه/\allowbreak{}خاکستری اعتبارسنجی می‌کند.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فرمان} & \CNth{کد} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{ME-Identity-Check-Request} & 324 & \lr{\mbox{MME\ensuremath{\to}EIR}} & ارسال \lr{\mbox{IMEI}} برای اعتبارسنجی \\
+\lr{ME-Identity-Check-Answer} & 324 & \lr{\mbox{EIR\ensuremath{\to}MME}} & بازگرداندن وضعیت تجهیزات (سفید/\allowbreak{}خاکستری/\allowbreak{}سیاه) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{\lr{\mbox{Diameter}} در احراز هویت \lr{\mbox{LTE}} (بررسی عمیق \lr{\mbox{S6a}})}
+
+\CNchained\CNsubsection{7.1}{جریان احراز هویت}
+
+وقتی \lr{\mbox{UE}} به شبکه \lr{\mbox{LTE}} متصل می‌شود، \lr{\mbox{MME}} از \lr{\mbox{S6a}} برای موارد زیر استفاده می‌کند:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{دریافت بردارهای احراز هویت} از \lr{HSS (AIR/\allowbreak{}AIA)}
+\item
+  \textbf{ثبت مکان \lr{\mbox{UE}}} در \lr{MME (ULR/\allowbreak{}ULA)}
+\end{enumerate}
+
+\CNfigure{m10-s6a-attach-1}{پیام‌های \lr{\mbox{S6a}} و \lr{\mbox{AVP}}های آن‌ها در هنگام اتصال\CNpart{1}{2}}
+
+\CNfigure{m10-s6a-attach-2}{پیام‌های \lr{\mbox{S6a}} و \lr{\mbox{AVP}}های آن‌ها در هنگام اتصال\CNpart{2}{2}}
+
+\CNsubsection{7.2}{جزییات \lr{AIR (Authentication-Information-Request)}}
+
+\textbf{هدف}: \lr{\mbox{MME}} بردارهای احراز هویت تازه از \lr{\mbox{HSS}} درخواست می‌کند
+
+\textbf{\lr{\mbox{AVP}}های کلیدی در \lr{\mbox{AIR}}}:\CNbr{}\lr{\mbox{\textbar{} AVP \textbar{}}} هدف \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—–\textbar{}———\textbar{}}}\CNbr{}\lr{\textbar{} User-Name \textbar{} IMSI} مشترک \lr{\textbar{}}\CNbr{}\lr{\textbar{} Visited-PLMN-Id \textbar{} MCC+MNC} سه بایتی شبکه بازدیدشده \lr{\textbar{}}\CNbr{}\lr{\textbar{} Requested-EUTRAN-Authentication-Info \textbar{}} مشخص می‌کند چند بردار لازم است \lr{\textbar{}}\CNbr{}\lr{\textbar{} Number-Of-Requested-Vectors \textbar{}} معمولاً \CNnum{1-5} \lr{\textbar{}}\CNbr{}\lr{\textbar{} Re-Synchronization-Info \textbar{}} اگر احراز هویت قبلی شکست خورده باشد ارسال می‌شود (همگام‌سازی \lr{\mbox{SQN}}) \lr{\textbar{}}
+
+\CNsubsection{7.3}{جزییات \lr{AIA (Authentication-Information-Answer)}}
+
+\textbf{هدف}: \lr{\mbox{HSS}} بردارهای احراز هویت \lr{\mbox{E-UTRAN}} را بازمی‌گرداند
+
+\textbf{\lr{\mbox{AVP}}های کلیدی در \lr{\mbox{AIA}}}:\CNbr{}\lr{\mbox{\textbar{} AVP \textbar{}}} هدف \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—–\textbar{}———\textbar{}}}\CNbr{}\lr{\textbar{} Result-Code \textbar{} 2001}=موفق، \lr{\mbox{5001}}=کاربر ناشناخته \lr{\textbar{}}\CNbr{}\lr{\textbar{} Authentication-Info (Grouped) \textbar{}} شامل بردارها \lr{\textbar{}}\CNbr{}\lr{\textbar{} E-UTRAN-Vector (Grouped) \textbar{}} یک بردار احراز هویت کامل \lr{\textbar{}}\CNbr{}\lr{\textbar{} ├─ RAND \textbar{}} چالش تصادفی 128 بیتی \lr{\textbar{}}\CNbr{}\lr{\textbar{} ├─ XRES \textbar{}} پاسخ مورد انتظار (برای تأیید) \lr{\textbar{}}\CNbr{}\lr{\textbar{} ├─ AUTN \textbar{}} نشانه احراز هویت (برای احراز هویت متقابل) \lr{\textbar{}}\CNbr{}\lr{\textbar{} └─ \ensuremath{K_{\mathrm{ASME}}} \textbar{}} کلید برای مشتق‌سازی امنیت \lr{NAS/\allowbreak{}AS} \lr{\textbar{}}
+
+\CNsubsection{7.4}{جزییات \lr{ULR (Update-Location-Request)}}
+
+\textbf{هدف}: \lr{\mbox{MME}} خود را به‌عنوان \lr{\mbox{MME}} خدمات‌دهنده برای این مشترک ثبت می‌کند
+
+\textbf{\lr{\mbox{AVP}}های کلیدی در \lr{\mbox{ULR}}}:\CNbr{}\lr{\mbox{\textbar{} AVP \textbar{}}} هدف \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—–\textbar{}———\textbar{}}}\CNbr{}\lr{\textbar{} User-Name \textbar{} IMSI \textbar{}}\CNbr{}\lr{\textbar{} Visited-PLMN-Id \textbar{}} هویت شبکه خدمات‌دهنده \lr{\textbar{}}\CNbr{}\lr{\textbar{} RAT-Type \textbar{} E-UTRAN (LTE) \textbar{}}\CNbr{}\lr{\textbar{} ULR-Flags \textbar{}} نشان‌دهنده اتصال اولیه در برابر \lr{\mbox{TAU}} \lr{\textbar{}}
+
+\CNsubsection{7.5}{جزییات \lr{ULA (Update-Location-Answer)}}
+
+\textbf{هدف}: \lr{\mbox{HSS}} تأیید می‌کند و پروفایل اشتراک کامل را بازمی‌گرداند
+
+\textbf{\lr{\mbox{AVP}}های کلیدی در \lr{\mbox{ULA}}}:\CNbr{}\lr{\mbox{\textbar{} AVP \textbar{}}} هدف \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}—–\textbar{}———\textbar{}}}\CNbr{}\lr{\textbar{} Result-Code \textbar{}} موفقیت یا شکست \lr{\textbar{}}\CNbr{}\lr{\textbar{} Subscription-Data (Grouped) \textbar{}} پروفایل کامل مشترک \lr{\textbar{}}\CNbr{}\lr{\textbar{} ├─ MSISDN \textbar{}} شماره تلفن \lr{\textbar{}}\CNbr{}\lr{\textbar{} ├─ AMBR \textbar{}} حداکثر نرخ بیت تجمیعی \lr{(UL + DL)} \lr{\textbar{}}\CNbr{}\lr{\textbar{} ├─ APN-Configuration-Profile \textbar{}} تمام \lr{\mbox{APN}}های پیکربندی‌شده \lr{\textbar{}}\CNbr{}\lr{\textbar{} └─ Subscriber-Status \textbar{} SERVICE\_\allowbreak{}GRANTED} یا \lr{\mbox{BARRED}} \lr{\textbar{}}
+
+\CNkeepfig{m10-gx-rx-1}{5}
+
+\CNsection{}{جریان سیاست \lr{\mbox{Gx}} (\lr{CCR-I/\allowbreak{}CCA-I} در شروع نشست)}
+
+\CNfigure{m10-gx-rx-1}{جریان سیاست \lr{\mbox{Gx}} و \lr{\mbox{Rx}} برای حامل پیش‌فرض و تماس \lr{\mbox{VoLTE}}\CNpart{1}{2}}
+
+\CNfigure{m10-gx-rx-2}{جریان سیاست \lr{\mbox{Gx}} و \lr{\mbox{Rx}} برای حامل پیش‌فرض و تماس \lr{\mbox{VoLTE}}\CNpart{2}{2}}
+
+\Needspace{14\baselineskip}
+
+\Needspace{30\baselineskip}
+
+\CNsection{8}{\lr{\mbox{Diameter}} در برابر \lr{HTTP/\allowbreak{}2} در \lr{\mbox{5G}}}
+
+\CNchained\CNsubsection{8.1}{گذار}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1818}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3409}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4773}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{4G (Diameter)}} & \CNth{\lr{5G (HTTP/\allowbreak{}2 + JSON)}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{پروتکل} & \lr{\mbox{Diameter}} (دودویی، \lr{TCP/\allowbreak{}SCTP}) & \lr{HTTP/\allowbreak{}2} (سرآیندهای متنی، قاب‌بندی دودویی) \\
+\textbf{قالب داده} & \lr{\mbox{AVP}}ها (\lr{\mbox{TLV}} دودویی) & \lr{\mbox{JSON}} (قابل خواندن توسط انسان) \\
+\textbf{معماری} & همتاهای نقطه-به-نقطه & واسط خدمات‌محور \lr{\mbox{(SBI)}} \\
+\textbf{کشف} & پیکربندی ایستای همتا /\allowbreak{} \lr{\mbox{DRA}} & \lr{\mbox{NRF}} (تابع مخزن شبکه) \\
+\textbf{نام‌گذاری واسط} & \lr{\mbox{S6a}}، \lr{\mbox{Gx}}، \lr{\mbox{Gy}}، \lr{\mbox{Rx}} & \lr{\mbox{Nausf}}، \lr{\mbox{Npcf}}، \lr{\mbox{Nchf}}، \lr{\mbox{Naf}} \\
+\textbf{وضعیت نشست} & حالت‌دار (\lr{session-id} نگهداری می‌شود) & بدون حالت (شبیه \lr{\mbox{REST}}) \\
+\textbf{مدل اتصال} & اتصالات همتای پایدار & درخواست/\allowbreak{}پاسخ \lr{\mbox{HTTP}} \\
+\textbf{مقیاس‌پذیری} & عمودی (همتاهای بزرگ‌تر) & افقی (بومی-ابر، \lr{\mbox{k8s}}) \\
+\textbf{مسیریابی پیام} & عوامل مسیریابی \lr{Diameter (DRA)} & \lr{Service Mesh} /\allowbreak{} دروازه \lr{\mbox{API}} \\
+\textbf{استاندارد} & \lr{IETF RFC 6733 + 3GPP} & \lr{3GPP + IETF HTTP/\allowbreak{}2 (RFC 7540)} \\
+\end{longtable}
+}
+
+\CNsubsection{8.2}{چرا \lr{\mbox{5G}} از \lr{\mbox{Diameter}} فاصله گرفت}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{ابزار ساده‌تر}: \lr{HTTP/\allowbreak{}2 + JSON} از زیرساخت وب موجود استفاده می‌کند (پروکسی‌ها، متعادل‌کننده‌های بار، دروازه‌های \lr{\mbox{API}})
+\item
+  \textbf{بومی-وب}: \lr{\mbox{API}}های \lr{\mbox{REST}} استاندارد \lr{—} آسان‌تر برای توسعه‌دهندگان، ابزارهای اشکال‌زدایی استاندارد
+\item
+  \textbf{طراحی بدون حالت}: میکروسرویس‌های بومی-ابر، مقیاس‌پذیری افقی، هماهنگ‌سازی \lr{\mbox{Kubernetes}} را ممکن می‌سازد
+\item
+  \textbf{سازگار با ابر}: بدون اتصالات همتای پایدار؛ توازن بار استاندارد کار می‌کند
+\item
+  \textbf{انعطاف‌پذیری}: تکامل طرح \lr{\mbox{JSON}} آسان‌تر از تعاریف \lr{\mbox{AVP}} دودویی است
+\item
+  \textbf{اکوسیستم}: اکوسیستم عظیم \lr{HTTP/\allowbreak{}2} (کتابخانه‌ها، ابزارها، پایش)
+\end{enumerate}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{8.3}{توابع معادل \lr{\mbox{Diameter}} در \lr{\mbox{5G}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط \lr{\mbox{Diameter}} در \lr{\mbox{4G}}} & \CNth{معادل \lr{\mbox{SBI}} در \lr{\mbox{5G}}} & \CNth{\lr{\mbox{NF}}های درگیر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{S6a (MME\ensuremath{\leftrightarrow}HSS)} & \lr{\mbox{Nudm}} (خدمات \lr{\mbox{UDM}}) & \lr{AMF \ensuremath{\leftrightarrow} UDM/\allowbreak{}AUSF} \\
+\lr{Gx (PCRF\ensuremath{\leftrightarrow}P-GW)} & \lr{\mbox{Npcf}} (خدمات سیاست) & \lr{SMF \ensuremath{\leftrightarrow} PCF} \\
+\lr{Gy (OCS\ensuremath{\leftrightarrow}P-GW)} & \lr{\mbox{Nchf}} (خدمات صورت‌حساب) & \lr{SMF \ensuremath{\leftrightarrow} CHF} \\
+\lr{Rx (AF\ensuremath{\leftrightarrow}PCRF)} & \lr{Npcf + Naf} & \lr{\mbox{AF \ensuremath{\leftrightarrow} PCF}} (از طریق \lr{\mbox{NEF}}) \\
+\end{longtable}
+}
+
+\CNsubsection{8.4}{مهاجرت: هم‌کنش‌گری \lr{4G/\allowbreak{}5G}}
+
+\lr{\mbox{Diameter}} از بین نرفته است \lr{—} در مرزهای هم‌کنش‌گری باقی می‌ماند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{عامل مسیریابی \lr{Diameter (DRA)}} همچنان در \lr{\mbox{4G}} استفاده می‌شود
+\item
+  \textbf{تابع هم‌کنش‌گری \lr{\mbox{(IWF)}}} در مرز \lr{4G/\allowbreak{}5G} بین \lr{Diameter \ensuremath{\leftrightarrow} HTTP/\allowbreak{}2} ترجمه می‌کند
+\item
+  \lr{\mbox{5G NSA}} (غیرمستقل) همچنان از \lr{\mbox{EPC}} با \lr{\mbox{Diameter}} استفاده می‌کند
+\item
+  مهاجرت کامل به \lr{\mbox{5G SA}} (مستقل) \lr{\mbox{Diameter}} را درون هسته حذف می‌کند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m10-planes}{8}
+
+\CNsection{9}{\lr{\mbox{Diameter}} = فقط صفحه کنترل}
+
+\CNchained\CNsubsection{}{تمایز حیاتی}
+
+\CNfigure{m10-planes}{\lr{\mbox{Diameter}} فقط به صفحه کنترل تعلق دارد}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{Diameter}} چه چیزی را کنترل می‌کند در برابر چه چیزی داده را حمل می‌کند}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{پروتکل} & \CNth{صفحه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+احراز هویت مشترک & \lr{Diameter S6a} & کنترل \\
+مجوزدهی سیاست \lr{\mbox{QoS}} & \lr{Diameter Gx} & کنترل \\
+بررسی موجودی اعتبار & \lr{Diameter Gy} & کنترل \\
+مجوزدهی نشست رسانه & \lr{Diameter Rx} & کنترل \\
+اعتبارسنجی \lr{\mbox{IMEI}} & \lr{Diameter S13} & کنترل \\
+حمل ویدیوی \lr{\mbox{YouTube}} & \lr{\mbox{GTP-U}} & کاربر \\
+حمل صدای \lr{VoLTE (RTP)} & \lr{\mbox{GTP-U}} & کاربر \\
+حمل وب‌گردی & \lr{\mbox{GTP-U}} & کاربر \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\lr{\mbox{\CNstar{}}} \textbf{به یاد داشته باشید}: \lr{\mbox{Diameter}} به شبکه می‌گوید \emph{چه کاری انجام دهد}. \lr{\mbox{GTP-U}} \emph{آن را انجام می‌دهد}.
+
+\end{CNquote}
+
+\Needspace{26\baselineskip}
+
+\CNsection{}{خلاصه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{موضوع} & \CNth{نکته کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+چرا \lr{\mbox{Diameter}} & \lr{\mbox{RADIUS}} برای هسته موبایل بیش از حد محدود بود (بدون انتقال قابل اعتماد، بدون ارسال، \lr{\mbox{AVP}}های محدود) \\
+معماری & مدل کارخواه/\allowbreak{}کارساز/\allowbreak{}عامل با همتاهای پایدار \lr{TCP/\allowbreak{}SCTP} و مسیریابی \lr{\mbox{realm}} \\
+پیام‌ها & سرآیند 20 بایتی + \lr{\mbox{AVP}}ها؛ هر درخواست دقیقاً یک پاسخ می‌گیرد \\
+\lr{\mbox{S6a}} & احراز هویت \lr{(AIR/\allowbreak{}AIA)} + به‌روزرسانی مکان \lr{(ULR/\allowbreak{}ULA)} \lr{—} ستون فقرات تحرک \lr{\mbox{LTE}} \\
+\lr{\mbox{Gx}} & کنترل سیاست \lr{—} نصب قواعد \lr{\mbox{QoS}} روی حامل‌ها \lr{(CCR/\allowbreak{}CCA + RAR/\allowbreak{}RAA)} \\
+\lr{\mbox{Gy}} & صورت‌حساب آنلاین \lr{—} کنترل اعتبار بلادرنگ \\
+\lr{\mbox{Rx}} & \lr{\mbox{QoS}} کاربرد \lr{—} مجوزدهی رسانه \lr{IMS/\allowbreak{}VoLTE} \\
+گذار \lr{\mbox{5G}} & \lr{HTTP/\allowbreak{}2 + JSON} جایگزین \lr{\mbox{Diameter}} می‌شود؛ \lr{\mbox{IWF}} برای هم‌کنش‌گری \\
+دامنه & فقط صفحه کنترل \lr{—} هرگز داده کاربر را حمل نمی‌کند \\
+\end{longtable}
+}
+
+\emph{ماژول 10 \lr{—} پروتکل \lr{\mbox{Diameter}} \lr{\textbar{}} شبکه‌های ارتباطی پیشرفته}

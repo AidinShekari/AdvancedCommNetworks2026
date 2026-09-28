@@ -1,0 +1,20 @@
+% Module 4 — cell reselection with hysteresis and Treselection
+\begin{tikzpicture}
+\begin{axis}[CNplot, width=12.5cm, height=6cm, xmin=0, xmax=10.5, ymin=0, ymax=6.4,
+  xtick={2.9,3.9,8}, xticklabels={$t_1$,$t_2$,$t_3$}, ytick=\empty,
+  xlabel={\CNL{time}{زمان}}, ylabel={\CNL{signal strength}{قدرت سیگنال}}]
+  \addplot[CNcyan, domain=0:10.3] {3};
+  \addplot[CNcyan, dashed, line width=0.9pt, domain=0:10.3] {4};
+  \addplot[CNsig, domain=0:10.3, samples=120, smooth] {1+4.5/(1+exp(-(x-3.5)))};
+  \fill[CNamber, opacity=0.14] (axis cs:3.9,0) rectangle (axis cs:8,6.1);
+  \draw[CNinkL, dashed] (axis cs:2.9,0) -- (axis cs:2.9,3);
+  \draw[CNinkL, dashed] (axis cs:3.9,0) -- (axis cs:3.9,6.1);
+  \draw[CNinkL, dashed] (axis cs:8,0) -- (axis cs:8,6.1);
+  \draw[CNamber!80!black, <->, line width=0.9pt] (axis cs:3.9,5.85) -- node[above, font=\sffamily\scriptsize] {Treselection} (axis cs:8,5.85);
+  \draw[decorate, decoration={brace, amplitude=3pt}, CNinkL] (axis cs:1.2,3) -- node[left=3pt, font=\sffamily\scriptsize] {QHyst} (axis cs:1.2,4);
+  \node[font=\sffamily\scriptsize, text=CNcyanD, anchor=west] at (axis cs:10.3,3) {\CNL{serving cell}{سلول خدمت‌دهنده}};
+  \node[font=\sffamily\scriptsize, text=CNcyanD, anchor=west] at (axis cs:10.3,4) {\CNL{serving + QHyst}{خدمت‌دهنده + \lr{QHyst}}};
+  \node[font=\sffamily\scriptsize, text=CNsig, anchor=west] at (axis cs:10.3,5.45) {\CNL{neighbour}{همسایه}};
+  \node[CNnote, anchor=south] at (axis cs:8,6.15) {\CNL{reselect at $t_3$}{انتخاب مجدد در $t_3$}};
+\end{axis}
+\end{tikzpicture}

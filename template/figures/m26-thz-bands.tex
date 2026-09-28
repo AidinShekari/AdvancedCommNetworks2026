@@ -1,0 +1,12 @@
+% Module 26 — sub-THz and THz bands
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNlink, ->, line width=1.2pt] (0,0) -- (13.2,0);
+\foreach \x/\t in {0.4/100 GHz, 4.4/300 GHz, 8.4/1 THz, 12.4/3 THz}{\draw[CNinkL] (\x,-0.12) -- (\x,0.12); \node[CNtiny, anchor=north] at (\x,-0.15) {\t};}
+\draw[CNcyan, line width=5pt] (0.4,0.45) -- node[above=3pt, font=\sffamily\small\bfseries, text=CNcyanD] {Sub-THz} (4.4,0.45);
+\draw[CNsig, line width=5pt] (4.4,0.45) -- node[above=3pt, font=\sffamily\small\bfseries, text=CNsig] {THz} (12.4,0.45);
+\foreach \r/\t/\a/\b/\c in {0/{\CNL{available BW}{پهنای باند موجود}}/{10--50 GHz}/{100+ GHz}/{\CNL{massive}{بسیار زیاد}},
+    1/{\CNL{range}{برد}}/{100--500 m}/{10--100 m}/{$<$ 10 m},
+    2/{\CNL{application}{کاربرد}}/{\CNL{access/backhaul}{دسترسی/بک‌هال}}/{\CNL{short range}{برد کوتاه}}/{\CNL{nano-networks}{نانوشبکه‌ها}}}{
+  \node[CNtiny, anchor=east, font=\sffamily\scriptsize\bfseries] at (-0.1,{-1.1-\r*0.55}) {\t};
+  \node[CNtiny] at (2.4,{-1.1-\r*0.55}) {\a}; \node[CNtiny] at (6.4,{-1.1-\r*0.55}) {\b}; \node[CNtiny] at (10.4,{-1.1-\r*0.55}) {\c};}
+\end{tikzpicture}

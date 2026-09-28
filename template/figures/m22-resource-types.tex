@@ -1,0 +1,17 @@
+% Module 22 — the three 5G QoS resource types
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNok, text width=5.6cm, minimum height=3.3cm, anchor=north west] at (0,0) {};
+\node[font=\sffamily\small\bfseries, text=CNgreen, anchor=north west] at (0.2,-0.12) {GBR};
+\fill[CNgreen!70] (0.3,-0.75) rectangle (2.4,-1.0); \node[CNtiny, anchor=west] at (2.5,-0.87) {GFBR};
+\fill[CNgreen!25] (0.3,-1.15) rectangle (2.4,-1.4); \node[CNtiny, anchor=west] at (2.5,-1.27) {(\CNL{up to MFBR}{تا \lr{MFBR}})};
+\node[CNtiny, anchor=north west, align=left, text width=5.3cm] at (0.2,-1.6) {\CNL{Resources reserved}{منابع رزرو می‌شوند}\\\CNL{Admission control}{کنترل پذیرش}\\\CNL{Voice, video call}{صدا، تماس تصویری}};
+\node[CNbox, text width=5.6cm, minimum height=3.3cm, anchor=north west] at (6.4,0) {};
+\node[font=\sffamily\small\bfseries, text=CNinkL, anchor=north west] at (6.6,-0.12) {Non-GBR};
+\draw[CNinkL, line width=1pt, decorate, decoration={snake, amplitude=1.2pt, segment length=6pt}] (6.7,-0.87) -- (8.8,-0.87);
+\node[CNtiny, anchor=west] at (8.9,-0.87) {\CNL{no rate guarantee}{بدون تضمین نرخ}};
+\node[CNtiny, anchor=north west, align=left, text width=5.3cm] at (6.6,-1.3) {\CNL{Limited by AMBR}{محدود به \lr{AMBR}}\\\CNL{Best effort, no admission control}{بهترین تلاش، بدون کنترل پذیرش}\\\CNL{Web, email, apps}{وب، ایمیل، برنامه‌ها}};
+\node[CNbad, text width=12cm, minimum height=2.9cm, anchor=north west] at (0,-3.7) {};
+\node[font=\sffamily\small\bfseries, text=CNred, anchor=north west] at (0.2,-3.82) {Delay-Critical GBR (DC-GBR)};
+\fill[CNred!70] (0.3,-4.5) rectangle (2.4,-4.75); \node[CNtiny, anchor=west] at (2.5,-4.62) {GFBR + \CNL{bounded delay}{تأخیر کران‌دار}};
+\node[CNtiny, anchor=north west, align=left, text width=11.6cm] at (0.2,-5.0) {\CNL{Additional parameter: Maximum Data Burst Volume (MDBV) — guarantees the delay bound for a burst}{پارامتر اضافی: بیشینه حجم انفجار داده (\lr{MDBV}) — کران تأخیر یک انفجار را تضمین می‌کند}\\\CNL{URLLC: industrial automation, V2X, remote surgery, AR/VR}{\lr{URLLC}: اتوماسیون صنعتی، \lr{V2X}، جراحی از راه دور، \lr{AR/VR}}};
+\end{tikzpicture}

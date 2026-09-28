@@ -1,0 +1,5 @@
+% Module 23 — GTP-U encapsulation at every hop
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\CNpacket{0}{Outer IP header/3.0/CNsig!12, UDP (port 2152)/3.0/CNsig!7, GTP-U header/2.8/CNsig!18, {\CNL{Inner IP packet (user data)}{بسته \lr{IP} درونی (داده کاربر)}}/5.4/CNcyan!14}
+\draw[decorate, decoration={brace, amplitude=4pt, mirror}, CNmuted] (0,-0.55) -- node[below=5pt, CNtiny] {\CNL{tunnel headers added at each hop}{سرآیندهای تونل که در هر گام افزوده می‌شوند}} (8.8,-0.55);
+\end{tikzpicture}

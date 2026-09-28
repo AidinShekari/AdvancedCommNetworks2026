@@ -1,0 +1,13 @@
+% Module 14 — 5G releases 15 to 18 and their headline features
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNlink, ->, line width=1.2pt] (-1.9,0) -- (14.2,0);
+\foreach \r/\yr/\nick/\items [count=\k from 0] in {
+   15/2018/{First 5G}/{NSA/SA\\eMBB\\\CNL{Basic NR PHY}{\lr{PHY} پایه \lr{NR}}\\5GC SBA\\\CNL{Network slicing}{برش‌دهی شبکه}},
+   16/2020/{5G Phase 2}/{\CNL{URLLC enhancements}{بهبودهای \lr{URLLC}}\\V2X (NR)\\NR-U\\IIoT\\\CNL{Positioning}{مکان‌یابی}\\IAB},
+   17/2022/{5G Expansion}/{RedCap\\NTN (\CNL{satellite}{ماهواره})\\FR2-2\\MBS\\\CNL{Sidelink enh.}{بهبود \lr{Sidelink}}\\\CNL{Coverage enh.}{بهبود پوشش}},
+   18/2024/{5G-Advanced}/{\CNL{AI/ML for NR}{\lr{AI/ML} برای \lr{NR}}\\\CNL{XR support}{پشتیبانی \lr{XR}}\\\CNL{Duplex evolution}{تحول دوطرفگی}\\\CNL{Energy saving}{صرفه‌جویی انرژی}\\\CNL{MIMO evolution}{تحول \lr{MIMO}}}}{
+  \fill[CNsig] ({\k*3.9},0) circle (0.12);
+  \node[CNdark, minimum width=3.3cm, anchor=south] (h\k) at ({\k*3.9},0.35) {Rel-\r{} (\yr)};
+  \node[font=\sffamily\small\itshape, text=CNsig, anchor=south] at (h\k.north) {“\nick”};
+  \node[CNbox, text width=3.1cm, align=left, anchor=north, font=\sffamily\scriptsize] at ({\k*3.9},-0.4) {\items};}
+\end{tikzpicture}

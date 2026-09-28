@@ -1,0 +1,25 @@
+% Module 23 — a downlink packet at each step from the Internet to the UE
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, H/.style={draw=CNinkL!75, line width=0.6pt, text width=4.6cm, align=left, font=\sffamily\scriptsize, inner sep=3pt, anchor=north}]
+\foreach \x/\yy/\t in {0/0/{\CNL{Step 1: Internet $\rightarrow$ UPF (N6)}{گام ۱: اینترنت $\rightarrow$ \lr{UPF (N6)}}}, 8/0/{\CNL{Step 2: UPF $\rightarrow$ gNB (N3, GTP-U)}{گام ۲: \lr{UPF} $\rightarrow$ \lr{gNB} (\lr{N3}، \lr{GTP-U})}}, 0/-7.4/{\CNL{Step 3: gNB $\rightarrow$ UE (radio)}{گام ۳: \lr{gNB} $\rightarrow$ \lr{UE} (رادیو)}}, 8/-7.4/{\CNL{Step 4: at the UE}{گام ۴: در \lr{UE}}}}{
+  \node[CNtitle, anchor=south, text width=4.9cm] at (\x,\yy+0.1) {\t};}
+% step 1
+\node[H, fill=CNcyan!14] (a1) at (0,0) {\textbf{IP header}\\Src: 93.184.216.34 (server)\\Dst: 10.0.0.1 (UE IP)};
+\node[H, fill=CNcyan!7] (a2) at (a1.south) {\textbf{TCP/UDP header}};
+\node[H, fill=white] (a3) at (a2.south) {\CNL{Application data (payload)}{داده کاربرد (محموله)}};
+% step 2
+\node[H, fill=CNsig!12] (b1) at (8,0) {\textbf{Outer IP header}\\Src: 192.168.100.1 (UPF N3 IP)\\Dst: 192.168.200.1 (gNB N3 IP)};
+\node[H, fill=CNsig!7] (b2) at (b1.south) {\textbf{UDP header} (Src: ephemeral, Dst: 2152)};
+\node[H, fill=CNsig!18] (b3) at (b2.south) {\textbf{GTP-U header}\\TEID: 0x00A1B2C3 (\CNL{assigned by the gNB}{تخصیص \lr{gNB}})\\Ext Hdr: PDU Session Container\\\hspace*{1em}QFI: 9 (QoS Flow ID)};
+\node[H, fill=CNcyan!14] (b4) at (b3.south) {\textbf{Inner IP header}\\Src: 93.184.216.34 (server)\\Dst: 10.0.0.1 (UE IP)};
+\node[H, fill=white] (b5) at (b4.south) {TCP/UDP + \CNL{application data}{داده کاربرد}};
+% step 3
+\node[H, fill=CNamber!18] (c1) at (0,-7.4) {\textbf{SDAP header} (QFI: 9)};
+\node[H, fill=CNamber!10] (c2) at (c1.south) {\textbf{PDCP header} (SN, \CNL{integrity info}{اطلاعات یکپارچگی})};
+\node[H, fill=CNcyan!14] (c3) at (c2.south) {\textbf{IP header}\\Src: 93.184.216.34\\Dst: 10.0.0.1};
+\node[H, fill=white] (c4) at (c3.south) {TCP/UDP + \CNL{application data}{داده کاربرد}};
+\node[CNtiny, anchor=north, text width=4.6cm] at ([yshift=-2pt]c4.south) {\CNL{RLC segmentation $\rightarrow$ MAC mux $\rightarrow$ PHY (radio transmission)}{قطعه‌بندی \lr{RLC} $\rightarrow$ تسهیم \lr{MAC} $\rightarrow$ \lr{PHY} (ارسال رادیویی)}};
+% step 4
+\node[H, fill=CNcyan!14] (d1) at (8,-7.4) {\textbf{IP header}\\Src: 93.184.216.34\\Dst: 10.0.0.1};
+\node[H, fill=white] (d2) at (d1.south) {TCP/UDP + \CNL{application data}{داده کاربرد}};
+\node[CNtiny, anchor=north, text width=4.6cm] at ([yshift=-2pt]d2.south) {\CNL{delivered to the application layer}{تحویل به لایه کاربرد}};
+\end{tikzpicture}

@@ -1,0 +1,26 @@
+% Module 13 — headers of a downlink packet on each segment of the EPS user plane
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, h/.style={draw=CNinkL!75, line width=0.6pt, minimum height=1.25cm, anchor=west, align=center, font=\sffamily\scriptsize, inner sep=2pt}]
+\newcommand{\seg}[2]{\node[CNtitle, anchor=west, font=\sffamily\small\bfseries] at (0,#1) {#2};}
+% segment 1
+\seg{0.55}{\CNL{Segment 1: Internet $\rightarrow$ P-GW (SGi)}{بخش ۱: اینترنت $\rightarrow$ \lr{P-GW (SGi)}}}
+\node[h, fill=CNcyan!12, minimum width=2.6cm] (a) at (0,-0.4) {\textbf{IP header}\\src=8.8.8.8\\dst=10.0.0.1};
+\node[h, fill=CNcyan!6, minimum width=1.4cm] (b) at (a.east) {\textbf{TCP}};
+\node[h, fill=white, minimum width=5.0cm] at (b.east) {\CNL{Application data}{داده کاربرد}};
+% segments 2 and 3
+\foreach \n/\y/\t/\src/\dst/\teid in {2/-2.4/{\CNL{Segment 2: P-GW $\rightarrow$ S-GW (S5/S8 GTP-U tunnel)}{بخش ۲: \lr{P-GW} $\rightarrow$ \lr{S-GW} (تونل \lr{GTP-U} روی \lr{S5/S8})}}/P-GW/S-GW/0xABCD,
+                                     3/-5.35/{\CNL{Segment 3: S-GW $\rightarrow$ eNB (S1-U GTP-U tunnel)}{بخش ۳: \lr{S-GW} $\rightarrow$ \lr{eNB} (تونل \lr{GTP-U} روی \lr{S1-U})}}/S-GW/eNB/0x1234}{
+  \seg{\y+0.95}{\t}
+  \node[h, fill=CNsig!10, minimum width=2.6cm] (o\n) at (0,\y) {\textbf{Outer IP}\\src=\src{} IP\\dst=\dst{} IP};
+  \node[h, fill=CNsig!6, minimum width=1.6cm] (u\n) at (o\n.east) {\textbf{UDP}\\dst=2152};
+  \node[h, fill=CNsig!16, minimum width=2.8cm] (g\n) at (u\n.east) {\textbf{GTP-U header}\\TEID=\teid\\Type=0xFF (TPDU)};
+  \node[h, fill=CNcyan!12, minimum width=2.6cm] (i\n) at (g\n.east) {\textbf{Inner IP}\\src=8.8.8.8\\dst=10.0.0.1};
+  \node[h, fill=CNcyan!6, minimum width=1.4cm] (t\n) at (i\n.east) {\textbf{TCP}};
+  \node[h, fill=white, minimum width=1.6cm] at (t\n.east) {Data};}
+% segment 4
+\seg{-7.35}{\CNL{Segment 4: eNB $\rightarrow$ UE (radio / air interface)}{بخش ۴: \lr{eNB} $\rightarrow$ \lr{UE} (رادیو / واسط هوایی)}}
+\node[h, fill=CNpaper, minimum width=1.3cm] (p) at (0,-8.3) {\textbf{PHY}};
+\node[h, fill=CNpaper, minimum width=1.3cm] (m) at (p.east) {\textbf{MAC}};
+\node[h, fill=CNpaper, minimum width=1.3cm] (r) at (m.east) {\textbf{RLC}};
+\node[h, fill=CNamber!18, minimum width=2.2cm] (d) at (r.east) {\textbf{PDCP}\\(\CNL{ciphered}{رمزشده})};
+\node[h, fill=CNcyan!12, minimum width=6.5cm] at (d.east) {\textbf{\CNL{Inner IP packet}{بسته \lr{IP} درونی}}\\(\CNL{original IP packet delivered to the UE}{بسته \lr{IP} اصلی که به \lr{UE} تحویل می‌شود})};
+\end{tikzpicture}

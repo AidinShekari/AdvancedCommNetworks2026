@@ -1,0 +1,10 @@
+% Module 10 — Diameter message header (20 bytes)
+\begin{tikzpicture}[CNfig]
+\CNbitruler
+\CNfield{0}{0}{8}{Version}{CNsig!10}\CNfield{0}{8}{24}{Message Length}{white}
+\foreach \f [count=\i from 0] in {R,P,E,T,r,r,r,r}{\CNfield{1}{\i}{1}{\f}{CNamber!20}}
+\CNfield{1}{8}{24}{Command Code}{CNsig!10}
+\CNfield{2}{0}{32}{Application-ID}{white}
+\CNfield{3}{0}{32}{Hop-by-Hop ID}{CNcyan!10}
+\CNfield{4}{0}{32}{End-to-End ID}{CNcyan!10}
+\end{tikzpicture}

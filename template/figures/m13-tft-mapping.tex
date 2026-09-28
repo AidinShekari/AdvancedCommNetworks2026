@@ -1,0 +1,24 @@
+% Module 13 — several bearers per PDN connection and how packets are mapped to them
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.4,-2.9) rectangle (14.2,0.95);
+\node[CNgrouplabel, font=\sffamily\small\bfseries, text=CNink, anchor=north west] at (-0.35,0.9) {\CNL{Multiple bearers per PDN connection}{چند حامل در هر اتصال \lr{PDN}}};
+\foreach \b/\t/\st [count=\k from 0] in {{Default Bearer (QCI 9)}/{\CNL{all traffic not matching any TFT}{همه ترافیکی که با هیچ \lr{TFT} تطبیق ندارد}}/CNbox,
+    {Dedicated Bearer 1 (QCI 1)}/{VoLTE: src port 1234, UDP}/CNup,
+    {Dedicated Bearer 2 (QCI 4)}/{Video: dst port 8080, TCP}/CNup}{
+  \node[\st, minimum width=4.6cm, anchor=west] (b\k) at (0.1,-\k*0.95) {\b};
+  \node[CNtiny, anchor=west, font=\sffamily\small] at (6.3,-\k*0.95) {$\leftarrow$ \t};}
+\begin{scope}[yshift=-4.1cm]
+\node[CNtitle, anchor=west] at (-0.2,0.55) {DL (\CNL{P-GW side}{سمت \lr{P-GW}})};
+\node[CNext, text width=2.6cm] (d1) at (1.3,-0.4) {\CNL{Internet packet arrives}{بسته اینترنت می‌رسد}};
+\node[CNcp, text width=2.6cm] (d2) at (5.0,-0.4) {\CNL{P-GW checks SDF filters}{\lr{P-GW} فیلترهای \lr{SDF} را بررسی می‌کند}};
+\node[CNhl, text width=2.6cm] (d3) at (8.7,-0.4) {\CNL{matches “VoLTE” $\rightarrow$}{تطبیق با «\lr{VoLTE}» $\rightarrow$}\\Dedicated Bearer 1};
+\node[CNup, text width=2.6cm] (d4) at (12.4,-0.4) {\CNL{GTP-U with Bearer 1's TEID}{\lr{GTP-U} با \lr{TEID} حامل ۱}};
+\draw[CNlink, ->] (d1) -- (d2); \draw[CNlink, ->] (d2) -- (d3); \draw[CNlink, ->] (d3) -- (d4);
+\node[CNtitle, anchor=west] at (-0.2,-1.75) {UL (\CNL{UE side}{سمت \lr{UE}})};
+\node[CNue, text width=2.6cm] (u1) at (1.3,-2.7) {\CNL{app sends a VoIP packet}{برنامه بسته \lr{VoIP} می‌فرستد}};
+\node[CNue, text width=2.6cm] (u2) at (5.0,-2.7) {\CNL{UE checks the UL TFT}{\lr{UE} فیلتر \lr{UL TFT} را بررسی می‌کند}};
+\node[CNhl, text width=2.6cm] (u3) at (8.7,-2.7) {\CNL{matches the}{تطبیق با فیلتر}\\Dedicated Bearer 1 \CNL{filter}{}};
+\node[CNran, text width=2.6cm] (u4) at (12.4,-2.7) {\CNL{sent on the DRB of Bearer 1}{ارسال روی \lr{DRB} حامل ۱}};
+\draw[CNlink, ->] (u1) -- (u2); \draw[CNlink, ->] (u2) -- (u3); \draw[CNlink, ->] (u3) -- (u4);
+\end{scope}
+\end{tikzpicture}

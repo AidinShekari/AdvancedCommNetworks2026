@@ -1,0 +1,393 @@
+این سند مفاهیم بنیادی را که به‌عنوان دانش قبلی فرض می‌شوند مرور می‌کند. از آن به‌عنوان یادآوری پیش از ورود به ماژول‌های درس استفاده کنید.
+
+\Needspace{21\baselineskip}
+
+\CNsection{1}{مرور مدل \lr{\mbox{OSI}} (با تمرکز بر مخابرات)}
+
+مدل 7-لایه \lr{\mbox{OSI}} چارچوب مرجع را فراهم می‌کند. در شبکه‌های موبایل/\allowbreak{}مخابرات، مرتبط‌ترین لایه‌ها عبارتند از:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{لایه} & \CNth{نام} & \CNth{ارتباط با مخابرات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \textbf{فیزیکی} & انتقال \lr{\mbox{RF}}، مدولاسیون، طراحی آنتن، کدگذاری کانال \\
+2 & \textbf{پیوند داده} & زمان‌بندی \lr{\mbox{MAC}}، \lr{ARQ/\allowbreak{}HARQ}، مدیریت منابع رادیویی \\
+3 & \textbf{شبکه} & مسیریابی \lr{\mbox{IP}}، تونل‌سازی \lr{\mbox{GTP}}، مدیریت تحرک \\
+4 & \textbf{انتقال} & \lr{TCP/\allowbreak{}UDP} برای تحویل سرتاسری، \lr{\mbox{SCTP}} در سیگنالینگ \\
+7 & \textbf{کاربرد} & \lr{IMS/\allowbreak{}SIP} برای صدا، \lr{HTTP/\allowbreak{}2} در واسط‌های \lr{\mbox{SBA}} در \lr{\mbox{5G}} \\
+\end{longtable}
+}
+
+\textbf{نکات کلیدی برای به خاطر سپردن:}
+
+\begin{itemize}
+\tightlist
+\item
+  لایه‌های \lr{\mbox{1–2}} جایی هستند که بیشتر نوآوری‌های مختص بی‌سیم رخ می‌دهد \lr{(PHY/\allowbreak{}MAC)}.
+\item
+  «صفحه کاربر» داده را حمل می‌کند (لایه \lr{\mbox{3}}+)، در حالی که «صفحه کنترل» سیگنالینگ را مدیریت می‌کند.
+\item
+  در \lr{\mbox{5G}}، پشته پروتکل تقسیم می‌شود: \lr{\mbox{CU}} (\lr{\mbox{PDCP}} و بالاتر) در برابر \lr{DU (RLC/\allowbreak{}MAC)} در برابر \lr{\mbox{RU (PHY)}}.
+\item
+  تونل‌های \lr{\mbox{GTP-U}} بسته‌های \lr{\mbox{IP}} کاربر را بین ایستگاه پایه و هسته کپسوله می‌کنند.
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{مفاهیم پایه \lr{\mbox{RF}}}
+
+\CNchained\CNsubsection{}{فرکانس و پهنای باند}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{فرکانس \lr{\mbox{(f)}}:} تعداد نوسان‌ها در ثانیه \lr{\mbox{(Hz)}}. باندهای موبایل از \lr{\mbox{700~MHz}} تا \lr{\mbox{100~GHz}} گسترده‌اند.
+\item
+  \textbf{طول‌موج:} \lr{$\lambda = c/f$}. فرکانس بالاتر \ensuremath{\leftarrow} طول‌موج کوتاه‌تر \ensuremath{\leftarrow} آنتن‌های کوچک‌تر اما تلفات مسیر بیشتر.
+\item
+  \textbf{پهنای باند \lr{\mbox{(BW)}}:} محدوده فرکانس‌هایی که یک سیگنال اشغال می‌کند. پهنای باند بیشتر \ensuremath{\leftarrow} نرخ داده بالاتر (شانون).
+\end{itemize}
+
+\CNsubsection{}{مدولاسیون}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{هدف:} نگاشت بیت‌های دیجیتال روی سیگنال‌های حامل آنالوگ.
+\item
+  \textbf{طرح‌های معمول:} \lr{\mbox{BPSK}}، \lr{\mbox{QPSK}}، \lr{\mbox{16-QAM}}، \lr{\mbox{64-QAM}}، \lr{\mbox{256-QAM}}.
+\item
+  مدولاسیون مرتبه بالاتر = بیت بیشتر در هر نماد اما نیازمند \lr{\mbox{SNR}} بهتر.
+\end{itemize}
+
+\CNsubsection{}{نسبت سیگنال به نویز \lr{\mbox{(SNR)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{$\mathrm{SNR} = P_{\mathrm{signal}}/P_{\mathrm{noise}}$} (خطی) یا \lr{$10\log_{10}(P_{\mathrm{signal}}/P_{\mathrm{noise}})$} بر حسب \lr{\mbox{dB}}.
+\item
+  ظرفیت شانون: \lr{$C = \mathrm{BW}\cdot\log_2(1+\mathrm{SNR})$} [بیت/\allowbreak{}ثانیه].
+\item
+  تعیین می‌کند کدام طرح مدولاسیون و کدگذاری \lr{\mbox{(MCS)}} می‌تواند استفاده شود.
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{مرجع سریع}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مدولاسیون} & \CNth{بیت در هر نماد} & \CNth{کاربرد معمول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{QPSK}} & 2 & مقاوم، در لبه سلول \\
+\lr{\mbox{64-QAM}} & 6 & گذردهی بالا، نیازمند \lr{\mbox{SNR}} بالا \\
+\lr{\mbox{256-QAM}} & 8 & نرخ‌های بیشینه، بسیار نزدیک به ایستگاه پایه \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{مبانی ارتباطات دیجیتال}
+
+\CNchained\CNsubsection{}{نرخ خطای بیت \lr{\mbox{(BER)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  احتمال اینکه یک بیت دریافتی با بیت ارسالی متفاوت باشد.
+\item
+  به \lr{\mbox{SNR}}، مرتبه مدولاسیون و کدگذاری بستگی دارد.
+\item
+  اهداف معمول: \lr{\mbox{10\textsuperscript{-3}}} (صدا)، \lr{\mbox{10\textsuperscript{-6}}} (داده پیش از \lr{\mbox{ARQ}}).
+\end{itemize}
+
+\CNsubsection{}{کدگذاری کانال}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{هدف:} افزودن افزونگی برای تشخیص/\allowbreak{}تصحیح خطا.
+\item
+  \textbf{کدهای توربو:} در \lr{3G/\allowbreak{}4G} برای کانال‌های داده استفاده می‌شوند.
+\item
+  \textbf{کدهای \lr{\mbox{LDPC}}:} در \lr{\mbox{5G NR}} برای داده \lr{\mbox{(eMBB)}} استفاده می‌شوند.
+\item
+  \textbf{کدهای پولار:} در \lr{\mbox{5G NR}} برای کانال‌های کنترل استفاده می‌شوند.
+\item
+  \textbf{نرخ کد \lr{\mbox{(R)}}:} نسبت بیت‌های اطلاعات به کل بیت‌ها. \lr{$R = k/n$} (مثلاً \lr{$R = 1/2$} یعنی 50\% افزونگی).
+\end{itemize}
+
+\CNsubsection{}{مفهوم \lr{\mbox{OFDM}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مسیله:} کانال‌های پهن‌باند از محوشدگی انتخابی-فرکانسی رنج می‌برند.
+\item
+  \textbf{راه‌حل:} تقسیم کانال پهن‌باند به بسیاری زیرحامل باریک، که هر یک محوشدگی تخت را تجربه می‌کند.
+\item
+  \textbf{پارامترهای کلیدی:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    فاصله زیرحامل \lr{\mbox{($\Delta f$)}}: \lr{15~kHz (LTE)}، \lr{15/\allowbreak{}30/\allowbreak{}60/\allowbreak{}120/\allowbreak{}240~kHz (5G NR)}.
+  \item
+    اندازه \lr{\mbox{FFT}}: تعداد زیرحامل‌ها را تعیین می‌کند.
+  \item
+    پیشوند چرخه‌ای \lr{\mbox{(CP)}}: بازه محافظ برای مقابله با تداخل بین-نمادی \lr{\mbox{(ISI)}}.
+  \end{itemize}
+\item
+  \textbf{مزایا:} یکسان‌سازی ساده (1-ضربه در هر زیرحامل)، تخصیص منبع انعطاف‌پذیر.
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{OFDMA:}}}}} چندین کاربر زیرحامل‌ها را به اشتراک می‌گذارند \ensuremath{\leftarrow} پایه پیوند پایین‌سو \lr{\mbox{LTE}} و \lr{\mbox{5G}}.
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{مبانی شبکه‌سازی \lr{\mbox{IP}}}
+
+\CNchained\CNsubsection{}{آدرس‌دهی}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{IPv4:}}}}} آدرس‌های 32 بیتی (مثلاً \CNnum{192.168.1.1)}، \lr{\mbox{NAT}} در شبکه‌های موبایل رایج است.
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{IPv6:}}}}} آدرس‌های 128 بیتی، به‌طور فزاینده در \lr{\mbox{5G}} استفاده می‌شود (از \lr{\mbox{NAT}} اجتناب می‌کند).
+\item
+  \textbf{زیرشبکه‌بندی:} نشانه‌گذاری \lr{\mbox{CIDR}} (مثلاً \lr{10.0.0.0/\allowbreak{}24 = 256} آدرس).
+\end{itemize}
+
+\CNsubsection{}{مسیریابی}
+
+\begin{itemize}
+\tightlist
+\item
+  شبکه‌های هسته موبایل از مسیریابی \lr{\mbox{IP}} بین توابع شبکه استفاده می‌کنند.
+\item
+  \textbf{مسیرهای ایستا} برای توپولوژی‌های ساده؛ \lr{\textbf{\lr{BGP/\allowbreak{}OSPF}}} در شبکه‌های حامل.
+\item
+  \textbf{تونل‌سازی \lr{\mbox{GTP}}:} بسته‌های \lr{\mbox{IP}} مشترک را درون \lr{GTP/\allowbreak{}UDP/\allowbreak{}IP} بین \lr{\mbox{gNB}} و \lr{\mbox{UPF}} کپسوله می‌کند.
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{پروتکل‌های انتقال}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2703}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2973}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4324}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پروتکل} & \CNth{ویژگی‌ها} & \CNth{کاربرد در مخابرات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{TCP}}}}} & قابل اعتماد، مرتب، کنترل ازدحام & \lr{HTTP/\allowbreak{}2} (\lr{\mbox{SBA}} در \lr{\mbox{5G}})، ترافیک وب \\
+\lr{\mbox{\textbf{\lr{\mbox{UDP}}}}} & غیرقابل اعتماد، کم-تأخیر & \lr{VoIP/\allowbreak{}RTP}، صفحه کاربر \lr{\mbox{GTP-U}} \\
+\lr{\mbox{\textbf{\lr{\mbox{SCTP}}}}} & چند-میزبانی، پیام-محور & سیگنالینگ \lr{S1AP/\allowbreak{}NGAP (4G/\allowbreak{}5G)} \\
+\end{longtable}
+}
+
+\CNsubsection{}{\lr{\mbox{DNS}} و \lr{\mbox{NAT}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}}ها آدرس \lr{\mbox{IP}} را از طریق برقراری نشست \lr{PDN/\allowbreak{}PDU} به‌دست می‌آورند (نه مستقیماً \lr{\mbox{DHCP}}).
+\item
+  حل \lr{\mbox{DNS}} برای کشف خدمات در \lr{\mbox{SBA}} در \lr{\mbox{5G (NRF)}}.
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{احتمال پایه}
+
+\CNchained\CNsubsection{}{چرا احتمال در مخابرات؟}
+
+\begin{itemize}
+\tightlist
+\item
+  دسترسی تصادفی \lr{\mbox{(RACH)}}: احتمال برخورد با چندین کاربر.
+\item
+  زمان‌بندی: مدل‌سازی رسیدن ترافیک (فرآیند پواسون).
+\item
+  محوشدگی: توزیع‌های رایلی/\allowbreak{}رایسی چندمسیری را مدل می‌کنند.
+\item
+  تحلیل \lr{\mbox{BER}}: تابع \lr{\mbox{Q}}، محاسبات احتمال خطا.
+\end{itemize}
+
+\CNsubsection{}{مفاهیم کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{متغیر تصادفی \lr{\mbox{(X)}}:} نتیجه یک آزمایش تصادفی.
+\item
+  \lr{\textbf{\lr{PDF /\allowbreak{} PMF:}}} تابع چگالی/\allowbreak{}جرم احتمال.
+\item
+  \textbf{امید ریاضی:} \lr{$E[X] = \sum_i x_i\,P(x_i)$} \lr{—} نتیجه میانگین.
+\item
+  \textbf{واریانس:} \lr{$\operatorname{Var}(X) = E[(X-\mu)^2]$} \lr{—} پراکندگی حول میانگین.
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{توزیع‌هایی که با آن‌ها روبه‌رو خواهید شد}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{توزیع} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{یکنواخت} & تایمرهای عقب‌نشینی تصادفی \\
+\textbf{نمایی} & زمان‌های بین-ورود (بدون حافظه) \\
+\textbf{پواسون} & تعداد ورودها در یک پنجره زمانی \\
+\textbf{رایلی} & پوش چندمسیری محوشدگی \lr{\mbox{(NLOS)}} \\
+\textbf{گاوسی (نرمال)} & مدل‌سازی نویز \lr{\mbox{(AWGN)}} \\
+\end{longtable}
+}
+
+\CNsubsection{}{فرمول مفید}
+
+\begin{itemize}
+\tightlist
+\item
+  احتمال برخورد در \lr{\mbox{ALOHA}} شکاف‌دار با \lr{$n$} کاربر، 1 شکاف: \lr{$P(\text{\rl{برخورد}}) = 1 - (1 - 1/K)^n \approx 1 - e^{-n/K}$} برای \lr{$K$} بزرگ.
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{ریاضیات دسی‌بل}
+
+\CNchained\CNsubsection{}{چرا دسی‌بل؟}
+
+سیگنال‌های بی‌سیم گستره دینامیکی عظیمی را در بر می‌گیرند (\lr{\mbox{pW}} تا \lr{\mbox{W}}). دسی‌بل این را به اعداد قابل مدیریت فشرده می‌کند و ضرب‌ها را به جمع تبدیل می‌کند.
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{تعاریف}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واحد} & \CNth{فرمول} & \CNth{مرجع} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{dB}}}}} & \lr{$10\log_{10}(P_1/P_2)$} & نسبت (بی‌بعد) \\
+\lr{\mbox{\textbf{\lr{\mbox{dBm}}}}} & \lr{$10\log_{10}(P / 1\,\mathrm{mW})$} & توان مطلق نسبت به \lr{\mbox{1~mW}} \\
+\lr{\mbox{\textbf{\lr{\mbox{dBW}}}}} & \lr{$10\log_{10}(P / 1\,\mathrm{W})$} & توان مطلق نسبت به \lr{\mbox{1~W}} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{تبدیل‌های معمول}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{خطی} & \CNth{\lr{\mbox{dB}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\ensuremath{\times}2}} & \lr{\mbox{+3~dB}} \\
+\lr{\mbox{\ensuremath{\times}10}} & \lr{\mbox{+10~dB}} \\
+\lr{\mbox{\ensuremath{\times}100}} & \lr{\mbox{+20~dB}} \\
+\lr{\mbox{\ensuremath{\times}1000}} & \lr{\mbox{+30~dB}} \\
+\lr{\mbox{\ensuremath{\times}0.5}} & \lr{\mbox{\ensuremath{-}3~dB}} \\
+\lr{\mbox{\ensuremath{\times}0.1}} & \lr{\mbox{\ensuremath{-}10~dB}} \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{جدول مرجع سریع}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{توان} & \CNth{\lr{\mbox{dBm}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{1~mW}} & \lr{\mbox{0~dBm}} \\
+\lr{\mbox{10~mW}} & \lr{\mbox{10~dBm}} \\
+\lr{\mbox{100~mW}} & \lr{\mbox{20~dBm}} \\
+\lr{\mbox{1~W}} & \lr{\mbox{30~dBm}} \\
+\lr{\mbox{20~W}} (ایستگاه پایه ماکرو) & \lr{\mbox{43~dBm}} \\
+\end{longtable}
+}
+
+\CNsubsection{}{بودجه پیوند (پیش‌نمایش)}
+
+\CNdisplay{P_{\mathrm{Rx}}\,[\mathrm{dBm}] = P_{\mathrm{Tx}}\,[\mathrm{dBm}] + G_{\mathrm{Tx}}\,[\mathrm{dBi}] - L_{\mathrm{path}}\,[\mathrm{dB}] + G_{\mathrm{Rx}}\,[\mathrm{dBi}]}
+
+(توان دریافتی = توان ارسالی + بهره آنتن فرستنده \lr{\mbox{\ensuremath{-}}} تلفات مسیر + بهره آنتن گیرنده)
+
+\CNsubsection{}{مسایل تمرینی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  یک فرستنده \lr{\mbox{2~W}} خروجی می‌دهد. بر حسب \lr{\mbox{dBm}} بیان کنید. \ensuremath{\leftarrow} \lr{$10\log_{10}(2000) = 33$ dBm}.
+\item
+  تلفات مسیر \lr{\mbox{130~dB}} است، \lr{Tx = 43 dBm}، بهره آنتن‌ها مجموعاً \lr{\mbox{18~dBi}}. توان \lr{\mbox{Rx}}؟ \ensuremath{\leftarrow} \lr{$43 + 18 - 130 = -69$ dBm}.
+\item
+  \lr{SNR = 20~dB}. نسبت خطی چیست؟ \ensuremath{\leftarrow} \lr{$10^{20/10} = 100$}.
+\end{enumerate}
+
+\CNboxsection{چک‌لیست خلاصه}
+
+\begin{CNbox}[unbreakable]{sum}{چک‌لیست خلاصه}
+
+پیش از شروع ماژول 2، تأیید کنید که می‌توانید:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\CNcheckbox{}}} شناسایی کنید کدام لایه‌های \lr{\mbox{OSI}} توابع \lr{\mbox{PHY}}، \lr{\mbox{MAC}} و \lr{\mbox{IP}} را انجام می‌دهند
+\item
+  \lr{\mbox{\CNcheckbox{}}} بین توان خطی و \lr{\mbox{dBm}} تبدیل کنید
+\item
+  \lr{\mbox{\CNcheckbox{}}} توضیح دهید چرا \lr{\mbox{OFDM}} با محوشدگی انتخابی-فرکانسی مقابله می‌کند
+\item
+  \lr{\mbox{\CNcheckbox{}}} ظرفیت شانون را با داشتن \lr{\mbox{BW}} و \lr{\mbox{SNR}} محاسبه کنید
+\item
+  \lr{\mbox{\CNcheckbox{}}} تفاوت بین \lr{\mbox{TCP}} و \lr{\mbox{UDP}} و محل استفاده هر یک را توصیف کنید
+\item
+  \lr{\mbox{\CNcheckbox{}}} احتمالات ساده برخورد را برای دسترسی تصادفی محاسبه کنید
+\end{itemize}
+
+اگر هر موضوعی ناآشنا به نظر می‌رسد، بخش‌های ارجاع‌شده را مرور کنید یا به کتاب‌های درسی توصیه‌شده در طرح درس مراجعه کنید.
+
+\emph{آخرین به‌روزرسانی: اوت 2026}
+
+\end{CNbox}

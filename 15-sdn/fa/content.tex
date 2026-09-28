@@ -1,0 +1,570 @@
+\Needspace{21\baselineskip}
+
+\CNsection{1}{چرا \lr{\mbox{SDN}}؟}
+
+شبکه‌های سنتی از محدودیت‌های بنیادی رنج می‌برند که مانع نوآوری و چابکی می‌شوند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مسیله} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{کنترل توزیع‌شده} & هر دستگاه صفحه کنترل خود را به‌طور مستقل اجرا می‌کند. هیچ موجودیت واحدی نمای جهانی از وضعیت شبکه ندارد. \\
+\textbf{وابستگی به سازنده} & بسته‌های سخت‌افزار + نرم‌افزار اختصاصی. مهاجرت بین سازندگان پرهزینه و پیچیده است. \\
+\textbf{تأمین کند} & پیکربندی دستی، جعبه-به-جعبه از طریق \lr{\mbox{CLI}}. هفته‌ها برای استقرار یک سرویس جدید. خطاهای انسانی باعث قطعی می‌شوند. \\
+\textbf{معماری سخت} & افزودن پروتکل‌های جدید نیازمند به‌روزرسانی فرم‌ور سازنده است. چرخه‌های نوآوری در مقیاس سال اندازه‌گیری می‌شوند. \\
+\textbf{سیاست‌های ناسازگار} & سیاست‌ها باید به‌صورت دستی در صدها دستگاه تکرار شوند. انحراف اجتناب‌ناپذیر است. \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{بینش اصلی}: اگر «مغز» (صفحه کنترل) را از «ماهیچه» (صفحه داده) جدا کنیم، می‌توانیم هوش را متمرکز کنیم، عملیات را خودکار کنیم و شبکه را مانند نرم‌افزار برنامه‌ریزی کنیم.
+
+\end{CNquote}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{معماری سنتی در برابر \lr{\mbox{SDN}}}
+
+\CNchained\CNsubsection{}{معماری سنتی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{صفحه کنترل تعبیه‌شده در هر دستگاه}
+\item
+  هر دستگاه به‌طور مستقل تصمیمات ارسال را محاسبه می‌کند
+\item
+  پروتکل‌های توزیع‌شده (\lr{\mbox{OSPF}}، \lr{\mbox{BGP}}، \lr{\mbox{STP}}) وضعیت را همگام می‌کنند
+\item
+  همگرایی زمان می‌برد؛ بدون بهینه‌سازی جهانی
+\end{itemize}
+
+\CNsubsection{}{معماری \lr{\mbox{SDN}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{صفحه کنترل استخراج و متمرکز شده}
+\item
+  سوییچ‌ها به دستگاه‌های ارسال ساده تبدیل می‌شوند
+\item
+  کنترلر \textbf{نمای جهانی} از کل شبکه دارد
+\item
+  قابل برنامه‌ریزی از طریق \lr{\mbox{API}}ها (شمال‌سو و جنوب‌سو)
+\end{itemize}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{سنتی} & \CNth{\lr{\mbox{SDN}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+صفحه کنترل & توزیع‌شده (در هر دستگاه) & متمرکز (کنترلر) \\
+صفحه داده & جفت‌شده با کنترل & جدا شده، ارسال ساده \\
+پیکربندی & \lr{\mbox{CLI}}، جعبه-به-جعبه & مبتنی بر \lr{\mbox{API}}، قابل برنامه‌ریزی \\
+سازنده & وابسته & باز، چند-سازنده \\
+سرعت نوآوری & سال‌ها (چرخه فرم‌ور) & روزها (توسعه نرم‌افزار) \\
+دیدپذیری & در هر دستگاه، تکه‌تکه & جهانی، بلادرنگ \\
+خودکارسازی & اسکریپت‌ها/\allowbreak{}قالب‌ها & \lr{\mbox{API}} بومی + قصد \\
+\end{longtable}
+}
+
+\CNkeepfig{m15-sdn-layers}{5}
+
+\CNsection{3}{لایه‌های معماری \lr{\mbox{SDN}}}
+
+\CNfigure{m15-sdn-layers}{معماری \lr{\mbox{SDN}}: لایه‌های کاربرد، کنترل و زیرساخت}
+
+\CNsubsection{3.1}{لایه زیرساخت (صفحه داده)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{سوییچ‌ها و مسیریاب‌های} فیزیکی یا مجازی
+\item
+  ارسال بسته را بر اساس \textbf{جداول جریان} برنامه‌ریزی‌شده توسط کنترلر انجام می‌دهد
+\item
+  بدون تصمیم‌گیری مستقل \lr{—} دستورالعمل‌های لایه کنترل را دنبال می‌کند
+\item
+  سخت‌افزار: سوییچ‌های جعبه-سفید، \lr{\mbox{ASIC}}های قابل برنامه‌ریزی، \lr{\mbox{TCAM}} برای جستجوی سریع
+\end{itemize}
+
+\CNsubsection{3.2}{لایه کنترل (کنترلر \lr{\mbox{SDN}})}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{«مغز»} شبکه
+\item
+  \textbf{نمای جهانی} از توپولوژی، پیوندها، میزبان‌ها و ترافیک را نگه می‌دارد
+\item
+  سیاست‌های سطح بالا را به قواعد جریان سطح پایین ترجمه می‌کند
+\item
+  نمونه‌ها: \lr{\mbox{ONOS}}، \lr{OpenDaylight (ODL)}، \lr{\mbox{Ryu}}، \lr{\mbox{Floodlight}}، \lr{Nokia NSP}، \lr{Cisco ACI}
+\end{itemize}
+
+\CNsubsection{3.3}{لایه کاربرد}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{منطق تجاری و سیاست‌ها} به‌صورت کاربردهای نرم‌افزاری بیان می‌شوند
+\item
+  \lr{\mbox{API}} شمال‌سوی کنترلر را مصرف می‌کند
+\item
+  نمونه‌ها: مهندسی ترافیک، امنیت (خرد-قطعه‌بندی)، توازن بار، پایش، شبکه‌سازی مبتنی بر قصد
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsection{4}{توابع کنترلر \lr{\mbox{SDN}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{کشف توپولوژی} & تمام دستگاه‌ها، پیوندها و میزبان‌های شبکه را کشف می‌کند. نمایش گرافی می‌سازد. از \lr{\mbox{LLDP}}، \lr{\mbox{OFDP}} استفاده می‌کند. \\
+\textbf{محاسبه مسیر /\allowbreak{} مسیریابی} & مسیرهای بهینه را با استفاده از نمای جهانی محاسبه می‌کند. می‌تواند محدودیت‌ها (تأخیر، پهنای باند، هزینه) اعمال کند. \\
+\textbf{اجرای سیاست} & سیاست‌های سطح بالا را به قواعد جریان سطح دستگاه ترجمه می‌کند. \\
+\textbf{نمایش \lr{\mbox{API}}} & \lr{\mbox{API}}های \lr{REST/\allowbreak{}gRPC} شمال‌سو برای مصرف خدمات شبکه توسط کاربردها فراهم می‌کند. \\
+\textbf{مدیریت وضعیت} & وضعیت سازگار شبکه را نگه می‌دارد (جداول جریان، شمارنده‌ها، وضعیت پورت). \\
+\textbf{چند-مستأجری} & شبکه‌بندی و جداسازی بین مستأجران. \\
+\textbf{مدیریت خطا} & شکست پیوند/\allowbreak{}دستگاه را تشخیص می‌دهد و ترافیک را در میلی‌ثانیه تغییر مسیر می‌دهد. \\
+\end{longtable}
+}
+
+\CNsection{5}{واسط‌های جنوب‌سو}
+
+واسط جنوب‌سو \textbf{کنترلر را به دستگاه‌های زیرساخت} (صفحه داده) متصل می‌کند.
+
+\CNsubsection{5.1}{\lr{\mbox{OpenFlow}}}
+
+\begin{itemize}
+\tightlist
+\item
+  شناخته‌شده‌ترین پروتکل جنوب‌سوی \lr{\mbox{SDN}}
+\item
+  تعریف‌شده توسط \textbf{بنیاد شبکه‌سازی باز \lr{\mbox{(ONF)}}}
+\item
+  روشی استاندارد برای برنامه‌ریزی \textbf{جداول جریان} در سوییچ‌ها فراهم می‌کند
+\item
+  کنترلر ورودی‌های جریان را نصب/\allowbreak{}اصلاح/\allowbreak{}حذف می‌کند
+\item
+  سوییچ رویدادها (تغییرات توپولوژی، \lr{packet-in}) را به کنترلر گزارش می‌دهد
+\item
+  نسخه‌ها: \CNnum{1.0} \ensuremath{\to} \CNnum{1.3} (پراستقرارترین) \ensuremath{\leftarrow} \CNnum{1.5}
+\end{itemize}
+
+\CNsubsection{5.2}{\lr{\mbox{P4}} (پردازنده‌های بسته مستقل از پروتکل برنامه‌نویسی‌پذیر)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{زبان دامنه-خاص} برای برنامه‌ریزی خود صفحه داده
+\item
+  فراتر از \lr{\mbox{OpenFlow}} می‌رود: مشخص می‌کند سوییچ روی \textbf{چه چیزی} می‌تواند تطبیق دهد
+\item
+  خطوط لوله تجزیه و پردازش بسته قابل برنامه‌ریزی
+\item
+  مستقل از هدف: به سخت‌افزارهای مختلف کامپایل می‌شود (\lr{\mbox{Tofino}}، \lr{\mbox{FPGA}}، سوییچ‌های نرم‌افزاری)
+\item
+  مورد استفاده: سرآیندهای سفارشی، رایانش درون-شبکه، \lr{\mbox{INT}} (تله‌متری درون-باند شبکه)
+\end{itemize}
+
+\CNsubsection{5.3}{\lr{\mbox{ForCES}} (جداسازی عنصر ارسال و کنترل)}
+
+\begin{itemize}
+\tightlist
+\item
+  استاندارد \lr{IETF (RFC 5810)}
+\item
+  عنصر کنترل \lr{\mbox{(CE)}} را از عنصر ارسال \lr{\mbox{(FE)}} جدا می‌کند
+\item
+  پروتکلی برای ارتباط \lr{\mbox{CE-FE}} تعریف می‌کند
+\item
+  در عمل کمتر از \lr{\mbox{OpenFlow}} پذیرفته شده است
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{5.4}{سایر پروتکل‌های جنوب‌سو}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پروتکل} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{NETCONF/\allowbreak{}YANG} & پیکربندی دستگاه (مدل-محور) \\
+\lr{gNMI/\allowbreak{}gNOI} & تله‌متری جریانی و عملیات \\
+\lr{\mbox{BGP-LS}} & صادرات توپولوژی از شبکه‌های سنتی به کنترلر \lr{\mbox{SDN}} \\
+\lr{\mbox{PCEP}} & محاسبه مسیر برای شبکه‌های \lr{MPLS/\allowbreak{}SR} \\
+\end{longtable}
+}
+
+\CNsection{6}{واسط‌های شمال‌سو}
+
+واسط شمال‌سو \textbf{کاربردها را به کنترلر} متصل می‌کند.
+
+\CNsubsection{6.1}{\lr{\mbox{API}}های \lr{\mbox{REST}}}
+
+\begin{itemize}
+\item
+  رایج‌ترین واسط شمال‌سو
+\item
+  مبتنی بر \lr{\mbox{HTTP}}، بارهای \lr{JSON/\allowbreak{}XML}
+\item
+  عملیات \lr{\mbox{CRUD}} روی منابع شبکه (جریان‌ها، توپولوژی‌ها، سیاست‌ها)
+\item
+  مثال:
+
+  \tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ErrorTok{POST} \ErrorTok{/api/v1/flows}
+\FunctionTok{\{}
+  \DataTypeTok{"switch"}\FunctionTok{:} \StringTok{"s1"}\FunctionTok{,}
+  \DataTypeTok{"match"}\FunctionTok{:} \FunctionTok{\{}\DataTypeTok{"src\_ip"}\FunctionTok{:} \StringTok{"10.0.0.1"}\FunctionTok{,} \DataTypeTok{"dst\_ip"}\FunctionTok{:} \StringTok{"10.0.0.2"}\FunctionTok{\},}
+  \DataTypeTok{"action"}\FunctionTok{:} \FunctionTok{\{}\DataTypeTok{"output"}\FunctionTok{:} \StringTok{"port3"}\FunctionTok{\},}
+  \DataTypeTok{"priority"}\FunctionTok{:} \DecValTok{100}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+\end{itemize}
+
+\CNsubsection{6.2}{شبکه‌سازی مبتنی بر قصد \lr{\mbox{(IBN)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  انتزاع بالاتر: بیان کنید \textbf{چه چیزی} می‌خواهید، نه \textbf{چگونه} به آن برسید
+\item
+  کنترلر قصد را به پیکربندی سطح دستگاه ترجمه می‌کند
+\item
+  قصد نمونه: \emph{«اطمینان حاصل کن که ترافیک ویدیو بین سایت \lr{\mbox{A}} و سایت \lr{\mbox{B}} تأخیر کمتر از \lr{\mbox{10ms}} دارد»}
+\item
+  کنترلر مسیر، سیاست‌های \lr{\mbox{QoS}} و تغییر مسیر را تعیین می‌کند
+\item
+  پیاده‌سازی‌ها: چارچوب قصد \lr{\mbox{ONOS}}، \lr{Cisco DNA Center}، \lr{Nokia NSP}
+\end{itemize}
+
+\CNsubsection{6.3}{\lr{gRPC /\allowbreak{} Protobuf}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{API}} با عملکرد بالا و قابلیت جریانی
+\item
+  در کنترلرهای مدرن برای تله‌متری و پیکربندی بلادرنگ استفاده می‌شود
+\item
+  به‌شدت نوع‌دار (طرح‌واره‌های \lr{\mbox{protobuf}})
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{25\baselineskip}
+
+\CNsection{7}{مبانی \lr{\mbox{OpenFlow}}}
+
+\CNchained\CNsubsection{7.1}{ساختار جدول جریان}
+
+هر سوییچ یک یا چند \textbf{جدول جریان} نگه می‌دارد. هر ورودی شامل موارد زیر است:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فیلد} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{فیلدهای تطبیق} & معیارهای تطبیق بسته‌ها (\lr{\mbox{MAC}} مبدأ/\allowbreak{}مقصد، \lr{\mbox{IP}}، پورت، \lr{\mbox{VLAN}}، برچسب \lr{\mbox{MPLS}}) \\
+\textbf{اولویت} & ورودی‌های با اولویت بالاتر ابتدا تطبیق می‌یابند \\
+\textbf{شمارنده‌ها} & تعداد بسته/\allowbreak{}بایت برای آمار \\
+\textbf{دستورالعمل‌ها/\allowbreak{}اقدامات} & با بسته‌های تطبیق‌یافته چه کاری انجام شود \\
+\textbf{مهلت‌ها} & مهلت بیکاری، مهلت سخت (انقضای خودکار) \\
+\lr{\mbox{\textbf{\lr{\mbox{Cookie}}}}} & شناسه مبهم تعیین‌شده توسط کنترلر \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.2}{اقدامات}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{اقدام} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\CNcode{OUTPUT(port)}}} & ارسال بسته به پورت مشخص \\
+\lr{\mbox{\CNcode{DROP}}} & دور ریختن بسته \\
+\lr{\mbox{\CNcode{SET\_FIELD}}} & اصلاح فیلدهای سرآیند (بازنویسی \lr{\mbox{MAC}}، \lr{\mbox{IP}}، \lr{\mbox{VLAN}}) \\
+\lr{\mbox{\CNcode{PUSH/POP\_VLAN}}} & افزودن یا حذف برچسب‌های \lr{\mbox{VLAN}} \\
+\lr{\mbox{\CNcode{GROUP}}} & ارسال به جدول گروه (چند-مسیری، تغییر مسیر) \\
+\lr{\mbox{\CNcode{METER}}} & محدودسازی نرخ جریان \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{7.3}{جداول گروه}
+
+ارسال پیشرفته را ممکن می‌سازند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع گروه} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{All}}}}} & چندپخشی/\allowbreak{}پخش (کپی به همه سبدها) \\
+\lr{\mbox{\textbf{\lr{\mbox{Select}}}}} & توازن بار (گردشی یا وزن‌دار) \\
+\lr{\mbox{\textbf{\lr{\mbox{Indirect}}}}} & گام بعدی واحد (اشاره‌گر کارآمد) \\
+\lr{\textbf{\lr{Fast Failover}}} & اولین سبد زنده استفاده می‌شود (حفاظت پیوند) \\
+\end{longtable}
+}
+
+\CNsubsection{7.4}{جداول \lr{\mbox{Meter}}}
+
+\begin{itemize}
+\tightlist
+\item
+  محدودسازی نرخ در هر جریان
+\item
+  در \textbf{باندها} تعریف می‌شود: آستانه نرخ + اقدام (دور ریختن یا بازنویسی \lr{\mbox{DSCP}})
+\item
+  اجرای \lr{\mbox{QoS}} در سطح سوییچ را ممکن می‌سازد
+\end{itemize}
+
+\CNkeepfig{m15-pipeline}{3}
+
+\CNsubsection{7.5}{خط لوله پردازش بسته}
+
+\CNfigure{m15-pipeline}{خط لوله پردازش بسته در \lr{\mbox{OpenFlow}}}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{\lr{\mbox{SDN}} در مخابرات}
+
+\CNchained\CNsubsection{8.1}{\lr{\mbox{SDN}} انتقال (بهینه‌سازی \lr{\mbox{WAN}})}
+
+\begin{itemize}
+\tightlist
+\item
+  کنترل متمرکز شبکه‌های انتقال نوری/\allowbreak{}\lr{\mbox{MPLS}}
+\item
+  تخصیص پویای پهنای باند بر اساس تقاضای ترافیک
+\item
+  بهینه‌سازی چند-لایه (\lr{\mbox{IP}} روی نوری)
+\item
+  نمونه‌ها: \lr{Nokia NSP}، \lr{Ciena Blue Planet}، \lr{Cisco WAE}
+\end{itemize}
+
+\CNsubsection{8.2}{\lr{\mbox{SD-WAN}} (شبکه گسترده نرم‌افزارمحور)}
+
+\begin{itemize}
+\tightlist
+\item
+  اصول \lr{\mbox{SDN}} اعمال‌شده بر \lr{\mbox{WAN}} سازمانی
+\item
+  کنترلر متمرکز دستگاه‌های \lr{\mbox{CPE}} شعب را مدیریت می‌کند
+\item
+  لایه‌های رویی بر فراز چندین انتقال زیرین (\lr{\mbox{MPLS}}، اینترنت، \lr{\mbox{LTE}})
+\item
+  مسیریابی آگاه به کاربرد (مسیریابی صدا روی \lr{\mbox{MPLS}}، وب روی اینترنت)
+\item
+  تأمین بدون-لمس برای سایت‌های شعب
+\item
+  سازندگان: \lr{Cisco Viptela}، \lr{VMware VeloCloud}، \lr{\mbox{Fortinet}}، \lr{\mbox{Versa}}
+\end{itemize}
+
+\CNkeepfig{m15-smf-upf}{3}
+
+\CNsubsection{8.3}{یکپارچگی \lr{\mbox{5G}}: \lr{\mbox{SMF}} به‌عنوان کنترلر \lr{\mbox{SDN}} برای \lr{\mbox{UPF}}}
+
+\CNfigure{m15-smf-upf}{\lr{\mbox{SMF}} در نقش کنترل‌گر \lr{\mbox{SDN}} برای \lr{\mbox{UPF}}ها}
+
+\Needspace{16\baselineskip}
+
+\textbf{صفحه کاربر \lr{\mbox{5G}} ذاتاً شبیه \lr{\mbox{SDN}} است:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4643}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5357}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مفهوم \lr{\mbox{SDN}}} & \CNth{معادل در \lr{\mbox{5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+کنترلر \lr{\mbox{SDN}} & \lr{\mbox{\textbf{\lr{\mbox{SMF}}}}} (تابع مدیریت نشست) \\
+سوییچ صفحه داده & \lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} (تابع صفحه کاربر) \\
+پروتکل جنوب‌سو & \lr{\mbox{\textbf{\lr{\mbox{PFCP}}}}} (پروتکل کنترل ارسال بسته) \\
+قواعد جریان & \textbf{\lr{\mbox{PDR}}ها} (قواعد تشخیص بسته) + \textbf{\lr{\mbox{FAR}}ها} (قواعد اقدام ارسال) \\
+اجرای \lr{\mbox{QoS}} & \textbf{\lr{\mbox{QER}}ها} (قواعد اجرای \lr{\mbox{QoS}}) \\
+\end{longtable}
+}
+
+\CNsubsection{8.4}{برنامه‌پذیری \lr{\mbox{UPF}} از طریق \lr{\mbox{PFCP}}}
+
+\lr{PFCP (3GPP TS 29.244)} پروتکل بین \lr{\mbox{SMF}} و \lr{\mbox{UPF}} است:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{PDR}} (قاعده تشخیص بسته)}: معیارهای تطبیق (واسط مبدأ، \lr{\mbox{IP}}، \lr{\mbox{TEID}} در \lr{\mbox{GTP}})
+\item
+  \textbf{\lr{\mbox{FAR}} (قاعده اقدام ارسال)}: اقدام (ارسال، دور ریختن، بافر، کپسوله‌سازی)
+\item
+  \textbf{\lr{\mbox{QER}} (قاعده اجرای \lr{\mbox{QoS}})}: محدودسازی نرخ (\lr{\mbox{MBR}}، \lr{\mbox{GBR}})
+\item
+  \textbf{\lr{\mbox{URR}} (قاعده گزارش‌دهی مصرف)}: اندازه‌گیری و گزارش‌دهی ترافیک
+\end{itemize}
+
+این از نظر عملکردی معادل مدل تطبیق-اقدام \lr{\mbox{OpenFlow}} است!
+
+\Needspace{22\baselineskip}
+
+\CNsection{9}{مزایای \lr{\mbox{SDN}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مزیت} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{برنامه‌پذیری} & شبکه تحت کنترل نرم‌افزار است؛ همه چیز را از طریق \lr{\mbox{API}}ها خودکار کنید \\
+\textbf{خودکارسازی} & تأمین بدون-لمس، خود-ترمیمی، \lr{CI/\allowbreak{}CD} برای شبکه \\
+\textbf{چند-سازنده} & واسط‌های باز امکان ترکیب سازندگان سخت‌افزار را می‌دهند (انقلاب جعبه-سفید) \\
+\textbf{نوآوری سریع} & خدمات جدید در ساعت/\allowbreak{}روز به‌جای ماه مستقر می‌شوند \\
+\textbf{بهینه‌سازی جهانی} & نمای متمرکز محاسبه مسیر بهینه را ممکن می‌سازد \\
+\textbf{شبکه‌بندی} & تخصیص پویای منابع در هر مستأجر/\allowbreak{}سرویس \\
+\textbf{کاهش هزینه} & سخت‌افزار عمومی + نرم‌افزار متن‌باز در برابر جعبه‌های اختصاصی \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{10}{چالش‌های \lr{\mbox{SDN}}}
+
+\CNchained\CNsubsection{10.1}{مقیاس‌پذیری کنترلر}
+
+\begin{itemize}
+\tightlist
+\item
+  کنترلر واحد نمی‌تواند هزاران سوییچ + میلیون‌ها جریان را مدیریت کند
+\item
+  \textbf{راه‌حل}: خوشه‌بندی کنترلر (\lr{\mbox{ONOS}}، \lr{\mbox{ODL}} از کنترلرهای توزیع‌شده پشتیبانی می‌کنند)
+\item
+  مبادله: سازگاری در برابر دسترس‌پذیری (قضیه \lr{\mbox{CAP}} اعمال می‌شود)
+\end{itemize}
+
+\CNsubsection{10.2}{نقطه شکست واحد}
+
+\begin{itemize}
+\tightlist
+\item
+  اگر کنترلر شکست بخورد، هیچ جریان جدیدی نمی‌تواند نصب شود
+\item
+  صفحه داده ارسال جریان‌های موجود را ادامه می‌دهد (حالت فعالانه)
+\item
+  \textbf{کاهش اثر}: افزونگی کنترلر (فعال-آماده، فعال-فعال)
+\end{itemize}
+
+\CNsubsection{10.3}{واسط شرق-غرب}
+
+\begin{itemize}
+\tightlist
+\item
+  ارتباط بین نمونه‌های کنترلر در یک خوشه
+\item
+  بدون پروتکل استاندارد (هر کنترلر خوشه‌بندی اختصاصی دارد)
+\item
+  چالش‌ها: همگام‌سازی وضعیت، سناریوهای مغز-شکافته، سازگاری
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{10.4}{امنیت}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تهدید} & \CNth{تأثیر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نفوذ به کنترلر & مهاجم کل شبکه را کنترل می‌کند \\
+مرد-در-میان (کنترلر\ensuremath{\leftrightarrow}سوییچ) & تزریق/\allowbreak{}اصلاح قاعده جریان \\
+\lr{\mbox{DoS}} روی کنترلر & اشباع با پیام‌های \lr{Packet-In} \\
+کاربرد مخرب & برنامه سرکش جریان‌های زیان‌بار را از طریق \lr{\mbox{NBI}} نصب می‌کند \\
+\end{longtable}
+}
+
+\textbf{کاهش اثر}: \lr{\mbox{TLS}} روی کانال \lr{\mbox{OpenFlow}}، \lr{\mbox{RBAC}} برای \lr{\mbox{API}} شمال‌سو، محدودسازی نرخ \lr{Packet-In}، جعبه‌شنی کاربرد.
+
+\CNboxsection{نکات کلیدی}
+
+\begin{CNbox}[unbreakable]{sum}{نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{SDN}} صفحه کنترل را از صفحه داده \textbf{جدا می‌کند}
+\item
+  یک \textbf{کنترلر متمرکز} نمای جهانی و برنامه‌پذیری فراهم می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{OpenFlow}}}}} پروتکل جنوب‌سوی بنیادی است (پارادایم تطبیق-اقدام)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{P4}}}}} برنامه‌پذیری را به خود خط لوله صفحه داده گسترش می‌دهد
+\item
+  معماری \lr{\mbox{5G}} \textbf{ذاتاً شبیه \lr{\mbox{SDN}} است} (\lr{\mbox{SMF}} از طریق \lr{\mbox{PFCP UPF}} را کنترل می‌کند)
+\item
+  \lr{\mbox{SDN}} \textbf{خودکارسازی شبکه، شبکه‌بندی و استقرار سریع سرویس} را ممکن می‌سازد
+\item
+  چالش‌ها پیرامون \textbf{مقیاس‌پذیری، امنیت و استانداردسازی} باقی می‌مانند
+\end{enumerate}
+
+\end{CNbox}

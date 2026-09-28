@@ -1,0 +1,761 @@
+% !TEX program = xelatex
+% Advanced Communication Networks — Fall 2026-2027 (Persian)
+% Instructor: Amin Azari — compile with XeLaTeX (or tectonic).
+\documentclass[11pt]{article}
+\def\CNroot{../../template}
+\input{\CNroot/acn-fa}
+\begin{document}
+\CNcoverpage{جزوه کامل درس}{ماژول‌های ۱ تا ۲۶}{Complete Lecture Notes - Modules 1-26}
+\CNsetmodule{}{\CNlangContents}{}
+\begin{CNbooktoc}
+\CNtocmodule{CNmod:Description}{}{توصیف درس}
+\CNtocitemk{Description}{1}{}{معرفی}
+\CNtocitemk{Description}{2}{}{ساختار و محتوا}
+\CNtocitemk{Description}{3}{}{ارزشیابی و کار عملی}
+\CNtocitemk{Description}{4}{}{منابع اصلی}
+\CNtocmodule{CNmod:Syllabus}{}{طرح درس}
+\CNtocitemk{Syllabus}{1}{}{اطلاعات درس}
+\CNtocitemk{Syllabus}{2}{}{اهداف درس}
+\CNtocitemk{Syllabus}{3}{}{فهرست ماژول‌ها (26 ماژول)}
+\CNtocitemk{Syllabus}{4}{}{تفکیک نمره‌دهی}
+\CNtocitemk{Syllabus}{5}{}{کتاب‌های درسی پیشنهادی}
+\CNtocitemk{Syllabus}{6}{}{برنامه هفته‌به‌هفته}
+\CNtocitemk{Syllabus}{7}{}{تمرین‌های آزمایشگاهی}
+\CNtocitemk{Syllabus}{8}{}{پروژه}
+\CNtocitemk{Syllabus}{9}{}{صداقت علمی}
+\CNtocmodule{CNmod:Prereq}{}{مرور پیش‌نیازها}
+\CNtocitemk{Prereq}{1}{1}{مرور مدل \lr{\mbox{OSI}} (با تمرکز بر مخابرات)}
+\CNtocitemk{Prereq}{2}{2}{مفاهیم پایه \lr{\mbox{RF}}}
+\CNtocitemk{Prereq}{3}{3}{مبانی ارتباطات دیجیتال}
+\CNtocitemk{Prereq}{4}{4}{مبانی شبکه‌سازی \lr{\mbox{IP}}}
+\CNtocitemk{Prereq}{5}{5}{احتمال پایه}
+\CNtocitemk{Prereq}{6}{6}{ریاضیات دسی‌بل}
+\CNtocitemk{Prereq}{7}{}{چک‌لیست خلاصه}
+\CNtocmodule{CNmod:1}{۱}{\lr{\mbox{GSM}}، \lr{\mbox{GPRS}} و \lr{\mbox{EDGE}}}
+\CNtocitemk{1}{1}{1}{معماری \lr{\mbox{GSM}}}
+\CNtocitemk{1}{2}{2}{عناصر شبکه \lr{\mbox{GSM}} \lr{—} توضیح تفصیلی}
+\CNtocitemk{1}{3}{3}{واسط‌های \lr{\mbox{GSM}}}
+\CNtocitemk{1}{4}{4}{تحرک و مدیریت مکان \lr{\mbox{GSM}}}
+\CNtocitemk{1}{5}{5}{احراز هویت و امنیت \lr{\mbox{GSM}}}
+\CNtocitemk{1}{6}{6}{چرا \lr{\mbox{GPRS}} لازم بود}
+\CNtocitemk{1}{7}{7}{معماری \lr{\mbox{GPRS}}}
+\CNtocitemk{1}{8}{8}{زمینه \lr{\mbox{PDP}}}
+\CNtocitemk{1}{9}{9}{مدیریت تحرک \lr{\mbox{GPRS}}}
+\CNtocitemk{1}{10}{10}{\lr{\mbox{EDGE}} \lr{—} نرخ داده بهبودیافته برای تحول \lr{\mbox{GSM}}}
+\CNtocitemk{1}{11}{11}{مسیر تحول: \lr{GSM \ensuremath{\to} GPRS \ensuremath{\to} EDGE \ensuremath{\to} 3G}}
+\CNtocitemk{1}{12}{}{جدول خلاصه}
+\CNtocitemk{1}{13}{}{پرسش‌های مرور}
+\CNtocitemk{1}{14}{}{مراجع}
+\CNtocmodule{CNmod:2}{۲}{سوییچینگ مداری \lr{\mbox{2G}}}
+\CNtocitemk{2}{1}{1}{مبانی سوییچینگ مداری}
+\CNtocitemk{2}{2}{2}{مفاهیم سیگنالینگ \lr{\mbox{SS7}}}
+\CNtocitemk{2}{3}{3}{فرآیند برقراری تماس}
+\CNtocitemk{2}{4}{4}{مسیریابی تماس}
+\CNtocitemk{2}{5}{5}{رویه به‌روزرسانی مکان}
+\CNtocitemk{2}{6}{6}{رویه احراز هویت}
+\CNtocitemk{2}{7}{7}{رومینگ}
+\CNtocitemk{2}{8}{8}{آزادسازی تماس}
+\CNtocitemk{2}{9}{9}{چرا سوییچینگ مداری؟}
+\CNtocitemk{2}{10}{}{خلاصه اصطلاحات کلیدی}
+\CNtocmodule{CNmod:3}{۳}{شبکه‌های هسته \lr{2G/\allowbreak{}3G}}
+\CNtocitemk{3}{1}{3.1}{تحول از \lr{\mbox{2G}} به \lr{\mbox{3G}} \lr{—} نیروهای محرک}
+\CNtocitemk{3}{2}{3.2}{مرور معماری \lr{\mbox{UMTS}}}
+\CNtocitemk{3}{3}{3.3}{\lr{\mbox{UTRAN}}: \lr{\mbox{NodeB}} و \lr{\mbox{RNC}}}
+\CNtocitemk{3}{4}{3.4}{شبکه هسته \lr{\mbox{3G}}: دامنه \lr{\mbox{CS}} + دامنه \lr{\mbox{PS}}}
+\CNtocitemk{3}{5}{3.5}{واسط \lr{\mbox{Iu}}}
+\CNtocitemk{3}{6}{3.6}{نسخه 99 در برابر نسخه \lr{\mbox{5}}+ (تحول \lr{\mbox{HSPA}})}
+\CNtocitemk{3}{7}{3.7}{\lr{\mbox{IMS}} (زیرسیستم چندرسانه‌ای \lr{\mbox{IP}}) \lr{—} مقدمه}
+\CNtocitemk{3}{8}{3.8}{جدول مقایسه اصلی: نسل‌های شبکه موبایل}
+\CNtocitemk{3}{9}{3.9}{تقسیم \lr{CS/\allowbreak{}PS} \lr{—} و چرا \lr{\mbox{LTE}} آن را از بین برد}
+\CNtocitemk{3}{10}{3.10}{خلاصه: نکات کلیدی}
+\CNtocitemk{3}{11}{}{پرسش‌های مرور}
+\CNtocmodule{CNmod:4}{۴}{تحرک و تحویل}
+\CNtocitemk{4}{1}{1}{چرا مدیریت تحرک لازم است}
+\CNtocitemk{4}{2}{2}{مدیریت مکان: \lr{\mbox{LA}} در برابر \lr{\mbox{RA}} در برابر \lr{\mbox{TA}}}
+\CNtocitemk{4}{3}{3}{انتخاب مجدد سلول (تحرک حالت بیکار)}
+\CNtocitemk{4}{4}{4}{انواع تحویل}
+\CNtocitemk{4}{5}{5}{فرآیند تصمیم تحویل}
+\CNtocitemk{4}{6}{6}{رویه تحویل \lr{—} تحویل \lr{\mbox{X2}} در \lr{\mbox{LTE}}}
+\CNtocitemk{4}{7}{7}{شکست‌های تحویل}
+\CNtocitemk{4}{8}{8}{تحول تحویل: \lr{2G \ensuremath{\to} 3G \ensuremath{\to} LTE \ensuremath{\to} 5G}}
+\CNtocitemk{4}{9}{9}{مثال‌های مهندسی با مقادیر معمول پارامترها}
+\CNtocitemk{4}{10}{10}{نمودارهای خلاصه}
+\CNtocitemk{4}{11}{}{خلاصه فرمول‌های کلیدی}
+\CNtocitemk{4}{12}{}{پرسش‌های مرور}
+\CNtocmodule{CNmod:5}{۵}{معماری \lr{\mbox{4G LTE}}}
+\CNtocitemk{5}{1}{5.1}{چرا \lr{\mbox{LTE}} توسعه یافت}
+\CNtocitemk{5}{2}{5.2}{اصول طراحی \lr{\mbox{LTE}}}
+\CNtocitemk{5}{3}{5.3}{مرور معماری \lr{\mbox{LTE}}}
+\CNtocitemk{5}{4}{5.4}{عناصر شبکه \lr{—} تفصیلی}
+\CNtocitemk{5}{5}{5.5}{واسط‌های \lr{\mbox{LTE}} \lr{—} نقاط مرجع}
+\CNtocitemk{5}{6}{5.6}{مرور \lr{\mbox{IMS}} (زیرسیستم چندرسانه‌ای \lr{\mbox{IP}})}
+\CNtocitemk{5}{7}{5.7}{جداسازی صفحه کنترل از صفحه کاربر \lr{\mbox{(CUPS)}}}
+\CNtocitemk{5}{8}{5.8}{تفاوت‌های کلیدی با \lr{\mbox{3G}}}
+\CNtocitemk{5}{9}{5.9}{مسیرهای صفحه کنترل در برابر صفحه کاربر}
+\CNtocitemk{5}{10}{5.10}{جدول خلاصه واسط‌ها}
+\CNtocitemk{5}{11}{}{نکات کلیدی}
+\CNtocitemk{5}{12}{}{مراجع}
+\CNtocmodule{CNmod:6}{۶}{\lr{\mbox{E-UTRAN}} \lr{—} شبکه دسترسی رادیویی \lr{\mbox{LTE}}}
+\CNtocitemk{6}{1}{6.1}{معماری \lr{\mbox{E-UTRAN}}}
+\CNtocitemk{6}{2}{6.2}{توابع \lr{\mbox{eNodeB}}}
+\CNtocitemk{6}{3}{6.3}{پشته پروتکل \lr{\mbox{LTE}}}
+\CNtocitemk{6}{4}{6.4}{لایه‌های پروتکل به‌تفصیل}
+\CNtocitemk{6}{5}{6.5}{ساختار کانال \lr{\mbox{LTE}}}
+\CNtocitemk{6}{6}{6.6}{واسط \lr{\mbox{S1}}}
+\CNtocitemk{6}{7}{6.7}{واسط \lr{\mbox{X2}}}
+\CNtocitemk{6}{8}{6.8}{حالت‌های \lr{\mbox{RRC}} و گذارها}
+\CNtocitemk{6}{9}{}{خلاصه}
+\CNtocmodule{CNmod:7}{۷}{زمان‌بندی \lr{\mbox{LTE}}}
+\CNtocitemk{7}{1}{1}{چرا زمان‌بندی اهمیت دارد}
+\CNtocitemk{7}{2}{2}{شبکه منابع \lr{\mbox{LTE}}}
+\CNtocitemk{7}{3}{3}{دانه‌بندی زمان‌بندی}
+\CNtocitemk{7}{4}{4}{زمان‌بندی پیوند پایین‌سو}
+\CNtocitemk{7}{5}{5}{زمان‌بندی پیوند بالاسو}
+\CNtocitemk{7}{6}{6}{نشانگر کیفیت کانال \lr{\mbox{(CQI)}}}
+\CNtocitemk{7}{7}{7}{تطبیق پیوند}
+\CNtocitemk{7}{8}{8}{\lr{\mbox{HARQ}} (درخواست تکرار خودکار ترکیبی)}
+\CNtocitemk{7}{9}{9}{الگوریتم‌های زمان‌بندی}
+\CNtocitemk{7}{10}{10}{مبادلات مهندسی}
+\CNtocitemk{7}{11}{11}{مثال عددی}
+\CNtocitemk{7}{12}{}{نکات کلیدی}
+\CNtocitemk{7}{13}{}{مراجع}
+\CNtocmodule{CNmod:8}{۸}{کانال دسترسی تصادفی \lr{\mbox{(RACH)}}}
+\CNtocitemk{8}{1}{8.1}{چرا دسترسی تصادفی لازم است}
+\CNtocitemk{8}{2}{8.2}{\lr{\mbox{PRACH}} (کانال دسترسی تصادفی فیزیکی)}
+\CNtocitemk{8}{3}{8.3}{توالی‌های پیشوند}
+\CNtocitemk{8}{4}{8.4}{دسترسی تصادفی مبتنی بر رقابت (\lr{\mbox{CBRA 4}}-گام)}
+\CNtocitemk{8}{5}{8.5}{دسترسی تصادفی بدون رقابت \lr{\mbox{(CFRA)}}}
+\CNtocitemk{8}{6}{8.6}{پیشروی زمانی \lr{\mbox{(TA)}}}
+\CNtocitemk{8}{7}{8.7}{برخوردها و عقب‌نشینی}
+\CNtocitemk{8}{8}{8.8}{اضافه‌بار \lr{\mbox{RACH}}}
+\CNtocitemk{8}{9}{8.9}{دسترسی تصادفی \lr{\mbox{5G NR}}}
+\CNtocitemk{8}{10}{8.10}{خلاصه و معادلات کلیدی}
+\CNtocitemk{8}{11}{}{پرسش‌های مرور}
+\CNtocitemk{8}{12}{}{مراجع}
+\CNtocmodule{CNmod:9}{۹}{هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}}}
+\CNtocitemk{9}{1}{9.1}{چرا \lr{\mbox{EPC}} طراحی شد}
+\CNtocitemk{9}{2}{9.2}{مرور معماری \lr{\mbox{EPC}}}
+\CNtocitemk{9}{3}{9.3}{توابع شبکه \lr{\mbox{EPC}}}
+\CNtocitemk{9}{4}{9.4}{حامل‌های \lr{\mbox{EPC}}}
+\CNtocitemk{9}{5}{9.5}{احراز هویت در \lr{\mbox{EPC}}}
+\CNtocitemk{9}{6}{9.6}{مدیریت نشست}
+\CNtocitemk{9}{7}{9.7}{مدیریت تحرک}
+\CNtocitemk{9}{8}{9.8}{سناریوهای شکست}
+\CNtocitemk{9}{9}{9.9}{خلاصه}
+\CNtocmodule{CNmod:10}{۱۰}{پروتکل \lr{\mbox{Diameter}}}
+\CNtocitemk{10}{1}{1}{چرا \lr{\mbox{Diameter}} معرفی شد}
+\CNtocitemk{10}{2}{2}{مقایسه \lr{\mbox{Diameter}} با \lr{\mbox{RADIUS}}}
+\CNtocitemk{10}{3}{3}{معماری \lr{\mbox{Diameter}}}
+\CNtocitemk{10}{4}{4}{ساختار پیام \lr{\mbox{Diameter}}}
+\CNtocitemk{10}{5}{5}{فرمان‌های \lr{\mbox{Diameter}}}
+\CNtocitemk{10}{6}{6}{کاربردهای مهم \lr{\mbox{Diameter}} در \lr{\mbox{LTE}}}
+\CNtocitemk{10}{7}{7}{\lr{\mbox{Diameter}} در احراز هویت \lr{\mbox{LTE}} (بررسی عمیق \lr{\mbox{S6a}})}
+\CNtocitemk{10}{8}{}{جریان سیاست \lr{\mbox{Gx}} (\lr{CCR-I/\allowbreak{}CCA-I} در شروع نشست)}
+\CNtocitemk{10}{9}{8}{\lr{\mbox{Diameter}} در برابر \lr{HTTP/\allowbreak{}2} در \lr{\mbox{5G}}}
+\CNtocitemk{10}{10}{9}{\lr{\mbox{Diameter}} = فقط صفحه کنترل}
+\CNtocitemk{10}{11}{}{خلاصه}
+\CNtocmodule{CNmod:11}{۱۱}{سرور مشترک خانگی \lr{\mbox{(HSS)}}}
+\CNtocitemk{11}{1}{1}{چرا یک پایگاه داده مرکزی مشترکین؟}
+\CNtocitemk{11}{2}{2}{نقش \lr{\mbox{HSS}} در \lr{LTE/\allowbreak{}EPC}}
+\CNtocitemk{11}{3}{3}{مدل داده \lr{\mbox{HSS}}}
+\CNtocitemk{11}{4}{4}{تولید بردار احراز هویت}
+\CNtocitemk{11}{5}{5}{تعامل \lr{\mbox{HSS}} با \lr{MME (S6a /\allowbreak{} Diameter)}}
+\CNtocitemk{11}{6}{6}{تعامل \lr{\mbox{HSS}} با سایر عناصر شبکه}
+\CNtocitemk{11}{7}{7}{سناریوی احراز هویت (گام-به-گام)}
+\CNtocitemk{11}{8}{8}{تحول به \lr{\mbox{5G}}: تجزیه \lr{\mbox{HSS}}}
+\CNtocitemk{11}{9}{}{خلاصه}
+\CNtocitemk{11}{10}{}{مراجع}
+\CNtocmodule{CNmod:12}{۱۲}{موجودیت مدیریت تحرک \lr{\mbox{(MME)}}}
+\CNtocitemk{12}{1}{1}{چرا \lr{\mbox{MME}} وجود دارد}
+\CNtocitemk{12}{2}{2}{توابع \lr{\mbox{MME}}}
+\CNtocitemk{12}{3}{3}{پشته پروتکل \lr{\mbox{NAS}}}
+\CNtocitemk{12}{4}{4}{رویه‌های تفصیلی}
+\CNtocitemk{12}{5}{5}{مدیریت حامل}
+\CNtocitemk{12}{6}{6}{انتخاب \lr{\mbox{MME}}}
+\CNtocitemk{12}{7}{7}{\lr{\mbox{S1-Flex}} و استخرسازی \lr{\mbox{MME}}}
+\CNtocitemk{12}{8}{8}{تحول: \lr{MME \ensuremath{\to} AMF (5G)}}
+\CNtocmodule{CNmod:13}{۱۳}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده) و \lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}
+\CNtocitemk{13}{1}{1}{چرا \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} جدا هستند؟}
+\CNtocitemk{13}{2}{2}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده)}
+\CNtocitemk{13}{3}{3}{\lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}
+\CNtocitemk{13}{4}{4}{پروتکل \lr{\mbox{GTP}}}
+\CNtocitemk{13}{5}{5}{ردیابی مسیر بسته (سرتاسری با کپسوله‌سازی)}
+\CNtocitemk{13}{6}{6}{\lr{\mbox{CUPS}}: جداسازی صفحه کنترل و صفحه کاربر}
+\CNtocitemk{13}{7}{7}{تحول: \lr{S-GW + P-GW \ensuremath{\to} UPF (5G)}}
+\CNtocitemk{13}{8}{}{خلاصه}
+\CNtocmodule{CNmod:14}{۱۴}{مقدمه‌ای بر شبکه‌های \lr{\mbox{5G}}}
+\CNtocitemk{14}{1}{1}{چرا \lr{\mbox{5G}}؟ \lr{—} محدودیت‌های \lr{LTE/\allowbreak{}4G}}
+\CNtocitemk{14}{2}{2}{نیازمندی‌های \lr{\mbox{5G}} \lr{—} اهداف \lr{\mbox{IMT-2020}} اتحادیه مخابرات بین‌المللی}
+\CNtocitemk{14}{3}{3}{سه ستون \lr{—} موارد استفاده \lr{\mbox{5G}}}
+\CNtocitemk{14}{4}{4}{\lr{\mbox{5G NR}} (رادیو جدید) \lr{—} لایه فیزیکی}
+\CNtocitemk{14}{5}{5}{\lr{\mbox{NSA}} در برابر \lr{\mbox{SA}} \lr{—} راهبردهای استقرار}
+\CNtocitemk{14}{6}{6}{مرور معماری \lr{\mbox{5G}}}
+\CNtocitemk{14}{7}{7}{معماری \lr{\mbox{gNB}} \lr{—} تقسیم \lr{CU/\allowbreak{}DU}}
+\CNtocitemk{14}{8}{8}{خط زمانی \lr{—} نسخه‌های \lr{\mbox{3GPP}}}
+\CNtocitemk{14}{9}{}{خلاصه \lr{—} نکات کلیدی}
+\CNtocitemk{14}{10}{}{مراجع}
+\CNtocmodule{CNmod:15}{۱۵}{شبکه‌سازی نرم‌افزارمحور \lr{\mbox{(SDN)}}}
+\CNtocitemk{15}{1}{1}{چرا \lr{\mbox{SDN}}؟}
+\CNtocitemk{15}{2}{2}{معماری سنتی در برابر \lr{\mbox{SDN}}}
+\CNtocitemk{15}{3}{3}{لایه‌های معماری \lr{\mbox{SDN}}}
+\CNtocitemk{15}{4}{4}{توابع کنترلر \lr{\mbox{SDN}}}
+\CNtocitemk{15}{5}{5}{واسط‌های جنوب‌سو}
+\CNtocitemk{15}{6}{6}{واسط‌های شمال‌سو}
+\CNtocitemk{15}{7}{7}{مبانی \lr{\mbox{OpenFlow}}}
+\CNtocitemk{15}{8}{8}{\lr{\mbox{SDN}} در مخابرات}
+\CNtocitemk{15}{9}{9}{مزایای \lr{\mbox{SDN}}}
+\CNtocitemk{15}{10}{10}{چالش‌های \lr{\mbox{SDN}}}
+\CNtocitemk{15}{11}{}{نکات کلیدی}
+\CNtocmodule{CNmod:16}{۱۶}{مجازی‌سازی توابع شبکه \lr{\mbox{(NFV)}}}
+\CNtocitemk{16}{1}{1}{چرا \lr{\mbox{NFV}}؟}
+\CNtocitemk{16}{2}{2}{مقایسه سنتی با \lr{\mbox{NFV}}}
+\CNtocitemk{16}{3}{3}{معماری \lr{\mbox{NFV}} سازمان \lr{\mbox{ETSI}}}
+\CNtocitemk{16}{4}{4}{زیرساخت \lr{NFV (NFVI)}}
+\CNtocitemk{16}{5}{5}{\lr{\mbox{VNF}} در برابر \lr{\mbox{CNF}}}
+\CNtocitemk{16}{6}{6}{\lr{\mbox{MANO}} (مدیریت و هماهنگ‌سازی)}
+\CNtocitemk{16}{7}{7}{\lr{\mbox{NFV}} در مخابرات (مثال‌های واقعی)}
+\CNtocitemk{16}{8}{8}{تحول: فیزیکی \ensuremath{\leftarrow} مجازی \ensuremath{\leftarrow} بومی-ابر}
+\CNtocitemk{16}{9}{9}{مزایای \lr{\mbox{NFV}}}
+\CNtocitemk{16}{10}{10}{چالش‌های \lr{\mbox{NFV}}}
+\CNtocitemk{16}{11}{}{نکات کلیدی}
+\CNtocmodule{CNmod:17}{۱۷}{استانداردسازی \lr{\mbox{3GPP}} برای شبکه‌های ارتباطی پیشرفته}
+\CNtocitemk{17}{1}{1}{\lr{\mbox{3GPP}} چیست؟}
+\CNtocitemk{17}{2}{2}{ساختار سازمانی \lr{\mbox{3GPP}}}
+\CNtocitemk{17}{3}{3}{انواع مشخصات}
+\CNtocitemk{17}{4}{4}{سیستم نسخه‌ها \lr{\mbox{(Release)}}}
+\CNtocitemk{17}{5}{5}{چگونه در مشخصات \lr{\mbox{3GPP}} پیمایش کنیم}
+\CNtocitemk{17}{6}{6}{موارد مطالعه در برابر موارد کار}
+\CNtocitemk{17}{7}{7}{راهنمای عملی: ارجاع به مشخصات \lr{\mbox{3GPP}} در کار دانشگاهی}
+\CNtocitemk{17}{8}{8}{جدول مهم سری‌های مشخصات}
+\CNtocitemk{17}{9}{}{خلاصه}
+\CNtocmodule{CNmod:18}{۱۸}{معماری خدمات‌محور \lr{\mbox{5G (SBA)}}}
+\CNtocitemk{18}{1}{1}{چرا \lr{\mbox{5G}} از واسط‌های نقطه-به-نقطه \lr{\mbox{EPC}} فاصله گرفت}
+\CNtocitemk{18}{2}{2}{اصول طراحی \lr{\mbox{SBA}}}
+\CNtocitemk{18}{3}{3}{توابع شبکه هسته \lr{\mbox{5G}}}
+\CNtocitemk{18}{4}{4}{\lr{\mbox{NRF}} \lr{—} توانمندساز کلیدی \lr{\mbox{SBA}}}
+\CNtocitemk{18}{5}{5}{جریان کشف و ارتباط خدمات}
+\CNtocitemk{18}{6}{6}{پشته پروتکل \lr{\mbox{SBI}}}
+\CNtocitemk{18}{7}{7}{مقایسه: واسط‌های \lr{\mbox{EPC}} در برابر \lr{\mbox{SBA}} در \lr{\mbox{5G}}}
+\CNtocitemk{18}{8}{}{خلاصه}
+\CNtocitemk{18}{9}{}{پرسش‌های مرور}
+\CNtocitemk{18}{10}{}{مراجع}
+\CNtocmodule{CNmod:19}{۱۹}{معماری هسته \lr{\mbox{5G}}}
+\CNtocitemk{19}{1}{1}{مرور هسته \lr{\mbox{5G}}}
+\CNtocitemk{19}{2}{2}{معماری مرجع}
+\CNtocitemk{19}{3}{3}{توابع شبکه به‌صورت تفصیلی}
+\CNtocitemk{19}{4}{4}{صفحه کنترل در برابر صفحه کاربر در هسته \lr{\mbox{5G}}}
+\CNtocitemk{19}{5}{5}{مقایسه عمده: \lr{\mbox{EPC}} در \lr{\mbox{4G}} در برابر هسته \lr{\mbox{5G}}}
+\CNtocitemk{19}{6}{6}{نقاط مرجع}
+\CNtocitemk{19}{7}{7}{گزینه‌های استقرار}
+\CNtocitemk{19}{8}{}{خلاصه}
+\CNtocmodule{CNmod:20}{۲۰}{رویه‌های \lr{\mbox{5G}}}
+\CNtocitemk{20}{1}{1}{ثبت‌نام (ثبت‌نام اولیه)}
+\CNtocitemk{20}{2}{2}{احراز هویت \lr{\mbox{(5G-AKA)}}}
+\CNtocitemk{20}{3}{3}{برقراری امنیت}
+\CNtocitemk{20}{4}{4}{برقراری نشست \lr{\mbox{PDU}}}
+\CNtocitemk{20}{5}{5}{آزادسازی نشست \lr{\mbox{PDU}}}
+\CNtocitemk{20}{6}{6}{درخواست خدمات}
+\CNtocitemk{20}{7}{7}{صفحه‌بندی}
+\CNtocitemk{20}{8}{8}{تحویل \lr{\mbox{Xn}}}
+\CNtocitemk{20}{9}{9}{تحویل \lr{\mbox{N2}} (بین-\lr{\mbox{AMF}})}
+\CNtocitemk{20}{10}{}{خلاصه: جدول مقایسه رویه‌ها}
+\CNtocitemk{20}{11}{}{مراجع کلیدی}
+\CNtocmodule{CNmod:21}{۲۱}{شبکه‌بندی}
+\CNtocitemk{21}{1}{1}{چرا شبکه‌بندی؟}
+\CNtocitemk{21}{2}{2}{مفهوم شبکه‌بندی}
+\CNtocitemk{21}{3}{3}{شناسایی برش}
+\CNtocitemk{21}{4}{4}{انتخاب برش (نقش \lr{\mbox{NSSF}})}
+\CNtocitemk{21}{5}{5}{معماری برش}
+\CNtocitemk{21}{6}{6}{جداسازی برش}
+\CNtocitemk{21}{7}{7}{مدیریت چرخه عمر برش}
+\CNtocitemk{21}{8}{8}{موارد استفاده برش}
+\CNtocitemk{21}{9}{9}{شبکه‌بندی در برابر \lr{\mbox{QoS}} در برابر \lr{\mbox{DNN}}}
+\CNtocitemk{21}{10}{10}{شبکه‌بندی \lr{\mbox{RAN}}}
+\CNtocitemk{21}{11}{}{خلاصه}
+\CNtocitemk{21}{12}{}{نکات کلیدی}
+\CNtocmodule{CNmod:22}{۲۲}{کیفیت خدمات \lr{\mbox{(QoS)}}}
+\CNtocitemk{22}{1}{1}{چرا \lr{\mbox{QoS}}؟}
+\CNtocitemk{22}{2}{2}{تحول \lr{\mbox{QoS}} در نسل‌ها}
+\CNtocitemk{22}{3}{3}{\lr{\mbox{QoS}} مبتنی بر حامل در \lr{\mbox{LTE}}}
+\CNtocitemk{22}{4}{4}{\lr{\mbox{QoS}} مبتنی بر جریان در \lr{\mbox{5G}}}
+\CNtocitemk{22}{5}{5}{نگاشت و اجرای \lr{\mbox{QoS}}}
+\CNtocitemk{22}{6}{6}{مقایسه حامل در برابر جریان}
+\CNtocitemk{22}{7}{7}{\lr{\mbox{GBR}} در برابر \lr{\mbox{Non-GBR}} در برابر \lr{\mbox{GBR}} حساس-به-تأخیر}
+\CNtocitemk{22}{8}{8}{\lr{\mbox{AMBR}} (حداکثر نرخ بیت تجمیعی)}
+\CNtocitemk{22}{9}{9}{معماری اجرای \lr{\mbox{QoS}}}
+\CNtocitemk{22}{10}{}{خلاصه: نکات کلیدی}
+\CNtocitemk{22}{11}{}{مرجع سریع \lr{\mbox{QCI}} در برابر \lr{\mbox{5QI}}}
+\CNtocmodule{CNmod:23}{۲۳}{صفحه کاربر}
+\CNtocitemk{23}{1}{1}{مفهوم صفحه کاربر}
+\CNtocitemk{23}{2}{2}{پروتکل \lr{\mbox{GTP-U}} (پروتکل تونل‌سازی \lr{\mbox{GPRS}} \lr{—} صفحه کاربر)}
+\CNtocitemk{23}{3}{3}{صفحه کاربر در \lr{\mbox{LTE (4G)}}}
+\CNtocitemk{23}{4}{4}{صفحه کاربر در \lr{\mbox{5G}}}
+\CNtocitemk{23}{5}{5}{توابع \lr{UPF (3GPP TS 23.501)}}
+\CNtocitemk{23}{6}{6}{مثال ردیابی بسته: داده پیوند پایین‌سو}
+\CNtocitemk{23}{7}{7}{بهینه‌سازی صفحه کاربر}
+\CNtocitemk{23}{8}{}{نمودار مسیر کامل صفحه کاربر \lr{\mbox{5G}}}
+\CNtocitemk{23}{9}{}{جدول خلاصه: صفحه کاربر در نسل‌ها}
+\CNtocitemk{23}{10}{}{نکات کلیدی}
+\CNtocmodule{CNmod:24}{۲۴}{صفحه کنترل}
+\CNtocitemk{24}{1}{1}{مفهوم صفحه کنترل}
+\CNtocitemk{24}{2}{2}{پروتکل‌های صفحه کنترل \lr{—} جدول مرجع اصلی}
+\CNtocitemk{24}{3}{3}{\lr{\mbox{NAS}} (لایه غیر-دسترسی)}
+\CNtocitemk{24}{4}{4}{\lr{\mbox{RRC}} (کنترل منابع رادیویی)}
+\CNtocitemk{24}{5}{5}{\lr{\mbox{NGAP}} (پروتکل کاربرد \lr{\mbox{NG}}) \lr{—} \lr{TS 38.413}}
+\CNtocitemk{24}{6}{6}{\lr{\mbox{GTP-C}} (صفحه کنترل \lr{\mbox{GTP}})}
+\CNtocitemk{24}{7}{7}{\lr{HTTP/\allowbreak{}2 SBI} (واسط خدمات‌محور)}
+\CNtocitemk{24}{8}{8}{تحول پروتکل سیگنالینگ: \lr{SS7 \ensuremath{\to} Diameter \ensuremath{\to} HTTP/\allowbreak{}2}}
+\CNtocitemk{24}{9}{}{نمودار معماری کامل صفحه کنترل \lr{\mbox{(5G)}}}
+\CNtocitemk{24}{10}{}{خلاصه: صفحه کنترل در برابر صفحه کاربر}
+\CNtocitemk{24}{11}{}{نکات کلیدی}
+\CNtocmodule{CNmod:25}{۲۵}{تحول شبکه \lr{—} ترکیب جامع}
+\CNtocitemk{25}{1}{1}{مقدمه}
+\CNtocitemk{25}{2}{2}{جدول مقایسه اصلی}
+\CNtocitemk{25}{3}{3}{تحلیل نسل-به-نسل}
+\CNtocitemk{25}{4}{4}{نمودار خط زمانی}
+\CNtocitemk{25}{5}{5}{نمودار تحول معماری}
+\CNtocitemk{25}{6}{6}{نمودار تحول نرخ داده (رشد نمایی)}
+\CNtocitemk{25}{7}{7}{درس‌های کلیدی از هر گذار}
+\CNtocitemk{25}{8}{8}{خلاصه الگوهای تحولی}
+\CNtocitemk{25}{9}{9}{مرجع سریع آماده‌سازی امتحان}
+\CNtocitemk{25}{10}{10}{نتیجه‌گیری}
+\CNtocmodule{CNmod:26}{۲۶}{فناوری‌های آینده \lr{\mbox{6G}} برای شبکه‌های ارتباطی پیشرفته}
+\CNtocitemk{26}{1}{}{\lr{\mbox{\CNwarn{}}} سلب مسیولیت مهم}
+\CNtocitemk{26}{2}{}{مرور: راه به‌سوی \lr{\mbox{6G}}}
+\CNtocitemk{26}{3}{1}{شبکه‌های بومی-\lr{AI /\allowbreak{} AI-RAN}}
+\CNtocitemk{26}{4}{2}{\lr{\mbox{MIMO}} بسیار بزرگ \lr{(XL-MIMO)}}
+\CNtocitemk{26}{5}{3}{\lr{Massive MIMO} بدون سلول}
+\CNtocitemk{26}{6}{4}{سنجش و ارتباط یکپارچه \lr{(ISAC /\allowbreak{} JCS)}}
+\CNtocitemk{26}{7}{5}{سطوح هوشمند قابل بازپیکربندی \lr{\mbox{(RIS)}}}
+\CNtocitemk{26}{8}{6}{ارتباطات \lr{Sub-THz /\allowbreak{} THz}}
+\CNtocitemk{26}{9}{7}{شبکه‌های غیرزمینی \lr{\mbox{(NTN)}}}
+\CNtocitemk{26}{10}{8}{ارتباطات معنایی}
+\CNtocitemk{26}{11}{9}{دوقلوهای دیجیتال برای شبکه‌ها}
+\CNtocitemk{26}{12}{10}{مکان‌یابی پیشرفته (سطح سانتی‌متر)}
+\CNtocitemk{26}{13}{}{ماتریس بلوغ فناوری}
+\CNtocitemk{26}{14}{}{خط زمانی پیش‌بینی‌شده: نسخه‌های \lr{\mbox{3GPP}} و فناوری‌های \lr{\mbox{6G}}}
+\CNtocitemk{26}{15}{}{خلاصه: تغییرات پارادایم \lr{\mbox{5G}} در برابر \lr{\mbox{6G}}}
+\CNtocitemk{26}{16}{}{نکات کلیدی}
+\CNtocitemk{26}{17}{}{مراجع و مطالعه بیشتر}
+\end{CNbooktoc}
+\clearpage
+\clearpage\CNsetmodule{}{توصیف درس}{}\gdef\CNmodkey{Description}
+\phantomsection\label{CNmod:Description}
+\input{../../00-course-description/fa/content}
+\clearpage\CNsetmodule{}{طرح درس}{}\gdef\CNmodkey{Syllabus}
+\phantomsection\label{CNmod:Syllabus}
+\input{../../00-syllabus/fa/content}
+\clearpage\CNsetmodule{}{مرور پیش‌نیازها}{}\gdef\CNmodkey{Prereq}
+\phantomsection\label{CNmod:Prereq}
+\input{../../00-prerequisites/fa/content}
+\CNmoduleopener{1}{\lr{\mbox{GSM}}، \lr{\mbox{GPRS}} و \lr{\mbox{EDGE}}}{GSM, GPRS, and EDGE}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{معماری \lr{\mbox{GSM}}}
+\CNtocitem{2}{2}{عناصر شبکه \lr{\mbox{GSM}} \lr{—} توضیح تفصیلی}
+\CNtocitem{3}{3}{واسط‌های \lr{\mbox{GSM}}}
+\CNtocitem{4}{4}{تحرک و مدیریت مکان \lr{\mbox{GSM}}}
+\CNtocitem{5}{5}{احراز هویت و امنیت \lr{\mbox{GSM}}}
+\CNtocitem{6}{6}{چرا \lr{\mbox{GPRS}} لازم بود}
+\CNtocitem{7}{7}{معماری \lr{\mbox{GPRS}}}
+\CNtocitem{8}{8}{زمینه \lr{\mbox{PDP}}}
+\CNtocitem{9}{9}{مدیریت تحرک \lr{\mbox{GPRS}}}
+\CNtocitem{10}{10}{\lr{\mbox{EDGE}} \lr{—} نرخ داده بهبودیافته برای تحول \lr{\mbox{GSM}}}
+\CNtocitem{11}{11}{مسیر تحول: \lr{GSM \ensuremath{\to} GPRS \ensuremath{\to} EDGE \ensuremath{\to} 3G}}
+\CNtocitem{12}{}{جدول خلاصه}
+\CNtocitem{13}{}{پرسش‌های مرور}
+\CNtocitem{14}{}{مراجع}
+\end{CNminitoc}
+\clearpage
+\input{../../01-gsm-gprs-edge/fa/content}
+\CNmoduleopener{2}{سوییچینگ مداری \lr{\mbox{2G}}}{2G Circuit Switching}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{مبانی سوییچینگ مداری}
+\CNtocitem{2}{2}{مفاهیم سیگنالینگ \lr{\mbox{SS7}}}
+\CNtocitem{3}{3}{فرآیند برقراری تماس}
+\CNtocitem{4}{4}{مسیریابی تماس}
+\CNtocitem{5}{5}{رویه به‌روزرسانی مکان}
+\CNtocitem{6}{6}{رویه احراز هویت}
+\CNtocitem{7}{7}{رومینگ}
+\CNtocitem{8}{8}{آزادسازی تماس}
+\CNtocitem{9}{9}{چرا سوییچینگ مداری؟}
+\CNtocitem{10}{}{خلاصه اصطلاحات کلیدی}
+\end{CNminitoc}
+\clearpage
+\input{../../02-circuit-switching/fa/content}
+\CNmoduleopener{3}{شبکه‌های هسته \lr{2G/\allowbreak{}3G}}{2G/\allowbreak{}3G Core Networks}
+\begin{CNminitoc}
+\CNtocitem{1}{3.1}{تحول از \lr{\mbox{2G}} به \lr{\mbox{3G}} \lr{—} نیروهای محرک}
+\CNtocitem{2}{3.2}{مرور معماری \lr{\mbox{UMTS}}}
+\CNtocitem{3}{3.3}{\lr{\mbox{UTRAN}}: \lr{\mbox{NodeB}} و \lr{\mbox{RNC}}}
+\CNtocitem{4}{3.4}{شبکه هسته \lr{\mbox{3G}}: دامنه \lr{\mbox{CS}} + دامنه \lr{\mbox{PS}}}
+\CNtocitem{5}{3.5}{واسط \lr{\mbox{Iu}}}
+\CNtocitem{6}{3.6}{نسخه 99 در برابر نسخه \lr{\mbox{5}}+ (تحول \lr{\mbox{HSPA}})}
+\CNtocitem{7}{3.7}{\lr{\mbox{IMS}} (زیرسیستم چندرسانه‌ای \lr{\mbox{IP}}) \lr{—} مقدمه}
+\CNtocitem{8}{3.8}{جدول مقایسه اصلی: نسل‌های شبکه موبایل}
+\CNtocitem{9}{3.9}{تقسیم \lr{CS/\allowbreak{}PS} \lr{—} و چرا \lr{\mbox{LTE}} آن را از بین برد}
+\CNtocitem{10}{3.10}{خلاصه: نکات کلیدی}
+\CNtocitem{11}{}{پرسش‌های مرور}
+\end{CNminitoc}
+\clearpage
+\input{../../03-2g-3g-core/fa/content}
+\CNmoduleopener{4}{تحرک و تحویل}{Mobility and Handover}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا مدیریت تحرک لازم است}
+\CNtocitem{2}{2}{مدیریت مکان: \lr{\mbox{LA}} در برابر \lr{\mbox{RA}} در برابر \lr{\mbox{TA}}}
+\CNtocitem{3}{3}{انتخاب مجدد سلول (تحرک حالت بیکار)}
+\CNtocitem{4}{4}{انواع تحویل}
+\CNtocitem{5}{5}{فرآیند تصمیم تحویل}
+\CNtocitem{6}{6}{رویه تحویل \lr{—} تحویل \lr{\mbox{X2}} در \lr{\mbox{LTE}}}
+\CNtocitem{7}{7}{شکست‌های تحویل}
+\CNtocitem{8}{8}{تحول تحویل: \lr{2G \ensuremath{\to} 3G \ensuremath{\to} LTE \ensuremath{\to} 5G}}
+\CNtocitem{9}{9}{مثال‌های مهندسی با مقادیر معمول پارامترها}
+\CNtocitem{10}{10}{نمودارهای خلاصه}
+\CNtocitem{11}{}{خلاصه فرمول‌های کلیدی}
+\CNtocitem{12}{}{پرسش‌های مرور}
+\end{CNminitoc}
+\clearpage
+\input{../../04-mobility-handover/fa/content}
+\CNmoduleopener{5}{معماری \lr{\mbox{4G LTE}}}{4G LTE Architecture}
+\begin{CNminitoc}
+\CNtocitem{1}{5.1}{چرا \lr{\mbox{LTE}} توسعه یافت}
+\CNtocitem{2}{5.2}{اصول طراحی \lr{\mbox{LTE}}}
+\CNtocitem{3}{5.3}{مرور معماری \lr{\mbox{LTE}}}
+\CNtocitem{4}{5.4}{عناصر شبکه \lr{—} تفصیلی}
+\CNtocitem{5}{5.5}{واسط‌های \lr{\mbox{LTE}} \lr{—} نقاط مرجع}
+\CNtocitem{6}{5.6}{مرور \lr{\mbox{IMS}} (زیرسیستم چندرسانه‌ای \lr{\mbox{IP}})}
+\CNtocitem{7}{5.7}{جداسازی صفحه کنترل از صفحه کاربر \lr{\mbox{(CUPS)}}}
+\CNtocitem{8}{5.8}{تفاوت‌های کلیدی با \lr{\mbox{3G}}}
+\CNtocitem{9}{5.9}{مسیرهای صفحه کنترل در برابر صفحه کاربر}
+\CNtocitem{10}{5.10}{جدول خلاصه واسط‌ها}
+\CNtocitem{11}{}{نکات کلیدی}
+\CNtocitem{12}{}{مراجع}
+\end{CNminitoc}
+\clearpage
+\input{../../05-4g-lte/fa/content}
+\CNmoduleopener{6}{\lr{\mbox{E-UTRAN}} \lr{—} شبکه دسترسی رادیویی \lr{\mbox{LTE}}}{E-UTRAN — LTE Radio Access Network}
+\begin{CNminitoc}
+\CNtocitem{1}{6.1}{معماری \lr{\mbox{E-UTRAN}}}
+\CNtocitem{2}{6.2}{توابع \lr{\mbox{eNodeB}}}
+\CNtocitem{3}{6.3}{پشته پروتکل \lr{\mbox{LTE}}}
+\CNtocitem{4}{6.4}{لایه‌های پروتکل به‌تفصیل}
+\CNtocitem{5}{6.5}{ساختار کانال \lr{\mbox{LTE}}}
+\CNtocitem{6}{6.6}{واسط \lr{\mbox{S1}}}
+\CNtocitem{7}{6.7}{واسط \lr{\mbox{X2}}}
+\CNtocitem{8}{6.8}{حالت‌های \lr{\mbox{RRC}} و گذارها}
+\CNtocitem{9}{}{خلاصه}
+\end{CNminitoc}
+\clearpage
+\input{../../06-eutran/fa/content}
+\CNmoduleopener{7}{زمان‌بندی \lr{\mbox{LTE}}}{LTE Scheduling}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا زمان‌بندی اهمیت دارد}
+\CNtocitem{2}{2}{شبکه منابع \lr{\mbox{LTE}}}
+\CNtocitem{3}{3}{دانه‌بندی زمان‌بندی}
+\CNtocitem{4}{4}{زمان‌بندی پیوند پایین‌سو}
+\CNtocitem{5}{5}{زمان‌بندی پیوند بالاسو}
+\CNtocitem{6}{6}{نشانگر کیفیت کانال \lr{\mbox{(CQI)}}}
+\CNtocitem{7}{7}{تطبیق پیوند}
+\CNtocitem{8}{8}{\lr{\mbox{HARQ}} (درخواست تکرار خودکار ترکیبی)}
+\CNtocitem{9}{9}{الگوریتم‌های زمان‌بندی}
+\CNtocitem{10}{10}{مبادلات مهندسی}
+\CNtocitem{11}{11}{مثال عددی}
+\CNtocitem{12}{}{نکات کلیدی}
+\CNtocitem{13}{}{مراجع}
+\end{CNminitoc}
+\clearpage
+\input{../../07-lte-scheduling/fa/content}
+\CNmoduleopener{8}{کانال دسترسی تصادفی \lr{\mbox{(RACH)}}}{Random Access Channel (RACH)}
+\begin{CNminitoc}
+\CNtocitem{1}{8.1}{چرا دسترسی تصادفی لازم است}
+\CNtocitem{2}{8.2}{\lr{\mbox{PRACH}} (کانال دسترسی تصادفی فیزیکی)}
+\CNtocitem{3}{8.3}{توالی‌های پیشوند}
+\CNtocitem{4}{8.4}{دسترسی تصادفی مبتنی بر رقابت (\lr{\mbox{CBRA 4}}-گام)}
+\CNtocitem{5}{8.5}{دسترسی تصادفی بدون رقابت \lr{\mbox{(CFRA)}}}
+\CNtocitem{6}{8.6}{پیشروی زمانی \lr{\mbox{(TA)}}}
+\CNtocitem{7}{8.7}{برخوردها و عقب‌نشینی}
+\CNtocitem{8}{8.8}{اضافه‌بار \lr{\mbox{RACH}}}
+\CNtocitem{9}{8.9}{دسترسی تصادفی \lr{\mbox{5G NR}}}
+\CNtocitem{10}{8.10}{خلاصه و معادلات کلیدی}
+\CNtocitem{11}{}{پرسش‌های مرور}
+\CNtocitem{12}{}{مراجع}
+\end{CNminitoc}
+\clearpage
+\input{../../08-random-access/fa/content}
+\CNmoduleopener{9}{هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}}}{Evolved Packet Core (EPC)}
+\begin{CNminitoc}
+\CNtocitem{1}{9.1}{چرا \lr{\mbox{EPC}} طراحی شد}
+\CNtocitem{2}{9.2}{مرور معماری \lr{\mbox{EPC}}}
+\CNtocitem{3}{9.3}{توابع شبکه \lr{\mbox{EPC}}}
+\CNtocitem{4}{9.4}{حامل‌های \lr{\mbox{EPC}}}
+\CNtocitem{5}{9.5}{احراز هویت در \lr{\mbox{EPC}}}
+\CNtocitem{6}{9.6}{مدیریت نشست}
+\CNtocitem{7}{9.7}{مدیریت تحرک}
+\CNtocitem{8}{9.8}{سناریوهای شکست}
+\CNtocitem{9}{9.9}{خلاصه}
+\end{CNminitoc}
+\clearpage
+\input{../../09-epc/fa/content}
+\CNmoduleopener{10}{پروتکل \lr{\mbox{Diameter}}}{Diameter Protocol}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{Diameter}} معرفی شد}
+\CNtocitem{2}{2}{مقایسه \lr{\mbox{Diameter}} با \lr{\mbox{RADIUS}}}
+\CNtocitem{3}{3}{معماری \lr{\mbox{Diameter}}}
+\CNtocitem{4}{4}{ساختار پیام \lr{\mbox{Diameter}}}
+\CNtocitem{5}{5}{فرمان‌های \lr{\mbox{Diameter}}}
+\CNtocitem{6}{6}{کاربردهای مهم \lr{\mbox{Diameter}} در \lr{\mbox{LTE}}}
+\CNtocitem{7}{7}{\lr{\mbox{Diameter}} در احراز هویت \lr{\mbox{LTE}} (بررسی عمیق \lr{\mbox{S6a}})}
+\CNtocitem{8}{}{جریان سیاست \lr{\mbox{Gx}} (\lr{CCR-I/\allowbreak{}CCA-I} در شروع نشست)}
+\CNtocitem{9}{8}{\lr{\mbox{Diameter}} در برابر \lr{HTTP/\allowbreak{}2} در \lr{\mbox{5G}}}
+\CNtocitem{10}{9}{\lr{\mbox{Diameter}} = فقط صفحه کنترل}
+\CNtocitem{11}{}{خلاصه}
+\end{CNminitoc}
+\clearpage
+\input{../../10-diameter/fa/content}
+\CNmoduleopener{11}{سرور مشترک خانگی \lr{\mbox{(HSS)}}}{Home Subscriber Server (HSS)}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا یک پایگاه داده مرکزی مشترکین؟}
+\CNtocitem{2}{2}{نقش \lr{\mbox{HSS}} در \lr{LTE/\allowbreak{}EPC}}
+\CNtocitem{3}{3}{مدل داده \lr{\mbox{HSS}}}
+\CNtocitem{4}{4}{تولید بردار احراز هویت}
+\CNtocitem{5}{5}{تعامل \lr{\mbox{HSS}} با \lr{MME (S6a /\allowbreak{} Diameter)}}
+\CNtocitem{6}{6}{تعامل \lr{\mbox{HSS}} با سایر عناصر شبکه}
+\CNtocitem{7}{7}{سناریوی احراز هویت (گام-به-گام)}
+\CNtocitem{8}{8}{تحول به \lr{\mbox{5G}}: تجزیه \lr{\mbox{HSS}}}
+\CNtocitem{9}{}{خلاصه}
+\CNtocitem{10}{}{مراجع}
+\end{CNminitoc}
+\clearpage
+\input{../../11-hss/fa/content}
+\CNmoduleopener{12}{موجودیت مدیریت تحرک \lr{\mbox{(MME)}}}{Mobility Management Entity (MME)}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{MME}} وجود دارد}
+\CNtocitem{2}{2}{توابع \lr{\mbox{MME}}}
+\CNtocitem{3}{3}{پشته پروتکل \lr{\mbox{NAS}}}
+\CNtocitem{4}{4}{رویه‌های تفصیلی}
+\CNtocitem{5}{5}{مدیریت حامل}
+\CNtocitem{6}{6}{انتخاب \lr{\mbox{MME}}}
+\CNtocitem{7}{7}{\lr{\mbox{S1-Flex}} و استخرسازی \lr{\mbox{MME}}}
+\CNtocitem{8}{8}{تحول: \lr{MME \ensuremath{\to} AMF (5G)}}
+\end{CNminitoc}
+\clearpage
+\input{../../12-mme/fa/content}
+\CNmoduleopener{13}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده) و \lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}{S-GW (Serving Gateway) and P-GW (PDN Gateway)}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} جدا هستند؟}
+\CNtocitem{2}{2}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده)}
+\CNtocitem{3}{3}{\lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}
+\CNtocitem{4}{4}{پروتکل \lr{\mbox{GTP}}}
+\CNtocitem{5}{5}{ردیابی مسیر بسته (سرتاسری با کپسوله‌سازی)}
+\CNtocitem{6}{6}{\lr{\mbox{CUPS}}: جداسازی صفحه کنترل و صفحه کاربر}
+\CNtocitem{7}{7}{تحول: \lr{S-GW + P-GW \ensuremath{\to} UPF (5G)}}
+\CNtocitem{8}{}{خلاصه}
+\end{CNminitoc}
+\clearpage
+\input{../../13-sgw-pgw/fa/content}
+\CNmoduleopener{14}{مقدمه‌ای بر شبکه‌های \lr{\mbox{5G}}}{5G Networks Introduction}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{5G}}؟ \lr{—} محدودیت‌های \lr{LTE/\allowbreak{}4G}}
+\CNtocitem{2}{2}{نیازمندی‌های \lr{\mbox{5G}} \lr{—} اهداف \lr{\mbox{IMT-2020}} اتحادیه مخابرات بین‌المللی}
+\CNtocitem{3}{3}{سه ستون \lr{—} موارد استفاده \lr{\mbox{5G}}}
+\CNtocitem{4}{4}{\lr{\mbox{5G NR}} (رادیو جدید) \lr{—} لایه فیزیکی}
+\CNtocitem{5}{5}{\lr{\mbox{NSA}} در برابر \lr{\mbox{SA}} \lr{—} راهبردهای استقرار}
+\CNtocitem{6}{6}{مرور معماری \lr{\mbox{5G}}}
+\CNtocitem{7}{7}{معماری \lr{\mbox{gNB}} \lr{—} تقسیم \lr{CU/\allowbreak{}DU}}
+\CNtocitem{8}{8}{خط زمانی \lr{—} نسخه‌های \lr{\mbox{3GPP}}}
+\CNtocitem{9}{}{خلاصه \lr{—} نکات کلیدی}
+\CNtocitem{10}{}{مراجع}
+\end{CNminitoc}
+\clearpage
+\input{../../14-5g-networks/fa/content}
+\CNmoduleopener{15}{شبکه‌سازی نرم‌افزارمحور \lr{\mbox{(SDN)}}}{Software Defined Networking (SDN)}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{SDN}}؟}
+\CNtocitem{2}{2}{معماری سنتی در برابر \lr{\mbox{SDN}}}
+\CNtocitem{3}{3}{لایه‌های معماری \lr{\mbox{SDN}}}
+\CNtocitem{4}{4}{توابع کنترلر \lr{\mbox{SDN}}}
+\CNtocitem{5}{5}{واسط‌های جنوب‌سو}
+\CNtocitem{6}{6}{واسط‌های شمال‌سو}
+\CNtocitem{7}{7}{مبانی \lr{\mbox{OpenFlow}}}
+\CNtocitem{8}{8}{\lr{\mbox{SDN}} در مخابرات}
+\CNtocitem{9}{9}{مزایای \lr{\mbox{SDN}}}
+\CNtocitem{10}{10}{چالش‌های \lr{\mbox{SDN}}}
+\CNtocitem{11}{}{نکات کلیدی}
+\end{CNminitoc}
+\clearpage
+\input{../../15-sdn/fa/content}
+\CNmoduleopener{16}{مجازی‌سازی توابع شبکه \lr{\mbox{(NFV)}}}{Network Function Virtualization (NFV)}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{NFV}}؟}
+\CNtocitem{2}{2}{مقایسه سنتی با \lr{\mbox{NFV}}}
+\CNtocitem{3}{3}{معماری \lr{\mbox{NFV}} سازمان \lr{\mbox{ETSI}}}
+\CNtocitem{4}{4}{زیرساخت \lr{NFV (NFVI)}}
+\CNtocitem{5}{5}{\lr{\mbox{VNF}} در برابر \lr{\mbox{CNF}}}
+\CNtocitem{6}{6}{\lr{\mbox{MANO}} (مدیریت و هماهنگ‌سازی)}
+\CNtocitem{7}{7}{\lr{\mbox{NFV}} در مخابرات (مثال‌های واقعی)}
+\CNtocitem{8}{8}{تحول: فیزیکی \ensuremath{\leftarrow} مجازی \ensuremath{\leftarrow} بومی-ابر}
+\CNtocitem{9}{9}{مزایای \lr{\mbox{NFV}}}
+\CNtocitem{10}{10}{چالش‌های \lr{\mbox{NFV}}}
+\CNtocitem{11}{}{نکات کلیدی}
+\end{CNminitoc}
+\clearpage
+\input{../../16-nfv/fa/content}
+\CNmoduleopener{17}{استانداردسازی \lr{\mbox{3GPP}} برای شبکه‌های ارتباطی پیشرفته}{3GPP Standardization for Advanced Communication Networks}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{\lr{\mbox{3GPP}} چیست؟}
+\CNtocitem{2}{2}{ساختار سازمانی \lr{\mbox{3GPP}}}
+\CNtocitem{3}{3}{انواع مشخصات}
+\CNtocitem{4}{4}{سیستم نسخه‌ها \lr{\mbox{(Release)}}}
+\CNtocitem{5}{5}{چگونه در مشخصات \lr{\mbox{3GPP}} پیمایش کنیم}
+\CNtocitem{6}{6}{موارد مطالعه در برابر موارد کار}
+\CNtocitem{7}{7}{راهنمای عملی: ارجاع به مشخصات \lr{\mbox{3GPP}} در کار دانشگاهی}
+\CNtocitem{8}{8}{جدول مهم سری‌های مشخصات}
+\CNtocitem{9}{}{خلاصه}
+\end{CNminitoc}
+\clearpage
+\input{../../17-3gpp/fa/content}
+\CNmoduleopener{18}{معماری خدمات‌محور \lr{\mbox{5G (SBA)}}}{5G Service-Based Architecture (SBA)}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{5G}} از واسط‌های نقطه-به-نقطه \lr{\mbox{EPC}} فاصله گرفت}
+\CNtocitem{2}{2}{اصول طراحی \lr{\mbox{SBA}}}
+\CNtocitem{3}{3}{توابع شبکه هسته \lr{\mbox{5G}}}
+\CNtocitem{4}{4}{\lr{\mbox{NRF}} \lr{—} توانمندساز کلیدی \lr{\mbox{SBA}}}
+\CNtocitem{5}{5}{جریان کشف و ارتباط خدمات}
+\CNtocitem{6}{6}{پشته پروتکل \lr{\mbox{SBI}}}
+\CNtocitem{7}{7}{مقایسه: واسط‌های \lr{\mbox{EPC}} در برابر \lr{\mbox{SBA}} در \lr{\mbox{5G}}}
+\CNtocitem{8}{}{خلاصه}
+\CNtocitem{9}{}{پرسش‌های مرور}
+\CNtocitem{10}{}{مراجع}
+\end{CNminitoc}
+\clearpage
+\input{../../18-sba/fa/content}
+\CNmoduleopener{19}{معماری هسته \lr{\mbox{5G}}}{5G Core Architecture}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{مرور هسته \lr{\mbox{5G}}}
+\CNtocitem{2}{2}{معماری مرجع}
+\CNtocitem{3}{3}{توابع شبکه به‌صورت تفصیلی}
+\CNtocitem{4}{4}{صفحه کنترل در برابر صفحه کاربر در هسته \lr{\mbox{5G}}}
+\CNtocitem{5}{5}{مقایسه عمده: \lr{\mbox{EPC}} در \lr{\mbox{4G}} در برابر هسته \lr{\mbox{5G}}}
+\CNtocitem{6}{6}{نقاط مرجع}
+\CNtocitem{7}{7}{گزینه‌های استقرار}
+\CNtocitem{8}{}{خلاصه}
+\end{CNminitoc}
+\clearpage
+\input{../../19-5g-core/fa/content}
+\CNmoduleopener{20}{رویه‌های \lr{\mbox{5G}}}{5G Procedures}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{ثبت‌نام (ثبت‌نام اولیه)}
+\CNtocitem{2}{2}{احراز هویت \lr{\mbox{(5G-AKA)}}}
+\CNtocitem{3}{3}{برقراری امنیت}
+\CNtocitem{4}{4}{برقراری نشست \lr{\mbox{PDU}}}
+\CNtocitem{5}{5}{آزادسازی نشست \lr{\mbox{PDU}}}
+\CNtocitem{6}{6}{درخواست خدمات}
+\CNtocitem{7}{7}{صفحه‌بندی}
+\CNtocitem{8}{8}{تحویل \lr{\mbox{Xn}}}
+\CNtocitem{9}{9}{تحویل \lr{\mbox{N2}} (بین-\lr{\mbox{AMF}})}
+\CNtocitem{10}{}{خلاصه: جدول مقایسه رویه‌ها}
+\CNtocitem{11}{}{مراجع کلیدی}
+\end{CNminitoc}
+\clearpage
+\input{../../20-5g-procedures/fa/content}
+\CNmoduleopener{21}{شبکه‌بندی}{Network Slicing}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا شبکه‌بندی؟}
+\CNtocitem{2}{2}{مفهوم شبکه‌بندی}
+\CNtocitem{3}{3}{شناسایی برش}
+\CNtocitem{4}{4}{انتخاب برش (نقش \lr{\mbox{NSSF}})}
+\CNtocitem{5}{5}{معماری برش}
+\CNtocitem{6}{6}{جداسازی برش}
+\CNtocitem{7}{7}{مدیریت چرخه عمر برش}
+\CNtocitem{8}{8}{موارد استفاده برش}
+\CNtocitem{9}{9}{شبکه‌بندی در برابر \lr{\mbox{QoS}} در برابر \lr{\mbox{DNN}}}
+\CNtocitem{10}{10}{شبکه‌بندی \lr{\mbox{RAN}}}
+\CNtocitem{11}{}{خلاصه}
+\CNtocitem{12}{}{نکات کلیدی}
+\end{CNminitoc}
+\clearpage
+\input{../../21-network-slicing/fa/content}
+\CNmoduleopener{22}{کیفیت خدمات \lr{\mbox{(QoS)}}}{Quality of Service (QoS)}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{QoS}}؟}
+\CNtocitem{2}{2}{تحول \lr{\mbox{QoS}} در نسل‌ها}
+\CNtocitem{3}{3}{\lr{\mbox{QoS}} مبتنی بر حامل در \lr{\mbox{LTE}}}
+\CNtocitem{4}{4}{\lr{\mbox{QoS}} مبتنی بر جریان در \lr{\mbox{5G}}}
+\CNtocitem{5}{5}{نگاشت و اجرای \lr{\mbox{QoS}}}
+\CNtocitem{6}{6}{مقایسه حامل در برابر جریان}
+\CNtocitem{7}{7}{\lr{\mbox{GBR}} در برابر \lr{\mbox{Non-GBR}} در برابر \lr{\mbox{GBR}} حساس-به-تأخیر}
+\CNtocitem{8}{8}{\lr{\mbox{AMBR}} (حداکثر نرخ بیت تجمیعی)}
+\CNtocitem{9}{9}{معماری اجرای \lr{\mbox{QoS}}}
+\CNtocitem{10}{}{خلاصه: نکات کلیدی}
+\CNtocitem{11}{}{مرجع سریع \lr{\mbox{QCI}} در برابر \lr{\mbox{5QI}}}
+\end{CNminitoc}
+\clearpage
+\input{../../22-qos/fa/content}
+\CNmoduleopener{23}{صفحه کاربر}{User Plane}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{مفهوم صفحه کاربر}
+\CNtocitem{2}{2}{پروتکل \lr{\mbox{GTP-U}} (پروتکل تونل‌سازی \lr{\mbox{GPRS}} \lr{—} صفحه کاربر)}
+\CNtocitem{3}{3}{صفحه کاربر در \lr{\mbox{LTE (4G)}}}
+\CNtocitem{4}{4}{صفحه کاربر در \lr{\mbox{5G}}}
+\CNtocitem{5}{5}{توابع \lr{UPF (3GPP TS 23.501)}}
+\CNtocitem{6}{6}{مثال ردیابی بسته: داده پیوند پایین‌سو}
+\CNtocitem{7}{7}{بهینه‌سازی صفحه کاربر}
+\CNtocitem{8}{}{نمودار مسیر کامل صفحه کاربر \lr{\mbox{5G}}}
+\CNtocitem{9}{}{جدول خلاصه: صفحه کاربر در نسل‌ها}
+\CNtocitem{10}{}{نکات کلیدی}
+\end{CNminitoc}
+\clearpage
+\input{../../23-user-plane/fa/content}
+\CNmoduleopener{24}{صفحه کنترل}{Control Plane}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{مفهوم صفحه کنترل}
+\CNtocitem{2}{2}{پروتکل‌های صفحه کنترل \lr{—} جدول مرجع اصلی}
+\CNtocitem{3}{3}{\lr{\mbox{NAS}} (لایه غیر-دسترسی)}
+\CNtocitem{4}{4}{\lr{\mbox{RRC}} (کنترل منابع رادیویی)}
+\CNtocitem{5}{5}{\lr{\mbox{NGAP}} (پروتکل کاربرد \lr{\mbox{NG}}) \lr{—} \lr{TS 38.413}}
+\CNtocitem{6}{6}{\lr{\mbox{GTP-C}} (صفحه کنترل \lr{\mbox{GTP}})}
+\CNtocitem{7}{7}{\lr{HTTP/\allowbreak{}2 SBI} (واسط خدمات‌محور)}
+\CNtocitem{8}{8}{تحول پروتکل سیگنالینگ: \lr{SS7 \ensuremath{\to} Diameter \ensuremath{\to} HTTP/\allowbreak{}2}}
+\CNtocitem{9}{}{نمودار معماری کامل صفحه کنترل \lr{\mbox{(5G)}}}
+\CNtocitem{10}{}{خلاصه: صفحه کنترل در برابر صفحه کاربر}
+\CNtocitem{11}{}{نکات کلیدی}
+\end{CNminitoc}
+\clearpage
+\input{../../24-control-plane/fa/content}
+\CNmoduleopener{25}{تحول شبکه \lr{—} ترکیب جامع}{Network Evolution — Grand Synthesis}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{مقدمه}
+\CNtocitem{2}{2}{جدول مقایسه اصلی}
+\CNtocitem{3}{3}{تحلیل نسل-به-نسل}
+\CNtocitem{4}{4}{نمودار خط زمانی}
+\CNtocitem{5}{5}{نمودار تحول معماری}
+\CNtocitem{6}{6}{نمودار تحول نرخ داده (رشد نمایی)}
+\CNtocitem{7}{7}{درس‌های کلیدی از هر گذار}
+\CNtocitem{8}{8}{خلاصه الگوهای تحولی}
+\CNtocitem{9}{9}{مرجع سریع آماده‌سازی امتحان}
+\CNtocitem{10}{10}{نتیجه‌گیری}
+\end{CNminitoc}
+\clearpage
+\input{../../25-network-evolution/fa/content}
+\CNmoduleopener{26}{فناوری‌های آینده \lr{\mbox{6G}} برای شبکه‌های ارتباطی پیشرفته}{Future 6G Technologies for Advanced Communication Networks}
+\begin{CNminitoc}
+\CNtocitem{1}{}{\lr{\mbox{\CNwarn{}}} سلب مسیولیت مهم}
+\CNtocitem{2}{}{مرور: راه به‌سوی \lr{\mbox{6G}}}
+\CNtocitem{3}{1}{شبکه‌های بومی-\lr{AI /\allowbreak{} AI-RAN}}
+\CNtocitem{4}{2}{\lr{\mbox{MIMO}} بسیار بزرگ \lr{(XL-MIMO)}}
+\CNtocitem{5}{3}{\lr{Massive MIMO} بدون سلول}
+\CNtocitem{6}{4}{سنجش و ارتباط یکپارچه \lr{(ISAC /\allowbreak{} JCS)}}
+\CNtocitem{7}{5}{سطوح هوشمند قابل بازپیکربندی \lr{\mbox{(RIS)}}}
+\CNtocitem{8}{6}{ارتباطات \lr{Sub-THz /\allowbreak{} THz}}
+\CNtocitem{9}{7}{شبکه‌های غیرزمینی \lr{\mbox{(NTN)}}}
+\CNtocitem{10}{8}{ارتباطات معنایی}
+\CNtocitem{11}{9}{دوقلوهای دیجیتال برای شبکه‌ها}
+\CNtocitem{12}{10}{مکان‌یابی پیشرفته (سطح سانتی‌متر)}
+\CNtocitem{13}{}{ماتریس بلوغ فناوری}
+\CNtocitem{14}{}{خط زمانی پیش‌بینی‌شده: نسخه‌های \lr{\mbox{3GPP}} و فناوری‌های \lr{\mbox{6G}}}
+\CNtocitem{15}{}{خلاصه: تغییرات پارادایم \lr{\mbox{5G}} در برابر \lr{\mbox{6G}}}
+\CNtocitem{16}{}{نکات کلیدی}
+\CNtocitem{17}{}{مراجع و مطالعه بیشتر}
+\end{CNminitoc}
+\clearpage
+\input{../../26-future-6g/fa/content}
+\end{document}

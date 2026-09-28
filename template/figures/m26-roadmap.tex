@@ -1,0 +1,25 @@
+% Module 26 — projected timeline of 3GPP releases and 6G technologies
+\begin{tikzpicture}[CNfig, x=1.45cm, y=1cm, ph/.style={draw=#1, fill=#1!22, line width=0.5pt, minimum height=0.36cm, inner sep=1pt, font=\sffamily\tiny, anchor=west}]
+\foreach \yr [count=\k from 0] in {2024,...,2032}{\node[CNtiny, font=\sffamily\scriptsize\bfseries] at (\k,0.9) {\yr}; \draw[CNline] (\k,0.65) -- (\k,-6.1);}
+\foreach \k/\r/\p in {0/R18/freeze, 1/R19/study, 2/R19/freeze, 3/R20/study, 4/R20/freeze, 5/R21/study, 6/R21/freeze, 7/R22/, 8/R22/}{
+  \node[CNtiny, align=center] at (\k,0.35) {\r\\{\color{CNmuted}\p}};}
+\draw[CNcyan, line width=2pt] (0,-0.25) -- node[below=1pt, CNtiny, text=CNcyanD] {5G-Advanced} (2,-0.25);
+\draw[CNsig, line width=2pt] (3,-0.25) -- node[below=1pt, CNtiny, text=CNsig] {6G (\CNL{expected}{مورد انتظار})} (6,-0.25);
+\draw[CNviolet, line width=2pt] (7,-0.25) -- node[below=1pt, CNtiny, text=CNviolet] {6G+} (8.5,-0.25);
+% technology rows: label, then segments (start, length, phase)
+\foreach \lab/\segs [count=\r from 0] in {
+   {AI/RAN}/{0/1/SI/CNamber, 1/1/WI/CNcyan, 2/1.5/SPEC/CNsig, 3.5/2/Deploy/CNgreen},
+   ISAC/{0.6/1/SI/CNamber, 1.6/1.2/WI/CNcyan, 2.8/1.5/SPEC/CNsig, 4.3/2/Deploy/CNgreen},
+   RIS/{0/1/SI/CNamber, 1/1.2/WI/CNcyan, 2.2/1.5/SPEC/CNsig, 3.7/2/Deploy/CNgreen},
+   NTN (adv)/{0/1/WI/CNcyan, 1/1.5/SPEC/CNsig, 2.5/2/Deploy/CNgreen, 4.5/2/Enhance/CNgreen},
+   Positioning/{0/1/SI/CNamber, 1/1.2/WI/CNcyan, 2.2/1.5/SPEC/CNsig, 3.7/2/Deploy/CNgreen},
+   XL-MIMO/{1.8/1.4/Research/CNviolet, 3.2/1/SI/CNamber, 4.2/1/WI/CNcyan, 5.2/1.5/SPEC/CNsig},
+   Cell-Free/{1.8/1.4/Research/CNviolet, 3.2/1/SI/CNamber, 4.2/1/WI/CNcyan, 5.2/1.5/SPEC/CNsig},
+   Sub-THz/{1.8/1.8/Research/CNviolet, 3.6/1/SI/CNamber, 4.6/1/WI/CNcyan, 5.6/1.5/SPEC/CNsig},
+   Digital Twin/{1.8/1.4/Research/CNviolet, 3.2/1/SI/CNamber, 4.2/1/WI/CNcyan, 5.2/1.5/SPEC/CNsig},
+   Semantic/{0.4/4.6/Research/CNviolet, 5/1.2/SI??/CNamber}}{
+  \node[CNtiny, anchor=east, font=\sffamily\scriptsize\bfseries] at (-0.25,{-0.95-\r*0.52}) {\lab};
+  \foreach \s/\l/\ph/\cc in \segs {
+    \node[ph=\cc, minimum width=\l*1.45cm] at (\s,{-0.95-\r*0.52}) {\ph};}}
+\node[CNtiny, anchor=north west] at (-1.3,-6.2) {SI = Study Item, WI = Work Item, SPEC = Specification};
+\end{tikzpicture}

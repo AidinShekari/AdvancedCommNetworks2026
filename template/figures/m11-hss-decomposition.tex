@@ -1,0 +1,18 @@
+% Module 11 — the 4G HSS is decomposed into AUSF, UDM and UDR in 5G
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.4,-2.35) rectangle (12.4,1.0);
+\node[CNgrouplabel, font=\sffamily\small\bfseries, text=CNink, anchor=north west] at (-0.35,0.95) {4G (LTE/EPC)};
+\draw[CNviolet, line width=0.9pt, fill=CNviolet!6, rounded corners=4pt] (0.6,-2.0) rectangle (11.4,0.45);
+\node[font=\sffamily\small\bfseries, text=CNviolet] at (6,0.15) {HSS};
+\foreach \t/\x in {{\CNL{Auth function}{تابع احراز هویت}}/2.4, {\CNL{User data storage}{ذخیره داده کاربر}}/6, {\CNL{Subscription management}{مدیریت اشتراک}}/9.6}{
+  \node[CNdb, fill=white, minimum width=3.1cm] at (\x,-0.95) {\t};}
+\node[font=\sffamily\small\bfseries, text=CNsig] at (6,-3.0) {$\downarrow$\ \CNL{decomposed into}{تفکیک می‌شود به}\ $\downarrow$};
+\begin{scope}[yshift=-6.4cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.4,-1.7) rectangle (12.4,2.6);
+\node[CNgrouplabel, font=\sffamily\small\bfseries, text=CNink, anchor=north west] at (-0.35,2.55) {5G (5GC/SBA)};
+\node[CNdb, text width=2.8cm] (a) at (2.2,0.4) {\textbf{AUSF}\\{\scriptsize \CNL{Authentication Server Function}{تابع سرور احراز هویت}}};
+\node[CNdb, text width=2.8cm] (u) at (6,0.4) {\textbf{UDM}\\{\scriptsize \CNL{Unified Data Management}{مدیریت یکپارچه داده}}};
+\node[CNdb, text width=2.8cm] (r) at (9.8,0.4) {\textbf{UDR}\\{\scriptsize \CNL{Unified Data Repository}{مخزن یکپارچه داده}}};
+\draw[CNsigl, <->] (a) -- (u); \draw[CNsigl, <->] (u) -- (r);
+\end{scope}
+\end{tikzpicture}

@@ -1,0 +1,826 @@
+\CNsection{1}{چرا \lr{\mbox{5G}}؟ \lr{—} محدودیت‌های \lr{LTE/\allowbreak{}4G}}
+
+با وجود موفقیت \lr{\mbox{LTE (4G)}}، چند محدودیت بنیادی نیاز به یک نسل جدید را ایجاب کرد:
+
+\CNsubsection{1.1}{کف تأخیر (حدود \lr{\mbox{10~ms}})}
+
+\begin{itemize}
+\tightlist
+\item
+  فاصله زمانی انتقال \lr{\mbox{(TTI)}} در \lr{\mbox{LTE}} به‌صورت ثابت \lr{\mbox{\textbf{\lr{\mbox{1~ms}}}}} زیرفریم است
+\item
+  با تأخیرهای زمان‌بندی، \lr{\mbox{HARQ}} و پردازش، \textbf{کف تأخیر رفت-و-برگشت عملی حدود \lr{\mbox{10~ms}}} است
+\item
+  این برای موارد زیر کافی نیست:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    کنترل خودروی خودران (نیازمند کمتر از \lr{\mbox{5~ms}})
+  \item
+    جراحی از راه دور /\allowbreak{} بازخورد لمسی (نیازمند حدود \lr{\mbox{1~ms}})
+  \item
+    حلقه‌های کنترل بلادرنگ صنعتی
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{1.2}{سقف ظرفیت}
+
+\begin{itemize}
+\tightlist
+\item
+  اوج \lr{\mbox{LTE}}: حدود \lr{\mbox{1~Gbps}} (\lr{\mbox{Cat-16}}، \lr{\mbox{3CA}}، \lr{\mbox{MIMO 4\ensuremath{\times}4}}، \lr{\mbox{256-QAM}}) \lr{—} نظری
+\item
+  توان عملیاتی عملی: \lr{100–300~Mbps} در شرایط ایده‌آل
+\item
+  طیف زیر \lr{\mbox{6~GHz}} اشباع است؛ پهنای باند محدود در هر حامل (حداکثر \lr{\mbox{20~MHz}})
+\item
+  \lr{\mbox{MIMO 4\ensuremath{\times}4}} حد عملی آنتن در قالب‌های \lr{\mbox{LTE}} است
+\end{itemize}
+
+\CNsubsection{1.3}{مقیاس \lr{\mbox{IoT}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{LTE}} برای ارتباط پهن‌باند \textbf{انسان‌محور} طراحی شده بود
+\item
+  \lr{LTE-M /\allowbreak{} NB-IoT} پشتیبانی \lr{\mbox{IoT}} را اضافه کردند، اما:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    چگالی اتصال به حدود \lr{\mbox{10\textsuperscript{4}}} دستگاه/\allowbreak{}\lr{\mbox{km\textsuperscript{2}}} محدود است
+  \item
+    به‌طور بومی برای \textbf{\lr{\mbox{10\textsuperscript{6}}} دستگاه/\allowbreak{}\lr{\mbox{km\textsuperscript{2}}}} مورد نیاز شهر هوشمند/\allowbreak{}\lr{\mbox{IoT}} صنعتی طراحی نشده است
+  \item
+    سربار سیگنالینگ در هر دستگاه برای استقرارهای انبوه بیش از حد بالاست
+  \end{itemize}
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{1.4}{خلاصه محدودیت‌های \lr{\mbox{LTE}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{قابلیت \lr{\mbox{LTE}}} & \CNth{هدف \lr{\mbox{5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+حداکثر نرخ داده \lr{\mbox{(DL)}} & حدود \lr{\mbox{1~Gbps}} & \lr{\mbox{20~Gbps}} \\
+تأخیر صفحه کاربر & حدود \lr{\mbox{10~ms}} & \lr{\mbox{1~ms}} \\
+چگالی اتصال & حدود \lr{10\textsuperscript{4}/\allowbreak{}km\textsuperscript{2}} & \lr{10\textsuperscript{6}/\allowbreak{}km\textsuperscript{2}} \\
+کارایی طیفی & \lr{30 bps/\allowbreak{}Hz} & \lr{90 bps/\allowbreak{}Hz} \\
+تحرک & \lr{350 km/\allowbreak{}h} & \lr{500 km/\allowbreak{}h} \\
+\end{longtable}
+}
+
+\CNsection{2}{نیازمندی‌های \lr{\mbox{5G}} \lr{—} اهداف \lr{\mbox{IMT-2020}} اتحادیه مخابرات بین‌المللی}
+
+اتحادیه مخابرات بین‌المللی \lr{(ITU) \textbf{\lr{\mbox{IMT-2020}}}} را به‌عنوان چارچوب \lr{\mbox{5G}} با شاخص‌های کلیدی عملکرد \lr{\mbox{(KPI)}} زیر تعریف کرد:
+
+\CNsubsection{2.1}{حداکثر نرخ داده}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{پیوند پایین‌سو}: \lr{\mbox{20~Gbps}}
+\item
+  \textbf{پیوند بالاسو}: \lr{\mbox{10~Gbps}}
+\item
+  از طریق پهنای باند بیشتر (تا \lr{\mbox{400~MHz}} در هر حامل) + \lr{\mbox{MIMO}} مرتبه بالاتر + \lr{\mbox{256-QAM}} به دست می‌آید
+\end{itemize}
+
+\CNsubsection{2.2}{تأخیر}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تأخیر صفحه کاربر}: \lr{\mbox{\textbf{\lr{\mbox{1~ms}}}}} (سناریوی \lr{\mbox{URLLC}})
+\item
+  \textbf{تأخیر صفحه کنترل}: \lr{\mbox{20~ms}} (بیکار تا متصل)
+\item
+  کاربردهای کنترل بلادرنگ را که قبلاً روی شبکه سلولی غیرممکن بود ممکن می‌سازد
+\end{itemize}
+
+\CNsubsection{2.3}{چگالی اتصال}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{10\textsuperscript{6}}} دستگاه در هر \lr{\mbox{km\textsuperscript{2}}}} (سناریوی \lr{\mbox{mMTC}})
+\item
+  بهبود 100 برابری نسبت به \lr{\mbox{LTE}}
+\item
+  پشتیبانی از حسگرها، محرک‌ها، کنتورها با حداقل سربار
+\end{itemize}
+
+\CNsubsection{2.4}{نرخ داده تجربه‌شده توسط کاربر}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{100~Mbps}}}}} در همه‌جا در دسترس (لبه سلول، شهری متراکم)
+\item
+  \textbf{\lr{\mbox{50~Mbps}} در \lr{\mbox{UL}}} در همه‌جا
+\item
+  نمایانگر «حداقل تضمین‌شده» تجربه کاربر است
+\end{itemize}
+
+\CNsubsection{2.5}{قابلیت اطمینان}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\CNnum{99.999\%}} (پنج نه) برای \lr{\mbox{URLLC}}
+\item
+  تحویل بسته درون بودجه تأخیر با احتمال خطای \lr{\mbox{10\textsuperscript{-5}}}
+\item
+  حیاتی برای کاربردهای مرتبط با ایمنی جان
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{2.6}{اهداف اضافی \lr{\mbox{IMT-2020}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{KPI}}} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ظرفیت ترافیک ناحیه‌ای & \lr{10 Mbps/\allowbreak{}m\textsuperscript{2}} \\
+کارایی انرژی شبکه & بهبود 100 برابری \\
+کارایی طیفی & 3 برابر نسبت به \lr{IMT-Advanced} \\
+تحرک & \lr{500 km/\allowbreak{}h} \\
+\end{longtable}
+}
+
+\CNkeepfig{m14-usage-triangle}{10}
+
+\CNsection{3}{سه ستون \lr{—} موارد استفاده \lr{\mbox{5G}}}
+
+\lr{\mbox{5G}} با سه دسته خدمات بنیادی (ستون‌های موارد استفاده) تعریف می‌شود:
+
+\CNsubsection{}{مثلث موارد استفاده \lr{\mbox{5G}}}
+
+\CNfigure{m14-usage-triangle}{سناریوهای کاربرد \lr{\mbox{5G}} در \lr{ITU IMT-2020}}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{3.1}{\lr{\mbox{eMBB}} \lr{—} پهن‌باند موبایل بهبودیافته}
+
+\textbf{تمرکز}: نرخ داده بالا، ظرفیت، پوشش
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{جزییات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نرخ اوج & \lr{20~Gbps DL /\allowbreak{} 10~Gbps UL} \\
+تجربه کاربر & \lr{\mbox{100~Mbps}} در همه‌جا \\
+فناوری کلیدی & \lr{Massive MIMO}، \lr{\mbox{mmWave}}، \lr{\mbox{CA}} \\
+\end{longtable}
+}
+
+\textbf{کاربردها}:
+
+\begin{itemize}
+\tightlist
+\item
+  واقعیت مجازی \lr{\mbox{(VR)}} /\allowbreak{} واقعیت افزوده \lr{\mbox{(AR)}} \lr{—} نیازمند بیش از \lr{\mbox{100 Mbps}}، کمتر از \lr{\mbox{20~ms}}
+\item
+  پخش جریانی ویدیوی \lr{4K/\allowbreak{}8K}
+\item
+  مکان‌های رویداد با تراکم بالا (استادیوم‌ها: بیش از 100 هزار کاربر)
+\item
+  دسترسی بی‌سیم ثابت \lr{\mbox{(FWA)}} به‌عنوان جانشین فیبر
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{3.2}{\lr{\mbox{URLLC}} \lr{—} ارتباطات فوق‌قابل اعتماد کم-تأخیر}
+
+\textbf{تمرکز}: تأخیر قطعی، قابلیت اطمینان شدید
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{جزییات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+تأخیر & \lr{\mbox{1~ms}} (صفحه کاربر، یک‌طرفه) \\
+قابلیت اطمینان & \lr{99.999\% (10\textsuperscript{-5} BLER)} \\
+فناوری کلیدی & مینی-اسلات، پیش‌گیری، افزونگی \\
+\end{longtable}
+}
+
+\textbf{کاربردها}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{رانندگی خودران}: ارتباط \lr{\mbox{V2X}}، ادراک مشارکتی
+\item
+  \textbf{جراحی از راه دور}: بازخورد لمسی روی شبکه سلولی
+\item
+  \textbf{صنعت \CNnum{4.0}}: کنترل رباتیک بلادرنگ، کنترل حرکت
+\item
+  \textbf{شبکه هوشمند}: حفاظت و جداسازی خطا
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{3.3}{\lr{\mbox{mMTC}} \lr{—} ارتباطات انبوه ماشین-به-ماشین}
+
+\textbf{تمرکز}: مقیاس‌پذیری، کارایی انرژی، هزینه پایین
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{جزییات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+چگالی & \lr{\mbox{10\textsuperscript{6}}} دستگاه/\allowbreak{}\lr{\mbox{km\textsuperscript{2}}} \\
+عمر باتری & \lr{\mbox{10–15}} سال روی باتری سکه‌ای \\
+فناوری کلیدی & دسترسی بدون-اعطا، \lr{\mbox{NOMA}}، پوشش عمیق \\
+\end{longtable}
+}
+
+\textbf{کاربردها}:
+
+\begin{itemize}
+\tightlist
+\item
+  شبکه‌های حسگر \lr{\mbox{IoT}} (محیطی، کشاورزی)
+\item
+  زیرساخت شهر هوشمند (پارکینگ، پسماند، روشنایی)
+\item
+  کنتورخوانی هوشمند (برق، آب، گاز)
+\item
+  ردیابی دارایی و لجستیک
+\item
+  دستگاه‌های پوشیدنی
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsection{4}{\lr{\mbox{5G NR}} (رادیو جدید) \lr{—} لایه فیزیکی}
+
+\lr{\mbox{5G NR}} فناوری دسترسی رادیویی تعریف‌شده در نسخه \lr{\mbox{15}}+ گروه \lr{\mbox{3GPP}} است که از پایه برای انعطاف‌پذیری طراحی شده است.
+
+\CNsubsection{4.1}{عددشناسی انعطاف‌پذیر}
+
+برخلاف \lr{\mbox{LTE}} (\lr{\mbox{SCS}} ثابت \lr{\mbox{15 kHz}}، \lr{\mbox{TTI 1 ms}})، \lr{\mbox{NR}} از \textbf{فاصله‌های زیرحامل \lr{\mbox{(SCS)}} متعدد} پشتیبانی می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccccl@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عددشناسی \lr{\mbox{($\mu$)}}} & \CNth{\lr{SCS (kHz)}} & \CNth{مدت شکاف} & \CNth{نوع \lr{\mbox{CP}}} & \CNth{کاربرد معمول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 15 & \lr{\mbox{1~ms}} & معمولی & \lr{\mbox{FR1}}، \lr{\mbox{eMBB}} (فرکانس پایین) \\
+1 & 30 & \lr{\mbox{0.5~ms}} & معمولی & \lr{\mbox{FR1}}، استقرار معمول \\
+2 & 60 & \lr{\mbox{0.25~ms}} & معمولی/\allowbreak{}گسترده & \lr{FR1/\allowbreak{}FR2}، \lr{\mbox{URLLC}} \\
+3 & 120 & \lr{\mbox{0.125~ms}} & معمولی & \lr{FR2 (mmWave)} \\
+4 & 240 & \lr{\mbox{62.5~\ensuremath{\mu}s}} & معمولی & \lr{\mbox{FR2}} (فقط \lr{\mbox{SSB}}) \\
+\end{longtable}
+}
+
+\textbf{روابط کلیدی}:
+
+\begin{itemize}
+\tightlist
+\item
+  مدت شکاف = \lr{$1\ \mathrm{ms}/2^{\mu}$}
+\item
+  نماد در هر شکاف = \lr{\mbox{14}} (\lr{\mbox{CP}} معمولی) یا 12 (\lr{\mbox{CP}} گسترده)
+\item
+  \lr{\mbox{SCS}} بالاتر \ensuremath{\leftarrow} شکاف کوتاه‌تر \ensuremath{\leftarrow} تأخیر کمتر (اما زیرحامل پهن‌تر \ensuremath{\leftarrow} تحمل نویز فاز بیشتر مورد نیاز برای \lr{\mbox{mmWave}})
+\end{itemize}
+
+\Needspace{12\baselineskip}
+
+\CNsubsection{4.2}{محدوده‌های فرکانسی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}ccccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{محدوده} & \CNth{باند} & \CNth{فرکانس‌ها} & \CNth{حداکثر \lr{\mbox{BW}}/\allowbreak{}حامل} & \CNth{\lr{\mbox{SCS}} معمول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{FR1}}}}} & زیر-\lr{\mbox{7~GHz}} & \lr{410~MHz – 7.125~GHz} & \lr{\mbox{100~MHz}} & \lr{15/\allowbreak{}30/\allowbreak{}60~kHz} \\
+\lr{\mbox{\textbf{\lr{\mbox{FR2}}}}} & \lr{\mbox{mmWave}} & \lr{24.25 – 52.6~GHz} & \lr{\mbox{400~MHz}} & \lr{60/\allowbreak{}120/\allowbreak{}240~kHz} \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{FR1}}}}} پوشش و ظرفیت فراهم می‌کند (\lr{\mbox{n77}}، \lr{\mbox{n78}} = باند \lr{\mbox{C}} با \lr{3.3–4.2~GHz})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{FR2}}}}} ظرفیت شدید در برد کوتاه فراهم می‌کند (\lr{n257 = 28 GHz}، \lr{n258 = 26 GHz}، \lr{n260 = 39 GHz}، \lr{n261 = 28~GHz})
+\item
+  \lr{\mbox{3GPP}} در \lr{Rel-17 \textbf{\lr{\mbox{FR2-2}}}} را معرفی کرد: \lr{52.6–71~GHz}
+\end{itemize}
+
+\CNsubsection{4.3}{بخش‌های پهنای باند \lr{\mbox{(BWP)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  یک \textbf{بخش پهنای باند} یک زیرمجموعه پیوسته از پهنای باند حامل است
+\item
+  \lr{\mbox{UE}} می‌تواند تا \textbf{\lr{\mbox{4 BWP}} در هر سلول خدمات‌دهنده} پیکربندی شود (1 فعال در هر زمان)
+\item
+  صرفه‌جویی در توان \lr{\mbox{UE}} را ممکن می‌سازد: \lr{\mbox{BWP}} باریک برای پایش، \lr{\mbox{BWP}} پهن برای داده
+\item
+  هر \lr{\mbox{BWP}} می‌تواند عددشناسی خود را داشته باشد (\lr{\mbox{SCS}}، \lr{\mbox{CP}})
+\end{itemize}
+
+\CNsubsection{4.4}{مینی-اسلات‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  شکاف استاندارد \lr{\mbox{NR = 14}} نماد
+\item
+  \textbf{مینی-اسلات} = \lr{\mbox{2}}، 4 یا 7 نماد \lr{\mbox{OFDM}}
+\item
+  زمان‌بندی زیر-شکاف را برای \lr{\mbox{\textbf{\lr{\mbox{URLLC}}}}} بدون انتظار برای مرز شکاف ممکن می‌سازد
+\item
+  می‌تواند ارسال‌های در جریان \lr{\mbox{eMBB}} را برای ترافیک فوری \lr{\mbox{URLLC}} \textbf{پیش‌گیری} کند
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{4.5}{\lr{Massive MIMO} و شکل‌دهی پرتو}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{\lr{\mbox{LTE}}} & \CNth{\lr{\mbox{5G NR}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+حداکثر پورت آنتن & 16 (\lr{\mbox{FD-MIMO}} در \lr{\mbox{Rel-13}}) & بیش از 256 \\
+شکل‌دهی پرتو & ثابت /\allowbreak{} نیمه-ایستا & پویا، مدیریت پرتو در هر شکاف \\
+مدیریت پرتو & \lr{N/\allowbreak{}A} & پرتوهای \lr{\mbox{SSB}}، \lr{\mbox{CSI-RS}}، ردیابی پرتو \\
+معماری پنل & پنل واحد & چند-پنل \lr{\mbox{(FR2)}} \\
+\end{longtable}
+}
+
+\textbf{رویه‌های مدیریت پرتو در \lr{\mbox{5G NR}}}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{P1}}}}}: کسب پرتو اولیه (جاروب \lr{\mbox{SSB}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{P2}}}}}: پالایش پرتو ارسال \lr{gNB (CSI-RS)}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{P3}}}}}: پالایش پرتو دریافت \lr{\mbox{UE}}
+\item
+  \textbf{بازیابی شکست پرتو}: تشخیص شکست \ensuremath{\leftarrow} انتخاب نامزد جدید \ensuremath{\leftarrow} بازیابی مبتنی بر \lr{\mbox{RACH}}
+\end{enumerate}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{4.6}{تفاوت‌های کلیدی با \lr{\mbox{PHY}} در \lr{\mbox{LTE}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{LTE}}} & \CNth{\lr{\mbox{5G NR}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+فاصله زیرحامل & ثابت \lr{\mbox{15~kHz}} & \lr{15/\allowbreak{}30/\allowbreak{}60/\allowbreak{}120/\allowbreak{}240~kHz} \\
+حداکثر پهنای باند & \lr{\mbox{20~MHz}} & \lr{100~MHz (FR1) /\allowbreak{} 400~MHz (FR2)} \\
+شکل‌موج \lr{\mbox{DL}} & \lr{\mbox{OFDMA}} & \lr{\mbox{CP-OFDMA}} \\
+شکل‌موج \lr{\mbox{UL}} & \lr{\mbox{SC-FDMA}} & \lr{CP-OFDMA (+ DFT-s-OFDMA)} \\
+سیگنال‌های مرجع & \lr{\mbox{CRS}} همیشه-فعال & بدون \lr{\mbox{CRS}}؛ \lr{DMRS/\allowbreak{}CSI-RS} در صورت تقاضا \\
+زمان‌بندی \lr{\mbox{HARQ}} & ثابت \lr{(RTT 8~ms)} & انعطاف‌پذیر، قابل پیکربندی \\
+زمان‌بندی & فقط مبتنی بر شکاف & شکاف + مینی-اسلات \\
+دوپلکس & \lr{\mbox{FDD}} یا \lr{\mbox{TDD}} (ثابت) & \lr{\mbox{TDD}} پویا، شکاف خود-شامل \\
+کانال کنترل & \lr{\mbox{PDCCH}} در \CNnum{1-3} نماد اول & \lr{\mbox{CORESET}} (انعطاف‌پذیر در زمان/\allowbreak{}فرکانس) \\
+زیرحامل \lr{\mbox{DC}} & بله (مرکز \lr{\mbox{LTE}}) & بدون زیرحامل \lr{\mbox{DC}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{\lr{\mbox{NSA}} در برابر \lr{\mbox{SA}} \lr{—} راهبردهای استقرار}
+
+\CNchained\CNsubsection{5.1}{غیرمستقل \lr{\mbox{(NSA)}} \lr{—} گزینه \lr{3/\allowbreak{}3a/\allowbreak{}3x}}
+
+\textbf{معماری}: رادیو \lr{\mbox{NR (gNB)}} + \textbf{هسته \lr{LTE (EPC)}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{eNB}} در \lr{\mbox{LTE}} به‌عنوان \textbf{گره اصلی} (لنگر) عمل می‌کند
+\item
+  \lr{\mbox{gNB}} در \lr{\mbox{NR}} \textbf{گره ثانویه} است (ظرفیت اضافه می‌کند)
+\item
+  صفحه کنترل از \lr{\mbox{LTE}} عبور می‌کند \lr{(eNB \ensuremath{\to} EPC)}
+\item
+  صفحه کاربر می‌تواند تقسیم یا سوییچ شود
+\end{itemize}
+
+\textbf{زیرگزینه‌ها}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{گزینه 3}: صفحه کاربر از طریق \lr{\mbox{eNB}} (تقسیم در \lr{\mbox{eNB}})
+\item
+  \textbf{گزینه \lr{\mbox{3a}}}: صفحه کاربر مستقیماً از \lr{\mbox{gNB}} به \lr{\mbox{EPC}}
+\item
+  \textbf{گزینه \lr{\mbox{3x}}}: صفحه کاربر در \lr{\mbox{gNB}} تقسیم می‌شود (\lr{\mbox{gNB}} داده \lr{\mbox{NR}} + بخشی از داده \lr{\mbox{LTE}} را مدیریت می‌کند)
+\end{itemize}
+
+\CNsubsection{5.2}{مستقل \lr{\mbox{(SA)}} \lr{—} گزینه 2}
+
+\textbf{معماری}: رادیو \lr{\mbox{NR (gNB)}} + \textbf{هسته \lr{\mbox{5G (5GC)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{gNB}} مستقیماً از طریق \textbf{واسط \lr{\mbox{NG}}} به هسته \lr{\mbox{5G}} متصل می‌شود
+\item
+  تمام قابلیت‌های \lr{\mbox{5G}} در دسترس است
+\item
+  بدون وابستگی به زیرساخت \lr{\mbox{LTE}}
+\end{itemize}
+
+\CNsubsection{5.3}{چرا \lr{\mbox{NSA}} ابتدا مستقر شد}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{زمان سریع‌تر به بازار}: استفاده مجدد از زیرساخت \lr{\mbox{EPC}} موجود
+\item
+  \textbf{\lr{\mbox{CAPEX}} کمتر}: نیاز به استقرار فوری هسته \lr{\mbox{5G}} نیست
+\item
+  \textbf{لنگر پوشش}: \lr{\mbox{LTE}} پوشش همه‌جاگیر فراهم می‌کند؛ \lr{\mbox{NR}} توان عملیاتی اضافه می‌کند
+\item
+  \textbf{هسته اثبات‌شده}: \lr{\mbox{EPC}} بالغ و شناخته‌شده است
+\item
+  \textbf{راهبرد طیف}: استقرارهای اولیه \lr{\mbox{NR}} در باندهای محدود
+\end{enumerate}
+
+\CNsubsection{5.4}{چرا \lr{\mbox{SA}} هدف است}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{شبکه‌بندی}: نیازمند هسته \lr{\mbox{5G}} مبتنی بر \lr{\mbox{SBA}} است
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{URLLC}}}}}: تأخیر کم سرتاسری نیازمند \lr{5GC + MEC} است
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{mMTC}}}}}: پشتیبانی بومی \lr{\mbox{5GC}} برای بهینه‌سازی‌های \lr{\mbox{IoT}}
+\item
+  \textbf{رایانش لبه}: انعطاف‌پذیری مکان \lr{\mbox{UPF}}
+\item
+  \textbf{استقلال}: بدون وابستگی به \lr{\mbox{LTE}}، معماری تمیزتر
+\item
+  \textbf{معماری خدمات‌محور}: ایجاد سریع خدمات را ممکن می‌سازد
+\end{enumerate}
+
+\CNkeepfig{m14-nsa-vs-sa}{3}
+
+\CNsubsection{5.5}{مقایسه معماری \lr{\mbox{NSA}} و \lr{\mbox{SA}}}
+
+\CNfigure{m14-nsa-vs-sa}{\lr{\mbox{NSA}} گزینه \lr{\mbox{3x}} در برابر \lr{\mbox{SA}} گزینه 2}
+
+\CNkeepfig{m14-deployment-options}{3}
+
+\CNsubsection{5.6}{مرور گزینه‌های استقرار}
+
+\CNfigure{m14-deployment-options}{گزینه‌های استقرار \lr{\mbox{3GPP}} و مسیرهای مهاجرت}
+
+\textbf{مسیر مهاجرت}: اکثر اپراتورها \textbf{گزینه 3 \ensuremath{\leftarrow} گزینه 7 \ensuremath{\leftarrow} گزینه 2} یا مستقیماً \textbf{گزینه 3 \ensuremath{\leftarrow} گزینه 2} را دنبال می‌کنند.
+
+\Needspace{14\baselineskip}
+
+\Needspace{18\baselineskip}
+
+\CNsection{6}{مرور معماری \lr{\mbox{5G}}}
+
+\CNchained\CNsubsection{6.1}{\lr{\mbox{NG-RAN}} (شبکه دسترسی رادیویی نسل بعد)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گره} & \CNth{نام کامل} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{gNB}}}}} & \lr{\mbox{Node B}} نسل بعد & ایستگاه پایه \lr{5G NR (SA)} \\
+\lr{\mbox{\textbf{\lr{\mbox{en-gNB}}}}} & \lr{\mbox{gNB}} در \lr{E-UTRA-NR} & گره \lr{\mbox{NR}} در \lr{\mbox{NSA}} (ثانویه نسبت به \lr{\mbox{eNB}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{ng-eNB}}}}} & \lr{\mbox{eNB}} نسل بعد & گره \lr{\mbox{LTE}} متصل به \lr{\mbox{5GC}} \\
+\end{longtable}
+}
+
+\textbf{واسط‌ها}:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Xn}}}}}: بین \lr{\mbox{gNB}}ها (و \lr{\mbox{ng-eNB}}ها) \lr{—} تحویل، اتصال دوگانه
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{NG}}}}}: بین \lr{\mbox{gNB}} و هسته \lr{\mbox{5G}} (\lr{\mbox{NG-C}} به \lr{\mbox{AMF}}، \lr{\mbox{NG-U}} به \lr{\mbox{UPF}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{F1}}}}}: تقسیم داخلی \lr{gNB (CU \ensuremath{\leftrightarrow} DU)}
+\item
+  \lr{\textbf{\lr{\mbox{E1}}}: CU-CP \ensuremath{\leftrightarrow} CU-UP}
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{6.2}{هسته \lr{\mbox{5G}} \lr{—} معماری خدمات‌محور \lr{\mbox{(SBA)}}}
+
+هسته \lr{\mbox{5G}} جایگزین \lr{\mbox{EPC}} یکپارچه با \textbf{میکروسرویس‌ها} می‌شود:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{AMF}}}}} (مدیریت دسترسی و تحرک) & ثبت‌نام، اتصال، تحرک، امنیت \lr{\mbox{NAS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{SMF}}}}} (مدیریت نشست) & برقراری نشست \lr{\mbox{PDU}}، \lr{\mbox{QoS}}، انتخاب \lr{\mbox{UPF}} \\
+\lr{\mbox{\textbf{\lr{\mbox{UPF}}}}} (تابع صفحه کاربر) & مسیریابی بسته، بازرسی، اجرای \lr{\mbox{QoS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{AUSF}}}}} (کارساز احراز هویت) & رویه‌های احراز هویت \\
+\lr{\mbox{\textbf{\lr{\mbox{UDM}}}}} (مدیریت داده یکپارچه) & داده اشتراک، مشابه \lr{\mbox{HSS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{PCF}}}}} (کنترل سیاست) & قواعد سیاست، جایگزین \lr{\mbox{PCRF}} \\
+\lr{\mbox{\textbf{\lr{\mbox{NSSF}}}}} (انتخاب برش شبکه) & انتخاب و مدیریت برش \\
+\lr{\mbox{\textbf{\lr{\mbox{NEF}}}}} (نمایش شبکه) & نمایش \lr{\mbox{API}} به کاربردهای خارجی \\
+\lr{\mbox{\textbf{\lr{\mbox{NRF}}}}} (مخزن \lr{\mbox{NF}}) & کشف و ثبت‌نام خدمات \\
+\end{longtable}
+}
+
+\textbf{اصول کلیدی \lr{\mbox{SBA}}}:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{NF}}ها از طریق \textbf{\lr{\mbox{API}}های \lr{\mbox{REST}} مبتنی بر \lr{HTTP/\allowbreak{}2}} (واسط‌های خدمات‌محور) ارتباط برقرار می‌کنند
+\item
+  طراحی \textbf{بدون حالت}: محاسبه و ذخیره‌سازی جدا شده‌اند
+\item
+  \textbf{بومی-ابر}: کانتینری، مقیاس‌پذیر افقی
+\item
+  \textbf{کشف خدمات}: \lr{\mbox{NRF}} ثبت‌نام پویای \lr{\mbox{NF}} را ممکن می‌سازد
+\end{itemize}
+
+\CNsubsection{6.3}{جداسازی فناوری رادیویی از معماری شبکه}
+
+یک اصل طراحی حیاتی \lr{\mbox{5G}}:
+
+\CNdisplay{\text{\rl{فناوری دسترسی رادیویی (RAT)}} \;\neq\; \text{\rl{معماری شبکه هسته}}}
+
+\begin{itemize}
+\tightlist
+\item
+  رادیو \lr{\mbox{LTE}} می‌تواند به هسته \lr{\mbox{5G}} متصل شود (\lr{\mbox{ng-eNB}} \ensuremath{\leftarrow} گزینه \lr{5/\allowbreak{}7})
+\item
+  رادیو \lr{\mbox{NR}} می‌تواند به \lr{\mbox{EPC}} متصل شود (\lr{\mbox{en-gNB}} \ensuremath{\leftarrow} گزینه 3)
+\item
+  \textbf{جداسازی} مهاجرت انعطاف‌پذیر و همزیستی را ممکن می‌سازد
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{7}{معماری \lr{\mbox{gNB}} \lr{—} تقسیم \lr{CU/\allowbreak{}DU}}
+
+\CNchained\CNsubsection{7.1}{تقسیم عملکردی}
+
+\lr{\mbox{gNB}} می‌تواند به موارد زیر تجزیه شود:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مؤلفه} & \CNth{عملکرد} & \CNth{مکان} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{CU}}}}} (واحد مرکزی) & \lr{\mbox{RRC}}، \lr{\mbox{SDAP}}، \lr{\mbox{PDCP}} & متمرکز (\lr{\mbox{DC}} لبه) \\
+\lr{\mbox{\textbf{\lr{\mbox{DU}}}}} (واحد توزیع‌شده) & \lr{\mbox{RLC}}، \lr{\mbox{MAC}}، \lr{\mbox{High-PHY}} & نزدیک سایت آنتن \\
+\lr{\mbox{\textbf{\lr{\mbox{RU}}}}} (واحد رادیویی) & \lr{\mbox{Low-PHY}}، \lr{\mbox{RF}} & در آنتن \\
+\end{longtable}
+}
+
+\CNsubsection{7.2}{تقسیم \lr{CU-CP /\allowbreak{} CU-UP}}
+
+\lr{\mbox{CU}} بیشتر تقسیم می‌شود:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{CU-CP}}}}} (صفحه کنترل): \lr{\mbox{RRC}} + بخش کنترل \lr{\mbox{PDCP}}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{CU-UP}}}}} (صفحه کاربر): \lr{\mbox{SDAP}} + بخش کاربر \lr{\mbox{PDCP}}
+\end{itemize}
+
+این موارد را ممکن می‌سازد:
+
+\begin{itemize}
+\tightlist
+\item
+  مقیاس‌پذیری مستقل صفحه کنترل و صفحه کاربر
+\item
+  چندین \lr{\mbox{CU-UP}} در هر \lr{\mbox{CU-CP}}
+\item
+  مکان‌یابی انعطاف‌پذیر (\lr{\mbox{CU-UP}} نزدیک‌تر به لبه برای تأخیر کم)
+\end{itemize}
+
+\CNkeepfig{m14-cu-du-split}{3}
+
+\CNsubsection{7.3}{معماری تقسیم \lr{CU/\allowbreak{}DU} در \lr{\mbox{gNB}}}
+
+\CNfigure{m14-cu-du-split}{\lr{\mbox{gNB}} تفکیک‌شده: \lr{\mbox{CU-CP}}، \lr{\mbox{CU-UP}}، \lr{\mbox{DU}} و \lr{\mbox{RU}}}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{7.4}{خلاصه واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{نقاط انتهایی} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\textbf{\lr{NG-C (N2)}}} & \lr{gNB \ensuremath{\leftrightarrow} AMF} & \lr{NGAP/\allowbreak{}SCTP} & سیگنالینگ صفحه کنترل \\
+\lr{\textbf{\lr{NG-U (N3)}}} & \lr{gNB \ensuremath{\leftrightarrow} UPF} & \lr{GTP-U/\allowbreak{}UDP} & انتقال داده کاربر \\
+\lr{\mbox{\textbf{\lr{\mbox{Xn-C}}}}} & \lr{gNB \ensuremath{\leftrightarrow} gNB} & \lr{XnAP/\allowbreak{}SCTP} & تحویل، اتصال دوگانه \\
+\lr{\mbox{\textbf{\lr{\mbox{Xn-U}}}}} & \lr{gNB \ensuremath{\leftrightarrow} gNB} & \lr{GTP-U/\allowbreak{}UDP} & ارسال داده در حین تحویل \\
+\lr{\mbox{\textbf{\lr{\mbox{F1-C}}}}} & \lr{CU-CP \ensuremath{\leftrightarrow} DU} & \lr{F1AP/\allowbreak{}SCTP} & انتقال پیام \lr{\mbox{RRC}}، زمینه \lr{\mbox{UE}} \\
+\lr{\mbox{\textbf{\lr{\mbox{F1-U}}}}} & \lr{CU-UP \ensuremath{\leftrightarrow} DU} & \lr{GTP-U/\allowbreak{}UDP} & داده کاربر بین \lr{\mbox{CU-UP}} و \lr{\mbox{DU}} \\
+\lr{\mbox{\textbf{\lr{\mbox{E1}}}}} & \lr{CU-CP \ensuremath{\leftrightarrow} CU-UP} & \lr{E1AP/\allowbreak{}SCTP} & مدیریت زمینه حامل \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{7.5}{سناریوهای استقرار}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1754}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2281}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2281}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1930}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1754}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{سناریو} & \CNth{مکان \lr{\mbox{CU}}} & \CNth{مکان \lr{\mbox{DU}}} & \CNth{فرانت‌هال} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هم‌مکان} & سایت سلول & سایت سلول & داخلی & روستایی، ساده \\
+\textbf{\lr{\mbox{CU}} متمرکز} & \lr{\mbox{DC}} لبه & سایت سلول & مید‌هال \lr{\mbox{(F1)}} & شهری، استخرسازی \\
+\textbf{تجزیه کامل} & \lr{\mbox{DC}} منطقه‌ای & تجمیع & مید + فرانت‌هال & \lr{Cloud RAN}، \lr{\mbox{O-RAN}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{8}{خط زمانی \lr{—} نسخه‌های \lr{\mbox{3GPP}}}
+
+\CNchained\CNsubsection{8.1}{مرور نسخه‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2571}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3429}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسخه} & \CNth{تاریخ تثبیت} & \CNth{ویژگی‌های کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{Rel-15}}}}} & \lr{2018 (Late Drop: 2019)} & اولین مشخصات \lr{\mbox{5G NR}}؛ \lr{\mbox{NSA}} و \lr{\mbox{SA}}؛ تمرکز \lr{\mbox{eMBB}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-16}}}}} & \lr{2020 (Q3)} & بهبودهای \lr{\mbox{URLLC}}؛ \lr{\mbox{V2X}}؛ \lr{\mbox{NR-U}} (غیرمجاز)؛ \lr{\mbox{IIoT}}؛ مکان‌یابی \lr{\mbox{NR}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-17}}}}} & \lr{2022 (Q1)} & \lr{FR2-2 (52-71 GHz)}؛ \lr{\mbox{RedCap}} (قابلیت کاهش‌یافته)؛ \lr{\mbox{NTN}} (ماهواره)؛ سایدلینک \lr{\mbox{NR}}؛ \lr{\mbox{MBS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-18}}}}} & \lr{2024 (Q1)} & \lr{5G-Advanced}؛ \lr{AI/\allowbreak{}ML} برای واسط رادیویی؛ بهینه‌سازی \lr{\mbox{XR}}؛ تحول دوپلکس؛ صرفه‌جویی انرژی شبکه \\
+\end{longtable}
+}
+
+\CNkeepfig{m14-releases}{3}
+
+\CNsubsection{8.2}{مسیر تحول}
+
+\CNfigure{m14-releases}{مسیر تحول از نسخه ۱۵ تا نسخه ۱۸}
+
+\CNsubsection{8.3}{نقاط عطف کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{دسامبر 2017}: مشخصات \lr{Rel-15 NSA} (گزینه 3) تکمیل شد \lr{(early drop)}
+\item
+  \textbf{ژوین 2018}: مشخصات \lr{Rel-15 SA} (گزینه 2) تکمیل شد
+\item
+  \textbf{آوریل 2019}: اولین شبکه‌های تجاری \lr{\mbox{5G NSA}} راه‌اندازی شد (کره جنوبی، آمریکا)
+\item
+  \textbf{2020}: اولین استقرارهای تجاری \lr{\mbox{5G SA}} (\lr{T-Mobile US}، اپراتورهای چین)
+\item
+  \textbf{2022}: تثبیت \lr{\mbox{Rel-17}}؛ \lr{RedCap IoT} میان‌رده را روی \lr{\mbox{NR}} ممکن ساخت
+\item
+  \textbf{2024}: تثبیت \lr{Rel-18 (5G-Advanced)}؛ پل به پژوهش \lr{\mbox{6G}}
+\end{itemize}
+
+\CNsection{}{خلاصه \lr{—} نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\lr{\mbox{5G}} سه محدودیت بنیادی \lr{\mbox{LTE}} را برطرف می‌کند}: تأخیر، ظرفیت و مقیاس \lr{\mbox{IoT}}
+\item
+  \textbf{اهداف \lr{\mbox{IMT-2020}}} اهداف کمی را تعریف می‌کنند: \lr{\mbox{20 Gbps}}، \lr{\mbox{1 ms}}، \lr{\mbox{10\textsuperscript{6}}} دستگاه/\allowbreak{}\lr{\mbox{km\textsuperscript{2}}}
+\item
+  \textbf{سه ستون} \lr{(eMBB/\allowbreak{}URLLC/\allowbreak{}mMTC)} به صنایع مختلف با \lr{\mbox{KPI}}های مختلف خدمات می‌دهند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{5G NR}}}}} عددشناسی انعطاف‌پذیر، پشتیبانی \lr{\mbox{mmWave}} و شکل‌دهی پرتو پویا را معرفی می‌کند
+\item
+  \textbf{\lr{\mbox{NSA}} استقرار سریع را ممکن می‌سازد} با استفاده مجدد از \lr{LTE/\allowbreak{}EPC}؛ \textbf{\lr{\mbox{SA}} پتانسیل کامل \lr{\mbox{5G}} را آزاد می‌کند}
+\item
+  \textbf{هسته \lr{\mbox{5G}} مبتنی بر \lr{\mbox{SBA}}} بومی-ابر و مبتنی بر میکروسرویس است و شبکه‌بندی و لبه را ممکن می‌سازد
+\item
+  \textbf{تجزیه \lr{\mbox{gNB}}} \lr{(CU/\allowbreak{}DU/\allowbreak{}RU)} استقرارهای انعطاف‌پذیر و مقیاس‌پذیر را ممکن می‌سازد
+\item
+  \textbf{نسخه‌های \lr{\mbox{3GPP}}} به‌تدریج ویژگی‌ها را اضافه می‌کنند: نسخه ۱۵: پایه؛ نسخه ۱۶: \lr{\mbox{URLLC}}؛ نسخه ۱۷: گسترش؛ نسخه ۱۸: \lr{5G-Advanced}
+\end{enumerate}
+
+\CNsection{}{مراجع}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{3GPP TS 38.300: NR and NG-RAN Overall Description}
+\item
+  \lr{3GPP TS 38.401: NG-RAN Architecture Description}
+\item
+  \lr{3GPP TS 23.501: System Architecture for 5G System}
+\item
+  \lr{ITU-R M.2083: IMT Vision — Framework and Overall Objectives of the Future Development of IMT for 2020 and Beyond}
+\item
+  \lr{3GPP TS 38.211: NR Physical Channels and Modulation}
+\item
+  \lr{3GPP TS 38.104: NR Base Station Radio Transmission and Reception}
+\end{itemize}
+
+\emph{ماژول 14 \lr{—} درس شبکه‌های ارتباطی پیشرفته}\CNbr{}\emph{آخرین به‌روزرسانی: اوت 2026}

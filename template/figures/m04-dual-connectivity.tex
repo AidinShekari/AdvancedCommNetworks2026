@@ -1,0 +1,9 @@
+% Module 4 — dual connectivity: two radio links at the same time
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ue) at (0,0) {UE};
+\node[CNran] (mn) at (4.4,0.9) {Master Node (MN)}; \node[CNran] (sn) at (4.4,-0.9) {Secondary Node (SN)};
+\node[CNcp] (cn) at (9.2,0.9) {Core Network};
+\draw[CNdata] (ue.east) -- ++(0.6,0) |- (mn.west); \draw[CNdata] (ue.east) -- ++(0.6,0) |- (sn.west);
+\draw[CNlink] (mn) -- (cn); \draw[CNlink] (sn.east) -| (cn.south);
+\node[CNtiny, anchor=north west, align=left] at (-0.4,-1.7) {\CNL{Both links active simultaneously $\rightarrow$ seamless mobility}{هر دو پیوند همزمان فعال $\rightarrow$ تحرک بدون وقفه}\\\CNL{SN change $\neq$ handover (no interruption to MN)}{تغییر \lr{SN} $\neq$ تحویل (بدون وقفه برای \lr{MN})}};
+\end{tikzpicture}

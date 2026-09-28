@@ -1,0 +1,7 @@
+% Module 11 — Diameter interfaces of the HSS
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNdb, minimum width=2.4cm, minimum height=6.4cm] (hss) at (7,-2.7) {\textbf{HSS}};
+\foreach \n/\i [count=\k from 0] in {MME/S6a, SGSN/S6d, {I/S-CSCF}/{Cx/Dx}, AS/Sh}{
+  \node[CNcp, minimum width=2.2cm] (n\k) at (0,-\k*1.8) {\n};
+  \draw[CNsigl, <->] (n\k.east) -- node[CNelab, above=1pt, fill=none] {\i} node[CNelab, below=1pt, fill=none, text=CNmuted] {(Diameter)} (n\k.east -| hss.west);}
+\end{tikzpicture}

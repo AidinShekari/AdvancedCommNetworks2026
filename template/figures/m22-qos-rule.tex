@@ -1,0 +1,11 @@
+% Module 22 — structure of a QoS rule and example rules
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNbox, text width=5.2cm, align=left, anchor=north west] (r) at (0,0) {\textbf{\CNL{QoS rule structure}{ساختار قاعده \lr{QoS}}}\\[2pt]{\small Rule ID\\Rule precedence (\CNL{priority}{اولویت})\\QFI (\CNL{target QoS flow}{جریان \lr{QoS} مقصد})\\\CNL{Packet filter(s):}{فیلتر(های) بسته:}\\\hspace*{1em}– \CNL{source IP/port}{\lr{IP}/درگاه مبدأ}\\\hspace*{1em}– \CNL{destination IP/port}{\lr{IP}/درگاه مقصد}\\\hspace*{1em}– \CNL{protocol}{پروتکل}\\\hspace*{1em}– \CNL{type of service}{نوع خدمت}\\\hspace*{1em}– \CNL{flow label}{برچسب جریان}}};
+\node[CNtitle, anchor=north west] at (6.3,0) {\CNL{Example}{مثال}};
+\foreach \t/\q/\c [count=\k from 0] in {{Rule 1: dst=10.0.0.5, proto=RTP, port=5060}/{QFI=1 (\CNL{voice}{صدا})}/CNcyan,
+    {Rule 2: dst=10.0.0.5, proto=RTP, port=8000}/{QFI=2 (\CNL{video}{ویدئو})}/CNamber,
+    {Rule 3: \CNL{default (match all)}{پیش‌فرض (تطبیق همه)}}/{QFI=3 (\CNL{best effort}{بهترین تلاش})}/CNgreen}{
+  \node[CNbox, anchor=west, font=\sffamily\scriptsize, text width=5.0cm, align=left] (e\k) at (6.3,{-1.0-\k*1.05}) {\t};
+  \node[draw=\c, fill=\c!12, rounded corners=2pt, anchor=west, font=\sffamily\scriptsize] (q\k) at (12.3,{-1.0-\k*1.05}) {\q};
+  \draw[CNlink, ->] (e\k) -- (q\k);}
+\end{tikzpicture}

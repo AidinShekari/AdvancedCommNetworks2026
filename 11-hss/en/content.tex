@@ -1,0 +1,702 @@
+\Needspace{19\baselineskip}
+
+\CNsection{1}{Why a Centralized Subscriber Database?}
+
+In any mobile network, thousands to millions of subscribers connect, move, and consume services simultaneously. A centralized subscriber database is essential for:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5263}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4737}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Authentication} & Verify subscriber identity before granting network access \\
+\textbf{Authorization} & Determine what services/\allowbreak{}resources a subscriber is allowed to use \\
+\textbf{Location Tracking} & Know which network element currently serves each subscriber \\
+\textbf{Subscription Management} & Store and enforce service plans, QoS profiles, and restrictions \\
+\end{longtable}
+}
+
+Without a centralized database:
+
+\begin{itemize}
+\tightlist
+\item
+  Any device could impersonate a subscriber
+\item
+  The network cannot route incoming calls/\allowbreak{}data to the correct location
+\item
+  Service differentiation (premium vs. basic plans) would be impossible
+\item
+  Roaming between networks would not function
+\end{itemize}
+
+The \textbf{HSS (Home Subscriber Server)} is the evolution of the 2G/\allowbreak{}3G HLR (Home Location Register), redesigned for all-IP LTE/\allowbreak{}EPC networks using the Diameter protocol instead of SS7/\allowbreak{}MAP.
+
+\CNkeepfig{m11-hss-contents}{7}
+
+\CNsection{2}{HSS Role in LTE/\allowbreak{}EPC}
+
+The HSS is the \textbf{master database} for all subscriber and subscription data in the Evolved Packet Core (EPC):
+
+\CNfigure{m11-hss-contents}{What the HSS stores}
+
+\CNsubsection{}{Key Responsibilities:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Stores Permanent Subscriber Identity (IMSI)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    International Mobile Subscriber Identity — globally unique 15-digit identifier
+  \item
+    Format: MCC (3 digits) + MNC (2-3 digits) + MSIN (9-10 digits)
+  \end{itemize}
+\item
+  \textbf{Stores Authentication Credentials (K, OPc)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{K}: 128-bit permanent secret key (shared only between USIM and HSS)
+  \item
+    \textbf{OPc}: Operator-specific constant derived from OP (operator key) and K
+  \item
+    Never transmitted over the air — used to generate temporary credentials
+  \end{itemize}
+\item
+  \textbf{Stores Subscription Profiles (APN, QoS, Allowed Services)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Which APNs the subscriber can connect to
+  \item
+    Maximum bitrates (AMBR) for uplink/\allowbreak{}downlink
+  \item
+    Quality of Service class identifiers (QCI)
+  \item
+    Allowed services and restrictions
+  \end{itemize}
+\item
+  \textbf{Tracks UE Location (Serving MME)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Records which MME currently serves the UE
+  \item
+    Enables routing of incoming services (MT-SMS, paging)
+  \item
+    Updated every time UE performs a Tracking Area Update (TAU) or attach
+  \end{itemize}
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m11-hss-data-model}{8}
+
+\CNsection{3}{HSS Data Model}
+
+\CNchained\CNsubsection{}{HSS Data Model Diagram}
+
+\CNfigure{m11-hss-data-model}{HSS data model: identity, authentication, subscription, location and restrictions}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Detailed Data Fields}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2564}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1795}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2308}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Category} & \CNth{Field} & \CNth{Description} & \CNth{Example} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Identity} & IMSI & Unique subscriber ID & 234150999999999 \\
+\textbf{Identity} & MSISDN & Phone number (E.164) & +447700900000 \\
+\textbf{Auth} & K & Permanent 128-bit secret key & 0x465B5CE8…(hex) \\
+\textbf{Auth} & OPc & Operator variant constant & 0xE8ED289D…(hex) \\
+\textbf{Auth} & SQN & Sequence number (anti-replay) & 000000000021 \\
+\textbf{Auth} & AMF & Authentication Management Field & 0x8000 \\
+\textbf{Subscription} & Default APN & Primary data connection & ``internet'' \\
+\textbf{Subscription} & APN list & All allowed APNs & internet, ims, mms \\
+\textbf{Subscription} & UE-AMBR & Max aggregate bitrate & DL:150M, UL:50M \\
+\textbf{Subscription} & APN-AMBR & Per-APN max bitrate & DL:100M, UL:40M \\
+\textbf{Subscription} & QCI & QoS Class Identifier & 9 (best effort) \\
+\textbf{Subscription} & ARP & Allocation/\allowbreak{}Retention Priority & Level 8, PCI=yes, PVI=no \\
+\textbf{Location} & MME Identity & Serving MME hostname/\allowbreak{}address & mme01.\allowbreak{}epc.\allowbreak{}mnc015.\allowbreak{}mcc234 \\
+\textbf{Location} & MME Realm & Diameter realm of MME & epc.\allowbreak{}mnc015.\allowbreak{}mcc234.3gppnetwork.\allowbreak{}org \\
+\textbf{Location} & Purged flag & UE detached/\allowbreak{}unreachable & true/\allowbreak{}false \\
+\textbf{Restrictions} & ODB & Operator Determined Barring & Barring of outgoing intl calls \\
+\textbf{Restrictions} & Roaming & Allowed/\allowbreak{}barred PLMNs & Home only /\allowbreak{} EU roaming \\
+\textbf{Restrictions} & RAT restriction & Allowed access technologies & E-UTRAN, UTRAN \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{24\baselineskip}
+
+\CNsection{4}{Authentication Vector Generation}
+
+\CNchained\CNsubsection{}{EPS-AKA (Evolved Packet System - Authentication and Key Agreement)}
+
+The HSS generates \textbf{Authentication Vectors (AVs)} that enable mutual authentication between UE and network without ever transmitting the permanent key K.
+
+Each Authentication Vector contains:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4231}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3462}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Component} & \CNth{Size} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{RAND} & 128~bits & Random challenge (generated fresh by HSS) \\
+\textbf{AUTN} & 128~bits & Authentication Token (proves network identity to UE) \\
+\textbf{XRES} & 32-128~bits & Expected Response (what UE should reply) \\
+\textbf{\ensuremath{K_{\mathrm{ASME}}}} & 256~bits & Base key for deriving all session keys \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{Milenage Algorithm Set}
+
+The \textbf{Milenage} algorithm set is the standard cryptographic toolkit (3GPP TS 35.205-208):
+
+\textbf{Inputs:} K (128-bit), RAND (128-bit), SQN (48-bit), AMF (16-bit), OPc (128-bit)
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Milenage function} & \CNth{Output} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+f1(K, RAND, SQN, AMF) & MAC-A & Network authentication \\
+f1*(K, RAND, SQN, AMF) & MAC-S & Resynchronisation \\
+f2(K, RAND) & RES /\allowbreak{} XRES & Response \\
+f3(K, RAND) & CK & Cipher key \\
+f4(K, RAND) & IK & Integrity key \\
+f5(K, RAND) & AK & Anonymity key \\
+f5*(K, RAND) & AK & Anonymity key for resynchronisation \\
+\end{longtable}
+}
+
+\textbf{Vector derivation process:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  HSS generates random 128-bit \textbf{RAND}
+\item
+  HSS increments \textbf{SQN} (sequence number)
+\item
+  Compute: \CNcode{MAC-A =}\allowbreak{}\CNcode{ f1(K, RAND, SQN, AMF)}
+\item
+  Compute: \CNcode{XRES = f2(K, RAND)}
+\item
+  Compute: \CNcode{CK = f3(K, RAND)}
+\item
+  Compute: \CNcode{IK = f4(K, RAND)}
+\item
+  Compute: \CNcode{AK = f5(K, RAND)}
+\item
+  Construct: \CNcode{AUTN =}\allowbreak{}\CNcode{ (SQN ⊕ AK) \textbar{}\textbar{} AMF \textbar{}\textbar{} MAC-A}
+\item
+  Derive: \CNcode{KASME =}\allowbreak{}\CNcode{ KDF(CK, IK, SN-ID, SQN ⊕ AK)}
+\end{enumerate}
+
+\CNsubsection{}{SQN Management (Replay Protection)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SQN} is a 48-bit counter maintained independently by HSS and USIM
+\item
+  Prevents replay of old authentication vectors
+\item
+  UE verifies: received SQN \textgreater{} last accepted SQN (within a window)
+\item
+  If SQN is out of range \ensuremath{\to} UE sends \textbf{AUTS} (resynchronization token)
+\item
+  HSS uses f1* and f5* to resynchronize its SQN with the USIM
+\end{itemize}
+
+\CNsubsection{}{Vector Delivery to MME}
+
+\begin{itemize}
+\tightlist
+\item
+  HSS typically generates \textbf{multiple vectors} (batch) per request
+\item
+  MME stores unused vectors for subsequent re-authentications
+\item
+  Reduces signaling load (MME doesn’t need to contact HSS every time)
+\item
+  Typical batch size: 3-5 vectors per AIR request
+\end{itemize}
+
+\Needspace{27\baselineskip}
+
+\CNsection{5}{HSS Interaction with MME (S6a /\allowbreak{} Diameter)}
+
+The \textbf{S6a interface} uses the \textbf{Diameter protocol} (RFC 6733) with the 3GPP Diameter application for EPS (application ID: 16777251).
+
+\CNsubsection{}{Message Flows}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2292}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3542}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2292}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1875}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Procedure} & \CNth{Request \ensuremath{\to} Answer} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Authentication & AIR \ensuremath{\to} AIA & MME \ensuremath{\to} HSS & Get auth vectors \\
+Location Update & ULR \ensuremath{\to} ULA & MME \ensuremath{\to} HSS & Register MME, get subscription \\
+Purge & PUR \ensuremath{\to} PUA & MME \ensuremath{\to} HSS & UE explicitly detached \\
+Cancel Location & CLR \ensuremath{\to} CLA & HSS \ensuremath{\to} MME & Force detach (e.g., UE moved) \\
+Insert Sub Data & IDR \ensuremath{\to} IDA & HSS \ensuremath{\to} MME & Push subscription changes \\
+Delete Sub Data & DSR \ensuremath{\to} DSA & HSS \ensuremath{\to} MME & Remove subscription data \\
+Notification & NOR \ensuremath{\to} NOA & MME \ensuremath{\to} HSS & Notify terminal info \\
+\end{longtable}
+}
+
+\CNkeepfig{m11-attach-s6a}{3}
+
+\CNsubsection{}{Attach Procedure (AIR/\allowbreak{}AIA + ULR/\allowbreak{}ULA)}
+
+\CNfigure{m11-attach-s6a}{S6a exchange between the MME and the HSS during attach}
+
+\textbf{AIR (Authentication-Information-Request):}
+
+\begin{itemize}
+\tightlist
+\item
+  IMSI of the subscriber
+\item
+  Visited PLMN ID
+\item
+  Number of requested vectors
+\item
+  Resynchronization info (AUTS, if SQN mismatch)
+\end{itemize}
+
+\textbf{AIA (Authentication-Information-Answer):}
+
+\begin{itemize}
+\tightlist
+\item
+  One or more EPS Authentication Vectors (RAND, AUTN, XRES, \ensuremath{K_{\mathrm{ASME}}})
+\item
+  Result code (success/\allowbreak{}failure)
+\end{itemize}
+
+\textbf{ULR (Update-Location-Request):}
+
+\begin{itemize}
+\tightlist
+\item
+  IMSI
+\item
+  MME identity (hostname + realm)
+\item
+  RAT type
+\item
+  ULR flags (initial attach, etc.)
+\end{itemize}
+
+\textbf{ULA (Update-Location-Answer):}
+
+\begin{itemize}
+\tightlist
+\item
+  Subscription data (all APNs, AMBR, QoS profiles)
+\item
+  Result code
+\item
+  Separation of default APN from additional APNs
+\end{itemize}
+
+\CNsubsection{}{Detach /\allowbreak{} Purge (PUR/\allowbreak{}PUA or CLR/\allowbreak{}CLA)}
+
+\textbf{Explicit detach (UE-initiated):}
+
+\begin{itemize}
+\tightlist
+\item
+  MME sends \textbf{PUR} \ensuremath{\to} HSS marks subscriber as ``not attached''
+\item
+  HSS responds with \textbf{PUA}
+\end{itemize}
+
+\textbf{Network-initiated cancel (HSS pushes):}
+
+\begin{itemize}
+\tightlist
+\item
+  HSS sends \textbf{CLR} to old MME (e.g., UE registered at new MME)
+\item
+  Old MME removes UE context, responds with \textbf{CLA}
+\item
+  CLR reasons: UE moved, subscription withdrawn, operator policy
+\end{itemize}
+
+\CNsubsection{}{Subscription Modification (IDR/\allowbreak{}IDA)}
+
+When operator modifies a subscription (e.g., customer upgrades plan):
+
+\begin{itemize}
+\tightlist
+\item
+  HSS sends \textbf{IDR} (Insert-Subscriber-Data-Request) to serving MME
+\item
+  MME updates local copy of subscription data
+\item
+  MME responds with \textbf{IDA}
+\item
+  Changes take effect immediately (no re-attach needed)
+\end{itemize}
+
+\CNkeepfig{m11-hss-interfaces}{5}
+
+\CNsection{6}{HSS Interaction with Other Network Elements}
+
+\CNfigure{m11-hss-interfaces}{Diameter interfaces of the HSS}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Interface Details}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2558}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3023}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2326}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2093}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer Entity} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{S6a} & MME & Diameter & EPS authentication, location, subscription \\
+\textbf{S6d} & SGSN & Diameter & 2G/\allowbreak{}3G interworking (same functions as S6a for GERAN/\allowbreak{}UTRAN) \\
+\textbf{Cx} & I-CSCF /\allowbreak{} S-CSCF & Diameter & IMS registration, user authorization \\
+\textbf{Dx} & I-CSCF & Diameter & IMS location query (find S-CSCF for user) \\
+\textbf{Sh} & Application Server & Diameter & Read/\allowbreak{}write user data for services \\
+\textbf{S13} & EIR & Diameter & Equipment identity check (IMEI verification) \\
+\end{longtable}
+}
+
+\CNsubsection{}{S6d (SGSN — 2G/\allowbreak{}3G interworking)}
+
+\begin{itemize}
+\tightlist
+\item
+  Same message set as S6a but adapted for GERAN/\allowbreak{}UTRAN access
+\item
+  Used when UE is connected via 2G/\allowbreak{}3G radio
+\item
+  Enables seamless handover between 4G and 2G/\allowbreak{}3G (IRAT)
+\end{itemize}
+
+\CNsubsection{}{Cx/\allowbreak{}Dx (IMS — VoLTE)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Cx}: Registration/\allowbreak{}de-registration of IMS users
+
+  \begin{itemize}
+  \tightlist
+  \item
+    UAR/\allowbreak{}UAA: User-Authorization (during REGISTER)
+  \item
+    SAR/\allowbreak{}SAA: Server-Assignment (assign S-CSCF)
+  \item
+    MAR/\allowbreak{}MAA: Multimedia-Auth (get IMS auth vectors)
+  \item
+    LIR/\allowbreak{}LIA: Location-Info (find assigned S-CSCF)
+  \end{itemize}
+\item
+  Used for VoLTE call setup and IMS registration
+\end{itemize}
+
+\CNsubsection{}{Sh (Application Servers)}
+
+\begin{itemize}
+\tightlist
+\item
+  Allows AS to read/\allowbreak{}update user-specific data
+\item
+  Used for supplementary services, presence, messaging
+\item
+  Supports subscriptions for notifications on data changes
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m11-eps-aka-1}{8}
+
+\CNsection{7}{Authentication Scenario (Step-by-Step)}
+
+\CNchained\CNsubsection{}{Full EPS-AKA Authentication Flow}
+
+\CNfigure{m11-eps-aka-1}{Full EPS-AKA authentication flow with the key computations\CNpart{1}{2}}
+
+\CNfigure{m11-eps-aka-2}{Full EPS-AKA authentication flow with the key computations\CNpart{2}{2}}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{Step-by-Step Explanation}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2609}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3478}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3913}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Action} & \CNth{Details} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & UE sends Attach Request & Contains IMSI (first time) or old GUTI (subsequent) \\
+2 & MME requests vectors & AIR sent to HSS with subscriber IMSI \\
+3 & HSS generates vectors & Uses K + OPc + RAND + SQN through Milenage \\
+4 & HSS returns vectors & AIA contains RAND, AUTN, XRES, \ensuremath{K_{\mathrm{ASME}}} (batch of 3-5) \\
+5 & MME challenges UE & Sends RAND + AUTN to UE in NAS Authentication Request \\
+6 & UE verifies network & Checks MAC in AUTN using its own K \ensuremath{\to} \textbf{mutual authentication} \\
+7 & UE computes RES & Sends response back to MME \\
+8 & MME verifies UE & Compares RES against XRES from HSS \\
+9 & Location update & MME registers itself at HSS as serving MME \\
+10 & Session setup & Keys derived, bearers established \\
+\end{longtable}
+}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{Authentication Failure Scenarios}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3704}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3704}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Scenario} & \CNth{Cause} & \CNth{Recovery} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MAC failure at UE & Network doesn’t know correct K & UE sends Auth Failure (cause: MAC failure) \\
+SQN out of range & SQN desynchronized & UE sends Auth Failure + AUTS for resync \\
+XRES mismatch at MME & UE doesn’t know correct K & MME rejects attach, may send Auth Reject \\
+Timeout & Network/\allowbreak{}UE unreachable & Retry with backoff \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m11-hss-decomposition}{10}
+
+\CNsection{8}{Evolution to 5G: HSS Decomposition}
+
+\CNchained\CNsubsection{}{Architecture Comparison}
+
+In 5G (3GPP Release 15+), the monolithic HSS is decomposed into specialized Network Functions:
+
+\CNfigure{m11-hss-decomposition}{The HSS is decomposed into AUSF, UDM and UDR in 5G}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Detailed Comparison: HSS (4G) vs UDM + AUSF + UDR (5G)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1905}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2381}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5714}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{HSS (4G)} & \CNth{UDM + AUSF + UDR (5G)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Architecture} & Monolithic & Decomposed, microservices \\
+\textbf{Protocol} & Diameter (S6a) & HTTP/\allowbreak{}2 + JSON (SBI) \\
+\textbf{Auth Function} & Built into HSS & Separate AUSF (Authentication Server Function) \\
+\textbf{Data Management} & Built into HSS & Separate UDM (Unified Data Management) \\
+\textbf{Data Storage} & Internal DB & Separate UDR (Unified Data Repository) \\
+\textbf{Identity} & IMSI (sent in clear) & SUPI/\allowbreak{}SUCI (SUCI = encrypted SUPI) \\
+\textbf{Privacy} & IMSI exposed on air & SUCI conceals identity (ECIES encryption) \\
+\textbf{Auth Protocol} & EPS-AKA only & 5G-AKA or EAP-AKA’ (extensible) \\
+\textbf{Key Hierarchy} & \ensuremath{K_{\mathrm{ASME}}} \ensuremath{\to} \ensuremath{K_{\mathrm{eNB}}} \ensuremath{\to} … & \ensuremath{K_{\mathrm{AUSF}}} \ensuremath{\to} \ensuremath{K_{\mathrm{SEAF}}} \ensuremath{\to} \ensuremath{K_{\mathrm{AMF}}} \ensuremath{\to} \ensuremath{K_{\mathrm{gNB}}} \ensuremath{\to} … \\
+\textbf{Scalability} & Scale entire HSS & Scale each NF independently \\
+\textbf{Interfaces} & Point-to-point Diameter & Service-Based Interface (REST APIs) \\
+\textbf{Discovery} & Static config /\allowbreak{} DNS & NRF (Network Repository Function) \\
+\textbf{Redundancy} & Active/\allowbreak{}Standby & Cloud-native, stateless NFs + shared UDR \\
+\end{longtable}
+}
+
+\CNsubsection{}{5G Identity: SUPI and SUCI}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+SUPI (Subscription Permanent Identifier)
+  = IMSI (same format as 4G: MCC+MNC+MSIN)
+  (never sent over the air in 5G!)
+
+SUCI (Subscription Concealed Identifier)
+  = Home Network ID + Routing Indicator + Protection Scheme + Encrypted MSIN
+  
+  Encryption: ECIES (Elliptic Curve Integrated Encryption Scheme)
+  - Home network publishes public key
+  - UE encrypts MSIN portion with home network public key
+  - Only home network (UDM) can decrypt → reveals SUPI
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNsubsection{}{5G Authentication Methods}
+
+\textbf{5G-AKA:}
+
+\begin{itemize}
+\tightlist
+\item
+  Enhanced version of EPS-AKA
+\item
+  Adds home network confirmation (HRES\emph{/\allowbreak{}HXRES})
+\item
+  Serving network proves to home network that auth completed
+\item
+  Prevents certain MITM attacks possible in 4G
+\end{itemize}
+
+\textbf{EAP-AKA’:}
+
+\begin{itemize}
+\tightlist
+\item
+  Extensible Authentication Protocol variant
+\item
+  Binds authentication to serving network name
+\item
+  Better suited for non-3GPP access (Wi-Fi, fixed)
+\item
+  Uses AT\_\allowbreak{}KDF\_\allowbreak{}INPUT for network binding
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{5G Decomposed Functions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2759}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2069}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5172}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{5G NF} & \CNth{Role} & \CNth{4G Equivalent} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{AUSF} & Handles authentication procedures, generates keys & HSS auth function \\
+\textbf{UDM} & Manages subscription data, generates auth vectors, handles registration & HSS data management \\
+\textbf{UDR} & Stores all data (subscriber, policy, application) & HSS internal database \\
+\textbf{SIDF} & Decrypts SUCI \ensuremath{\to} SUPI (part of UDM) & N/\allowbreak{}A (no equivalent in 4G) \\
+\end{longtable}
+}
+
+\CNsection{}{Summary}
+
+The HSS is the security and identity anchor of the LTE/\allowbreak{}EPC network. It:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Guards the keys} — K never leaves the HSS (and USIM)
+\item
+  \textbf{Proves identity} — Mutual authentication via EPS-AKA
+\item
+  \textbf{Controls access} — Subscription profiles determine what users can do
+\item
+  \textbf{Tracks location} — Knows which MME serves each subscriber
+\item
+  \textbf{Evolves gracefully} — Decomposed into UDM/\allowbreak{}AUSF/\allowbreak{}UDR in 5G for cloud-native deployment
+\end{enumerate}
+
+Understanding the HSS is critical for:
+
+\begin{itemize}
+\tightlist
+\item
+  Network security analysis
+\item
+  Debugging authentication failures
+\item
+  Planning subscriber provisioning
+\item
+  Understanding the transition from 4G to 5G core
+\end{itemize}
+
+\CNsection{}{References}
+
+\begin{itemize}
+\tightlist
+\item
+  3GPP TS 29.272: S6a/\allowbreak{}S6d Diameter-based interface (MME/\allowbreak{}SGSN–HSS)
+\item
+  3GPP TS 33.401: EPS security architecture
+\item
+  3GPP TS 35.205-208: Milenage algorithm specification
+\item
+  3GPP TS 23.501: 5G System Architecture
+\item
+  3GPP TS 33.501: 5G Security Architecture and Procedures
+\item
+  3GPP TS 29.509: AUSF Services (5G)
+\item
+  3GPP TS 29.503: UDM Services (5G)
+\end{itemize}

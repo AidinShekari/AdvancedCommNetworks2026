@@ -1,0 +1,10 @@
+% Module 4 — LTE: flat architecture, the eNB decides, X2 between eNBs
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ue) at (0,0) {UE}; \node[CNran, line width=1.4pt] (e1) at (3.2,0) {eNB}; \node[CNran] (e2) at (7.2,0) {eNB};
+\node[CNcp] (core) at (5.2,-2.2) {MME / S-GW};
+\draw[CNdata, ->] (ue) -- node[CNelab, above=1pt, fill=none] {radio} (e1);
+\draw[CNlink, ->, double, double distance=1.2pt] (e1) -- node[CNelab, above=2pt, fill=none] {X2} (e2);
+\draw[CNsigl, ->] (e1.south) |- node[pos=0.75, CNelab, above, fill=none] {S1} (core.west);
+\draw[CNsigl] (e2.south) |- (core.east);
+\node[CNnote, anchor=west, align=left] at (9.0,0) {\CNL{flat architecture: no BSC/RNC}{معماری مسطح: بدون \lr{BSC/RNC}}\\\CNL{the eNB makes the HO decision}{\lr{eNB} تصمیم تحویل را می‌گیرد}};
+\end{tikzpicture}

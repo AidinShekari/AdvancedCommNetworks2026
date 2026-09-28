@@ -1,0 +1,9 @@
+% Module 4 — hard handover: break before make
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNran, minimum width=5.2cm] (s) at (0,0) {\CNL{Connected to source}{متصل به سلول مبدأ}};
+\node[CNbad, minimum width=1.3cm] (g) at (3.45,0) {GAP};
+\node[CNok, minimum width=5.2cm] (t) at (6.9,0) {\CNL{Connected to target}{متصل به سلول مقصد}};
+\draw[CNlink, ->, line width=1.1pt] (-3.1,-0.85) -- node[pos=0.97, below, CNtiny] {\CNL{time}{زمان}} (10.2,-0.85);
+\node[CNnote, anchor=north, text width=3.4cm] (n) at (3.45,-1.4) {\textbf{\CNL{Interruption}{وقفه}}\\20--50 ms (LTE)\\100--200 ms (GSM)};
+\draw[CNsig, ->, line width=0.8pt] (n.north) -- (g.south);
+\end{tikzpicture}

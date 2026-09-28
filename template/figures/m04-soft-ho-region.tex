@@ -1,0 +1,17 @@
+% Module 4 — soft handover region: the UE is connected to both cells
+\begin{tikzpicture}
+\begin{axis}[CNplot, width=12.5cm, height=5.8cm, xmin=0, xmax=10, ymin=0, ymax=6.2,
+  xtick={3,7}, xticklabels={\CNL{cell A boundary}{مرز سلول \lr{A}}, \CNL{cell B boundary}{مرز سلول \lr{B}}},
+  ytick=\empty, xlabel={\CNL{distance}{فاصله}}, ylabel={\CNL{signal}{سیگنال}}]
+  \fill[CNcyan, opacity=0.12] (axis cs:3,0) rectangle (axis cs:7,5.9);
+  \addplot[CNcyan, domain=0:9.6, samples=100, smooth] {5/(1+exp(1.1*(x-6.0)))+0.3};
+  \addplot[CNsig, domain=0.4:10, samples=100, smooth] {5/(1+exp(-1.1*(x-4.0)))+0.3};
+  \draw[CNinkL, dashed] (axis cs:3,0) -- (axis cs:3,5.9);
+  \draw[CNinkL, dashed] (axis cs:7,0) -- (axis cs:7,5.9);
+  \draw[CNink, <->] (axis cs:3,4.35) -- (axis cs:7,4.35);
+  \node[font=\sffamily\scriptsize\bfseries, text=CNink] at (axis cs:5,4.75) {\CNL{soft handover region}{ناحیه تحویل نرم}};
+  \node[font=\sffamily\scriptsize, text=CNink, align=center] at (axis cs:5,2.4) {\CNL{UE connected}{\lr{UE} به هر دو}\\\CNL{to BOTH cells}{سلول متصل است}};
+  \node[font=\sffamily\scriptsize\bfseries, text=CNcyanD] at (axis cs:1.2,5.65) {\CNL{source cell}{سلول مبدأ}};
+  \node[font=\sffamily\scriptsize\bfseries, text=CNsig] at (axis cs:8.8,5.65) {\CNL{target cell}{سلول مقصد}};
+\end{axis}
+\end{tikzpicture}

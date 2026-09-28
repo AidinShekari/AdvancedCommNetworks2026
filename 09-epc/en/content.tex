@@ -1,0 +1,1325 @@
+\Needspace{25\baselineskip}
+
+\CNsection{9.1}{Why EPC Was Designed}
+
+The Evolved Packet Core (EPC) was introduced in 3GPP Release 8 as the core network for LTE/\allowbreak{}4G. Its design was driven by fundamental limitations in legacy core networks (2G/\allowbreak{}3G circuit-switched + packet-switched domains).
+
+\CNsubsection{}{Design Principles}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2750}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3750}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Principle} & \CNth{Legacy Problem} & \CNth{EPC Solution} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{All-IP Architecture} & Separate CS and PS domains, TDM transport & Single flat IP-based core for all services (voice via VoLTE/\allowbreak{}IMS) \\
+\textbf{Flat Architecture} & Deep hierarchy (RNC, SGSN, GGSN) adding latency & Reduced node count; eNB connects directly to EPC \\
+\textbf{Control/\allowbreak{}User Plane Separation} & Combined CP/\allowbreak{}UP in SGSN/\allowbreak{}GGSN & MME (CP only), S-GW/\allowbreak{}P-GW (UP with minimal CP) \\
+\textbf{Multiple RAT Support} & Separate cores per RAT & Single EPC serves LTE, WCDMA, CDMA2000, Wi-Fi \\
+\textbf{Simplified Mobility} & Complex handover with many nodes & GTP-based anchoring with fewer hops \\
+\textbf{Policy \& Charging Convergence} & Fragmented policy/\allowbreak{}charging & Integrated PCC architecture (PCRF/\allowbreak{}PCEF) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Key Benefits}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Lower latency}: User plane path is shorter (eNB \ensuremath{\to} S-GW \ensuremath{\to} P-GW \ensuremath{\to} Internet)
+\item
+  \textbf{Higher throughput}: No RNC bottleneck; distributed scheduling at eNB
+\item
+  \textbf{Scalability}: Stateless forwarding nodes; CP scales independently
+\item
+  \textbf{Service agility}: Dynamic QoS via dedicated bearers and PCC rules
+\item
+  \textbf{Cost efficiency}: IP transport throughout; commodity hardware
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m09-epc-architecture}{8}
+
+\CNsection{9.2}{EPC Architecture Overview}
+
+\CNchained\CNsubsection{}{Complete Architecture Diagram}
+
+\CNfigure{m09-epc-architecture}{Complete EPC architecture with its interfaces and protocols}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Interface Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Endpoints} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S1-MME & eNB \ensuremath{\leftrightarrow} MME & S1AP over SCTP & Control plane signaling \\
+S1-U & eNB \ensuremath{\leftrightarrow} S-GW & GTP-U over UDP & User plane data \\
+X2 & eNB \ensuremath{\leftrightarrow} eNB & X2AP + GTP-U & Handover, load mgmt \\
+S11 & MME \ensuremath{\leftrightarrow} S-GW & GTPv2-C & Session/\allowbreak{}bearer mgmt \\
+S5/\allowbreak{}S8 & S-GW \ensuremath{\leftrightarrow} P-GW & GTP (S5) or PMIP (S8) & User plane + CP \\
+S6a & MME \ensuremath{\leftrightarrow} HSS & Diameter & Authentication, subscription \\
+S10 & MME \ensuremath{\leftrightarrow} MME & GTPv2-C & MME relocation \\
+S3 & MME \ensuremath{\leftrightarrow} SGSN & GTPv2-C & Inter-RAT mobility \\
+Gx & PCRF \ensuremath{\leftrightarrow} P-GW & Diameter & Policy \& charging rules \\
+Gy & P-GW \ensuremath{\leftrightarrow} OCS & Diameter & Online charging \\
+Rx & PCRF \ensuremath{\leftrightarrow} AF/\allowbreak{}IMS & Diameter & Service-level QoS request \\
+SGi & P-GW \ensuremath{\leftrightarrow} PDN & IP & External data network \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNsection{9.3}{EPC Network Functions}
+
+\CNchained\CNsubsection{9.3.1}{MME — Mobility Management Entity}
+
+\CNchained\CNsubsubsection{Purpose}
+
+The MME is the \textbf{primary control plane node} in EPC. It handles all signaling between the UE and the core network, managing mobility, security, and session establishment. The MME never touches user plane data.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{NAS Signaling}: Terminates Non-Access Stratum protocols (EMM and ESM) with the UE
+\item
+  \textbf{Authentication \& Security}: Initiates EPS-AKA, derives keys (\ensuremath{K_{\mathrm{ASME}}} \ensuremath{\to} \ensuremath{K_{\mathrm{eNB}}}), selects NAS security algorithms
+\item
+  \textbf{Mobility Management}: Tracks UE location (TAI), manages ECM states, handles handover signaling
+\item
+  \textbf{Bearer Management}: Creates/\allowbreak{}modifies/\allowbreak{}deletes EPS bearers via S11 signaling to S-GW
+\item
+  \textbf{Paging}: Pages UEs in ECM-IDLE state when downlink data arrives
+\item
+  \textbf{MME Selection \& Pooling}: Multiple MMEs serve a pool area; load balanced via S1AP weighting
+\item
+  \textbf{Inter-RAT Mobility}: Handles handover to/\allowbreak{}from 2G/\allowbreak{}3G via S3 interface to SGSN
+\item
+  \textbf{Lawful Intercept}: Provides signaling for LI triggers
+\end{enumerate}
+
+\Needspace{19\baselineskip}
+
+\CNsubsubsection{Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S1-MME & eNB & S1AP/\allowbreak{}SCTP & RAN control plane \\
+S11 & S-GW & GTPv2-C & Bearer/\allowbreak{}session management \\
+S6a & HSS & Diameter & Auth vectors, subscription data \\
+S10 & MME & GTPv2-C & MME relocation (handover) \\
+S3 & SGSN & GTPv2-C & Inter-RAT mobility \\
+S13 & EIR & Diameter & Equipment identity check \\
+NAS & UE & EMM/\allowbreak{}ESM (over S1AP) & Direct UE signaling \\
+\end{longtable}
+}
+
+\CNsubsubsection{Protocols}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{S1AP}: Application protocol for S1 interface (ASN.1 encoded, SCTP transport)
+\item
+  \textbf{GTPv2-C}: GPRS Tunnelling Protocol v2 Control (UDP port 2123)
+\item
+  \textbf{Diameter}: For S6a (authentication), S13 (EIR check)
+\item
+  \textbf{NAS}: EMM (EPS Mobility Management) + ESM (EPS Session Management)
+\end{itemize}
+
+\CNsubsubsection{Failure Impact}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Immediate}: All UEs served by the failed MME lose signaling connectivity
+\item
+  \textbf{S1 connections released}: eNBs detect failure via SCTP heartbeat timeout
+\item
+  \textbf{Recovery}: UEs in ECM-CONNECTED move to ECM-IDLE, then re-attach to a different MME in the pool
+\item
+  \textbf{Mitigation}: MME pooling ensures surviving MMEs absorb load; UE context can be retrieved from HSS
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.2}{HSS — Home Subscriber Server}
+
+\CNchained\CNsubsubsection{Purpose}
+
+The HSS is the \textbf{central subscriber database} for EPC. It is the evolution of the HLR/\allowbreak{}AuC from 2G/\allowbreak{}3G, storing all permanent subscriber information, authentication credentials, and service profiles.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Subscriber Database}: Stores IMSI, MSISDN, service subscriptions, APN configurations
+\item
+  \textbf{Authentication Vector Generation}: Generates EPS authentication vectors (RAND, AUTN, XRES, \ensuremath{K_{\mathrm{ASME}}}) using the permanent key K and sequence number SQN
+\item
+  \textbf{Location Management}: Maintains current MME address per subscriber; handles registration/\allowbreak{}deregistration
+\item
+  \textbf{Subscription Profiles}: Stores allowed APNs, QoS profiles (subscribed AMBR, default QCI), roaming restrictions
+\item
+  \textbf{Charging Characteristics}: Per-subscriber charging config
+\item
+  \textbf{Service Authorization}: Determines which services a UE is permitted
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3056}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2778}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S6a & MME & Diameter & Auth vectors, location update, subscription data \\
+S6d & SGSN & Diameter & 2G/\allowbreak{}3G equivalent of S6a \\
+Cx/\allowbreak{}Dx & IMS (CSCF) & Diameter & IMS registration, routing \\
+Sh & AS & Diameter & Service data for application servers \\
+\end{longtable}
+}
+
+\CNsubsubsection{Protocols}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Diameter}: All HSS interfaces use Diameter (RFC 6733) with specific applications:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    S6a: 3GPP Diameter application (vendor-specific AVPs)
+  \item
+    Authentication-Information-Request/\allowbreak{}Answer (AIR/\allowbreak{}AIA)
+  \item
+    Update-Location-Request/\allowbreak{}Answer (ULR/\allowbreak{}ULA)
+  \item
+    Cancel-Location-Request (CLR) for purging old MME
+  \end{itemize}
+\end{itemize}
+
+\CNsubsubsection{Failure Impact}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{New attaches fail}: No authentication vectors available for new UEs
+\item
+  \textbf{Existing sessions survive}: MME caches auth vectors (typically 5 per UE)
+\item
+  \textbf{Handovers impacted}: If new MME cannot fetch subscriber profile
+\item
+  \textbf{Mitigation}: HSS is typically deployed as a geo-redundant mated pair with database replication
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.3}{S-GW — Serving Gateway}
+
+\CNchained\CNsubsubsection{Purpose}
+
+The S-GW is the \textbf{user plane anchor} between the radio network and the core. It acts as a local mobility anchor for inter-eNB handovers, ensuring user plane continuity while the UE moves between base stations.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{User Plane Forwarding}: Routes user data between eNB and P-GW via GTP-U tunnels
+\item
+  \textbf{Local Mobility Anchor}: During X2 handover, S-GW remains unchanged; only the downlink GTP-U endpoint is switched to the target eNB
+\item
+  \textbf{Downlink Data Buffering}: When UE is in ECM-IDLE, S-GW buffers incoming packets and triggers MME to page the UE
+\item
+  \textbf{Per-UE Charging}: Collects charging data (CDRs) per bearer, reports to charging system
+\item
+  \textbf{Lawful Intercept}: User plane copy point for legal interception
+\item
+  \textbf{Inter-RAT Anchor}: Anchors user plane during handover between LTE and 2G/\allowbreak{}3G (with SGSN)
+\item
+  \textbf{Transport Level Marking}: Applies DSCP marking based on bearer QCI
+\end{enumerate}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S1-U & eNB & GTP-U & User plane from RAN \\
+S11 & MME & GTPv2-C & Bearer/\allowbreak{}tunnel management \\
+S5/\allowbreak{}S8 & P-GW & GTP-U + GTPv2-C & User plane + signaling to P-GW \\
+S4 & SGSN & GTP & Inter-RAT user plane (2G/\allowbreak{}3G) \\
+S12 & UTRAN & GTP-U & Direct tunnel (3G) \\
+\end{longtable}
+}
+
+\CNsubsubsection{Protocols}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{GTP-U} (UDP port 2152): Encapsulates user IP packets in GTP headers with TEID
+\item
+  \textbf{GTPv2-C} (UDP port 2123): Create/\allowbreak{}Modify/\allowbreak{}Delete Session messages from MME
+\item
+  \textbf{DSCP}: Outer IP header marking for transport QoS
+\end{itemize}
+
+\CNsubsubsection{Failure Impact}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Active sessions disrupted}: Ongoing data flows interrupted
+\item
+  \textbf{Path switch required}: MME detects failure, selects a new S-GW, re-establishes GTP tunnels
+\item
+  \textbf{Buffered data lost}: Any DL packets buffered for IDLE UEs are lost
+\item
+  \textbf{Mitigation}: S-GW typically deployed in N+1 redundancy; ICGW (Idle-mode Signaling Reduction) minimizes state
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.4}{P-GW — PDN Gateway}
+
+\CNchained\CNsubsubsection{Purpose}
+
+The P-GW is the \textbf{point of interconnection} between the EPC and external packet data networks (PDNs). It is the IP anchor point for UE sessions — the UE’s IP address remains constant as long as the PDN connection exists, regardless of mobility.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{IP Address Allocation}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    IPv4: DHCPv4 or static assignment from configured pools
+  \item
+    IPv6: Stateless Address Autoconfiguration (SLAAC) via Router Advertisement; assigns /\allowbreak{}64 prefix
+  \item
+    Dual-stack: Both simultaneously
+  \end{itemize}
+\item
+  \textbf{Policy Enforcement (PCEF)}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Applies PCC rules received from PCRF
+  \item
+    Traffic Flow Templates (TFT): Packet filters mapping IP flows to bearers
+  \item
+    Service Data Flow (SDF) filters: 5-tuple matching for QoS/\allowbreak{}charging
+  \end{itemize}
+\item
+  \textbf{Charging}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Offline (Gz interface \ensuremath{\to} CDR generation)
+  \item
+    Online (Gy interface \ensuremath{\to} real-time credit control with OCS)
+  \end{itemize}
+\item
+  \textbf{SGi Interface}: Connects to external networks (Internet, IMS, enterprise VPN)
+\item
+  \textbf{NAT/\allowbreak{}NAPT}: Optional Network Address Translation for IPv4
+\item
+  \textbf{GTP Anchoring}: Terminates S5/\allowbreak{}S8 GTP tunnels from S-GW
+\end{enumerate}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S5/\allowbreak{}S8 & S-GW & GTP & User plane + control plane \\
+Gx & PCRF & Diameter & PCC rule download \\
+Gy & OCS & Diameter (Ro) & Online charging \\
+Gz & OFCS & GTP’ (CDRs) & Offline charging \\
+SGi & PDN/\allowbreak{}Internet & IP & External connectivity \\
+S2a/\allowbreak{}S2b & ePDG/\allowbreak{}TWAG & GTP/\allowbreak{}PMIP & Wi-Fi offload \\
+\end{longtable}
+}
+
+\CNsubsubsection{Protocols}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{GTP-U/\allowbreak{}GTPv2-C}: Tunnel and session management toward S-GW
+\item
+  \textbf{Diameter Gx}: Policy and Charging Control (Install/\allowbreak{}Remove PCC rules)
+\item
+  \textbf{Diameter Gy (Ro)}: Credit-Control-Request/\allowbreak{}Answer for online charging
+\item
+  \textbf{DHCPv4/\allowbreak{}ICMPv6}: IP address allocation to UE
+\item
+  \textbf{RADIUS/\allowbreak{}Diameter}: Possible AAA for enterprise APNs
+\end{itemize}
+
+\CNsubsubsection{Failure Impact}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Session loss}: All PDN connections through the failed P-GW are lost (IP addresses released)
+\item
+  \textbf{UE must re-establish}: New PDN connectivity request \ensuremath{\to} new IP address (breaks ongoing TCP sessions)
+\item
+  \textbf{Critical impact for VoLTE}: Active voice calls dropped
+\item
+  \textbf{Mitigation}: P-GW clustering, session replication, ICSR (Inter-Chassis Session Recovery)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.5}{PCRF — Policy and Charging Rules Function}
+
+\CNchained\CNsubsubsection{Purpose}
+
+The PCRF is the \textbf{policy decision point} in the PCC architecture. It makes real-time decisions about QoS authorization, gating, and charging rules based on subscriber profile, network conditions, and application requirements.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{PCC Rule Generation}: Creates Policy and Charging Control rules containing:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    SDF filters (which traffic)
+  \item
+    QoS parameters (QCI, GBR, MBR)
+  \item
+    Charging keys and methods
+  \item
+    Gate status (open/\allowbreak{}close)
+  \end{itemize}
+\item
+  \textbf{QoS Authorization}: Validates requested QoS against subscription and network policy
+\item
+  \textbf{Dynamic Policy}: Real-time policy changes (e.g., when VoLTE call starts \ensuremath{\to} install GBR bearer rule)
+\item
+  \textbf{Rx Interface Processing}: Receives session information from AF/\allowbreak{}IMS (media description, bandwidth) and translates to PCC rules
+\item
+  \textbf{Spending Limits}: Interfaces with OCS for policy decisions based on remaining credit
+\item
+  \textbf{Subscription-Based Policy}: Applies rules based on subscriber tier (e.g., gold/\allowbreak{}silver/\allowbreak{}bronze plans)
+\end{enumerate}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gx & P-GW (PCEF) & Diameter & Install/\allowbreak{}remove PCC rules \\
+Rx & AF /\allowbreak{} IMS (P-CSCF) & Diameter & Service-level info (SDP) \\
+Sp & SPR & Diameter/\allowbreak{}proprietary & Subscriber profile retrieval \\
+Sy & OCS & Diameter & Spending limit reporting \\
+Sd & TDF & Diameter & Traffic Detection Function rules \\
+\end{longtable}
+}
+
+\CNsubsubsection{Protocols}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Diameter Gx Application}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    CC-Request/\allowbreak{}Answer (CCR/\allowbreak{}CCA): Initial, Update, Terminate
+  \item
+    Re-Auth-Request (RAR): Push rule changes to PCEF
+  \end{itemize}
+\item
+  \textbf{Diameter Rx Application}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    AA-Request/\allowbreak{}Answer (AAR/\allowbreak{}AAA): AF session establishment
+  \item
+    Session-Termination-Request (STR): AF session teardown
+  \item
+    Abort-Session-Request (ASR): Network-initiated removal
+  \end{itemize}
+\end{itemize}
+
+\CNsubsubsection{Failure Impact}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Static rules continue}: Previously installed PCC rules at P-GW remain active
+\item
+  \textbf{No dynamic policy}: New service requests (e.g., VoLTE) cannot get dedicated bearer authorization
+\item
+  \textbf{Default QoS only}: New sessions get only default bearer with static policy
+\item
+  \textbf{Mitigation}: PCRF deployed in active/\allowbreak{}standby pairs; Diameter routing agent (DRA) for failover
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.6}{PCEF — Policy and Charging Enforcement Function}
+
+\CNchained\CNsubsubsection{Purpose}
+
+The PCEF is the \textbf{policy enforcement point}, co-located with the P-GW. It enforces the PCC rules received from the PCRF by applying packet filtering, QoS enforcement, and charging actions on every user plane packet.
+
+\CNsubsubsection{Key Functions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{SDF Filter Enforcement}: Matches incoming/\allowbreak{}outgoing IP packets against Service Data Flow filters (5-tuple: src IP, dst IP, src port, dst port, protocol)
+\item
+  \textbf{Gate Control}: Opens or closes the gate for specific SDFs (blocking/\allowbreak{}allowing traffic)
+\item
+  \textbf{QoS Enforcement}: Applies rate limiting per-flow:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    GBR (Guaranteed Bit Rate): Minimum rate ensured
+  \item
+    MBR (Maximum Bit Rate): Hard cap per bearer
+  \item
+    AMBR (Aggregate Maximum Bit Rate): Cap across all non-GBR bearers
+  \end{itemize}
+\item
+  \textbf{Bearer Binding}: Maps SDF filters to appropriate EPS bearers
+\item
+  \textbf{Charging Enforcement}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Applies charging keys to traffic
+  \item
+    Volume/\allowbreak{}time measurement per rating group
+  \item
+    Online charging: Reports usage, enforces credit limits
+  \item
+    Offline charging: Generates CDRs
+  \end{itemize}
+\item
+  \textbf{Usage Monitoring}: Reports volume thresholds to PCRF for policy decisions
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{Interfaces}
+
+The PCEF is integrated within the P-GW, so its external interface is primarily:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Peer} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gx & PCRF & Diameter & Receives PCC rules \\
+Gy & OCS & Diameter (Ro) & Online charging credit control \\
+Gz & OFCS & GTP’ & Offline CDR delivery \\
+\end{longtable}
+}
+
+\CNsubsubsection{Protocols}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Diameter Gx}: Receives Charging-Rule-Install/\allowbreak{}Remove AVPs containing PCC rules
+\item
+  \textbf{Deep Packet Inspection (DPI)}: Optional; identifies applications for application-aware charging
+\item
+  \textbf{Token Bucket /\allowbreak{} Leaky Bucket}: Rate enforcement algorithms for GBR/\allowbreak{}MBR policing
+\end{itemize}
+
+\CNsubsubsection{Failure Impact}
+
+\begin{itemize}
+\tightlist
+\item
+  Since PCEF is co-located with P-GW, PCEF failure = P-GW failure (see Section 9.3.4)
+\item
+  \textbf{Degraded mode}: If only policy engine fails, traffic may pass unpoliced (fail-open) or be blocked (fail-close) depending on implementation
+\item
+  \textbf{Mitigation}: Hardware redundancy within P-GW chassis; hitless software upgrades
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{9.4}{EPC Bearers}
+
+\CNchained\CNsubsection{}{Bearer Concept}
+
+An EPS bearer is an \textbf{end-to-end logical channel} between the UE and the P-GW with specific QoS characteristics. Every bearer is defined by three components:
+
+\CNdisplay{\text{Bearer} = \{\,\text{TFT} + \text{QoS parameters} + \text{GTP tunnel(s)}\,\}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{TFT (Traffic Flow Template)}: Packet filters (5-tuple) that classify which IP packets belong to this bearer
+\item
+  \textbf{QoS Parameters}: QCI, ARP, GBR/\allowbreak{}MBR (for GBR bearers), AMBR (aggregate)
+\item
+  \textbf{GTP Tunnel}: Identified by TEID (Tunnel Endpoint Identifier) on each hop:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    S1-U: eNB \ensuremath{\leftrightarrow} S-GW
+  \item
+    S5/\allowbreak{}S8: S-GW \ensuremath{\leftrightarrow} P-GW
+  \end{itemize}
+\end{itemize}
+
+\CNkeepfig{m09-bearers}{3}
+
+\CNsubsection{}{Bearer Structure Diagram}
+
+\CNfigure{m09-bearers}{Default and dedicated bearers: TFT, QoS and GTP-U tunnel per bearer}
+
+\CNsubsection{9.4.1}{Default Bearer}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Created automatically} during PDN connection (Attach or additional PDN connectivity request)
+\item
+  \textbf{Always-on}: Exists for the entire duration of the PDN connection
+\item
+  \textbf{Non-GBR}: No guaranteed bit rate; best-effort with AMBR cap
+\item
+  \textbf{Match-all TFT}: Carries all traffic that doesn’t match any dedicated bearer’s TFT
+\item
+  \textbf{QoS from subscription}: QCI and AMBR values come from HSS subscription profile
+\item
+  \textbf{One per PDN connection}: Each APN gets exactly one default bearer (EBI = EPS Bearer ID assigned)
+\end{itemize}
+
+\CNsubsection{9.4.2}{Dedicated Bearer}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Created on-demand}: Triggered by service request (PCRF rule) or UE/\allowbreak{}network request
+\item
+  \textbf{Specific QoS}: Can be GBR (guaranteed) or Non-GBR (prioritized best-effort)
+\item
+  \textbf{Specific TFT}: Packet filters direct matching traffic to this bearer
+\item
+  \textbf{Linked to default bearer}: Shares the same PDN connection (same IP address)
+\item
+  \textbf{Lifecycle}: Created via Bearer Resource Allocation \ensuremath{\to} PCRF decision \ensuremath{\to} P-GW initiates dedicated bearer activation
+\item
+  \textbf{Example triggers}: VoLTE call start (QCI 1), video streaming (QCI 4), gaming (QCI 3)
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{9.4.3}{QCI Table (Standardized Values)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.0562}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1573}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1124}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2247}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2584}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1910}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{QCI} & \CNth{Resource Type} & \CNth{Priority} & \CNth{Packet Delay Budget} & \CNth{Packet Error Loss Rate} & \CNth{Example Services} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & GBR & 2 & 100~ms & 10\textsuperscript{-2} & Conversational Voice (VoLTE) \\
+2 & GBR & 4 & 150~ms & 10\textsuperscript{-3} & Conversational Video (live) \\
+3 & GBR & 3 & 50~ms & 10\textsuperscript{-3} & Real-time Gaming \\
+4 & GBR & 5 & 300~ms & 10\textsuperscript{-6} & Non-conversational Video (buffered streaming) \\
+5 & Non-GBR & 1 & 100~ms & 10\textsuperscript{-6} & IMS Signaling (SIP) \\
+6 & Non-GBR & 6 & 300~ms & 10\textsuperscript{-6} & Video (buffered), TCP-based services (web, email) \\
+7 & Non-GBR & 7 & 100~ms & 10\textsuperscript{-3} & Voice, Video (live), Interactive Gaming \\
+8 & Non-GBR & 8 & 300~ms & 10\textsuperscript{-6} & Video (buffered), TCP-based (premium) \\
+9 & Non-GBR & 9 & 300~ms & 10\textsuperscript{-6} & Video (buffered), TCP-based (default/\allowbreak{}best-effort) \\
+\end{longtable}
+}
+
+\textbf{Key QoS Parameters:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{QCI (QoS Class Identifier)}: Scalar value (1-9) mapping to standardized packet treatment
+\item
+  \textbf{ARP (Allocation and Retention Priority)}: Priority level (1-15), pre-emption capability/\allowbreak{}vulnerability
+\item
+  \textbf{GBR}: Guaranteed minimum bit rate (only for QCI 1-4)
+\item
+  \textbf{MBR}: Maximum bit rate (caps GBR bearers)
+\item
+  \textbf{UE-AMBR}: Aggregate MBR across all non-GBR bearers of a UE
+\item
+  \textbf{APN-AMBR}: Aggregate MBR across all non-GBR bearers of one APN
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m09-eps-aka}{12}
+
+\CNsection{9.5}{Authentication in EPC}
+
+\CNchained\CNsubsection{9.5.1}{EPS-AKA (EPS Authentication and Key Agreement)}
+
+EPS-AKA provides \textbf{mutual authentication} between the UE and the network. Both parties prove knowledge of the permanent key K (stored in USIM and HSS) without transmitting it.
+
+\CNsubsubsection{EPS-AKA Flow}
+
+\CNfigure{m09-eps-aka}{EPS-AKA authentication and NAS/\allowbreak{}AS security activation}
+
+\CNsubsubsection{Authentication Failure Cases}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{MAC failure} (UE rejects AUTN): Network is not authentic \ensuremath{\to} UE sends Authentication Failure (cause: MAC failure)
+\item
+  \textbf{SQN out of range}: Synchronization failure \ensuremath{\to} UE sends AUTS for resync
+\item
+  \textbf{XRES mismatch}: UE is not authentic \ensuremath{\to} MME sends Authentication Reject
+\end{itemize}
+
+\CNsubsection{9.5.2}{\ensuremath{K_{\mathrm{ASME}}} Derivation}
+
+The \textbf{\ensuremath{K_{\mathrm{ASME}}}} (Key for Access Security Management Entity) is the master key for all EPC security:
+
+\CNdisplay{K_{\mathrm{ASME}} = \mathrm{KDF}\left(\mathrm{CK} \,\|\, \mathrm{IK},\ \text{SN-ID},\ \mathrm{SQN} \oplus \mathrm{AK}\right)}
+
+where:
+
+\begin{itemize}
+\tightlist
+\item
+  KDF = HMAC-SHA-256 based key derivation function
+\item
+  CK = cipher key = f3(K, RAND)
+\item
+  IK = integrity key = f4(K, RAND)
+\item
+  SN-ID = serving network identity (MCC \ensuremath{\|} MNC)
+\item
+  SQN = sequence number
+\item
+  AK = anonymity key = f5(K, RAND)
+\end{itemize}
+
+\CNkeepfig{m09-key-hierarchy}{2}
+
+\CNsubsubsection{Key Hierarchy}
+
+\CNfigure{m09-key-hierarchy}{EPS key hierarchy}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{9.5.3}{NAS Security}
+
+NAS security operates between UE and MME (transparent to eNB):
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2895}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4737}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2368}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Protection} & \CNth{Algorithm Options} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Integrity (mandatory) & EIA1 (SNOW 3G), EIA2 (AES), EIA3 (ZUC) & Prevents message tampering \\
+Ciphering (optional) & EEA0 (null), EEA1 (SNOW 3G), EEA2 (AES), EEA3 (ZUC) & Prevents eavesdropping \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{NAS COUNT}: 32-bit counter prevents replay attacks (separate UL/\allowbreak{}DL counts)
+\item
+  \textbf{Security Mode Command}: Establishes algorithms; itself integrity-protected
+\item
+  \textbf{Protected messages}: All NAS messages after SMC are integrity-protected; most are ciphered
+\end{itemize}
+
+\CNsubsection{9.5.4}{AS Security (Access Stratum)}
+
+AS security operates between UE and eNB:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\ensuremath{K_{\mathrm{eNB}}}}: Derived from \ensuremath{K_{\mathrm{ASME}}} at MME, sent to eNB in Initial Context Setup
+\item
+  \textbf{RRC protection}: Both integrity and ciphering (SRB1, SRB2)
+\item
+  \textbf{User plane}: Ciphering only (no integrity for performance reasons in LTE)
+\item
+  \textbf{Key refresh}: New \ensuremath{K_{\mathrm{eNB}}} derived at handover (\ensuremath{K_{\mathrm{eNB}}}* = KDF(\ensuremath{K_{\mathrm{eNB}}}, PCI, freq))
+\item
+  \textbf{Activated via}: SecurityModeCommand (RRC level, distinct from NAS SMC)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{9.6}{Session Management}
+
+\CNchained\CNsubsection{9.6.1}{PDN Connectivity (Default Bearer Establishment)}
+
+PDN connectivity creates the \textbf{default EPS bearer} and assigns an IP address to the UE.
+
+\CNsubsubsection{Procedure Flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{UE \ensuremath{\to} MME}: ESM PDN Connectivity Request (APN, PDN type: IPv4/\allowbreak{}IPv6/\allowbreak{}IPv4v6)
+\item
+  \textbf{MME \ensuremath{\to} S-GW}: Create Session Request (IMSI, bearer QoS from HSS profile, APN)
+\item
+  \textbf{S-GW \ensuremath{\to} P-GW}: Create Session Request (forwarded with S-GW F-TEID)
+\item
+  \textbf{P-GW}: Allocates IP address, contacts PCRF (CCR-Initial on Gx), installs default PCC rules
+\item
+  \textbf{P-GW \ensuremath{\to} S-GW}: Create Session Response (IP address, bearer context, TFT)
+\item
+  \textbf{S-GW \ensuremath{\to} MME}: Create Session Response (S-GW F-TEID, bearer context)
+\item
+  \textbf{MME \ensuremath{\to} eNB}: Initial Context Setup Request (bearer context, \ensuremath{K_{\mathrm{eNB}}}, NAS: Attach Accept + Activate Default Bearer)
+\item
+  \textbf{eNB \ensuremath{\to} UE}: RRC Connection Reconfiguration (DRB setup) + NAS messages
+\item
+  \textbf{UE \ensuremath{\to} eNB \ensuremath{\to} MME}: Attach Complete /\allowbreak{} Activate Default EPS Bearer Context Accept
+\item
+  \textbf{MME \ensuremath{\to} S-GW}: Modify Bearer Request (eNB F-TEID for downlink)
+\end{enumerate}
+
+\textbf{Result}: End-to-end bearer established: UE \ensuremath{\leftrightarrow} eNB \ensuremath{\leftrightarrow} S-GW \ensuremath{\leftrightarrow} P-GW \ensuremath{\leftrightarrow} Internet
+
+\CNsubsection{9.6.2}{Dedicated Bearer Activation}
+
+Dedicated bearers are \textbf{network-initiated} (triggered by PCRF rule or operator policy):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{PCRF \ensuremath{\to} P-GW}: Re-Auth-Request (RAR) with PCC rule (QCI, GBR, TFT filters)
+\item
+  \textbf{P-GW \ensuremath{\to} S-GW}: Create Bearer Request (EBI, TFT, QoS, S5 F-TEID)
+\item
+  \textbf{S-GW \ensuremath{\to} MME}: Create Bearer Request (forwarded with S1-U F-TEID)
+\item
+  \textbf{MME \ensuremath{\to} eNB \ensuremath{\to} UE}: Bearer Setup Request (NAS: Activate Dedicated Bearer Context Request)
+\item
+  \textbf{UE}: Accepts, stores TFT for uplink classification
+\item
+  \textbf{UE \ensuremath{\to} eNB \ensuremath{\to} MME}: Activate Dedicated EPS Bearer Context Accept
+\item
+  \textbf{MME \ensuremath{\to} S-GW \ensuremath{\to} P-GW}: Create Bearer Response (all TEIDs now bound)
+\end{enumerate}
+
+\CNsubsection{9.6.3}{Bearer Modification}
+
+Bearer modification changes QoS or TFT of an existing bearer:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Network-initiated}: PCRF updates PCC rule \ensuremath{\to} P-GW sends Update Bearer Request
+\item
+  \textbf{UE-initiated}: UE sends Bearer Resource Modification Request to MME
+\item
+  \textbf{Examples}: Upgrade video quality (increase GBR), add new SDF filter, change gate status
+\end{itemize}
+
+\CNsubsection{9.6.4}{Bearer Deactivation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Network-initiated}: PCRF removes PCC rule \ensuremath{\to} P-GW sends Delete Bearer Request
+\item
+  \textbf{UE-initiated}: UE sends Deactivate EPS Bearer Context Request
+\item
+  \textbf{Default bearer deactivation}: Deletes ALL associated dedicated bearers + releases IP address
+\item
+  \textbf{PDN disconnection}: Triggered when last default bearer is deactivated
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{17\baselineskip}
+
+\CNsection{9.7}{Mobility Management}
+
+\CNchained\CNsubsection{9.7.1}{ECM States}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2449}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3878}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2245}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{State} & \CNth{Description} & \CNth{UE Location Known?} & \CNth{Resources} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{ECM-IDLE} & No NAS signaling connection; UE monitors paging & TA-level only (TAI list) & No S1 connection, no DRB; S-GW buffers DL data \\
+\textbf{ECM-CONNECTED} & Active NAS signaling via S1-MME & Cell-level (ECGI) & S1-U tunnel active; DRBs established \\
+\end{longtable}
+}
+
+\textbf{State Transitions:}
+
+\begin{itemize}
+\tightlist
+\item
+  IDLE \ensuremath{\to} CONNECTED: Service Request (UE-triggered) or Paging Response (network-triggered)
+\item
+  CONNECTED \ensuremath{\to} IDLE: S1 Release (inactivity timer expiry or explicit release)
+\end{itemize}
+
+\CNsubsection{9.7.2}{Tracking Area Update (TAU)}
+
+TAU keeps the network informed of the UE’s approximate location in ECM-IDLE state:
+
+\textbf{When TAU is triggered:}
+
+\begin{itemize}
+\tightlist
+\item
+  UE enters a new Tracking Area (TA) not in its TAI list
+\item
+  Periodic TAU timer expires (configurable, typically 54 minutes)
+\item
+  After ISR (Idle-mode Signaling Reduction) activation
+\end{itemize}
+
+\textbf{TAU Procedure:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE \ensuremath{\to} MME: Tracking Area Update Request (old GUTI, TAI visited)
+\item
+  MME: Verifies identity, optionally authenticates
+\item
+  MME \ensuremath{\to} HSS: Update Location (if new MME)
+\item
+  MME \ensuremath{\to} old MME: Context transfer (if MME changed)
+\item
+  MME \ensuremath{\to} UE: TAU Accept (new GUTI, new TAI list)
+\item
+  MME \ensuremath{\to} S-GW: Modify Bearer (if S-GW changed)
+\end{enumerate}
+
+\textbf{TAI List}: MME assigns a list of TAs to reduce TAU frequency (load balancing vs. paging cost tradeoff)
+
+\CNsubsection{9.7.3}{X2 Handover (Intra-LTE, Without MME Change)}
+
+The \textbf{fastest handover} in LTE — direct eNB-to-eNB signaling without MME involvement for data forwarding:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Source eNB}: Measurement reports indicate target cell is better
+\item
+  \textbf{Source \ensuremath{\to} Target eNB} (X2): Handover Request (UE context, bearers, QoS)
+\item
+  \textbf{Target eNB}: Admits UE, allocates resources
+\item
+  \textbf{Target \ensuremath{\to} Source eNB} (X2): Handover Request Acknowledge (DL forwarding address)
+\item
+  \textbf{Source eNB \ensuremath{\to} UE}: RRC Connection Reconfiguration (handover command)
+\item
+  \textbf{Source eNB}: Starts forwarding buffered + new DL data to target eNB via X2
+\item
+  \textbf{UE}: Detaches from source, synchronizes to target cell
+\item
+  \textbf{UE \ensuremath{\to} Target eNB}: RRC Connection Reconfiguration Complete
+\item
+  \textbf{Target eNB \ensuremath{\to} MME}: Path Switch Request (new ECGI, new TEIDs)
+\item
+  \textbf{MME \ensuremath{\to} S-GW}: Modify Bearer Request (target eNB address)
+\item
+  \textbf{S-GW}: Switches DL path to target eNB (end marker to source)
+\item
+  \textbf{MME \ensuremath{\to} Target eNB}: Path Switch Request Acknowledge
+\item
+  \textbf{Target \ensuremath{\to} Source eNB}: UE Context Release (cleanup)
+\end{enumerate}
+
+\textbf{Key point}: S-GW is unchanged (local mobility anchor). Only the S1-U endpoint moves.
+
+\CNsubsection{9.7.4}{S1 Handover (With MME/\allowbreak{}S-GW Change)}
+
+Used when X2 is unavailable or when MME/\allowbreak{}S-GW relocation is needed:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Source eNB \ensuremath{\to} Source MME}: Handover Required (target ID, cause)
+\item
+  \textbf{Source MME \ensuremath{\to} Target MME}: Forward Relocation Request (UE context) [if MME changes]
+\item
+  \textbf{Target MME \ensuremath{\to} Target eNB}: Handover Request (bearer setup)
+\item
+  \textbf{Target eNB \ensuremath{\to} Target MME}: Handover Request Acknowledge
+\item
+  \textbf{Target MME \ensuremath{\to} Source MME}: Forward Relocation Response
+\item
+  \textbf{Source MME \ensuremath{\to} Source eNB}: Handover Command
+\item
+  \textbf{Source eNB \ensuremath{\to} UE}: RRC Connection Reconfiguration
+\item
+  \textbf{UE \ensuremath{\to} Target eNB}: Handover Confirm
+\item
+  \textbf{Target eNB \ensuremath{\to} Target MME}: Handover Notify
+\item
+  \textbf{Target MME \ensuremath{\to} S-GW}: Modify Bearer /\allowbreak{} Create Session (if S-GW changes)
+\end{enumerate}
+
+\textbf{Indirect Data Forwarding}: DL data forwarded Source eNB \ensuremath{\to} Source S-GW \ensuremath{\to} Target S-GW \ensuremath{\to} Target eNB during handover gap.
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.7.5}{Inter-RAT Mobility (LTE \ensuremath{\leftrightarrow} 3G)}
+
+\CNchained\CNsubsubsection{LTE \ensuremath{\to} 3G (PS Handover)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  MME triggers handover to UTRAN (measurement reports or coverage)
+\item
+  MME \ensuremath{\to} SGSN (S3): Forward Relocation Request (PDP contexts mapped from EPS bearers)
+\item
+  SGSN \ensuremath{\to} RNC: Relocation Request
+\item
+  After handover: S-GW reroutes user plane via S4 to SGSN (or direct tunnel via S12 to RNC)
+\item
+  Bearer QoS mapped: QCI \ensuremath{\to} UMTS Traffic Class (Conversational/\allowbreak{}Streaming/\allowbreak{}Interactive/\allowbreak{}Background)
+\end{enumerate}
+
+\CNsubsubsection{3G \ensuremath{\to} LTE}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  SGSN detects LTE capability; initiates handover
+\item
+  SGSN \ensuremath{\to} MME (S3): Forward Relocation Request
+\item
+  MME activates bearers, sets up S1 path
+\item
+  PDP contexts mapped to EPS bearers
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\Needspace{23\baselineskip}
+
+\CNsection{9.8}{Failure Scenarios}
+
+\CNchained\CNsubsection{9.8.1}{MME Failure}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Impact} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Detection} & eNB detects via SCTP association failure (heartbeat timeout \textasciitilde{}30s) \\
+\textbf{Immediate effect} & All S1-MME connections to failed MME are lost \\
+\textbf{ECM-CONNECTED UEs} & Move to ECM-IDLE; eNB releases radio resources \\
+\textbf{Recovery action} & UE sends Service Request /\allowbreak{} Attach to new MME (selected via S1AP weighting from MME pool) \\
+\textbf{Context recovery} & New MME fetches subscription from HSS; active bearers re-established via new Create Session to S-GW \\
+\textbf{Data loss} & Momentary — ongoing TCP sessions may survive (IP address preserved at P-GW); UDP/\allowbreak{}real-time sessions interrupted \\
+\end{longtable}
+}
+
+\textbf{Mitigation Strategies:}
+
+\begin{itemize}
+\tightlist
+\item
+  MME pooling (multiple MMEs per tracking area)
+\item
+  Active/\allowbreak{}Standby with session state replication
+\item
+  S10-based context transfer from backup node
+\item
+  DNS-based MME selection for load distribution
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{9.8.2}{S-GW Failure}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Impact} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Detection} & MME detects via GTPv2-C Echo timeout on S11; eNB detects via GTP-U path failure on S1-U \\
+\textbf{Immediate effect} & User plane interrupted for all UEs served by failed S-GW \\
+\textbf{Recovery action} & MME selects new S-GW, sends Modify Bearer to P-GW with new S-GW address \\
+\textbf{Path switch} & P-GW redirects S5 tunnel to new S-GW; MME updates eNB with new S1-U TEID \\
+\textbf{Data loss} & Buffered DL data (for IDLE UEs) at failed S-GW is lost \\
+\end{longtable}
+}
+
+\textbf{Mitigation Strategies:}
+
+\begin{itemize}
+\tightlist
+\item
+  S-GW pool with DNS-based selection (weighted records)
+\item
+  GTP-U path failure detection (Echo Request/\allowbreak{}Response)
+\item
+  N+1 redundancy; ICSR between chassis pairs
+\item
+  Pre-established backup GTP contexts
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{9.8.3}{P-GW Failure}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Impact} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Detection} & S-GW detects via GTP path failure on S5; PCRF detects via Diameter transport failure on Gx \\
+\textbf{Immediate effect} & All PDN connections through failed P-GW are lost \\
+\textbf{IP address loss} & UE IP addresses are released — cannot be recovered \\
+\textbf{Session impact} & All TCP/\allowbreak{}UDP sessions terminated; VoLTE calls dropped \\
+\textbf{Recovery action} & UE must establish new PDN connectivity (new default bearer, new IP address) \\
+\textbf{Application impact} & DNS-based services recover; long-lived sessions (VPN, SSH) broken \\
+\end{longtable}
+}
+
+\textbf{Mitigation Strategies:}
+
+\begin{itemize}
+\tightlist
+\item
+  Inter-Chassis Session Recovery (ICSR): Active/\allowbreak{}Standby P-GW pair with session state sync
+\item
+  GTP-C restart counter: S-GW detects P-GW restart, reports to MME
+\item
+  IP address pool replication between paired P-GWs
+\item
+  P-GW selection via DNS with health monitoring
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{9.8.4}{HSS Unreachable}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Impact} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Detection} & MME detects via Diameter transport failure or watchdog timeout on S6a \\
+\textbf{Existing sessions} & Continue normally — bearer state is at MME/\allowbreak{}S-GW/\allowbreak{}P-GW \\
+\textbf{Authentication} & MME uses \textbf{cached authentication vectors} (typically 5 vectors per UE fetched at last AIR) \\
+\textbf{New attaches} & Fail once cached vectors exhausted — no new UEs can authenticate \\
+\textbf{Handover to new MME} & Impacted — new MME cannot fetch subscription profile \\
+\textbf{Duration tolerance} & Depends on cache depth; typically sustains operations for minutes to hours \\
+\end{longtable}
+}
+
+\textbf{Mitigation Strategies:}
+
+\begin{itemize}
+\tightlist
+\item
+  Geo-redundant HSS pair (active/\allowbreak{}active or active/\allowbreak{}standby)
+\item
+  Diameter Routing Agent (DRA) for automatic failover
+\item
+  Increased auth vector batch size (e.g., 10 instead of 5)
+\item
+  MME-level subscription caching with TTL
+\end{itemize}
+
+\Needspace{20\baselineskip}
+
+\CNsection{9.9}{Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2391}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1522}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2826}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3261}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Component} & \CNth{Plane} & \CNth{Primary Role} & \CNth{Key Interface} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MME & Control & Signaling, Auth, Mobility & S1-MME, S11, S6a \\
+HSS & Control & Subscriber DB, Auth vectors & S6a \\
+S-GW & User + Control & Local UP anchor, buffering & S1-U, S5/\allowbreak{}S8 \\
+P-GW & User + Control & IP anchor, policy enforcement & S5/\allowbreak{}S8, SGi, Gx \\
+PCRF & Control & Policy decision & Gx, Rx \\
+PCEF & User & Policy enforcement & Gx (at P-GW) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{EPC eliminates circuit-switching}: All services (including voice) over IP bearers
+\item
+  \textbf{Control/\allowbreak{}User plane split}: Enables independent scaling and evolution toward 5G
+\item
+  \textbf{Bearer-based QoS}: Deterministic quality for real-time services (QCI 1-4 = GBR)
+\item
+  \textbf{Security by design}: Mutual authentication (EPS-AKA), layered key derivation, mandatory integrity
+\item
+  \textbf{Mobility without disruption}: GTP anchoring at S-GW (local) and P-GW (global) preserves IP sessions
+\item
+  \textbf{Policy architecture}: PCRF/\allowbreak{}PCEF enable real-time, subscriber-aware traffic treatment
+\item
+  \textbf{Resilience through pooling}: MME pools, S-GW pools, and HSS redundancy minimize single points of failure
+\end{enumerate}
+
+\emph{Module 9 — End}

@@ -1,0 +1,883 @@
+\CNsection{1}{Why Scheduling Matters}
+
+In LTE, the radio channel is a \textbf{shared resource}. Multiple users compete for limited time-frequency resources on the same carrier. The scheduler is the central intelligence at the eNodeB that decides:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Who} gets to transmit/\allowbreak{}receive
+\item
+  \textbf{When} (which subframe)
+\item
+  \textbf{Where} (which resource blocks)
+\item
+  \textbf{How} (which modulation and coding scheme)
+\end{itemize}
+
+Without scheduling, users would collide, resources would be wasted, and QoS guarantees would be impossible. The scheduler must balance:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Throughput maximization} — use resources efficiently
+\item
+  \textbf{Fairness} — don’t starve cell-edge users
+\item
+  \textbf{Latency} — meet delay budgets for real-time services
+\item
+  \textbf{QoS} — honor GBR (Guaranteed Bit Rate) bearers
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsection{2}{The LTE Resource Grid}
+
+The resource grid is the fundamental 2D structure that organizes all LTE transmissions in time and frequency.
+
+\CNsubsection{}{Time Domain Hierarchy}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Structure} & \CNth{Duration} & \CNth{Composition} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Radio Frame & 10~ms & 10 subframes \\
+Subframe & 1~ms & 2 slots \\
+Slot & 0.5~ms & 7 OFDM symbols (normal CP) \\
+OFDM Symbol & \textasciitilde{}71.4 \ensuremath{\mu}s & 1 symbol period + cyclic prefix \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{Frequency Domain Hierarchy}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Structure} & \CNth{Bandwidth} & \CNth{Composition} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Subcarrier & 15~kHz & Smallest frequency unit \\
+Resource Block (RB) & 180~kHz & 12 subcarriers \\
+System Bandwidth & 1.4–20~MHz & 6–100~RBs \\
+\end{longtable}
+}
+
+\CNsubsection{}{Key Definitions}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Resource Element (RE):} 1 subcarrier \ensuremath{\times} 1 OFDM symbol — the smallest allocatable unit
+\item
+  \textbf{Resource Block (RB):} 12 subcarriers \ensuremath{\times} 7 symbols = \textbf{84~REs} (one slot)
+\item
+  \textbf{Resource Block Pair:} 12 subcarriers \ensuremath{\times} 14 symbols = \textbf{168~REs} (one subframe /\allowbreak{} TTI)
+\end{itemize}
+
+\CNkeepfig{m07-frame-hierarchy}{3}
+
+\CNsubsection{}{Resource Grid Visualization}
+
+\CNfigure{m07-frame-hierarchy}{LTE time structure: frame, subframe, slot and OFDM symbols}
+
+\CNfigure{m07-rb-pair}{Resource elements of one resource block (12 subcarriers \ensuremath{\times} 7 symbols)}
+
+\Needspace{19\baselineskip}
+
+\CNsection{3}{Scheduling Granularity}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6111}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3889}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Value} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Time granularity} & 1 subframe = 1~ms (Transmission Time Interval, TTI) \\
+\textbf{Frequency granularity} & 1 Resource Block = 180~kHz (12 subcarriers) \\
+\textbf{Minimum allocation} & 1 RB pair per TTI per user \\
+\textbf{Maximum allocation} & All RBs in a TTI to one user \\
+\textbf{Scheduling decision rate} & 1000 decisions/\allowbreak{}second \\
+\end{longtable}
+}
+
+The scheduler makes a fresh decision every TTI (1~ms), assigning RBs to UEs based on channel conditions, buffer status, QoS requirements, and fairness metrics.
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{Downlink Scheduling}
+
+\CNchained\CNsubsection{}{Overview}
+
+The eNodeB scheduler controls all downlink resource assignments. It informs UEs of their allocations via \textbf{DCI (Downlink Control Information)} messages carried on the \textbf{PDCCH (Physical Downlink Control Channel)}.
+
+\CNsubsection{}{DCI Contents}
+
+A DCI message tells the UE:
+
+\begin{itemize}
+\tightlist
+\item
+  Which RBs are allocated (resource assignment)
+\item
+  Which MCS to use for decoding
+\item
+  HARQ process number and redundancy version
+\item
+  Power control commands
+\item
+  MIMO-related parameters (precoding, layers)
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{Resource Allocation Types}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1622}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2162}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3514}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2703}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Type} & \CNth{Method} & \CNth{Flexibility} & \CNth{Overhead} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Type 0} & Bitmap of RB Groups (RBGs) & Distributed, non-contiguous & Medium \\
+\textbf{Type 1} & Subset + shift + bitmap & Distributed within subset & Higher \\
+\textbf{Type 2} & Start RB + length (RIV) & Contiguous only & Lowest \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\textbf{RBG size} depends on system bandwidth:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{System BW (RBs)} & \CNth{RBG Size (RBs)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+6 & 1 \\
+15 & 2 \\
+25 & 2 \\
+50 & 3 \\
+75 & 4 \\
+100 & 4 \\
+\end{longtable}
+}
+
+\CNsubsection{}{MCS Selection}
+
+The scheduler selects MCS based on:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE reports \textbf{CQI} (Channel Quality Indicator)
+\item
+  Scheduler maps CQI \ensuremath{\to} appropriate MCS index
+\item
+  Applies outer-loop adjustments based on ACK/\allowbreak{}NACK history
+\item
+  Encodes DCI with selected MCS for the UE to decode PDSCH
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{Uplink Scheduling}
+
+\CNchained\CNsubsection{}{Key Differences from Downlink}
+
+Unlike downlink, uplink scheduling must account for:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SC-FDMA constraint:} UEs must be allocated \textbf{contiguous} RBs (single-carrier property)
+\item
+  \textbf{UE power limitations:} Distance from eNodeB affects achievable rate
+\item
+  \textbf{Buffer awareness:} eNodeB doesn’t directly know UE buffer status
+\end{itemize}
+
+\CNsubsection{}{Scheduling Grant}
+
+The eNodeB sends an \textbf{uplink grant} via DCI (Format 0/\allowbreak{}4) on PDCCH, containing:
+
+\begin{itemize}
+\tightlist
+\item
+  RB allocation (contiguous)
+\item
+  MCS index
+\item
+  Power control command
+\item
+  HARQ information
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{Buffer Status Reports (BSR)}
+
+UEs inform the eNodeB about queued data via BSR:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5263}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4737}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{BSR Type} & \CNth{Trigger} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Regular BSR} & New data arrives in a logical channel group with higher priority than currently reported \\
+\textbf{Periodic BSR} & Timer-based periodic reporting \\
+\textbf{Padding BSR} & Sent when UL grant has spare capacity \\
+\end{longtable}
+}
+
+BSR reports data volume per \textbf{Logical Channel Group (LCG)}, allowing priority-aware scheduling.
+
+\CNsubsection{}{Power Headroom Report (PHR)}
+
+PHR tells the eNodeB how much \textbf{additional transmit power} the UE has available:
+
+\CNdisplay{PH = P_{MAX} - P_{PUSCH}}
+
+\begin{itemize}
+\tightlist
+\item
+  If PH \textgreater{} 0: UE can support higher MCS or more RBs
+\item
+  If PH \ensuremath{\le} 0: UE is power-limited, scheduler should reduce allocation
+\end{itemize}
+
+\CNkeepfig{m07-scfdma-alloc}{3}
+
+\CNsubsection{}{SC-FDMA Contiguous Allocation}
+
+\CNfigure{m07-scfdma-alloc}{SC-FDMA uplink allocations must be contiguous in frequency}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{Channel Quality Indicator (CQI)}
+
+\CNchained\CNsubsection{}{What CQI Represents}
+
+CQI is a \textbf{4-bit index} (1–15) reported by the UE indicating the highest MCS that can be received with a transport block error rate (BLER) \ensuremath{\le} \textbf{10\%}.
+
+CQI = 0 means ``out of range'' (channel too poor for any transmission).
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{CQI Table (3GPP TS 36.213, Table 7.2.3-1)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1528}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2639}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.4167}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{CQI Index} & \CNth{Modulation} & \CNth{Code Rate \ensuremath{\times} 1024} & \CNth{Spectral Efficiency (bps/\allowbreak{}Hz)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & QPSK & 78 & 0.1523 \\
+2 & QPSK & 120 & 0.2344 \\
+3 & QPSK & 193 & 0.3770 \\
+4 & QPSK & 308 & 0.6016 \\
+5 & QPSK & 449 & 0.8770 \\
+6 & QPSK & 602 & 1.1758 \\
+7 & 16QAM & 378 & 1.4766 \\
+8 & 16QAM & 490 & 1.9141 \\
+9 & 16QAM & 616 & 2.4063 \\
+10 & 64QAM & 466 & 2.7305 \\
+11 & 64QAM & 567 & 3.3223 \\
+12 & 64QAM & 666 & 3.9023 \\
+13 & 64QAM & 772 & 4.5234 \\
+14 & 64QAM & 873 & 5.1152 \\
+15 & 64QAM & 948 & 5.5547 \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{Wideband vs Subband CQI}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3947}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3421}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2632}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Reporting Mode} & \CNth{Description} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Wideband CQI} & Single CQI for entire bandwidth & Low overhead, coarse adaptation \\
+\textbf{Subband CQI} & CQI per group of RBs & Frequency-selective scheduling, higher gain \\
+\textbf{UE-selected subband} & UE reports best-M subbands & Compromise between overhead and gain \\
+\end{longtable}
+}
+
+Subband CQI enables \textbf{frequency-selective scheduling}, where the scheduler assigns each UE the RBs where their channel is best.
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{Link Adaptation}
+
+\CNchained\CNsubsection{}{Adaptive Modulation and Coding (AMC)}
+
+AMC dynamically adjusts the modulation order and code rate to match instantaneous channel conditions:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Good channel} \ensuremath{\to} Higher-order modulation + higher code rate \ensuremath{\to} More bits/\allowbreak{}RE
+\item
+  \textbf{Poor channel} \ensuremath{\to} Lower-order modulation + lower code rate \ensuremath{\to} Fewer bits/\allowbreak{}RE but robust
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{Modulation Schemes}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Modulation} & \CNth{Bits per Symbol} & \CNth{Required SNR (approx.)} & \CNth{Usage} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+QPSK & 2 & \textless{} 10~dB & Cell-edge users \\
+16QAM & 4 & 10–17~dB & Mid-range users \\
+64QAM & 6 & 17–25~dB & Near-cell users \\
+256QAM & 8 & \textgreater{} 25~dB & Cat-11+ (Rel-12), best conditions \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{MCS Index Table (3GPP TS 36.213, Table 7.1.7.1-1)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{MCS Index} & \CNth{Modulation Order} & \CNth{TBS Index} & \CNth{Notes} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 2 (QPSK) & 0 & Lowest rate \\
+1 & 2 (QPSK) & 1 & \\
+2 & 2 (QPSK) & 2 & \\
+3 & 2 (QPSK) & 3 & \\
+4 & 2 (QPSK) & 4 & \\
+5 & 2 (QPSK) & 5 & \\
+6 & 2 (QPSK) & 6 & \\
+7 & 2 (QPSK) & 7 & \\
+8 & 2 (QPSK) & 8 & \\
+9 & 2 (QPSK) & 9 & \\
+10 & 4 (16QAM) & 9 & Modulation transition \\
+11 & 4 (16QAM) & 10 & \\
+12 & 4 (16QAM) & 11 & \\
+13 & 4 (16QAM) & 12 & \\
+14 & 4 (16QAM) & 13 & \\
+15 & 4 (16QAM) & 14 & \\
+16 & 4 (16QAM) & 15 & \\
+17 & 6 (64QAM) & 15 & Modulation transition \\
+18 & 6 (64QAM) & 16 & \\
+19 & 6 (64QAM) & 17 & \\
+20 & 6 (64QAM) & 18 & \\
+21 & 6 (64QAM) & 19 & \\
+22 & 6 (64QAM) & 20 & \\
+23 & 6 (64QAM) & 21 & \\
+24 & 6 (64QAM) & 22 & \\
+25 & 6 (64QAM) & 23 & \\
+26 & 6 (64QAM) & 24 & \\
+27 & 6 (64QAM) & 25 & \\
+28 & 6 (64QAM) & 26 & Highest rate \\
+29 & 2 (QPSK) & — & Reserved (retx) \\
+30 & 4 (16QAM) & — & Reserved (retx) \\
+31 & 6 (64QAM) & — & Reserved (retx) \\
+\end{longtable}
+}
+
+\CNsubsection{}{Outer Loop Link Adaptation (OLLA)}
+
+The inner loop (CQI \ensuremath{\to} MCS) can be inaccurate due to:
+
+\begin{itemize}
+\tightlist
+\item
+  CQI reporting delay
+\item
+  UE measurement errors
+\item
+  Interference variability
+\end{itemize}
+
+\textbf{OLLA} adjusts the effective CQI with an offset:
+
+\CNdisplay{MCS_{effective} = f(CQI + \Delta_{OLLA})}
+
+The offset is updated based on HARQ feedback:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ACK received:} $\Delta_{\mathrm{OLLA}} \mathrel{+}= \mathrm{step\_up}$ (e.g., +0.1~dB) \ensuremath{\to} try higher MCS
+\item
+  \textbf{NACK received:} $\Delta_{\mathrm{OLLA}} \mathrel{-}= \mathrm{step\_down}$ (e.g., -1.0~dB) \ensuremath{\to} fall back to lower MCS
+\end{itemize}
+
+Target: maintain \textbf{10\% BLER} at first transmission (ratio $\mathrm{step\_down}/\mathrm{step\_up} \approx 9{:}1$).
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{HARQ (Hybrid Automatic Repeat Request)}
+
+\CNchained\CNsubsection{}{Overview}
+
+HARQ combines \textbf{FEC (Forward Error Correction)} with \textbf{ARQ (retransmission)} for reliable delivery with low latency.
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{LTE HARQ Parameters}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Downlink} & \CNth{Uplink} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Type & Asynchronous & Synchronous \\
+\# Processes & 8 & 8 \\
+Timing & Flexible retx subframe & Fixed: retx at n+8 \\
+Feedback & ACK/\allowbreak{}NACK on PUCCH/\allowbreak{}PUSCH & PHICH (ACK/\allowbreak{}NACK) \\
+RTT & 8~ms & 8~ms \\
+\end{longtable}
+}
+
+\CNkeepfig{m07-harq-processes}{5}
+
+\CNsubsection{}{Stop-and-Wait with 8 Processes}
+
+Each process handles one transport block at a time (stop-and-wait). With \textbf{8 parallel processes}, the pipeline stays full:
+
+\CNfigure{m07-harq-processes}{Eight parallel stop-and-wait HARQ processes}
+
+\textbf{RTT = 8~ms:} UE receives at time $t$ \ensuremath{\to} decodes \ensuremath{\to} sends ACK/\allowbreak{}NACK at $t+4$ \ensuremath{\to} eNB receives \ensuremath{\to} retransmits at $t+8$.
+
+\Needspace{12\baselineskip}
+
+\CNsubsection{}{Combining Methods}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4062}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3438}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Method} & \CNth{Description} & \CNth{Advantage} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Chase Combining (CC)} & Retransmit identical bits, soft-combine at receiver & Simple, \textasciitilde{}3~dB gain \\
+\textbf{Incremental Redundancy (IR)} & Retransmit different redundancy version (new parity bits) & Higher coding gain, better performance \\
+\end{longtable}
+}
+
+LTE uses \textbf{incremental redundancy} by default with 4 redundancy versions (RV 0, 2, 3, 1).
+
+\Needspace{14\baselineskip}
+
+\Needspace{24\baselineskip}
+
+\CNsection{9}{Scheduling Algorithms}
+
+\CNchained\CNsubsection{}{Round Robin (RR)}
+
+\textbf{Principle:} Allocate equal resources to all users in turn.
+
+\CNdisplay{\text{User}_{selected}(t) = (t \mod N_{users})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Pros} & \CNth{Cons} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Simple to implement & Ignores channel conditions \\
+Perfectly fair in resources & Unfair in throughput (edge users get less) \\
+No feedback required & Poor spectral efficiency \\
+Low computational cost & No QoS differentiation \\
+\end{longtable}
+}
+
+\CNsubsection{}{Proportional Fair (PF)}
+
+\textbf{Principle:} Maximize the ratio of instantaneous rate to average throughput.
+
+\CNdisplay{\text{User}_{selected} = \arg\max_k \frac{R_k^{inst}(t)}{\bar{R}_k(t)}}
+
+Where:
+
+\begin{itemize}
+\tightlist
+\item
+  $R_k^{inst}(t)$ = instantaneous achievable rate for user k (from CQI)
+\item
+  $\bar{R}_k(t)$ = exponential moving average of user k’s throughput
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+Average update:\CNdisplay{\bar{R}_k(t+1) = (1-\frac{1}{t_c})\bar{R}_k(t) + \frac{1}{t_c} \cdot r_k(t)}
+
+where $t_c$ is the averaging window (typically 100–1000 TTIs).
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Pros} & \CNth{Cons} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Exploits multi-user diversity & More complex \\
+Good throughput-fairness balance & Requires CQI feedback \\
+Schedules users on their peaks & Tuning tc affects behavior \\
+Maximizes sum log(throughput) & Not optimal for strict delay \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Maximum C/\allowbreak{}I (Max Throughput)}
+
+\textbf{Principle:} Always schedule the user with the best channel.
+
+\CNdisplay{\text{User}_{selected} = \arg\max_k R_k^{inst}(t)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Pros} & \CNth{Cons} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Maximizes cell throughput & Starves cell-edge users \\
+Best spectral efficiency & Extremely unfair \\
+Simple decision & Violates QoS for weak users \\
+\end{longtable}
+}
+
+\CNsubsection{}{QoS-Aware Scheduling}
+
+\textbf{Principle:} Guarantee minimum rates for GBR bearers, prioritize by QCI.
+
+Steps:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Satisfy GBR bearers first} — allocate minimum required RBs
+\item
+  \textbf{Priority ordering} — rank by QCI priority level
+\item
+  \textbf{Remaining resources} — distribute via PF among non-GBR bearers
+\item
+  \textbf{Delay budget check} — boost priority for packets approaching deadline
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m07-trilemma}{8}
+
+\CNsection{10}{Engineering Trade-offs}
+
+\CNchained\CNsubsection{}{The Scheduling Trilemma}
+
+\CNfigure{m07-trilemma}{The scheduling trilemma and where each algorithm sits}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Algorithm} & \CNth{Throughput} & \CNth{Fairness} & \CNth{Latency} & \CNth{Complexity} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Round Robin & Low & High (resource) & Medium & Very Low \\
+Proportional Fair & High & Medium & Medium & Medium \\
+Max C/\allowbreak{}I & Highest & Very Low & Low (for best users) & Low \\
+QoS-Aware & Medium-High & Configurable & Guaranteed & High \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Design Considerations}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.2759}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.7241}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Factor} & \CNth{Impact on Scheduling} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{User density} & More users \ensuremath{\to} more multi-user diversity \ensuremath{\to} PF gains increase \\
+\textbf{Traffic type} & VoLTE needs strict latency; FTP tolerates delay \\
+\textbf{Cell size} & Large cells \ensuremath{\to} big CQI spread \ensuremath{\to} fairness more critical \\
+\textbf{Frequency band} & Higher bands \ensuremath{\to} more path loss variation \ensuremath{\to} more scheduling gain \\
+\textbf{MIMO mode} & MU-MIMO allows co-scheduling users on same RBs \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{11}{Numerical Example}
+
+\CNchained\CNsubsection{}{System Parameters}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Bandwidth:} 10~MHz \ensuremath{\to} \textbf{50~RBs} available per TTI
+\item
+  \textbf{Users:} 5 UEs with different channel conditions
+\item
+  \textbf{Overhead:} Assume 10 data symbols per subframe (after control/\allowbreak{}reference signals)
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{User CQI and Spectral Efficiency}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.0811}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.0676}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1622}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.4054}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2838}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{User} & \CNth{CQI} & \CNth{Modulation} & \CNth{Spectral Efficiency (bps/\allowbreak{}Hz)} & \CNth{Bits per RB per TTI} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE1 & 4 & QPSK & 0.6016 & 0.6016 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 108 \\
+UE2 & 7 & 16QAM & 1.4766 & 1.4766 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 266 \\
+UE3 & 10 & 64QAM & 2.7305 & 2.7305 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 491 \\
+UE4 & 13 & 64QAM & 4.5234 & 4.5234 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 814 \\
+UE5 & 15 & 64QAM & 5.5547 & 5.5547 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 1000 \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{Note:} Bits per RB per TTI \ensuremath{\approx} Spectral Efficiency \ensuremath{\times} 12 subcarriers \ensuremath{\times} 15~kHz spacing \ensuremath{\times} 1~ms \ensuremath{\approx} SE \ensuremath{\times} 180 (simplified; actual TBS lookup gives discrete values).
+
+\end{CNquote}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{Round Robin Allocation}
+
+Each user gets equal RBs: \textbf{50~RBs \ensuremath{\div} 5 users = 10 RBs/\allowbreak{}user}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{User} & \CNth{RBs} & \CNth{Throughput per TTI} & \CNth{Throughput (Mbps)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE1 & 10 & 10 \ensuremath{\times} 108 = 1,080~bits & 1.08 \\
+UE2 & 10 & 10 \ensuremath{\times} 266 = 2,660~bits & 2.66 \\
+UE3 & 10 & 10 \ensuremath{\times} 491 = 4,910~bits & 4.91 \\
+UE4 & 10 & 10 \ensuremath{\times} 814 = 8,140~bits & 8.14 \\
+UE5 & 10 & 10 \ensuremath{\times} 1,000 = 10,000~bits & 10.00 \\
+\textbf{Total} & \textbf{50} & \textbf{26,790~bits} & \textbf{26.79} \\
+\end{longtable}
+}
+
+\textbf{Jain’s Fairness Index (resource):} 1.0 (perfectly fair in RBs)\CNbr{}\textbf{Jain’s Fairness Index (throughput):} \textasciitilde{}0.69
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{Maximum C/\allowbreak{}I Allocation}
+
+All 50~RBs go to UE5 (best channel):
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{User} & \CNth{RBs} & \CNth{Throughput (Mbps)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE1 & 0 & 0 \\
+UE2 & 0 & 0 \\
+UE3 & 0 & 0 \\
+UE4 & 0 & 0 \\
+UE5 & 50 & 50.00 \\
+\textbf{Total} & \textbf{50} & \textbf{50.00} \\
+\end{longtable}
+}
+
+\textbf{Cell throughput:} 50~Mbps (maximum possible)\CNbr{}\textbf{Jain’s Fairness Index:} 0.20 (worst case for 5 users)
+
+\CNsubsection{}{Proportional Fair Allocation}
+
+Assuming all users start with equal average throughput, PF initially behaves like Max C/\allowbreak{}I. After convergence, it balances by scheduling users on their relative peaks.
+
+\Needspace{19\baselineskip}
+
+\textbf{Steady-state approximation} (PF tends toward equal throughput in log domain):
+
+The PF scheduler approximately equalizes $\log(\bar{R}_k)$, leading to a throughput distribution between RR and Max C/\allowbreak{}I:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{User} & \CNth{Approx. RBs} & \CNth{Throughput (Mbps)} & \CNth{Metric (\ensuremath{R_{\mathrm{inst}}}/\allowbreak{}\ensuremath{R_{\mathrm{avg}}})} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE1 & 15 & 1.62 & Boosted (low \ensuremath{R_{\mathrm{avg}}}) \\
+UE2 & 12 & 3.19 & Moderate \\
+UE3 & 10 & 4.91 & Baseline \\
+UE4 & 8 & 6.51 & Slightly reduced \\
+UE5 & 5 & 5.00 & Reduced (high \ensuremath{R_{\mathrm{avg}}}) \\
+\textbf{Total} & \textbf{50} & \textbf{21.23} & — \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{Note:} Exact PF allocation depends on fading dynamics and tc window. In flat-fading (no frequency selectivity), PF gives more resources to weaker users over time. With frequency-selective fading, all users benefit from being scheduled on their best subbands.
+
+\end{CNquote}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Comparison Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Metric} & \CNth{Round Robin} & \CNth{Max C/\allowbreak{}I} & \CNth{Proportional Fair} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Cell Throughput (Mbps) & 26.79 & 50.00 & \textasciitilde{}21–35 \\
+UE1 Throughput (Mbps) & 1.08 & 0 & \textasciitilde{}1.6 \\
+UE5 Throughput (Mbps) & 10.00 & 50.00 & \textasciitilde{}5.0 \\
+Fairness (Jain’s, resource) & 1.0 & 0.20 & \textasciitilde{}0.75 \\
+Spectral Efficiency & Low & Maximum & High \\
+Starvation? & No & Yes (4 users) & No \\
+\end{longtable}
+}
+
+\CNboxsection{Key Takeaways}
+
+\begin{CNbox}[unbreakable]{sum}{Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{The resource grid} is a time-frequency matrix — scheduling operates at RB granularity every 1~ms TTI
+\item
+  \textbf{CQI feedback} is the scheduler’s eyes — it drives MCS selection and resource allocation
+\item
+  \textbf{HARQ} provides reliability with 8 parallel processes and 8~ms RTT
+\item
+  \textbf{Link adaptation (AMC + OLLA)} continuously matches rate to channel conditions
+\item
+  \textbf{No single algorithm wins} — the choice depends on deployment scenario, traffic mix, and operator priorities
+\item
+  \textbf{Proportional Fair} is the de-facto standard in commercial networks as it provides a good throughput-fairness compromise
+\item
+  \textbf{SC-FDMA} constrains uplink to contiguous allocation, limiting scheduling flexibility compared to downlink OFDMA
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{References}
+
+\begin{itemize}
+\tightlist
+\item
+  3GPP TS 36.213: Physical layer procedures (CQI/\allowbreak{}MCS tables)
+\item
+  3GPP TS 36.321: MAC protocol (BSR, PHR, HARQ)
+\item
+  3GPP TS 36.212: Multiplexing and channel coding (TBS tables)
+\item
+  Sesia, Toufik, Baker: ``LTE – The UMTS Long Term Evolution'' (Wiley)
+\end{itemize}

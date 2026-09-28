@@ -1,0 +1,9 @@
+% Module 24 — NAS passes transparently through the gNB
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue, minimum width=1.8cm, minimum height=1.5cm] (ue) at (0,0) {\textbf{UE}\\[2pt]{\scriptsize NAS}};
+\node[CNran, minimum width=1.8cm, minimum height=1.5cm] (g) at (4.2,0) {\textbf{gNB}};
+\node[CNcp, minimum width=1.8cm, minimum height=1.5cm] (a) at (8.4,0) {\textbf{AMF}\\[2pt]{\scriptsize NAS}};
+\draw[CNlink, ->] ([yshift=3mm]ue.east) -- node[CNelab, above=1pt, fill=none] {RRC} ([yshift=3mm]g.west);
+\draw[CNsigl, ->] ([yshift=3mm]g.east) -- node[CNelab, above=1pt, fill=none] {NGAP} ([yshift=3mm]a.west);
+\draw[CNsig, ->, line width=1pt, dash pattern=on 4pt off 3pt] ([yshift=-4mm]ue.east) -- node[CNelab, below=6pt, fill=none] {(\CNL{transparent}{شفاف})} ([yshift=-4mm]a.west);
+\end{tikzpicture}

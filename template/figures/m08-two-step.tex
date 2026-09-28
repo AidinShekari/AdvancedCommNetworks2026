@@ -1,0 +1,14 @@
+% Module 8 — four-step LTE RACH versus two-step NR RACH
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtiny, anchor=east, font=\sffamily\small\bfseries] at (-0.3,0) {4-step LTE};
+\foreach \m [count=\i] in {Msg1, Msg2, Msg3, Msg4}{\node[CNcp, minimum width=1.5cm] (f\i) at ({(\i-1)*2.3},0) {\m};}
+\foreach \a/\b in {1/2,2/3,3/4}{\draw[CNlink, ->] (f\a) -- (f\b);}
+\node[CNtiny, anchor=west] at (7.8,0) {($\sim$15 ms)};
+\node[CNtiny, anchor=east, font=\sffamily\small\bfseries] at (-0.3,-1.5) {2-step NR};
+\node[CNok, minimum width=3.8cm] (a) at (1.15,-1.5) {MsgA};
+\node[CNok, minimum width=3.8cm] (b) at (5.75,-1.5) {MsgB};
+\draw[CNlink, ->] (a) -- (b);
+\node[CNtiny, anchor=west] at (7.8,-1.5) {($\sim$5 ms)};
+\node[CNtiny, anchor=north, text width=4.3cm] at (1.15,-2.1) {MsgA = \CNL{preamble}{پیشوند} (Msg1) + \CNL{payload}{محموله} (Msg3)\\{}[PRACH + PUSCH]};
+\node[CNtiny, anchor=north, text width=4.3cm] at (5.75,-2.1) {MsgB = RAR (Msg2) + \CNL{contention resolution}{حل رقابت} (Msg4)};
+\end{tikzpicture}

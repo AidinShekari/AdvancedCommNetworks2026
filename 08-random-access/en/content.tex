@@ -1,0 +1,873 @@
+\Needspace{17\baselineskip}
+
+\CNsection{8.1}{Why Random Access is Needed}
+
+When a UE (User Equipment) powers on or transitions from idle mode, it faces fundamental challenges:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4583}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5417}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Challenge} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{No uplink timing alignment} & UE doesn’t know its propagation delay to the base station \\
+\textbf{No allocated uplink resources} & UE has no scheduled grants for transmission \\
+\textbf{No unique identity} & Network hasn’t assigned a C-RNTI yet \\
+\end{longtable}
+}
+
+\CNsubsection{}{Scenarios Requiring Random Access}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Initial Access} — UE powering on, first connection to network
+\item
+  \textbf{Handover} — Moving to a new cell, need synchronization with target eNodeB (eNB)
+\item
+  \textbf{DL Data Arrival (Idle Mode)} — UE paged for incoming data, must re-establish UL sync
+\item
+  \textbf{UL Data Arrival} — UE in connected mode lost UL synchronization
+\item
+  \textbf{Positioning} — Timing measurements for location services
+\end{enumerate}
+
+\begin{CNquote}
+
+\begin{CNinsight}
+
+\textbf{Key Insight:} Random access is the ONLY mechanism for a UE to initiate uplink communication when it has no prior scheduling from the network.
+
+\end{CNinsight}
+
+\end{CNquote}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8.2}{PRACH (Physical Random Access Channel)}
+
+\CNchained\CNsubsection{}{Time-Frequency Location in Resource Grid}
+
+The PRACH occupies a specific position in the LTE resource grid:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Frequency domain:} 6 consecutive PRBs (1.08~MHz bandwidth)
+\item
+  \textbf{Time domain:} Configurable subframes based on PRACH configuration index
+\item
+  \textbf{Location:} Specified by \CNcode{prach-FreqOffset} (PRB offset from lowest UL PRB)
+\end{itemize}
+
+\CNsubsection{}{PRACH Configuration Index}
+
+The configuration index (0–63) determines:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Which subframes} carry PRACH opportunities
+\item
+  \textbf{Periodicity} of PRACH occasions (every 1, 2, 5, or 10~ms)
+\item
+  \textbf{Preamble format} used
+\end{itemize}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Config Index} & \CNth{Preamble Format} & \CNth{Subframe(s)} & \CNth{Density} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 0 & 1 & 1 per frame \\
+3 & 0 & 1, 4, 7 & 3 per frame \\
+15 & 0 & 0–9 & 10 per frame \\
+48 & 4 (short) & 1 & 1 per frame \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Preamble Formats}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\begin{minipage}[b]{\linewidth}\centering
+\CNth{Format}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Sequence Length (Ts)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{CP Length (Ts)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Total Duration}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Max Cell Radius}
+\end{minipage} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 24576 (0.8~ms) & 3168 (0.1~ms) & \textasciitilde{}1~ms & \textasciitilde{}14.5~km \\
+1 & 24576 (0.8~ms) & 21024 (0.68~ms) & \textasciitilde{}2~ms & \textasciitilde{}77.3~km \\
+2 & 2\ensuremath{\times}24576 (1.6~ms) & 6240 (0.2~ms) & \textasciitilde{}2~ms & \textasciitilde{}29.5~km \\
+3 & 2\ensuremath{\times}24576 (1.6~ms) & 21024 (0.68~ms) & \textasciitilde{}3~ms & \textasciitilde{}100.2~km \\
+4 (short) & 4096 (0.13~ms) & 448 (0.015~ms) & \textasciitilde{}0.15~ms & \textasciitilde{}1.4~km \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{Design Trade-off:} Longer CP \ensuremath{\to} larger cell radius but fewer PRACH opportunities per frame.
+
+\end{CNquote}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8.3}{Preamble Sequences}
+
+\CNchained\CNsubsection{}{Zadoff-Chu (ZC) Sequences}
+
+The PRACH preamble uses Zadoff-Chu sequences defined as:
+
+\CNdisplay{x_u(n) = e^{-j\pi u n(n+1)/N_{ZC}}}
+
+where:
+
+\begin{itemize}
+\tightlist
+\item
+  $u$ = root sequence index ($1 \le u \le N_{\mathrm{ZC}} - 1$)
+\item
+  $N_{ZC}$ = sequence length (839 for long, 139 for short)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\textbf{Why Zadoff-Chu?}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5263}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4737}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Property} & \CNth{Benefit} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Constant amplitude (zero PAPR)} & Maximizes PA efficiency at cell edge \\
+\textbf{Ideal periodic autocorrelation} & Enables precise timing estimation \\
+\textbf{Zero cross-correlation between roots} & Different root \ensuremath{\to} zero interference \\
+\textbf{Flat frequency spectrum} & Robust in frequency-selective channels \\
+\end{longtable}
+}
+
+\CNsubsection{64}{Preambles Per Cell}
+
+Each cell has exactly \textbf{64 available preambles}, derived from:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Root Sequence Index} (\CNcode{rootSequenceIndex}, broadcast in SIB2)
+\item
+  \textbf{Cyclic Shifts} applied to root sequences
+\end{enumerate}
+
+\CNdisplay{\mathrm{Preamble}(v) = \mathrm{CyclicShift}\left(x_u,\; v \times N_{CS}\right)}
+
+Where:
+
+\begin{itemize}
+\tightlist
+\item
+  \CNcode{N\_CS} = cyclic shift size (\CNcode{zeroCorrelationZoneConfig})
+\item
+  Number of preambles per root = $\lfloor N_{\mathrm{ZC}} / N_{\mathrm{CS}} \rfloor$
+\item
+  Multiple roots used if one root doesn’t provide 64 preambles
+\end{itemize}
+
+\CNsubsection{}{Cell Coverage and Cyclic Shift}
+
+The cyclic shift \CNcode{N\_CS} determines the \textbf{zero-correlation zone}, which must exceed the maximum round-trip delay:
+
+\CNdisplay{N_{CS} > \frac{2\, d_{\max}}{c\, T_{s,\mathrm{seq}}}}
+
+where $d_{\max}$ is the maximum cell radius, $c$ the speed of light ($3 \times 10^{8}$ m/\allowbreak{}s) and $T_{s,\mathrm{seq}}$ the sequence sample duration.
+
+\textbf{Example:} For \ensuremath{N_{\mathrm{CS}}} = 13 (format 0):
+
+\begin{itemize}
+\tightlist
+\item
+  Max distinguishable delay = $13 \times (1/1.25\,\mathrm{MHz}) = 10.4\ \mu\mathrm{s}$
+\item
+  Max cell radius = $10.4\ \mu\mathrm{s} \times c/2 \approx 1.56\ \mathrm{km}$
+\item
+  Preambles per root = $\lfloor 839/13 \rfloor = 64$ \ensuremath{\to} single root sufficient
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m08-cbra}{8}
+
+\CNsection{8.4}{Contention-Based Random Access (4-Step CBRA)}
+
+\CNchained\CNsubsection{}{Procedure Overview}
+
+\CNfigure{m08-cbra}{Four-step contention-based random access}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{Step-by-Step Details}
+
+\CNchained\CNsubsubsection{Step 1 — Msg1: Preamble Transmission}
+
+\begin{itemize}
+\tightlist
+\item
+  UE selects a \textbf{random preamble} from the available set (contention preambles)
+\item
+  Transmits on PRACH at configured time-frequency resources
+\item
+  \textbf{RA-RNTI} derived from PRACH occasion: \CNcode{RA-RNTI =}\allowbreak{}\CNcode{ 1 + t\_}\allowbreak{}\CNcode{id + 10 × f\_}\allowbreak{}\CNcode{id}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \CNcode{t\_id} = subframe index (0–9)
+  \item
+    \CNcode{f\_id} = frequency index (0–5)
+  \end{itemize}
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Step 2 — Msg2: Random Access Response (RAR)}
+
+RAR contains (per responding preamble):
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3182}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2727}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4091}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Field} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Bits}
+\end{minipage} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Timing Advance & 11 & UL timing correction (0–1282, step = $16 \times T_s$) \\
+UL Grant & 20 & Resources for Msg3 \\
+TC-RNTI & 16 & Temporary identity \\
+Backoff Indicator & 4 & Backoff if overloaded \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{RAR Window:} 2–10 subframes (configurable by \CNcode{ra-ResponseWindowSize})
+\item
+  If no RAR received \ensuremath{\to} back off and retry
+\end{itemize}
+
+\CNsubsubsection{Step 3 — Msg3: Scheduled Transmission}
+
+\begin{itemize}
+\tightlist
+\item
+  UE transmits on UL-SCH using the grant from Msg2
+\item
+  Contains \textbf{RRC Connection Request} with:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    UE identity (S-TMSI or random value)
+  \item
+    Establishment cause
+  \end{itemize}
+\item
+  HARQ enabled (max 5 retransmissions for Msg3)
+\end{itemize}
+
+\CNsubsubsection{Step 4 — Msg4: Contention Resolution}
+
+\begin{itemize}
+\tightlist
+\item
+  eNB echoes the UE identity received in Msg3
+\item
+  UE checks if the echoed identity matches its own:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Match} \ensuremath{\to} RACH successful, TC-RNTI becomes C-RNTI
+  \item
+    \textbf{No match} \ensuremath{\to} Collision detected, restart from Step 1 with backoff
+  \end{itemize}
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{8.5}{Contention-Free Random Access (CFRA)}
+
+\CNchained\CNsubsection{}{When Used}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5556}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4444}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Scenario} & \CNth{Reason} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Handover} & Fast sync needed, can’t afford collision delay \\
+\textbf{DL data arrival (connected)} & eNB knows UE, can pre-assign preamble \\
+\textbf{Positioning (OTDOA)} & Precise timing required \\
+\textbf{Beam failure recovery} & Quick recovery needed \\
+\end{longtable}
+}
+
+\CNkeepfig{m08-cfra}{3}
+
+\CNsubsection{}{Procedure}
+
+\CNfigure{m08-cfra}{Contention-free random access}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Key Differences from CBRA}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}lcc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Contention-Based} & \CNth{Contention-Free} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Steps & 4 & 2 \\
+Preamble selection & Random & Assigned by eNB \\
+Collision possible & Yes & No \\
+Latency & \textasciitilde{}15~ms (success) & \textasciitilde{}5~ms \\
+Use case & Initial access & Handover, DL data \\
+Preamble pool & Shared (e.g., 54) & Dedicated (e.g., 10) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m08-timing-advance}{10}
+
+\CNsection{8.6}{Timing Advance (TA)}
+
+\CNchained\CNsubsection{}{Why Timing Advance is Needed}
+
+In OFDMA uplink (SC-FDMA), all UE signals must arrive at the eNB \textbf{aligned within the cyclic prefix} to maintain orthogonality:
+
+\CNfigure{m08-timing-advance}{Timing advance aligns the uplink signals of near and far UEs}
+
+\CNsubsection{}{TA Mechanism}
+
+\textbf{Initial TA (from RAR - Msg2):}
+
+\begin{itemize}
+\tightlist
+\item
+  11-bit value: 0–1282
+\item
+  Step size: $16 \times T_s = 16 \times (1/30.72\,\mathrm{MHz}) \approx$ \textbf{0.52~\ensuremath{\mu}s}
+\item
+  Represents one-way advance applied to UL transmission
+\end{itemize}
+
+\textbf{TA Maintenance (MAC CE - Timing Advance Command):}
+
+\begin{itemize}
+\tightlist
+\item
+  6-bit value: 0–63
+\item
+  Applied as: \CNcode{TA\_}\allowbreak{}\CNcode{new =}\allowbreak{}\CNcode{ TA\_}\allowbreak{}\CNcode{old + (TA\_}\allowbreak{}\CNcode{command − 31) × 16 × Ts}
+\item
+  Sent periodically via MAC Control Element
+\item
+  If no TA update received within \CNcode{timeAlignmentTimer} \ensuremath{\to} UL sync lost
+\end{itemize}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{Cell Radius from Timing Advance}
+
+The maximum TA corrects for the \textbf{round-trip propagation delay}:
+
+\CNdisplay{
+\begin{aligned}
+\text{Round-trip delay} &= \mathrm{TA} \times 16 \times T_s\\
+\text{One-way delay} &= \mathrm{TA} \times 16 \times T_s / 2\\
+\text{Max distance} &= c \times \text{one-way delay}
+\end{aligned}
+}
+
+\CNsubsubsection{Numerical Example: Maximum Cell Radius}
+
+\textbf{For initial TA (11-bit, max = 1282):}\CNdisplay{
+\begin{aligned}
+\text{Max round-trip delay} &= 1282 \times 16 \times T_s = 1282 \times 16 \times \frac{1}{30.72 \times 10^{6}}\\
+&= 1282 \times 0.5208\ \mu\text{s} = 667.7\ \mu\text{s}\\
+\text{Max one-way delay} &= 667.7 / 2 = 333.8\ \mu\text{s}\\
+\text{Max cell radius} &= 3 \times 10^{8} \times 333.8 \times 10^{-6} = 100.1\ \text{km}
+\end{aligned}
+}
+
+\textbf{Verification with preamble format:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Format} & \CNth{Guard Time (CP)} & \CNth{Max RTD} & \CNth{Max Cell Radius} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 99.5~\ensuremath{\mu}s ($3168 \times T_s$) & 99.5~\ensuremath{\mu}s & \textbf{14.9~km} \\
+1 & 684.4~\ensuremath{\mu}s ($21024 \times T_s$) & 684.4~\ensuremath{\mu}s & \textbf{102.6~km} \\
+2 & 203.1~\ensuremath{\mu}s ($6240 \times T_s$) & 203.1~\ensuremath{\mu}s & \textbf{30.5~km} \\
+3 & 684.4~\ensuremath{\mu}s ($21024 \times T_s$) & 684.4~\ensuremath{\mu}s & \textbf{102.6~km} \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{Note:} The actual cell radius is limited by the \textbf{smaller} of: TA range OR preamble CP duration.
+
+\end{CNquote}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8.7}{Collisions and Backoff}
+
+\CNchained\CNsubsection{}{Collision Probability}
+
+When N UEs simultaneously attempt random access with 64 available preambles:
+
+\textbf{Probability that a specific UE collides with at least one other UE:}
+
+\CNdisplay{P_{collision} = 1 - \left(1 - \frac{1}{64}\right)^{N-1}}
+
+\Needspace{19\baselineskip}
+
+\CNsubsubsection{Numerical Examples}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{N (simultaneous UEs)} & \CNth{P(collision) per UE} & \CNth{Expected colliding UEs} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2 & 1.56\% & 0.03 \\
+5 & 6.10\% & 0.31 \\
+10 & 13.0\% & 1.30 \\
+20 & 25.5\% & 5.10 \\
+30 & 36.8\% & 11.0 \\
+50 & 54.0\% & 27.0 \\
+64 & 63.2\% & 40.4 \\
+\end{longtable}
+}
+
+\textbf{Example Calculation (N=10):}\CNdisplay{
+\begin{aligned}
+P(\text{collision}) &= 1 - \left(1 - \tfrac{1}{64}\right)^{10-1} = 1 - \left(\tfrac{63}{64}\right)^{9}\\
+&= 1 - (0.98438)^{9} = 1 - 0.8681 = 0.1319 \approx 13.2\%
+\end{aligned}
+}
+
+\CNkeepfig{m08-collision}{3}
+
+\CNsubsection{}{Collision Scenario with Resolution}
+
+\CNfigure{m08-collision}{Preamble collision and its resolution in Msg4}
+
+\CNsubsection{}{Backoff Mechanism}
+
+When a RACH attempt fails, the UE must wait before retrying:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Backoff Indicator (BI):} Broadcast in RAR subheader
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Values: 0, 10, 20, 30, 40, 60, 80, 120, 160, 240, 320, 480, 960~ms
+  \item
+    UE selects random backoff: uniform [0, BI]
+  \end{itemize}
+\item
+  \textbf{Power Ramping:} Each failed attempt increases transmit power
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Step size: \CNcode{powerRampingStep} (2~dB typical)
+  \item
+    \CNcode{P\_}\allowbreak{}\CNcode{PRACH(attempt) =}\allowbreak{}\CNcode{ P\_}\allowbreak{}\CNcode{initial + (attempt − 1) × powerRampingStep}
+  \item
+    Maximum: \CNcode{preambleInitialReceivedTargetPower} + ramping
+  \item
+    Max attempts: \CNcode{preambleTransMax} (3, 4, 5, 6, 7, 8, 10, 20, 50, 100, 200)
+  \end{itemize}
+\item
+  \textbf{Preamble re-selection:} New random preamble chosen for each attempt
+\end{enumerate}
+
+\CNkeepfig{m08-rach-attempts}{3}
+
+\CNsubsection{}{RACH Attempt Timeline}
+
+\CNfigure{m08-rach-attempts}{RACH attempts with power ramping and backoff}
+
+\Needspace{14\baselineskip}
+
+\Needspace{22\baselineskip}
+
+\CNsection{8.8}{RACH Overload}
+
+\CNchained\CNsubsection{}{Causes of RACH Overload}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4815}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Cause} & \CNth{Description} & \CNth{Scale} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{M2M/\allowbreak{}IoT} & Massive simultaneous device activation (e.g., smart meters reporting hourly) & 10,000–30,000 devices \\
+\textbf{Paging storms} & Major event triggers mass DL data (emergency alert, popular content) & Thousands of UEs \\
+\textbf{Disaster/\allowbreak{}emergency} & Everyone calls simultaneously after earthquake/\allowbreak{}event & Extreme burst \\
+\textbf{Cell reselection} & Many UEs hand over simultaneously (train, stadium) & Hundreds \\
+\textbf{Power outage recovery} & All devices reconnect simultaneously & Thousands \\
+\end{longtable}
+}
+
+\CNsubsection{}{Overload Symptoms}
+
+\begin{itemize}
+\tightlist
+\item
+  High collision rate (\textgreater{}50\%)
+\item
+  Excessive preamble retransmissions \ensuremath{\to} increased interference
+\item
+  RAR capacity exhausted (limited DL resources for RAR)
+\item
+  Msg3/\allowbreak{}Msg4 resource starvation
+\item
+  Access delays from seconds to minutes
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{Solutions}
+
+\CNchained\CNsubsubsection{Access Class Barring (ACB)}
+
+\begin{itemize}
+\tightlist
+\item
+  UEs assigned to Access Classes 0–9 (plus special classes 11–15)
+\item
+  eNB broadcasts barring factor (0–1) and barring time
+\item
+  UE draws random number; if \textgreater{} barring factor \ensuremath{\to} barred for barring time
+\item
+  Spreads access attempts over time
+\end{itemize}
+
+\CNsubsubsection{Extended Access Barring (EAB)}
+
+\begin{itemize}
+\tightlist
+\item
+  For delay-tolerant M2M/\allowbreak{}IoT devices (AC 0–9)
+\item
+  eNB broadcasts EAB bitmap (one bit per AC)
+\item
+  Barred UEs wait for barring to be lifted
+\item
+  More aggressive than ACB for low-priority traffic
+\end{itemize}
+
+\CNsubsubsection{Back-off Tuning}
+
+\begin{itemize}
+\tightlist
+\item
+  Dynamically increase BI (up to 960~ms) during overload
+\item
+  Effectively rate-limits RACH attempts
+\item
+  Trade-off: individual access delay vs. system throughput
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Additional 3GPP Solutions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3600}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4400}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\begin{minipage}[b]{\linewidth}\centering
+\CNth{Release}
+\end{minipage} & \CNth{Solution} & \CNth{Mechanism} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+R10 & ACB & Probabilistic barring \\
+R11 & EAB & IoT/\allowbreak{}M2M specific barring \\
+R12 & ACDC & App-level congestion control \\
+R13 & Group paging & Reduce paging-triggered RACH \\
+R14 & EDT (Early Data Transmission) & Data in Msg3 \ensuremath{\to} fewer full connections \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNkeepfig{m08-two-step}{12}
+
+\CNsection{8.9}{5G NR Random Access}
+
+\CNchained\CNsubsection{}{Key Enhancements over LTE}
+
+\CNchained\CNsubsubsection{2-Step RACH (Rel-16): MsgA + MsgB}
+
+Combines the 4-step procedure into 2 steps for \textbf{ultra-low latency}:
+
+\CNfigure{m08-two-step}{Four-step LTE RACH versus two-step NR RACH}
+
+\textbf{When to use 2-step vs 4-step:}
+
+\begin{itemize}
+\tightlist
+\item
+  2-step: Small cells, low load, URLLC requirements
+\item
+  4-step: Large cells (need TA before UL data), high load scenarios
+\item
+  Fallback: If MsgB not received \ensuremath{\to} fall back to 4-step
+\end{itemize}
+
+\CNkeepfig{m08-ssb-rach}{4}
+
+\CNsubsubsection{Beam-Based RACH (SSB-to-RACH Mapping)}
+
+In 5G NR with beamforming, the RACH procedure is \textbf{beam-aware}:
+
+\CNfigure{m08-ssb-rach}{SSB-to-RACH mapping: one PRACH occasion per beam}
+
+\begin{itemize}
+\tightlist
+\item
+  UE selects \textbf{best SSB beam} (highest RSRP)
+\item
+  Transmits preamble on \textbf{associated RACH occasion}
+\item
+  gNB knows which beam direction the UE is located \ensuremath{\to} \textbf{beam correspondence}
+\item
+  Enables directional RAR transmission
+\end{itemize}
+
+\textbf{Configuration:}
+
+\begin{itemize}
+\tightlist
+\item
+  \CNcode{ssb-perRACH-OccasionAndCB-PreamblesPerSSB}: maps SSBs to RACH occasions
+\item
+  Multiple SSBs can share one RACH occasion, or one SSB can span multiple
+\end{itemize}
+
+\CNsubsubsection{Supplementary Uplink (SUL) RACH}
+
+\begin{itemize}
+\tightlist
+\item
+  Lower frequency band (e.g., 700~MHz) for extended coverage
+\item
+  UE selects SUL PRACH when \CNcode{rsrp-ThresholdSSB-SUL} condition met
+\item
+  Separate preamble format and configuration for SUL
+\item
+  Enables coverage extension without increasing NR UL power
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsubsection{NR Preamble Formats}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Format} & \CNth{Sequence Length} & \CNth{Subcarrier Spacing} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 839 (long) & 1.25~kHz & Large cells (FR1) \\
+1 & 839 (long) & 1.25~kHz & Very large cells \\
+2 & 839 (long) & 1.25~kHz & Extreme coverage \\
+3 & 839 (long) & 5~kHz & Medium cells \\
+A1 & 139 (short) & 15/\allowbreak{}30~kHz & Small cells (FR1) \\
+A2 & 139 (short) & 15/\allowbreak{}30~kHz & Normal cells (FR1) \\
+A3 & 139 (short) & 15/\allowbreak{}30~kHz & Normal cells (FR1) \\
+B4 & 139 (short) & 60/\allowbreak{}120~kHz & FR2 (mmWave) \\
+C0 & 139 (short) & 15/\allowbreak{}30~kHz & Msg3 early TX \\
+C2 & 139 (short) & 15/\allowbreak{}30~kHz & Msg3 early TX \\
+\end{longtable}
+}
+
+\CNsubsubsection{Beam Failure Recovery (BFR)}
+
+A special RACH-like procedure in NR:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE detects beam failure (RSRP below threshold for all configured beams)
+\item
+  UE selects a \textbf{new candidate beam} (from measured SSBs/\allowbreak{}CSI-RS)
+\item
+  UE transmits \textbf{dedicated CFRA preamble} on PRACH occasion of new beam
+\item
+  gNB responds with BFR response \ensuremath{\to} reconfigure beam pair
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\Needspace{23\baselineskip}
+
+\CNsection{8.10}{Summary and Key Equations}
+
+\CNchained\CNsubsection{}{Critical Formulas}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Formula} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Collision probability & $P_c = 1 - (63/64)^{N-1}$ \\
+RA-RNTI & $1 + t_{id} + 10 \times f_{id}$ \\
+Timing Advance (initial) & $TA = N_{TA} \times 16 \times T_s$ \\
+Max cell radius & $d_{max} = c \times N_{TA,max} \times 16 \times T_s / 2$ \\
+Power ramping & $P_n = P_{init} + (n-1) \times \Delta_{ramp}$ \\
+Preambles per root & $\lfloor N_{ZC} / N_{CS} \rfloor$ \\
+\end{longtable}
+}
+
+\CNkeepfig{m08-tradeoffs}{3}
+
+\CNsubsection{}{Design Trade-offs}
+
+\CNfigure{m08-tradeoffs}{RACH design trade-offs}
+
+\CNboxsection{Review Questions}
+
+\begin{CNbox}[unbreakable]{q}{Review Questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Why can’t the UE simply transmit on PUSCH without performing RACH first?
+\item
+  Calculate the collision probability when 25 UEs attempt simultaneous access.
+\item
+  What is the maximum cell radius for PRACH format 3? Show your calculation.
+\item
+  Explain why contention-free RACH is used during handover instead of contention-based.
+\item
+  A cell has \CNcode{zeroCorrelationZoneConfig} = 11 (\ensuremath{N_{\mathrm{CS}}} = 15). How many root sequences are needed to generate 64 preambles?
+\item
+  Describe the beam failure recovery procedure in 5G NR and its relation to RACH.
+\item
+  An IoT network has 10,000 devices that simultaneously attempt RACH. Describe two mechanisms to handle this overload.
+\item
+  Compare the latency of 2-step NR RACH vs. 4-step LTE RACH. When would you choose each?
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{References}
+
+\begin{itemize}
+\tightlist
+\item
+  3GPP TS 36.211 §5.7: Physical Random Access Channel (LTE)
+\item
+  3GPP TS 36.213 §6: Random Access Procedure (LTE)
+\item
+  3GPP TS 36.321 §5.1: Random Access Procedure (MAC)
+\item
+  3GPP TS 38.211 §6.3.3: PRACH (NR)
+\item
+  3GPP TS 38.213 §8: Random Access Procedure (NR)
+\item
+  3GPP TS 38.321 §5.1: Random Access Procedure (NR MAC)
+\end{itemize}

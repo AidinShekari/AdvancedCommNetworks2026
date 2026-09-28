@@ -1,0 +1,14 @@
+% Module 9 — EPS key hierarchy
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, key/.style={CNdb, anchor=west, minimum height=0.7cm, text width=5.6cm, align=left}]
+\node[key, fill=CNink, text=white] (k) at (0,0) {\textbf{K} \CNL{(permanent, in USIM/HSS)}{(دائمی، در \lr{USIM/HSS})}};
+\node[key] (ckik) at (0.9,-1.0) {CK, IK \CNL{(from f3, f4)}{(از \lr{f3} و \lr{f4})}};
+\node[key, fill=CNsig!15, draw=CNsig] (kasme) at (1.8,-2.0) {\textbf{K\textsubscript{ASME}} \CNL{(master session key)}{(کلید اصلی نشست)}};
+\node[key, fill=CNcyan!12, draw=CNcyan] (kenb) at (2.7,-3.0) {K\textsubscript{eNB} \CNL{(eNodeB key, AS security)}{(کلید \lr{eNodeB}، امنیت \lr{AS})}};
+\node[key] (a) at (3.6,-4.0) {K\textsubscript{RRCint} \CNL{(RRC integrity)}{(یکپارچگی \lr{RRC})}};
+\node[key] (b) at (3.6,-4.9) {K\textsubscript{RRCenc} \CNL{(RRC ciphering)}{(رمزگذاری \lr{RRC})}};
+\node[key] (c) at (3.6,-5.8) {K\textsubscript{UPenc} \CNL{(user-plane ciphering)}{(رمزگذاری صفحه کاربر)}};
+\node[key] (d) at (2.7,-6.8) {K\textsubscript{NASint} \CNL{(NAS integrity protection)}{(حفاظت یکپارچگی \lr{NAS})}};
+\node[key] (e) at (2.7,-7.7) {K\textsubscript{NASenc} \CNL{(NAS ciphering)}{(رمزگذاری \lr{NAS})}};
+\foreach \p/\c in {k/ckik, ckik/kasme, kasme/kenb, kenb/a, kenb/b, kenb/c, kasme/d, kasme/e}{
+  \draw[CNlink] ([xshift=4mm]\p.south west) |- (\c.west);}
+\end{tikzpicture}

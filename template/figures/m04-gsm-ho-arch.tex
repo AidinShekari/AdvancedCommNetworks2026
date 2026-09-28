@@ -1,0 +1,10 @@
+% Module 4 — GSM: the BSC takes the handover decision
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ms) at (0,0) {MS}; \node[CNran] (bts) at (3,0) {BTS};
+\node[CNran, line width=1.4pt] (bsc) at (6,0) {BSC}; \node[CNcp] (msc) at (9,0) {MSC};
+\draw[CNdata, ->] (ms) -- node[CNelab, above=1pt, fill=none] {radio} (bts);
+\draw[CNlink, ->] (bts) -- node[CNelab, above=1pt, fill=none] {Abis} (bsc);
+\draw[CNlink, ->] (bsc) -- node[CNelab, above=1pt, fill=none] {A} (msc);
+\node[CNnote, anchor=north] (n) at (6,-1.15) {\CNL{HO decision here}{تصمیم تحویل اینجا}};
+\draw[CNsig, ->, line width=0.9pt] (n.north) -- (bsc.south);
+\end{tikzpicture}

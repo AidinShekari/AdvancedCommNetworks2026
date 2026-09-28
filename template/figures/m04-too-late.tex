@@ -1,0 +1,16 @@
+% Module 4 — too-late handover: radio link failure before the handover
+\begin{tikzpicture}
+\begin{axis}[CNplot, width=12cm, height=6cm, xmin=0, xmax=10, ymin=0, ymax=6,
+  xtick={6.4}, xticklabels={RLF}, ytick=\empty, xlabel={\CNL{time}{زمان}}, ylabel={\CNL{signal}{سیگنال}}]
+  \addplot[CNcyan, domain=0:9, samples=50] {5.4-0.61*x};
+  \addplot[CNsig, domain=1:10, samples=50] {0.1+0.52*x};
+  \addplot[CNred, dashed, line width=0.9pt, domain=0:10] {1.5};
+  \draw[CNamber!80!black, dashed, line width=0.9pt] (axis cs:7.2,0) -- (axis cs:7.2,5.6);
+  \node[CNnote, anchor=south west] at (axis cs:7.3,4.6) {\CNL{handover triggered (too late!)}{تحویل آغاز شد (خیلی دیر!)}};
+  \fill[CNred] (axis cs:6.4,1.5) circle (3pt);
+  \node[font=\sffamily\scriptsize\bfseries, text=CNred, anchor=north west, align=left] at (axis cs:7.5,1.25) {\CNL{RLF occurs here —}{\lr{RLF} اینجا رخ می‌دهد —}\\\CNL{connection dropped}{اتصال قطع شد}};
+  \node[font=\sffamily\scriptsize, text=CNred, anchor=south west] at (axis cs:0.1,1.52) {\CNL{radio link failure threshold (Qout)}{آستانه شکست پیوند رادیویی (\lr{Qout})}};
+  \node[font=\sffamily\scriptsize\bfseries, text=CNcyanD] at (axis cs:1.2,5.5) {\CNL{serving}{خدمت‌دهنده}};
+  \node[font=\sffamily\scriptsize\bfseries, text=CNsig] at (axis cs:9.2,5.5) {\CNL{target}{مقصد}};
+\end{axis}
+\end{tikzpicture}

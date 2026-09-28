@@ -1,0 +1,684 @@
+\Needspace{27\baselineskip}
+
+\CNsection{1}{\lr{\mbox{3GPP}} چیست؟}
+
+\textbf{پروژه مشارکت نسل سوم \lr{\mbox{(3GPP)}}} یک همکاری جهانی از سازمان‌های استانداردسازی مخابرات است که مشخصات و گزارش‌های فنی برای سیستم‌های ارتباطی موبایل تدوین می‌کند. \lr{\mbox{3GPP}} که در دسامبر 1998 تأسیس شد، هفت شریک سازمانی \lr{\mbox{(OP)}} منطقه‌ای را برای تولید استانداردهای کاربردپذیر جهانی شامل دسترسی رادیویی، معماری شبکه هسته و قابلیت‌های خدمات متحد می‌کند.
+
+\CNsubsection{}{شرکای سازمانی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شریک} & \CNth{منطقه} & \CNth{نام کامل} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{ETSI}}}}} & اروپا & مؤسسه استانداردسازی مخابرات اروپا \\
+\lr{\mbox{\textbf{\lr{\mbox{ARIB}}}}} & ژاپن & انجمن صنایع و کسب‌وکارهای رادیویی \\
+\lr{\mbox{\textbf{\lr{\mbox{ATIS}}}}} & آمریکای شمالی & اتحاد راه‌حل‌های صنعت مخابرات \\
+\lr{\mbox{\textbf{\lr{\mbox{CCSA}}}}} & چین & انجمن استانداردهای ارتباطات چین \\
+\lr{\mbox{\textbf{\lr{\mbox{TTA}}}}} & کره جنوبی & انجمن فناوری مخابرات \\
+\lr{\mbox{\textbf{\lr{\mbox{TTC}}}}} & ژاپن & کمیته فناوری مخابرات \\
+\lr{\mbox{\textbf{\lr{\mbox{TSDSI}}}}} & هند & انجمن توسعه استانداردهای مخابرات، هند \\
+\end{longtable}
+}
+
+\CNsubsection{}{ویژگی‌های کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{شخصیت حقوقی نیست} \lr{—} \lr{\mbox{3GPP}} یک پروژه مشارکتی است که توسط \lr{\mbox{OP}}های خود اداره می‌شود
+\item
+  \textbf{شرکای نمایندگی بازار \lr{\mbox{(MRP)}}} ورودی صنعت را فراهم می‌کنند (مثلاً \lr{\mbox{GSMA}}، \lr{\mbox{5GAA}}، \lr{\mbox{NGMN}})
+\item
+  \textbf{اعضای فردی} شرکت‌هایی هستند که از طریق \lr{\mbox{OP}} منطقه‌ای خود مشارکت می‌کنند
+\item
+  مشخصات توسط هر \lr{\mbox{OP}} به استانداردهای منطقه‌ای \textbf{تبدیل} می‌شوند (مثلاً \lr{\mbox{ETSI}} آن‌ها را به‌عنوان \lr{EN/\allowbreak{}ES/\allowbreak{}TS} منتشر می‌کند)
+\item
+  سیستم‌های \textbf{\lr{2G (GSM/\allowbreak{}GPRS/\allowbreak{}EDGE)}، \lr{3G (UMTS)}، \lr{4G (LTE/\allowbreak{}LTE-A)} و \lr{\mbox{5G (NR)}}} را پوشش می‌دهد
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m17-org}{8}
+
+\CNsection{2}{ساختار سازمانی \lr{\mbox{3GPP}}}
+
+\CNchained\CNsubsection{}{نمودار ساختار سازمانی}
+
+\CNfigure{m17-org}{ساختار سازمانی \lr{\mbox{3GPP}}}
+
+\Needspace{11\baselineskip}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{}{گروه‌های مشخصات فنی \lr{\mbox{(TSG)}}}
+
+\CNchained\CNsubsubsection{\lr{\mbox{TSG RAN}} \lr{—} شبکه دسترسی رادیویی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گروه کاری} & \CNth{مسیولیت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{RAN1}}}}} & مشخصات لایه فیزیکی \lr{\mbox{(PHY)}} \\
+\lr{\mbox{\textbf{\lr{\mbox{RAN2}}}}} & لایه 2 (\lr{\mbox{MAC}}، \lr{\mbox{RLC}}، \lr{\mbox{PDCP}}، \lr{\mbox{SDAP}}) و لایه \lr{\mbox{3 (RRC)}} \\
+\lr{\mbox{\textbf{\lr{\mbox{RAN3}}}}} & واسط‌های معماری شبکه (\lr{\mbox{Xn}}، \lr{\mbox{NG}}، \lr{\mbox{F1}}، \lr{\mbox{E1}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{RAN4}}}}} & عملکرد رادیویی، پارامترهای \lr{\mbox{RF}}، نیازمندی‌های \lr{\mbox{RRM}} \\
+\lr{\mbox{\textbf{\lr{\mbox{RAN5}}}}} & آزمون انطباق \lr{\mbox{UE}} \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{\lr{\mbox{TSG SA}} \lr{—} جنبه‌های خدمات و سیستم}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گروه کاری} & \CNth{مسیولیت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{SA1}}}}} & نیازمندی‌ها و ویژگی‌های خدمات \\
+\lr{\mbox{\textbf{\lr{\mbox{SA2}}}}} & معماری سیستم و توابع شبکه \\
+\lr{\mbox{\textbf{\lr{\mbox{SA3}}}}} & امنیت و حریم خصوصی \\
+\lr{\mbox{\textbf{\lr{\mbox{SA4}}}}} & کدک‌های رسانه، پخش جریانی، \lr{\mbox{MBMS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{SA5}}}}} & مدیریت، هماهنگ‌سازی و صورت‌حساب \\
+\lr{\mbox{\textbf{\lr{\mbox{SA6}}}}} & توانمندسازی لایه کاربرد (\lr{\mbox{SEAL}}، \lr{\mbox{CAPIF}}، \lr{\mbox{EDGEAPP}}) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{\lr{\mbox{TSG CT}} \lr{—} شبکه هسته و پایانه‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گروه کاری} & \CNth{مسیولیت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{CT1}}}}} & پروتکل‌های \lr{\mbox{NAS}} (\lr{\mbox{MM}}، \lr{\mbox{SM}}، کنترل تماس) \\
+\lr{\mbox{\textbf{\lr{\mbox{CT3}}}}} & هم‌کنش‌گری با شبکه‌های خارجی \\
+\lr{\mbox{\textbf{\lr{\mbox{CT4}}}}} & پروتکل‌های صفحه کنترل (\lr{\mbox{GTP-C}}، \lr{\mbox{Diameter}}، \lr{\mbox{SBI}} مبتنی بر \lr{HTTP/\allowbreak{}2}) \\
+\lr{\mbox{\textbf{\lr{\mbox{CT6}}}}} & جنبه‌های کاربرد کارت هوشمند (\lr{\mbox{USIM}}، \lr{\mbox{ISIM}}) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{17\baselineskip}
+
+\CNsection{3}{انواع مشخصات}
+
+\CNchained\CNsubsection{3.1}{انواع اسناد}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2069}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2069}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2759}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3103}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{نام} & \CNth{ماهیت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{TS}}}}} & مشخصات فنی & \textbf{هنجاری} & نیازمندی‌ها، رویه‌ها، پروتکل‌های اجباری را تعریف می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{TR}}}}} & گزارش فنی & \textbf{اطلاع‌رسانی} & مطالعه‌ها، تحلیل‌های امکان‌سنجی، بهترین رویه‌ها را مستند می‌کند \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{اسناد \lr{\mbox{TS}}} شامل نیازمندی‌های «\lr{\mbox{shall}}» هستند \lr{—} تعریف می‌کنند پیاده‌سازی‌ها \textbf{باید} چه کاری انجام دهند
+\item
+  \textbf{اسناد \lr{\mbox{TR}}} شامل زبان «\lr{should/\allowbreak{}may}» هستند \lr{—} تصمیمات را آگاه می‌کنند اما الزام‌آور نیستند
+\item
+  \lr{\mbox{TR}}ها اغلب پیش از \lr{\mbox{TS}}ها می‌آیند (یک مطالعه، یک \lr{\mbox{TR}} تولید می‌کند که به یک کار منجر می‌شود که \lr{\mbox{TS}}ها را تولید/\allowbreak{}به‌روزرسانی می‌کند)
+\end{itemize}
+
+\CNkeepfig{m17-numbering}{5}
+
+\CNsubsection{3.2}{سیستم شماره‌گذاری}
+
+قالب شماره مشخصات به‌صورت زیر است: \lr{\mbox{\textbf{\lr{\mbox{xx.yyy}}}}} (یا \lr{\mbox{xx.yyy}} برای سری‌های \lr{\mbox{\ensuremath{\le} 13}}) و \lr{\mbox{\textbf{\lr{\mbox{xx.yyy}}}}} برای تمام سری‌ها.
+
+\CNfigure{m17-numbering}{شماره‌گذاری مشخصه‌ها: سری و شماره}
+
+\textbf{مثال:} \lr{\mbox{\CNcode{38.331}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{38} = سری فناوری رادیویی \lr{\mbox{5G NR}}
+\item
+  \textbf{331} = مشخصات پروتکل \lr{\mbox{RRC}}
+\end{itemize}
+
+\CNsubsubsection{سری‌های \lr{\mbox{00–13}}: سری \lr{GSM/\allowbreak{}GPRS} قدیمی (در ابتدا بدون ارقام پیشرو شماره‌گذاری شده‌اند)}
+
+این‌ها به شماره‌گذاری قدیمی‌تر مشخصات \lr{\mbox{GSM}} نگاشت می‌شوند و برای سازگاری رو به عقب نگهداری می‌شوند.
+
+\Needspace{25\baselineskip}
+
+\CNsubsubsection{سری‌های \lr{\mbox{21–38}}: \lr{\mbox{UMTS}} و فراتر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{سری} & \CNth{حوزه موضوعی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{21} & نیازمندی‌ها \\
+\textbf{22} & جنبه‌های خدمات («مرحله \lr{\mbox{1}}») \\
+\textbf{23} & تحقق فنی («مرحله \lr{\mbox{2}}» \lr{—} معماری) \\
+\textbf{24} & پروتکل‌های سیگنالینگ («مرحله \lr{\mbox{3» — UE}} به شبکه) \\
+\textbf{25} & فناوری رادیویی \lr{UTRAN (3G)} \\
+\textbf{26} & کدک‌ها \\
+\textbf{27} & داده (فرمان‌های \lr{\mbox{AT}} و غیره) \\
+\textbf{28} & پروتکل‌های سیگنالینگ («مرحله \lr{\mbox{3» — SS}}، \lr{\mbox{OAM}}) \\
+\textbf{29} & پروتکل‌های شبکه هسته (مرحله 3 \lr{—} شبکه به شبکه) \\
+\textbf{30} & مدیریت برنامه (شماره‌گذاری قدیمی \lr{\mbox{Rel-4}}) \\
+\textbf{31} & \lr{UICC /\allowbreak{} USIM /\allowbreak{} ISIM} \\
+\textbf{32} & \lr{\mbox{OAM\&P}} (مدیریت و صورت‌حساب) \\
+\textbf{33} & امنیت \\
+\textbf{34} & مشخصات آزمون \lr{\mbox{UE}} \\
+\textbf{35} & الگوریتم‌های امنیتی \\
+\textbf{36} & فناوری رادیویی \lr{\mbox{LTE}} (\lr{\mbox{UTRA}} تکامل‌یافته) \\
+\textbf{37} & اندازه‌گیری رادیویی و انطباق پروتکل (چند-\lr{\mbox{RAT}}) \\
+\textbf{38} & فناوری رادیویی \lr{\mbox{5G NR}} \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{3.3}{روش مرحله‌ای (رویکرد \lr{\mbox{ITU-T}})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مرحله} & \CNth{توضیح} & \CNth{سری معمول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{مرحله 1} & توصیف خدمات از دیدگاه کاربر & \lr{\mbox{22.xxx}} \\
+\textbf{مرحله 2} & تحلیل منطقی /\allowbreak{} معماری & \lr{\mbox{23.xxx}} \\
+\textbf{مرحله 3} & پیاده‌سازی پروتکل /\allowbreak{} رویه‌های تفصیلی & \lr{\mbox{24.xxx}}، \lr{\mbox{29.xxx}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m17-lifecycle}{8}
+
+\CNsection{4}{سیستم نسخه‌ها \lr{\mbox{(Release)}}}
+
+\CNchained\CNsubsection{4.1}{چرخه عمر نسخه}
+
+\CNfigure{m17-lifecycle}{چرخه حیات یک نسخه \lr{\mbox{3GPP}}}
+
+\textbf{جزییات مراحل:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{مرحله مطالعه} \lr{—} بررسی‌های امکان‌سنجی و فنی؛ خروجی یک \lr{\mbox{TR}} است
+\item
+  \textbf{تصویب کار} \lr{—} \lr{PCG/\allowbreak{}TSG} تصویب می‌کند؛ پیش‌نویس مشخصات آغاز می‌شود
+\item
+  \textbf{تثبیت عملکردی} \lr{—} تمام ویژگی‌های نسخه کامل می‌شوند؛ عملکرد جدیدی اضافه نمی‌شود
+\item
+  \textbf{تثبیت \lr{\mbox{ASN.1}} /\allowbreak{} پروتکل} \lr{—} کدگذاری پروتکل (\lr{\mbox{ASN.1}}، \lr{\mbox{JSON}} و غیره) تثبیت می‌شود؛ فقط تصحیحات ضروری
+\item
+  \textbf{نگهداری} \lr{—} فقط درخواست‌های تغییر \lr{\mbox{(CR)}} حیاتی رفع اشکال پذیرفته می‌شوند
+\end{enumerate}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{4.2}{نسخه‌های کلیدی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2250}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسخه} & \CNth{سال} & \CNth{نسل} & \CNth{ویژگی‌های کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{R99}}}}} & 2000 & \lr{3G (UMTS)} & واسط رادیویی \lr{\mbox{WCDMA}}، هسته \lr{CS/\allowbreak{}PS}، \lr{384~kbps DL} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-4}}}}} & 2001 & \lr{\mbox{3G}} & \lr{\mbox{TD-SCDMA}}، تقسیم \lr{MSC server/\allowbreak{}MGW} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-5}}}}} & 2002 & \lr{3G/\allowbreak{}3.5G} & \lr{HSDPA (14.4~Mbps DL)}، معرفی \lr{\mbox{IMS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-6}}}}} & 2005 & \lr{\mbox{3.5G}} & \lr{HSUPA (5.76~Mbps UL)}، \lr{\mbox{MBMS}}، هم‌کنش‌گری \lr{\mbox{WLAN}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-7}}}}} & 2007 & \lr{\mbox{3.5G+}} & \lr{\mbox{HSPA}}+ (\lr{\mbox{MIMO}}، \lr{\mbox{64QAM}})، \lr{\mbox{VoIP}} روی \lr{\mbox{HSPA}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-8}}}}} & 2009 & \lr{\mbox{\textbf{\lr{\mbox{4G (LTE)}}}}} & \lr{OFDMA/\allowbreak{}SC-FDMA}، معماری مسطح \lr{(eNB/\allowbreak{}EPC)}، \lr{100~Mbps DL} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-9}}}}} & 2010 & \lr{\mbox{4G}} & \lr{\mbox{eMBMS}}، شکل‌دهی پرتو دو-لایه، \lr{\mbox{HeNB}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-10}}}}} & 2011 & \lr{\textbf{\lr{4G (LTE-A)}}} & تجمیع حامل، \lr{\mbox{MIMO 8\ensuremath{\times}8}}، گره‌های رله، \lr{1~Gbps DL} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-11}}}}} & 2013 & \lr{\mbox{4G+}} & \lr{\mbox{CoMP}}، \lr{\mbox{ICIC}} بهبودیافته، بهبودهای تجمیع حامل \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-12}}}}} & 2015 & \lr{\mbox{4G+}} & \lr{D2D (ProSe)}، \lr{MTC/\allowbreak{}M2M}، اتصال دوگانه، \lr{256QAM DL} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-13}}}}} & 2016 & \lr{\mbox{4G+}} & \lr{\mbox{LAA}}، \lr{\mbox{LTE-U}}، \lr{\mbox{NB-IoT}}، \lr{eMTC (Cat-M1)} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-14}}}}} & 2017 & \lr{\mbox{4G}}+/\allowbreak{}پیش-\lr{\mbox{5G}} & \lr{V2X (LTE)}، \lr{\mbox{eLAA}}، بهبودهای بیشتر \lr{\mbox{IoT}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-15}}}}} & 2019 & \textbf{\lr{\mbox{5G}} فاز 1} & \lr{NR NSA/\allowbreak{}SA}، \lr{\mbox{eMBB}}، \lr{\mbox{mmWave}}، \lr{5GC (SBA)}، شبکه‌بندی \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-16}}}}} & 2020 & \textbf{\lr{\mbox{5G}} فاز 2} & بهبودهای \lr{\mbox{URLLC}}، \lr{\mbox{NR V2X}}، \lr{\mbox{IAB}}، \lr{\mbox{NR-U}}، \lr{\mbox{IIoT}}، \lr{\mbox{NPN}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-17}}}}} & 2022 & \lr{\mbox{5G}} & \lr{\mbox{NTN}} (ماهواره)، \lr{\mbox{RedCap}}، بهبود سایدلینک \lr{\mbox{NR}}، \lr{\mbox{XR}}، چندپخشی \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-18}}}}} & 2024 & \lr{\textbf{\lr{5G-Advanced}}} & \lr{AI/\allowbreak{}ML} برای \lr{\mbox{NR}}، تحول دوپلکس، بهبود \lr{\mbox{NR-light}}، بهبود \lr{\mbox{XR}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Rel-19}}}}} & \CNnum{2025-26} & \lr{5G-Advanced+} & مطالعات واسط رادیویی بومی-\lr{\mbox{AI}}، \lr{\mbox{IoT}} محیطی، \lr{\mbox{NTN}} بیشتر \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m17-spec-anatomy}{10}
+
+\CNsection{5}{چگونه در مشخصات \lr{\mbox{3GPP}} پیمایش کنیم}
+
+\CNchained\CNsubsection{5.1}{قاعده شماره‌گذاری مشخصات}
+
+درک شماره بلافاصله به شما می‌گوید یک مشخصات چه چیزی را پوشش می‌دهد:
+
+\CNfigure{m17-spec-anatomy}{خواندن ارجاع یک مشخصه}
+
+\textbf{شماره‌گذاری نسخه:} رقم اول نسخه به نسخه \lr{\mbox{(Release)}} نگاشت می‌شود:
+
+\begin{itemize}
+\tightlist
+\item
+  نسخه \lr{3.x.x \ensuremath{\to} Release 99}
+\item
+  نسخه \lr{4.x.x \ensuremath{\to} Release 4}
+\item
+  \lr{\mbox{…}}
+\item
+  نسخه \lr{15.x.x \ensuremath{\to} Release 15}
+\item
+  نسخه \lr{17.x.x \ensuremath{\to} Release 17}
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{5.2}{چگونه مشخصات را پیدا کنیم}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{منبع} & \CNth{\lr{\mbox{URL}}} & \CNth{کاربرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Spec Finder} & \lr{\url{https://www.3gpp.org/specifications/specification-numbering}} & جستجو بر اساس شماره \\
+سری مشخصات & \lr{\url{https://www.3gpp.org/specifications}} & مرور بر اساس سری \\
+پورتال (آخرین + آرشیو) & \lr{\url{https://portal.3gpp.org/}} & جستجوی پیشرفته، ردیابی \lr{\mbox{CR}} \\
+سرور \lr{\mbox{FTP}} & \lr{\url{https://www.3gpp.org/ftp/Specs/}} & دانلود مستقیم فایل‌های .\lr{\mbox{zip}} \\
+برنامه کار & \lr{\url{https://www.3gpp.org/specifications/work-plan}} & ردیابی موارد در جریان \\
+\end{longtable}
+}
+
+\textbf{گردش کار جستجوی عملی:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  به \lr{\textbf{\lr{portal.3gpp.org}}} بروید \ensuremath{\leftarrow} تب «\lr{\mbox{Specifications}}»
+\item
+  شماره مشخصات (مثلاً «\lr{\mbox{23.501}}») یا کلیدواژه را وارد کنید
+\item
+  بر اساس نسخه و ورژن فیلتر کنید
+\item
+  آخرین نسخه تصویب‌شده را دانلود کنید (.\lr{\mbox{docx}} یا .\lr{\mbox{pdf}})
+\end{enumerate}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{5.3}{خواندن یک مشخصات \lr{\mbox{3GPP}}}
+
+هر مشخصات \lr{\mbox{3GPP}} از ساختار استانداردی پیروی می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{بخش} & \CNth{محتوا} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{1. دامنه} & مشخصات چه چیزی را پوشش می‌دهد و چه چیزی را \textbf{نه} \\
+\textbf{2. مراجع} & مراجع هنجاری و اطلاع‌رسانی به سایر مشخصات \\
+\textbf{3. تعاریف و اختصارات} & تعاریف دقیق اصطلاحات؛ فهرست اختصارات \\
+\textbf{4. کلیات /\allowbreak{} مرور} & توصیف سطح بالای سیستم \\
+\textbf{\lr{\mbox{5}}+. محتوای فنی} & رویه‌ها، معماری، جریان‌های پیام \\
+\textbf{پیوست‌ها} & اطلاعات اضافی، \lr{\mbox{ASN.1}}، مثال‌ها \\
+\end{longtable}
+}
+
+\textbf{نکات خواندن:}
+
+\begin{itemize}
+\tightlist
+\item
+  با \textbf{دامنه} شروع کنید تا تأیید کنید سند صحیح را دارید
+\item
+  از \textbf{مراجع} برای ردیابی وابستگی‌ها استفاده کنید (مشخصات به‌شدت به یکدیگر ارجاع می‌دهند)
+\item
+  بخش \textbf{تعاریف} ابهام را رفع می‌کند \lr{—} همیشه به آن مراجعه کنید
+\item
+  به‌دنبال \lr{\mbox{\textbf{\lr{\mbox{``shall''}}}}} (اجباری)، \lr{\mbox{\textbf{\lr{\mbox{``should''}}}}} (توصیه‌شده)، \lr{\mbox{\textbf{\lr{\mbox{``may''}}}}} (اختیاری) بگردید
+\item
+  از \lr{\mbox{Ctrl+F}} برای نام رویه‌های مشخص یا عناصر اطلاعات استفاده کنید
+\end{itemize}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{5.4}{مشخصات کلیدی که هر مهندس مخابرات باید بداند}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2143}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5357}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مشخصات} & \CNth{عنوان} & \CNth{چرا مهم است} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\textbf{\lr{TS 23.501}}} & معماری سیستم برای سیستم \lr{\mbox{5G (5GS)}} & معماری \lr{\mbox{5GC}}، توابع شبکه، نقاط مرجع را تعریف می‌کند \\
+\lr{\textbf{\lr{TS 23.502}}} & رویه‌های سیستم \lr{\mbox{5G}} & ثبت‌نام، نشست \lr{\mbox{PDU}}، رویه‌های تحویل \\
+\lr{\textbf{\lr{TS 24.501}}} & پروتکل \lr{\mbox{NAS}} برای \lr{5GS (UE \ensuremath{\leftrightarrow} AMF)} & تعاریف پیام \lr{\mbox{NAS}} در \lr{\mbox{5G}}، ماشین‌های حالت \\
+\lr{\textbf{\lr{TS 38.300}}} & توصیف کلی \lr{\mbox{NR}} و \lr{\mbox{NG-RAN}} & مرور سیستم \lr{\mbox{NR}}، پشته پروتکل، کانال‌ها \\
+\lr{\textbf{\lr{TS 38.331}}} & مشخصات پروتکل \lr{\mbox{RRC}} در \lr{\mbox{NR}} & رویه‌های \lr{\mbox{RRC}}، اندازه‌گیری‌ها، پیکربندی مجدد \\
+\lr{\textbf{\lr{TS 38.211}}} & کانال‌های فیزیکی و مدولاسیون \lr{\mbox{NR}} & پارامترهای \lr{\mbox{OFDM}}، شبکه منابع، سیگنال‌های مرجع \\
+\lr{\textbf{\lr{TS 38.213}}} & رویه‌های کنترل لایه فیزیکی \lr{\mbox{NR}} & قالب‌های \lr{\mbox{DCI}}، \lr{\mbox{HARQ}}، کنترل توان \\
+\lr{\textbf{\lr{TS 38.214}}} & رویه‌های داده لایه فیزیکی \lr{\mbox{NR}} & اندازه بلوک انتقال، جداول \lr{CQI/\allowbreak{}MCS}، زمان‌بندی \\
+\lr{\textbf{\lr{TS 33.501}}} & معماری امنیت برای \lr{\mbox{5GS}} & چارچوب امنیت \lr{\mbox{5G}}، سلسله‌مراتب کلید، الگوریتم‌ها \\
+\lr{\textbf{\lr{TS 28.541}}} & \lr{\mbox{NRM}} در \lr{\mbox{5G}} (مدل منابع شبکه) & مدل مدیریت و هماهنگ‌سازی شبکه \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m17-si-wi}{8}
+
+\CNsection{6}{موارد مطالعه در برابر موارد کار}
+
+\CNchained\CNsubsection{6.1}{مرور}
+
+\CNfigure{m17-si-wi}{قلم مطالعاتی در برابر قلم کاری}
+
+\CNsubsection{6.2}{مورد مطالعه \lr{\mbox{(SI)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{هدف:} بررسی امکان‌سنجی یک ویژگی یا فناوری جدید
+\item
+  \textbf{خروجی:} گزارش فنی \lr{\mbox{(TR)}} که یافته‌ها، گزینه‌ها، نتایج را مستند می‌کند
+\item
+  \textbf{مدت:} معمولاً \lr{\mbox{1–4}} جلسه \lr{\mbox{TSG}} (\lr{\mbox{9–18}} ماه)
+\item
+  \textbf{فرآیند:}
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    یک شرکت توصیف \lr{\mbox{SI (SID)}} را به \lr{\mbox{TSG}} ارایه می‌دهد
+  \item
+    \lr{\mbox{TSG}} مطالعه را تصویب می‌کند
+  \item
+    گروه کاری مطالعه را انجام می‌دهد (مشارکت‌های شرکت‌های عضو)
+  \item
+    \lr{\mbox{TR}} با نتایج و توصیه‌ها تولید می‌شود
+  \item
+    در صورت امکان‌پذیری \ensuremath{\leftarrow} پیشنهاد \lr{\mbox{WI}} ارایه می‌شود
+  \end{enumerate}
+\end{itemize}
+
+\CNsubsection{6.3}{مورد کار \lr{\mbox{(WI)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{هدف:} ایجاد یا اصلاح مشخصات هنجاری
+\item
+  \textbf{خروجی:} مشخصات فنی \lr{\mbox{(TS)}} جدید یا به‌روزشده
+\item
+  \textbf{مدت:} مقید به زمان‌بندی نسخه هدف
+\item
+  \textbf{فرآیند:}
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    یک شرکت توصیف مورد کار \lr{\mbox{(WID)}} را بر اساس نتایج \lr{\mbox{SI}} ارایه می‌دهد
+  \item
+    \lr{\mbox{TSG WI}} را تصویب می‌کند (به گروه کاری اختصاص می‌دهد، نقاط عطف تعیین می‌کند)
+  \item
+    گروه کاری درخواست‌های تغییر \lr{\mbox{(CR)}} به مشخصات موجود یا مشخصات جدید پیش‌نویس می‌کند
+  \item
+    \lr{\mbox{CR}}ها در سطح \lr{WG/\allowbreak{}TSG} بازبینی، اصلاح و تصویب می‌شوند
+  \item
+    \lr{\mbox{CR}}های تصویب‌شده در نسخه مشخصات برای آن \lr{\mbox{Release}} جای می‌گیرند
+  \end{enumerate}
+\end{itemize}
+
+\CNsubsection{6.4}{مثال جریان \lr{\mbox{SI \ensuremath{\to} WI}}}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Example: NR Sidelink Relay (Release 17)
+
+SI Phase (2019-2020):
+  └── TR 38.836: "Study on NR sidelink relay"
+        └── Conclusions: Relay architectures A and B feasible
+              └── Recommended for WI
+
+WI Phase (2020-2022):
+  └── WID approved at TSG RAN#90
+        └── Updates to: TS 38.300, TS 38.331, TS 38.321, TS 24.587
+              └── Feature complete at Rel-17 functional freeze
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{راهنمای عملی: ارجاع به مشخصات \lr{\mbox{3GPP}} در کار دانشگاهی}
+
+\CNchained\CNsubsection{7.1}{قالب استناد استاندارد}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+3GPP, "Title of Specification," 3GPP TS/TR xx.yyy, Version Vx.y.z, Month Year.
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{مثال (سبک \lr{\mbox{IEEE}}):}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+[1] 3GPP, "System architecture for the 5G System (5GS); Stage 2,"
+    3GPP TS 23.501, Version 17.6.0, Sep. 2022.
+\end{Verbatim}
+\end{CNplaincode}
+
+\textbf{مثال (سبک \lr{\mbox{APA}}):}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+3rd Generation Partnership Project. (2022). System architecture for the 5G System
+(5GS); Stage 2 (3GPP TS 23.501 V17.6.0). https://www.3gpp.org/
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{7.2}{بهترین رویه‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3636}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6364}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{انجام دهید} & \CNth{انجام ندهید} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\CNyes{}}} به نسخه مشخص استناد کنید \lr{\mbox{(Vx.y.z)}} & \lr{\mbox{\CNno{}}} بدون نسخه استناد کنید (مشخصات هر فصل تغییر می‌کنند) \\
+\lr{\mbox{\CNyes{}}} شماره \lr{\mbox{Release}} را ذکر کنید & \lr{\mbox{\CNno{}}} فرض کنید «آخرین» پایدار است \\
+\lr{\mbox{\CNyes{}}} به بخش/\allowbreak{}بند دقیق ارجاع دهید & \lr{\mbox{\CNno{}}} به کل مشخصات 500 صفحه‌ای بدون بند استناد کنید \\
+\lr{\mbox{\CNyes{}}} از عناوین رسمی اسناد \lr{\mbox{3GPP}} استفاده کنید & \lr{\mbox{\CNno{}}} عناوین را بازنویسی کنید \\
+\lr{\mbox{\CNyes{} URL}}/\allowbreak{}تاریخ دسترسی را برای مراجع آنلاین ذکر کنید & \lr{\mbox{\CNno{}}} به آینه‌های غیررسمی لینک دهید \\
+\end{longtable}
+}
+
+\CNsubsection{7.3}{محل دانلود برای استناد}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{آرشیو رسمی:} \lr{\url{https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=xxxx}}
+\item
+  \textbf{الگوی \lr{\mbox{URL}} مستقیم مشخصات:} \lr{\CNcode{https:/}\allowbreak{}\CNcode{/}\allowbreak{}\CNcode{www.}\allowbreak{}\CNcode{3gpp.}\allowbreak{}\CNcode{org/}\allowbreak{}\CNcode{ftp/}\allowbreak{}\CNcode{Specs/}\allowbreak{}\CNcode{archive/}\allowbreak{}\CNcode{[series]/}\allowbreak{}\CNcode{[spec\_}\allowbreak{}\CNcode{number]/}}
+\item
+  همیشه به نسخه \textbf{تصویب‌شده} استناد کنید (نه پیش‌نویس‌ها یا اسناد کاری)
+\end{itemize}
+
+\CNsubsection{7.4}{استناد به درخواست‌های تغییر \lr{\mbox{(CR)}} و مشارکت‌ها}
+
+برای ارجاع به پیشنهادها یا تغییرات مشخص:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+3GPP TSG RAN WG1, "Title," Tdoc R1-21xxxxx, Meeting #10x, Month Year.
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{28\baselineskip}
+
+\CNsection{8}{جدول مهم سری‌های مشخصات}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1905}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1429}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3095}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{سری} & \CNth{حوزه} & \CNth{توضیح} & \CNth{مشخصات نمونه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{21} & نیازمندی‌ها & نیازمندی‌های کلی سیستم & \CNnum{21.915} (خلاصه \lr{\mbox{Rel-15}}) \\
+\textbf{22} & خدمات (مرحله 1) & توصیف خدمات، موارد استفاده & \CNnum{22.261} (نیازمندی‌های خدمات \lr{\mbox{5G}}) \\
+\textbf{23} & معماری (مرحله 2) & معماری سیستم، توصیف‌های عملکردی & \CNnum{23.501} (معماری \lr{\mbox{5GS}})، \CNnum{23.502} (رویه‌های \lr{\mbox{5GS}}) \\
+\textbf{24} & سیگنالینگ \lr{\mbox{UE}}-شبکه (مرحله 3) & پروتکل‌های \lr{\mbox{NAS}}، \lr{\mbox{SIP}}، فرمان‌های \lr{\mbox{AT}} & \CNnum{24.501} (\lr{\mbox{NAS}} در \lr{\mbox{5G}})، \CNnum{24.229} (\lr{\mbox{SIP}} در \lr{\mbox{IMS}}) \\
+\textbf{25} & \lr{\mbox{UTRAN}} (رادیو \lr{\mbox{3G}}) & لایه فیزیکی \lr{\mbox{WCDMA}}، \lr{\mbox{RLC}}، \lr{\mbox{RRC}} & \CNnum{25.331} (\lr{\mbox{RRC}} در \lr{\mbox{UTRAN}}) \\
+\textbf{26} & کدک‌ها & کدک‌های گفتار، صدا، ویدیو & \lr{26.171 (AMR-WB)}، \lr{26.346 (MBMS)} \\
+\textbf{27} & داده & انطباق پایانه، فرمان‌های \lr{\mbox{AT}} & \CNnum{27.007} (فرمان‌های \lr{\mbox{AT}}) \\
+\textbf{28} & سیگنالینگ (مرحله \lr{\mbox{3 - SS}}) & خدمات تکمیلی، \lr{\mbox{OAM}} & \CNnum{28.541} (\lr{\mbox{NRM}} در \lr{\mbox{5G}}) \\
+\textbf{29} & پروتکل‌های \lr{\mbox{CN}} (مرحله 3) & پروتکل‌های شبکه هسته \lr{\mbox{(N-N)}} & \CNnum{29.500} (\lr{\mbox{API}}های \lr{\mbox{HTTP}} در \lr{\mbox{5GC}})، \lr{29.244 (PFCP)} \\
+\textbf{30} & مدیریت برنامه & (قدیمی - عصر \lr{\mbox{Rel-4}}) & \lr{\mbox{—}} \\
+\textbf{31} & \lr{UICC/\allowbreak{}USIM/\allowbreak{}ISIM} & مشخصات کارت \lr{\mbox{SIM}} & \lr{31.102 (USIM)} \\
+\textbf{32} & \lr{\mbox{OAM}} و صورت‌حساب & مدیریت، عملکرد، صورت‌حساب & \CNnum{32.255} (صورت‌حساب \lr{\mbox{5G}}) \\
+\textbf{33} & امنیت & معماری امنیت، الگوریتم‌ها & \CNnum{33.501} (امنیت \lr{\mbox{5G}}) \\
+\textbf{34} & آزمون \lr{\mbox{UE}} & مشخصات آزمون، انطباق & \CNnum{34.229} (انطباق \lr{\mbox{SIP}}) \\
+\textbf{35} & الگوریتم‌ها & مشخصات الگوریتم رمزنگاری & \CNnum{35.231} (الگوریتم \lr{\mbox{TUAK}}) \\
+\textbf{36} & \lr{LTE (E-UTRA)} & فناوری رادیویی \lr{\mbox{LTE}} & \CNnum{36.331} (\lr{\mbox{RRC}} در \lr{\mbox{LTE}})، \CNnum{36.211} (\lr{\mbox{PHY}} در \lr{\mbox{LTE}}) \\
+\textbf{37} & چند-\lr{\mbox{RAT}} & اندازه‌گیری‌های رادیویی در \lr{\mbox{RAT}}ها & \lr{37.340 (MR-DC)} \\
+\textbf{38} & \lr{\mbox{NR}} (رادیو \lr{\mbox{5G}}) & فناوری رادیو جدید \lr{\mbox{5G}} & \CNnum{38.331} (\lr{\mbox{RRC}} در \lr{\mbox{NR}})، \CNnum{38.211} (\lr{\mbox{PHY}} در \lr{\mbox{NR}}) \\
+\end{longtable}
+}
+
+\CNsection{}{خلاصه}
+
+\lr{\mbox{3GPP}} سنگ‌بنای استانداردسازی مخابرات موبایل جهانی است. درک ساختار، شماره‌گذاری مشخصات و سیستم نسخه‌های آن برای موارد زیر ضروری است:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مهندسان} که تجهیزات منطبق با استاندارد پیاده‌سازی می‌کنند
+\item
+  \textbf{پژوهشگران} که بر فناوری فعلی می‌سازند یا آن را گسترش می‌دهند
+\item
+  \textbf{مدیران محصول} که نقشه‌های راه ویژگی‌ها را هم‌راستا با زمان‌بندی نسخه‌ها برنامه‌ریزی می‌کنند
+\item
+  \textbf{رگولاتورها} که به نیازمندی‌های هنجاری ارجاع می‌دهند
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{کارت مرجع سریع}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پرسش} & \CNth{پاسخ} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{3GPP}} مخفف چیست؟ & پروژه مشارکت نسل سوم \\
+چند \lr{\mbox{OP}}؟ & 7 (\lr{\mbox{ETSI}}، \lr{\mbox{ARIB}}، \lr{\mbox{ATIS}}، \lr{\mbox{CCSA}}، \lr{\mbox{TTA}}، \lr{\mbox{TTC}}، \lr{\mbox{TSDSI}}) \\
+چند \lr{\mbox{TSG}}؟ & 3 (\lr{\mbox{RAN}}، \lr{\mbox{SA}}، \lr{\mbox{CT}}) \\
+\lr{\mbox{TS}} در برابر \lr{\mbox{TR}}؟ & \lr{\mbox{TS}} = هنجاری \lr{\mbox{(shall)}}؛ \lr{\mbox{TR}} = اطلاع‌رسانی (مطالعه) \\
+نسخه فعلی \lr{\mbox{5G}}؟ & \lr{Rel-18 (5G-Advanced)}، \lr{\mbox{Rel-19}} در جریان \\
+مشخصات کلیدی معماری \lr{\mbox{5G}}؟ & \lr{TS 23.501} \\
+مشخصات کلیدی \lr{\mbox{NR}} در \lr{\mbox{5G}}؟ & \lr{TS 38.300} (مرور)، \lr{TS 38.331 (RRC)} \\
+قالب مشخصات؟ & \lr{\mbox{xx.yyy}} که \lr{\mbox{xx}} = سری، \lr{\mbox{yyy}} = شماره مشخصات \\
+کجا پیدا کنیم؟ & \lr{portal.3gpp.org} یا \lr{3gpp.\allowbreak{}org/\allowbreak{}specifications} \\
+\end{longtable}
+}
+
+\emph{پایان ماژول 17}

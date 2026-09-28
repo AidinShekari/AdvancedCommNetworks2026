@@ -1,0 +1,866 @@
+\Needspace{17\baselineskip}
+
+\CNsection{8.1}{چرا دسترسی تصادفی لازم است}
+
+وقتی یک \lr{\mbox{UE}} (تجهیزات کاربر) روشن می‌شود یا از حالت بیکار خارج می‌شود، با چالش‌های بنیادی روبرو می‌شود:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4583}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5417}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{چالش} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{بدون هم‌ترازی زمانی پیوند بالاسو} & \lr{\mbox{UE}} تأخیر انتشار خود تا ایستگاه پایه را نمی‌داند \\
+\textbf{بدون منابع پیوند بالاسوی تخصیص‌یافته} & \lr{\mbox{UE}} هیچ اعطای زمان‌بندی‌شده‌ای برای ارسال ندارد \\
+\textbf{بدون هویت یکتا} & شبکه هنوز \lr{\mbox{C-RNTI}} تخصیص نداده است \\
+\end{longtable}
+}
+
+\CNsubsection{}{سناریوهای نیازمند دسترسی تصادفی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{دسترسی اولیه} \lr{—} \lr{\mbox{UE}} روشن می‌شود، اولین اتصال به شبکه
+\item
+  \textbf{تحویل} \lr{—} جابه‌جایی به سلول جدید، نیاز به همگام‌سازی با \lr{eNodeB (eNB)} مقصد
+\item
+  \textbf{رسیدن داده \lr{\mbox{DL}} (حالت بیکار)} \lr{—} \lr{\mbox{UE}} برای داده ورودی صفحه‌بندی می‌شود، باید همگام‌سازی \lr{\mbox{UL}} را دوباره برقرار کند
+\item
+  \textbf{رسیدن داده \lr{\mbox{UL}}} \lr{—} \lr{\mbox{UE}} در حالت متصل همگام‌سازی \lr{\mbox{UL}} را از دست داده است
+\item
+  \textbf{مکان‌یابی} \lr{—} اندازه‌گیری‌های زمان‌بندی برای خدمات مکان
+\end{enumerate}
+
+\begin{CNquote}
+
+\begin{CNinsight}
+
+\textbf{نکته کلیدی:} دسترسی تصادفی \textbf{تنها} سازوکار برای \lr{\mbox{UE}} جهت آغاز ارتباط پیوند بالاسو است زمانی که هیچ زمان‌بندی پیشینی از شبکه ندارد.
+
+\end{CNinsight}
+
+\end{CNquote}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8.2}{\lr{\mbox{PRACH}} (کانال دسترسی تصادفی فیزیکی)}
+
+\CNchained\CNsubsection{}{موقعیت زمان-فرکانس در شبکه منابع}
+
+\lr{\mbox{PRACH}} موقعیت مشخصی در شبکه منابع \lr{\mbox{LTE}} اشغال می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{دامنه فرکانس:} \lr{\mbox{6 PRB}} پیوسته (پهنای باند \lr{\mbox{1.08~MHz}})
+\item
+  \textbf{دامنه زمان:} زیرفریم‌های قابل پیکربندی بر اساس شاخص پیکربندی \lr{\mbox{PRACH}}
+\item
+  \textbf{موقعیت:} مشخص‌شده توسط \lr{\CNcode{prach-FreqOffset}} (آفست \lr{\mbox{PRB}} از پایین‌ترین \lr{\mbox{PRB}} در \lr{\mbox{UL}})
+\end{itemize}
+
+\CNsubsection{}{شاخص پیکربندی \lr{\mbox{PRACH}}}
+
+شاخص پیکربندی \lr{\mbox{(0–63)}} موارد زیر را تعیین می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{کدام زیرفریم‌ها} فرصت‌های \lr{\mbox{PRACH}} را حمل می‌کنند
+\item
+  \textbf{دوره‌تناوب} فرصت‌های \lr{\mbox{PRACH}} (هر 1، 2، 5 یا \lr{\mbox{10~ms}})
+\item
+  \textbf{قالب پیشوند} مورد استفاده
+\end{itemize}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شاخص پیکربندی} & \CNth{قالب پیشوند} & \CNth{زیرفریم(ها)} & \CNth{چگالی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 0 & 1 & 1 در هر فریم \\
+3 & 0 & 1، 4، 7 & 3 در هر فریم \\
+15 & 0 & \lr{\mbox{0–9}} & 10 در هر فریم \\
+48 & 4 (کوتاه) & 1 & 1 در هر فریم \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{قالب‌های پیشوند}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\begin{minipage}[b]{\linewidth}\centering
+\CNth{قالب}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{طول توالی \lr{\mbox{(Ts)}}}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{طول \lr{\mbox{CP (Ts)}}}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{مدت کل}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{حداکثر شعاع سلول}
+\end{minipage} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & \lr{24576 (0.8~ms)} & \lr{3168 (0.1~ms)} & حدود \lr{\mbox{1~ms}} & حدود \lr{\mbox{14.5~km}} \\
+1 & \lr{24576 (0.8~ms)} & \lr{21024 (0.68~ms)} & حدود \lr{\mbox{2~ms}} & حدود \lr{\mbox{77.3~km}} \\
+2 & \lr{2\ensuremath{\times}24576 (1.6~ms)} & \lr{6240 (0.2~ms)} & حدود \lr{\mbox{2~ms}} & حدود \lr{\mbox{29.5~km}} \\
+3 & \lr{2\ensuremath{\times}24576 (1.6~ms)} & \lr{21024 (0.68~ms)} & حدود \lr{\mbox{3~ms}} & حدود \lr{\mbox{100.2~km}} \\
+4 (کوتاه) & \lr{4096 (0.13~ms)} & \lr{448 (0.015~ms)} & حدود \lr{\mbox{0.15~ms}} & حدود \lr{\mbox{1.4~km}} \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{مبادله طراحی:} \lr{\mbox{CP}} طولانی‌تر \ensuremath{\leftarrow} شعاع سلول بزرگ‌تر اما فرصت‌های \lr{\mbox{PRACH}} کمتر در هر فریم.
+
+\end{CNquote}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8.3}{توالی‌های پیشوند}
+
+\CNchained\CNsubsection{}{توالی‌های \lr{Zadoff-Chu (ZC)}}
+
+پیشوند \lr{\mbox{PRACH}} از توالی‌های \lr{Zadoff-Chu} استفاده می‌کند که به‌صورت زیر تعریف می‌شوند:
+
+\CNdisplay{x_u(n) = e^{-j\pi u n(n+1)/N_{ZC}}}
+
+که در آن:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{$u$} = شاخص توالی ریشه \lr{($1 \le u \le N_{\mathrm{ZC}} - 1$)}
+\item
+  \lr{$N_{ZC}$} = طول توالی (839 برای بلند، 139 برای کوتاه)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\textbf{چرا \lr{Zadoff-Chu}؟}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{مزیت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{دامنه ثابت (\lr{\mbox{PAPR}} صفر)} & کارایی \lr{\mbox{PA}} را در لبه سلول بیشینه می‌کند \\
+\textbf{خودهمبستگی دوره‌ای ایده‌آل} & تخمین دقیق زمان‌بندی را ممکن می‌سازد \\
+\textbf{همبستگی متقابل صفر بین ریشه‌ها} & ریشه متفاوت \ensuremath{\leftarrow} تداخل صفر \\
+\textbf{طیف فرکانسی مسطح} & مقاوم در کانال‌های انتخاب-فرکانسی \\
+\end{longtable}
+}
+
+\CNsubsection{64}{پیشوند در هر سلول}
+
+هر سلول دقیقاً \textbf{64 پیشوند در دسترس} دارد که از موارد زیر مشتق می‌شود:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{شاخص توالی ریشه} (\lr{\CNcode{rootSequenceIndex}}، پخش‌شده در \lr{\mbox{SIB2}})
+\item
+  \textbf{شیفت‌های چرخه‌ای} اعمال‌شده بر توالی‌های ریشه
+\end{enumerate}
+
+\CNdisplay{\mathrm{Preamble}(v) = \mathrm{CyclicShift}\left(x_u,\; v \times N_{CS}\right)}
+
+که در آن:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\CNcode{N\_CS}}} = اندازه شیفت چرخه‌ای \lr{(\CNcode{zeroCorrelationZoneConfig})}
+\item
+  تعداد پیشوند در هر ریشه = \lr{$\lfloor N_{\mathrm{ZC}} / N_{\mathrm{CS}} \rfloor$}
+\item
+  اگر یک ریشه 64 پیشوند فراهم نکند، چندین ریشه استفاده می‌شود
+\end{itemize}
+
+\CNsubsection{}{پوشش سلول و شیفت چرخه‌ای}
+
+شیفت چرخه‌ای \lr{\mbox{\CNcode{N\_CS}}} \textbf{ناحیه همبستگی صفر} را تعیین می‌کند که باید از حداکثر تأخیر رفت-و-برگشت فراتر رود:
+
+\CNdisplay{N_{CS} > \frac{2\, d_{\max}}{c\, T_{s,\mathrm{seq}}}}
+
+که در آن \lr{$d_{\max}$} بیشینه شعاع سلول، \lr{$c$} سرعت نور \lr{($3 \times 10^{8}$ m/\allowbreak{}s)} و \lr{$T_{s,\mathrm{seq}}$} مدت هر نمونه دنباله است.
+
+\textbf{مثال:} برای \lr{\ensuremath{N_{\mathrm{CS}}} = 13} (قالب 0):
+
+\begin{itemize}
+\tightlist
+\item
+  حداکثر تأخیر قابل تشخیص = \lr{$13 \times (1/1.25\,\mathrm{MHz}) = 10.4\ \mu\mathrm{s}$}
+\item
+  حداکثر شعاع سلول = \lr{$10.4\ \mu\mathrm{s} \times c/2 \approx 1.56\ \mathrm{km}$}
+\item
+  پیشوند در هر ریشه = \lr{$\lfloor 839/13 \rfloor = 64$} \ensuremath{\leftarrow} یک ریشه کافی است
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m08-cbra}{8}
+
+\CNsection{8.4}{دسترسی تصادفی مبتنی بر رقابت (\lr{\mbox{CBRA 4}}-گام)}
+
+\CNchained\CNsubsection{}{مرور رویه}
+
+\CNfigure{m08-cbra}{دسترسی تصادفی مبتنی بر رقابت چهارگامی}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{جزییات گام-به-گام}
+
+\CNchained\CNsubsubsection{گام \lr{\mbox{1 — Msg1}}: ارسال پیشوند}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} یک \textbf{پیشوند تصادفی} از مجموعه در دسترس انتخاب می‌کند (پیشوندهای رقابتی)
+\item
+  روی \lr{\mbox{PRACH}} در منابع زمان-فرکانس پیکربندی‌شده ارسال می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{RA-RNTI}}}}} مشتق‌شده از فرصت \lr{\mbox{PRACH}}: \lr{\CNcode{RA-RNTI =}\allowbreak{}\CNcode{ 1 + t\_}\allowbreak{}\CNcode{id + 10 × f\_}\allowbreak{}\CNcode{id}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{\CNcode{t\_id}}} = شاخص زیرفریم \lr{\mbox{(0–9)}}
+  \item
+    \lr{\mbox{\CNcode{f\_id}}} = شاخص فرکانس \lr{\mbox{(0–5)}}
+  \end{itemize}
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{گام \lr{\mbox{2 — Msg2}}: پاسخ دسترسی تصادفی \lr{\mbox{(RAR)}}}
+
+\lr{\mbox{RAR}} شامل موارد زیر است (به‌ازای هر پیشوند پاسخ‌داده‌شده):
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3182}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2727}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4091}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{فیلد} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{بیت}
+\end{minipage} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+پیشروی زمانی & 11 & تصحیح زمان‌بندی \lr{\mbox{UL}} (\lr{\mbox{0–1282}}، گام = \lr{$16 \times T_s$}) \\
+اعطای \lr{\mbox{UL}} & 20 & منابع برای \lr{\mbox{Msg3}} \\
+\lr{\mbox{TC-RNTI}} & 16 & هویت موقت \\
+نشانگر عقب‌نشینی & 4 & عقب‌نشینی در صورت اضافه‌بار \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{پنجره \lr{\mbox{RAR}}:} \lr{\mbox{2–10}} زیرفریم (قابل پیکربندی با \lr{\CNcode{ra-ResponseWindowSize}})
+\item
+  اگر \lr{\mbox{RAR}} دریافت نشد \ensuremath{\leftarrow} عقب‌نشینی و تلاش مجدد
+\end{itemize}
+
+\CNsubsubsection{گام \lr{\mbox{3 — Msg3}}: ارسال زمان‌بندی‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} روی \lr{\mbox{UL-SCH}} با استفاده از اعطای \lr{\mbox{Msg2}} ارسال می‌کند
+\item
+  شامل \lr{\textbf{\lr{RRC Connection Request}}} با موارد زیر است:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    هویت \lr{\mbox{UE}} (\lr{\mbox{S-TMSI}} یا مقدار تصادفی)
+  \item
+    علت برقراری
+  \end{itemize}
+\item
+  \lr{\mbox{HARQ}} فعال است (حداکثر 5 بازارسال برای \lr{\mbox{Msg3}})
+\end{itemize}
+
+\CNsubsubsection{گام \lr{\mbox{4 — Msg4}}: حل رقابت}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{eNB}} هویت \lr{\mbox{UE}} دریافت‌شده در \lr{\mbox{Msg3}} را بازمی‌گرداند
+\item
+  \lr{\mbox{UE}} بررسی می‌کند که آیا هویت بازگردانده‌شده با هویت خودش مطابقت دارد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{مطابقت} \ensuremath{\leftarrow} \lr{\mbox{RACH}} موفق، \lr{\mbox{TC-RNTI}} به \lr{\mbox{C-RNTI}} تبدیل می‌شود
+  \item
+    \textbf{عدم مطابقت} \ensuremath{\leftarrow} برخورد تشخیص داده شد، از گام 1 با عقب‌نشینی دوباره شروع کن
+  \end{itemize}
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{8.5}{دسترسی تصادفی بدون رقابت \lr{\mbox{(CFRA)}}}
+
+\CNchained\CNsubsection{}{چه زمانی استفاده می‌شود}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5556}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4444}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{سناریو} & \CNth{دلیل} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{تحویل} & همگام‌سازی سریع لازم است، تأخیر برخورد قابل قبول نیست \\
+\textbf{رسیدن داده \lr{\mbox{DL}} (متصل)} & \lr{\mbox{eNB UE}} را می‌شناسد، می‌تواند پیشوند را پیش‌تخصیص دهد \\
+\textbf{مکان‌یابی \lr{\mbox{(OTDOA)}}} & زمان‌بندی دقیق لازم است \\
+\textbf{بازیابی شکست پرتو} & بازیابی سریع لازم است \\
+\end{longtable}
+}
+
+\CNkeepfig{m08-cfra}{3}
+
+\CNsubsection{}{رویه}
+
+\CNfigure{m08-cfra}{دسترسی تصادفی بدون رقابت}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{تفاوت‌های کلیدی با \lr{\mbox{CBRA}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}lcc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{مبتنی بر رقابت} & \CNth{بدون رقابت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+گام‌ها & 4 & 2 \\
+انتخاب پیشوند & تصادفی & تخصیص‌یافته توسط \lr{\mbox{eNB}} \\
+برخورد ممکن & بله & خیر \\
+تأخیر & حدود \lr{\mbox{15~ms}} (موفق) & حدود \lr{\mbox{5~ms}} \\
+مورد استفاده & دسترسی اولیه & تحویل، داده \lr{\mbox{DL}} \\
+استخر پیشوند & مشترک (مثلاً 54) & اختصاصی (مثلاً 10) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m08-timing-advance}{10}
+
+\CNsection{8.6}{پیشروی زمانی \lr{\mbox{(TA)}}}
+
+\CNchained\CNsubsection{}{چرا پیشروی زمانی لازم است}
+
+در پیوند بالاسوی \lr{OFDMA (SC-FDMA)}، همه سیگنال‌های \lr{\mbox{UE}} باید \textbf{درون پیشوند چرخه‌ای هم‌تراز} به \lr{\mbox{eNB}} برسند تا تعامد حفظ شود:
+
+\CNfigure{m08-timing-advance}{پیشروی زمانی سیگنال‌های پیوند بالاسو \lr{\mbox{UE}}های نزدیک و دور را هم‌تراز می‌کند}
+
+\CNsubsection{}{سازوکار \lr{\mbox{TA}}}
+
+\textbf{\lr{\mbox{TA}} اولیه (از \lr{RAR - Msg2}):}
+
+\begin{itemize}
+\tightlist
+\item
+  مقدار 11 بیتی: \lr{\mbox{0–1282}}
+\item
+  اندازه گام: \lr{$16 \times T_s = 16 \times (1/30.72\,\mathrm{MHz}) \approx$ \textbf{\lr{\mbox{0.52~\ensuremath{\mu}s}}}}
+\item
+  نشان‌دهنده پیشروی یک‌طرفه اعمال‌شده بر ارسال \lr{\mbox{UL}} است
+\end{itemize}
+
+\textbf{نگهداری \lr{\mbox{TA}} (\lr{\mbox{MAC CE}} - فرمان پیشروی زمانی):}
+
+\begin{itemize}
+\tightlist
+\item
+  مقدار 6 بیتی: \lr{\mbox{0–63}}
+\item
+  به‌صورت زیر اعمال می‌شود: \lr{\CNcode{TA\_}\allowbreak{}\CNcode{new =}\allowbreak{}\CNcode{ TA\_}\allowbreak{}\CNcode{old + (TA\_}\allowbreak{}\CNcode{command − 31) × 16 × Ts}}
+\item
+  به‌صورت دوره‌ای از طریق عنصر کنترل \lr{\mbox{MAC}} ارسال می‌شود
+\item
+  اگر به‌روزرسانی \lr{\mbox{TA}} در \lr{\CNcode{timeAlignmentTimer}} دریافت نشود \ensuremath{\leftarrow} همگام‌سازی \lr{\mbox{UL}} از دست می‌رود
+\end{itemize}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{شعاع سلول از پیشروی زمانی}
+
+حداکثر \lr{\mbox{TA}} \textbf{تأخیر انتشار رفت-و-برگشت} را تصحیح می‌کند:
+
+\CNdisplay{
+\begin{aligned}
+\text{\rl{تأخیر رفت‌وبرگشت}} &= \mathrm{TA} \times 16 \times T_s\\
+\text{\rl{تأخیر یک‌طرفه}} &= \mathrm{TA} \times 16 \times T_s / 2\\
+\text{\rl{بیشینه فاصله}} &= c \times \text{\rl{تأخیر یک‌طرفه}}
+\end{aligned}
+}
+
+\CNsubsubsection{مثال عددی: حداکثر شعاع سلول}
+
+\textbf{برای \lr{\mbox{TA}} اولیه (11 بیتی، حداکثر = \lr{\mbox{1282}}):}\CNdisplay{
+\begin{aligned}
+\text{\rl{بیشینه تأخیر رفت‌وبرگشت}} &= 1282 \times 16 \times T_s = 1282 \times 16 \times \frac{1}{30.72 \times 10^{6}}\\
+&= 1282 \times 0.5208\ \mu\mathrm{s} = 667.7\ \mu\mathrm{s}\\
+\text{\rl{بیشینه تأخیر یک‌طرفه}} &= 667.7 / 2 = 333.8\ \mu\mathrm{s}\\
+\text{\rl{بیشینه شعاع سلول}} &= 3 \times 10^{8} \times 333.8 \times 10^{-6} = 100.1\ \mathrm{km}
+\end{aligned}
+}
+
+\textbf{تأیید با قالب پیشوند:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{قالب} & \CNth{زمان محافظ \lr{\mbox{(CP)}}} & \CNth{حداکثر \lr{\mbox{RTD}}} & \CNth{حداکثر شعاع سلول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & \lr{99.5~\ensuremath{\mu}s ($3168 \times T_s$)} & \lr{\mbox{99.5~\ensuremath{\mu}s}} & \lr{\mbox{\textbf{\lr{\mbox{14.9~km}}}}} \\
+1 & \lr{684.4~\ensuremath{\mu}s ($21024 \times T_s$)} & \lr{\mbox{684.4~\ensuremath{\mu}s}} & \lr{\mbox{\textbf{\lr{\mbox{102.6~km}}}}} \\
+2 & \lr{203.1~\ensuremath{\mu}s ($6240 \times T_s$)} & \lr{\mbox{203.1~\ensuremath{\mu}s}} & \lr{\mbox{\textbf{\lr{\mbox{30.5~km}}}}} \\
+3 & \lr{684.4~\ensuremath{\mu}s ($21024 \times T_s$)} & \lr{\mbox{684.4~\ensuremath{\mu}s}} & \lr{\mbox{\textbf{\lr{\mbox{102.6~km}}}}} \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{یادداشت:} شعاع واقعی سلول توسط \textbf{کوچک‌ترِ} دو مورد زیر محدود می‌شود: محدوده \lr{\mbox{TA}} یا مدت \lr{\mbox{CP}} پیشوند.
+
+\end{CNquote}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8.7}{برخوردها و عقب‌نشینی}
+
+\CNchained\CNsubsection{}{احتمال برخورد}
+
+وقتی \lr{\mbox{N}} کاربر \lr{\mbox{UE}} به‌طور همزمان تلاش دسترسی تصادفی با 64 پیشوند در دسترس انجام می‌دهند:
+
+\textbf{احتمال اینکه یک \lr{\mbox{UE}} مشخص با حداقل یک \lr{\mbox{UE}} دیگر برخورد کند:}
+
+\CNdisplay{P_{collision} = 1 - \left(1 - \frac{1}{64}\right)^{N-1}}
+
+\Needspace{19\baselineskip}
+
+\CNsubsubsection{مثال‌های عددی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{N}} (\lr{\mbox{UE}}های همزمان)} & \CNth{\lr{\mbox{P(\rl{برخورد})}} در هر \lr{\mbox{UE}}} & \CNth{\lr{\mbox{UE}}های برخوردی مورد انتظار} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2 & \CNnum{1.56\%} & \CNnum{0.03} \\
+5 & \CNnum{6.10\%} & \CNnum{0.31} \\
+10 & \CNnum{13.0\%} & \CNnum{1.30} \\
+20 & \CNnum{25.5\%} & \CNnum{5.10} \\
+30 & \CNnum{36.8\%} & \CNnum{11.0} \\
+50 & \CNnum{54.0\%} & \CNnum{27.0} \\
+64 & \CNnum{63.2\%} & \CNnum{40.4} \\
+\end{longtable}
+}
+
+\textbf{مثال محاسبه \lr{\mbox{(N=10)}}:}\CNdisplay{
+\begin{aligned}
+P(\text{\rl{برخورد}}) &= 1 - \left(1 - \tfrac{1}{64}\right)^{10-1} = 1 - \left(\tfrac{63}{64}\right)^{9}\\
+&= 1 - (0.98438)^{9} = 1 - 0.8681 = 0.1319 \approx 13.2\%
+\end{aligned}
+}
+
+\CNkeepfig{m08-collision}{3}
+
+\CNsubsection{}{سناریوی برخورد با حل آن}
+
+\CNfigure{m08-collision}{برخورد پیشوند و حل آن در \lr{\mbox{Msg4}}}
+
+\CNsubsection{}{سازوکار عقب‌نشینی}
+
+وقتی یک تلاش \lr{\mbox{RACH}} شکست می‌خورد، \lr{\mbox{UE}} باید پیش از تلاش مجدد منتظر بماند:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{نشانگر عقب‌نشینی \lr{\mbox{(BI)}}:} پخش در زیرسرآیند \lr{\mbox{RAR}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    مقادیر: 0، 10، 20، 30، 40، 60، 80، 120، 160، 240، 320، 480، \lr{\mbox{960~ms}}
+  \item
+    \lr{\mbox{UE}} عقب‌نشینی تصادفی انتخاب می‌کند: یکنواخت \lr{\mbox{[0, BI]}}
+  \end{itemize}
+\item
+  \textbf{شیب‌دهی توان:} هر تلاش ناموفق توان ارسال را افزایش می‌دهد
+
+  \begin{itemize}
+  \tightlist
+  \item
+    اندازه گام: \lr{\CNcode{powerRampingStep}} (معمولاً \lr{\mbox{2~dB}})
+  \item
+    \lr{\CNcode{P\_}\allowbreak{}\CNcode{PRACH(attempt) =}\allowbreak{}\CNcode{ P\_}\allowbreak{}\CNcode{initial + (attempt − 1) × powerRampingStep}}
+  \item
+    حداکثر: \lr{\CNcode{preambleInitialReceivedTargetPower}} + شیب‌دهی
+  \item
+    حداکثر تلاش‌ها: \lr{\CNcode{preambleTransMax}} (3، 4، 5، 6، 7، 8، 10، 20، 50، 100، 200)
+  \end{itemize}
+\item
+  \textbf{انتخاب مجدد پیشوند:} پیشوند تصادفی جدید برای هر تلاش انتخاب می‌شود
+\end{enumerate}
+
+\CNkeepfig{m08-rach-attempts}{3}
+
+\CNsubsection{}{خط زمانی تلاش \lr{\mbox{RACH}}}
+
+\CNfigure{m08-rach-attempts}{تلاش‌های \lr{\mbox{RACH}} با افزایش تدریجی توان و عقب‌نشینی}
+
+\Needspace{14\baselineskip}
+
+\Needspace{22\baselineskip}
+
+\CNsection{8.8}{اضافه‌بار \lr{\mbox{RACH}}}
+
+\CNchained\CNsubsection{}{علل اضافه‌بار \lr{\mbox{RACH}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4815}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{علت} & \CNth{توضیح} & \CNth{مقیاس} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\textbf{\lr{M2M/\allowbreak{}IoT}}} & فعال‌سازی انبوه همزمان دستگاه‌ها (مثلاً کنتورهای هوشمند با گزارش ساعتی) & \lr{\mbox{10,000–30,000}} دستگاه \\
+\textbf{طوفان‌های صفحه‌بندی} & رویداد بزرگ، داده \lr{\mbox{DL}} انبوه را فعال می‌کند (هشدار اضطراری، محتوای محبوب) & هزاران \lr{\mbox{UE}} \\
+\textbf{بلایا/\allowbreak{}اضطرار} & همه پس از زلزله/\allowbreak{}رویداد به‌طور همزمان تماس می‌گیرند & انفجار شدید \\
+\textbf{انتخاب مجدد سلول} & بسیاری از \lr{\mbox{UE}}ها به‌طور همزمان تحویل می‌شوند (قطار، استادیوم) & صدها \\
+\textbf{بازیابی قطع برق} & همه دستگاه‌ها به‌طور همزمان دوباره متصل می‌شوند & هزاران \\
+\end{longtable}
+}
+
+\CNsubsection{}{نشانه‌های اضافه‌بار}
+
+\begin{itemize}
+\tightlist
+\item
+  نرخ برخورد بالا (بیش از 50\%)
+\item
+  بازارسال‌های بیش‌ازحد پیشوند \ensuremath{\leftarrow} افزایش تداخل
+\item
+  ظرفیت \lr{\mbox{RAR}} تمام‌شده (منابع \lr{\mbox{DL}} محدود برای \lr{\mbox{RAR}})
+\item
+  گرسنگی منابع \lr{Msg3/\allowbreak{}Msg4}
+\item
+  تأخیرهای دسترسی از چند ثانیه تا چند دقیقه
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{راه‌حل‌ها}
+
+\CNchained\CNsubsubsection{ممنوعیت کلاس دسترسی \lr{\mbox{(ACB)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}}ها به کلاس‌های دسترسی \lr{\mbox{0–9}} تخصیص می‌یابند (به‌علاوه کلاس‌های ویژه \lr{\mbox{11–15}})
+\item
+  \lr{\mbox{eNB}} عامل ممنوعیت \lr{\mbox{(0–1)}} و زمان ممنوعیت را پخش می‌کند
+\item
+  \lr{\mbox{UE}} عدد تصادفی می‌کشد؛ اگر \lr{\textgreater{}} عامل ممنوعیت \ensuremath{\leftarrow} برای مدت زمان ممنوعیت ممنوع می‌شود
+\item
+  تلاش‌های دسترسی را در طول زمان پخش می‌کند
+\end{itemize}
+
+\CNsubsubsection{ممنوعیت دسترسی گسترده \lr{\mbox{(EAB)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  برای دستگاه‌های \lr{M2M/\allowbreak{}IoT} تحمل‌کننده تأخیر \lr{\mbox{(AC 0–9)}}
+\item
+  \lr{\mbox{eNB}} نگاشت بیتی \lr{\mbox{EAB}} را پخش می‌کند (یک بیت در هر \lr{\mbox{AC}})
+\item
+  \lr{\mbox{UE}}های ممنوع‌شده تا رفع ممنوعیت منتظر می‌مانند
+\item
+  تهاجمی‌تر از \lr{\mbox{ACB}} برای ترافیک کم‌اولویت
+\end{itemize}
+
+\CNsubsubsection{تنظیم عقب‌نشینی}
+
+\begin{itemize}
+\tightlist
+\item
+  افزایش پویا \lr{\mbox{BI}} (تا \lr{\mbox{960~ms}}) در حین اضافه‌بار
+\item
+  تلاش‌های \lr{\mbox{RACH}} را به‌طور مؤثر محدود می‌کند
+\item
+  مبادله: تأخیر دسترسی فردی در برابر توان عملیاتی سیستم
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{راه‌حل‌های اضافی \lr{\mbox{3GPP}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cll@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسخه} & \CNth{راه‌حل} & \CNth{سازوکار} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{R10}} & \lr{\mbox{ACB}} & ممنوعیت احتمالی \\
+\lr{\mbox{R11}} & \lr{\mbox{EAB}} & ممنوعیت مختص \lr{IoT/\allowbreak{}M2M} \\
+\lr{\mbox{R12}} & \lr{\mbox{ACDC}} & کنترل ازدحام در سطح کاربرد \\
+\lr{\mbox{R13}} & صفحه‌بندی گروهی & کاهش \lr{\mbox{RACH}} با محرک صفحه‌بندی \\
+\lr{\mbox{R14}} & \lr{\mbox{EDT}} (ارسال داده زودهنگام) & داده در \lr{\mbox{Msg3}} \ensuremath{\leftarrow} اتصالات کامل کمتر \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNkeepfig{m08-two-step}{12}
+
+\CNsection{8.9}{دسترسی تصادفی \lr{\mbox{5G NR}}}
+
+\CNchained\CNsubsection{}{بهبودهای کلیدی نسبت به \lr{\mbox{LTE}}}
+
+\CNchained\CNsubsubsection{\lr{\mbox{RACH 2}}-گام \lr{\mbox{(Rel-16)}}: \lr{MsgA + MsgB}}
+
+رویه 4-گام را برای \textbf{تأخیر فوق‌العاده کم} به 2 گام ترکیب می‌کند:
+
+\CNfigure{m08-two-step}{\lr{\mbox{RACH}} چهارگامی \lr{\mbox{LTE}} در برابر \lr{\mbox{RACH}} دوگامی \lr{\mbox{NR}}}
+
+\textbf{چه زمانی از 2-گام در برابر 4-گام استفاده شود:}
+
+\begin{itemize}
+\tightlist
+\item
+  2-گام: سلول‌های کوچک، بار کم، نیازمندی‌های \lr{\mbox{URLLC}}
+\item
+  4-گام: سلول‌های بزرگ (نیاز به \lr{\mbox{TA}} پیش از داده \lr{\mbox{UL}})، سناریوهای بار بالا
+\item
+  بازگشت: اگر \lr{\mbox{MsgB}} دریافت نشد \ensuremath{\leftarrow} بازگشت به 4-گام
+\end{itemize}
+
+\CNkeepfig{m08-ssb-rach}{4}
+
+\CNsubsubsection{\lr{\mbox{RACH}} مبتنی بر پرتو (نگاشت \lr{\mbox{SSB}} به \lr{\mbox{RACH}})}
+
+در \lr{\mbox{5G NR}} با شکل‌دهی پرتو، رویه \lr{\mbox{RACH}} \textbf{آگاه به پرتو} است:
+
+\CNfigure{m08-ssb-rach}{نگاشت \lr{\mbox{SSB}} به \lr{\mbox{RACH}}: یک فرصت \lr{\mbox{PRACH}} برای هر پرتو}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} \textbf{بهترین پرتو \lr{\mbox{SSB}}} را انتخاب می‌کند (بالاترین \lr{\mbox{RSRP}})
+\item
+  پیشوند را روی \textbf{فرصت \lr{\mbox{RACH}} مرتبط} ارسال می‌کند
+\item
+  \lr{\mbox{gNB}} می‌داند \lr{\mbox{UE}} در کدام جهت پرتو قرار دارد \ensuremath{\leftarrow} \textbf{تناظر پرتو}
+\item
+  ارسال \lr{\mbox{RAR}} جهت‌دار را ممکن می‌سازد
+\end{itemize}
+
+\textbf{پیکربندی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\CNcode{ssb-perRACH-OccasionAndCB-PreamblesPerSSB}: SSB}ها را به فرصت‌های \lr{\mbox{RACH}} نگاشت می‌کند
+\item
+  چندین \lr{\mbox{SSB}} می‌توانند یک فرصت \lr{\mbox{RACH}} را به اشتراک بگذارند، یا یک \lr{\mbox{SSB}} می‌تواند چندین فرصت را در بر گیرد
+\end{itemize}
+
+\CNsubsubsection{\lr{\mbox{RACH}} پیوند بالاسوی تکمیلی \lr{\mbox{(SUL)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  باند فرکانسی پایین‌تر (مثلاً \lr{\mbox{700~MHz}}) برای پوشش گسترده
+\item
+  \lr{\mbox{UE}} زمانی که شرط \lr{\CNcode{rsrp-ThresholdSSB-SUL}} برآورده شود، \lr{\mbox{PRACH}} در \lr{\mbox{SUL}} را انتخاب می‌کند
+\item
+  قالب پیشوند و پیکربندی جداگانه برای \lr{\mbox{SUL}}
+\item
+  گسترش پوشش بدون افزایش توان \lr{\mbox{UL}} در \lr{\mbox{NR}} را ممکن می‌سازد
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsubsection{قالب‌های پیشوند \lr{\mbox{NR}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{قالب} & \CNth{طول توالی} & \CNth{فاصله زیرحامل} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 839 (بلند) & \lr{\mbox{1.25~kHz}} & سلول‌های بزرگ \lr{\mbox{(FR1)}} \\
+1 & 839 (بلند) & \lr{\mbox{1.25~kHz}} & سلول‌های بسیار بزرگ \\
+2 & 839 (بلند) & \lr{\mbox{1.25~kHz}} & پوشش شدید \\
+3 & 839 (بلند) & \lr{\mbox{5~kHz}} & سلول‌های متوسط \\
+\lr{\mbox{A1}} & 139 (کوتاه) & \lr{15/\allowbreak{}30~kHz} & سلول‌های کوچک \lr{\mbox{(FR1)}} \\
+\lr{\mbox{A2}} & 139 (کوتاه) & \lr{15/\allowbreak{}30~kHz} & سلول‌های عادی \lr{\mbox{(FR1)}} \\
+\lr{\mbox{A3}} & 139 (کوتاه) & \lr{15/\allowbreak{}30~kHz} & سلول‌های عادی \lr{\mbox{(FR1)}} \\
+\lr{\mbox{B4}} & 139 (کوتاه) & \lr{60/\allowbreak{}120~kHz} & \lr{FR2 (mmWave)} \\
+\lr{\mbox{C0}} & 139 (کوتاه) & \lr{15/\allowbreak{}30~kHz} & ارسال زودهنگام \lr{\mbox{Msg3}} \\
+\lr{\mbox{C2}} & 139 (کوتاه) & \lr{15/\allowbreak{}30~kHz} & ارسال زودهنگام \lr{\mbox{Msg3}} \\
+\end{longtable}
+}
+
+\CNsubsubsection{بازیابی شکست پرتو \lr{\mbox{(BFR)}}}
+
+یک رویه ویژه شبه-\lr{\mbox{RACH}} در \lr{\mbox{NR}}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE}} شکست پرتو را تشخیص می‌دهد (\lr{\mbox{RSRP}} زیر آستانه برای تمام پرتوهای پیکربندی‌شده)
+\item
+  \lr{\mbox{UE}} یک \textbf{پرتو نامزد جدید} انتخاب می‌کند (از \lr{\mbox{SSB}}ها/\allowbreak{}\lr{\mbox{CSI-RS}}های اندازه‌گیری‌شده)
+\item
+  \lr{\mbox{UE}} \textbf{پیشوند \lr{\mbox{CFRA}} اختصاصی} را روی فرصت \lr{\mbox{PRACH}} پرتو جدید ارسال می‌کند
+\item
+  \lr{\mbox{gNB}} با پاسخ \lr{\mbox{BFR}} پاسخ می‌دهد \ensuremath{\leftarrow} پیکربندی مجدد جفت پرتو
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\Needspace{23\baselineskip}
+
+\CNsection{8.10}{خلاصه و معادلات کلیدی}
+
+\CNchained\CNsubsection{}{فرمول‌های حیاتی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{فرمول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+احتمال برخورد & \lr{$P_c = 1 - (63/64)^{N-1}$} \\
+\lr{\mbox{RA-RNTI}} & \lr{$1 + t_{id} + 10 \times f_{id}$} \\
+پیشروی زمانی (اولیه) & \lr{$TA = N_{TA} \times 16 \times T_s$} \\
+حداکثر شعاع سلول & \lr{$d_{max} = c \times N_{TA,max} \times 16 \times T_s / 2$} \\
+شیب‌دهی توان & \lr{$P_n = P_{init} + (n-1) \times \Delta_{ramp}$} \\
+پیشوند در هر ریشه & \lr{$\lfloor N_{ZC} / N_{CS} \rfloor$} \\
+\end{longtable}
+}
+
+\CNkeepfig{m08-tradeoffs}{3}
+
+\CNsubsection{}{مبادلات طراحی}
+
+\CNfigure{m08-tradeoffs}{بده‌بستان‌های طراحی \lr{\mbox{RACH}}}
+
+\CNboxsection{پرسش‌های مرور}
+
+\begin{CNbox}[unbreakable]{q}{پرسش‌های مرور}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  چرا \lr{\mbox{UE}} نمی‌تواند به‌سادگی بدون انجام اولین \lr{\mbox{RACH}} روی \lr{\mbox{PUSCH}} ارسال کند؟
+\item
+  احتمال برخورد را وقتی \lr{\mbox{25 UE}} تلاش دسترسی همزمان می‌کنند محاسبه کنید.
+\item
+  حداکثر شعاع سلول برای قالب \lr{\mbox{PRACH 3}} چقدر است؟ محاسبه خود را نشان دهید.
+\item
+  توضیح دهید چرا در حین تحویل از \lr{\mbox{RACH}} بدون رقابت به‌جای مبتنی بر رقابت استفاده می‌شود.
+\item
+  یک سلول \lr{\CNcode{zeroCorrelationZoneConfig} = 11 (\ensuremath{N_{\mathrm{CS}}} = 15)} دارد. چند توالی ریشه برای تولید 64 پیشوند لازم است؟
+\item
+  رویه بازیابی شکست پرتو در \lr{\mbox{5G NR}} و رابطه آن با \lr{\mbox{RACH}} را توصیف کنید.
+\item
+  یک شبکه \lr{\mbox{IoT}} دارای \CNnum{10,000} دستگاه است که به‌طور همزمان تلاش \lr{\mbox{RACH}} می‌کنند. دو سازوکار برای مدیریت این اضافه‌بار توصیف کنید.
+\item
+  تأخیر \lr{\mbox{RACH 2}}-گام در \lr{\mbox{NR}} را با \lr{\mbox{RACH 4}}-گام در \lr{\mbox{LTE}} مقایسه کنید. چه زمانی هر یک را انتخاب می‌کنید؟
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{مراجع}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{3GPP TS 36.211 §5.7: Physical Random Access Channel (LTE)}
+\item
+  \lr{3GPP TS 36.213 §6: Random Access Procedure (LTE)}
+\item
+  \lr{3GPP TS 36.321 §5.1: Random Access Procedure (MAC)}
+\item
+  \lr{3GPP TS 38.211 §6.3.3: PRACH (NR)}
+\item
+  \lr{3GPP TS 38.213 §8: Random Access Procedure (NR)}
+\item
+  \lr{3GPP TS 38.321 §5.1: Random Access Procedure (NR MAC)}
+\end{itemize}

@@ -1,0 +1,11 @@
+% Module 2 — ISUP release: REL / RLC between the two exchanges
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNactor, minimum width=3cm] (a) at (0,0) {\CNL{Calling side}{سمت مبدأ (تماس‌گیرنده)}};
+\node[CNactor, minimum width=3cm] (b) at (8,0) {\CNL{Called side}{سمت مقصد}};
+\draw[CNlife] (a.south) -- (0,-3.2); \draw[CNlife] (b.south) -- (8,-3.2);
+\draw[CNmsg] (8,-1.25) -- node[CNmlab, above] {\textbf{REL} (Release)} (0,-1.25);
+\node[CNtiny, anchor=west] at (8.2,-1.25) {\CNL{(or either direction)}{(یا در هر جهت)}};
+\draw[CNmsg] (0,-2.25) -- node[CNmlab, above] {\textbf{RLC} (Release Complete)} (8,-2.25);
+\node[CNok] at (0,-3.75) {\CNL{Circuit freed}{مدار آزاد شد}};
+\node[CNok] at (8,-3.75) {\CNL{Circuit freed}{مدار آزاد شد}};
+\end{tikzpicture}

@@ -1,0 +1,1594 @@
+\Needspace{14\baselineskip}
+
+\CNsection{1}{ثبت‌نام (ثبت‌نام اولیه)}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه ثبت‌نام اولیه به \lr{\mbox{UE}} امکان می‌دهد برای اولین بار یا پس از لغو ثبت‌نام، در شبکه هسته \lr{\mbox{5G (5GC)}} ثبت‌نام کند. حضور \lr{\mbox{UE}} در شبکه را برقرار می‌کند، مشترک را احراز هویت می‌کند، یک \lr{\mbox{5G-GUTI}} (شناسه موقت یکتای جهانی) تخصیص می‌دهد و به‌صورت اختیاری یک نشست \lr{\mbox{PDU}} برای اتصال داده برقرار می‌کند.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} روشن است و یک \lr{\mbox{USIM}} معتبر با اعتبارنامه‌های اشتراک \lr{\mbox{5G}} دارد
+\item
+  \lr{\mbox{UE}} یک \lr{\mbox{PLMN}} انتخاب کرده و روی یک سلول \lr{\mbox{(gNB)}} کمپ کرده است
+\item
+  \lr{\mbox{UE}} در حالت \lr{RRC\_\allowbreak{}IDLE} یا \lr{RRC\_\allowbreak{}INACTIVE} است
+\item
+  \lr{\mbox{UE}} هیچ \lr{\mbox{5G-GUTI}} معتبری ندارد (ثبت‌نام بار اول) یا \lr{\mbox{GUTI}} قبلی منقضی شده است
+\item
+  اتصال \lr{\mbox{RRC}} برقرار شده است (رویه دسترسی تصادفی کامل شده)
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE}} & ثبت‌نام را آغاز می‌کند، هویت \lr{(SUCI/\allowbreak{}5G-GUTI)} را ارایه می‌دهد \\
+\lr{\mbox{gNB}} & گره \lr{\mbox{RAN}}، پیام‌های \lr{\mbox{NAS}} را بین \lr{\mbox{UE}} و \lr{\mbox{AMF}} ارسال می‌کند \\
+\lr{\mbox{AMF}} & لنگر ثبت‌نام، \lr{\mbox{AUSF}} را انتخاب می‌کند، زمینه را مدیریت می‌کند \\
+\lr{\mbox{AUSF}} & کارساز احراز هویت، اعتبارنامه‌ها را اعتبارسنجی می‌کند \\
+\lr{\mbox{UDM}} & داده اشتراک را ذخیره می‌کند، بردارهای احراز هویت را تولید می‌کند \\
+\lr{\mbox{ARPF}} & مخزن اعتبارنامه احراز هویت (درون \lr{\mbox{UDM}}) \\
+\lr{\mbox{PCF}} & سیاست‌های \lr{\mbox{AM}} را فراهم می‌کند \\
+\lr{\mbox{SMF}} & مدیریت نشست (در صورت درخواست نشست \lr{\mbox{PDU}}) \\
+\lr{\mbox{UPF}} & صفحه کاربر (در صورت درخواست نشست \lr{\mbox{PDU}}) \\
+\lr{\mbox{NRF}} & کشف و انتخاب \lr{\mbox{NF}} \\
+\lr{\mbox{NSSF}} & انتخاب برش شبکه \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{Uu (UE\ensuremath{\to}gNB)} & \lr{RRCSetupRequest} \\
+2 & \lr{Uu (gNB\ensuremath{\to}UE)} & \lr{\mbox{RRCSetup}} \\
+3 & \lr{Uu (UE\ensuremath{\to}gNB)} & \lr{RRCSetupComplete + NAS Registration Request} \\
+4 & \lr{N2 (gNB\ensuremath{\to}AMF)} & \lr{NGAP Initial UE Message (NAS: Registration Request)} \\
+5 & \lr{N12 (AMF\ensuremath{\to}AUSF)} & \lr{Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Request} \\
+6 & \lr{N13 (AUSF\ensuremath{\to}UDM)} & \lr{Nudm\_\allowbreak{}UEAuthentication\_\allowbreak{}Get Request} \\
+7 & \lr{N13 (UDM\ensuremath{\to}AUSF)} & \lr{Nudm\_\allowbreak{}UEAuthentication\_\allowbreak{}Get Response (AV)} \\
+8 & \lr{N12 (AUSF\ensuremath{\to}AMF)} & \lr{Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Response} \\
+9 & \lr{N2/\allowbreak{}NAS (AMF\ensuremath{\to}UE)} & \lr{Authentication Request (RAND, AUTN)} \\
+10 & \lr{N2/\allowbreak{}NAS (UE\ensuremath{\to}AMF)} & \lr{Authentication Response (RES*)} \\
+11 & \lr{N12 (AMF\ensuremath{\to}AUSF)} & \lr{Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate (RES*)} \\
+12 & \lr{N12 (AUSF\ensuremath{\to}AMF)} & \lr{Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate (Success + \ensuremath{K_{\mathrm{SEAF}}})} \\
+13 & \lr{N2/\allowbreak{}NAS (AMF\ensuremath{\to}UE)} & \lr{Security Mode Command} \\
+14 & \lr{N2/\allowbreak{}NAS (UE\ensuremath{\to}AMF)} & \lr{Security Mode Complete} \\
+15 & \lr{N8 (AMF\ensuremath{\to}UDM)} & \lr{Nudm\_\allowbreak{}UECM\_\allowbreak{}Registration} \\
+16 & \lr{N8 (AMF\ensuremath{\to}UDM)} & \lr{Nudm\_\allowbreak{}SDM\_\allowbreak{}Get (Subscription Data)} \\
+17 & \lr{N15 (AMF\ensuremath{\to}PCF)} & \lr{Npcf\_\allowbreak{}AMPolicyControl\_\allowbreak{}Create} \\
+18 & \lr{N2/\allowbreak{}NAS (AMF\ensuremath{\to}UE)} & \lr{Registration Accept} (\lr{\mbox{5G-GUTI}}، \lr{\mbox{TAI List}}، \lr{Allowed NSSAI}) \\
+19 & \lr{N2/\allowbreak{}NAS (UE\ensuremath{\to}AMF)} & \lr{Registration Complete} \\
+20 & \lr{N2 (AMF\ensuremath{\to}gNB)} & \lr{NGAP Initial Context Setup Request} \\
+\end{longtable}
+}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{برقراری اتصال \lr{\mbox{RRC}}}: \lr{\mbox{UE}} دسترسی تصادفی انجام می‌دهد و \lr{RRCSetupRequest} را به \lr{\mbox{gNB}} می‌فرستد
+\item
+  \textbf{راه‌اندازی \lr{\mbox{RRC}}}: \lr{\mbox{gNB}} با پیام \lr{\mbox{RRCSetup}} پاسخ می‌دهد
+\item
+  \textbf{درخواست ثبت‌نام}: \lr{\mbox{UE}} یک \lr{RRCSetupComplete} حاوی \lr{NAS Registration Request} می‌فرستد (شامل \lr{\mbox{SUCI}} یا \lr{\mbox{5G-GUTI}}، نوع ثبت‌نام، قابلیت‌های امنیتی \lr{\mbox{UE}}، \lr{\mbox{NSSAI}} درخواستی)
+\item
+  \textbf{انتخاب \lr{\mbox{AMF}}}: \lr{\mbox{gNB AMF}} مناسب را انتخاب می‌کند (در صورت نیاز از طریق \lr{\mbox{NSSF}}) و از طریق \lr{NGAP Initial UE Message} ارسال می‌کند
+\item
+  \textbf{درخواست هویت (شرطی)}: اگر \lr{\mbox{AMF}} نتواند هویت را حل کند، \lr{Identity Request} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \textbf{حل \lr{\mbox{SUCI}}}: \lr{\mbox{AMF}} احراز هویت را آغاز می‌کند؛ \lr{\mbox{SUCI}} را به \lr{\mbox{AUSF}} می‌فرستد
+\item
+  \textbf{درخواست بردار احراز هویت}: \lr{\mbox{AUSF}} بردار احراز هویت را از \lr{UDM/\allowbreak{}ARPF} درخواست می‌کند
+\item
+  \textbf{تولید \lr{\mbox{AV}}}: \lr{UDM/\allowbreak{}ARPF} یک \lr{\mbox{5G HE AV}} تولید می‌کند (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{XRES*}}، \lr{\mbox{\ensuremath{K_{\mathrm{AUSF}}}}})، \lr{\mbox{SUCI}} را به \lr{\mbox{SUPI}} حل می‌کند
+\item
+  \textbf{پاسخ بردار احراز هویت}: \lr{\mbox{AUSF}} بردار را دریافت می‌کند، \lr{\mbox{HXRES*}} را محاسبه می‌کند، \lr{\mbox{XRES*}} را ذخیره می‌کند
+\item
+  \textbf{درخواست احراز هویت}: \lr{\mbox{AMF}} یک \lr{NAS Authentication Request} به \lr{\mbox{UE}} می‌فرستد (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}})
+\item
+  \textbf{تأیید \lr{\mbox{UE}}}: \lr{\mbox{UE}} مقدار \lr{\mbox{AUTN}} را تأیید می‌کند، \lr{\mbox{RES*}}، \lr{\mbox{CK}}، \lr{\mbox{IK}} را محاسبه و \lr{\mbox{\ensuremath{K_{\mathrm{AUSF}}}}} را مشتق می‌کند
+\item
+  \textbf{پاسخ احراز هویت}: \lr{\mbox{UE}} یک \lr{Authentication Response (RES*)} به \lr{\mbox{AMF}} می‌فرستد
+\item
+  \textbf{تأیید \lr{\mbox{RES}}}\emph{: \lr{\mbox{AMF}} مقدار \lr{\mbox{RES}}} را به \lr{\mbox{AUSF}} می‌فرستد؛ \lr{\mbox{AUSF}} تأیید می‌کند \lr{\mbox{HRES*}} با \lr{\mbox{HXRES*}} مطابقت دارد
+\item
+  \textbf{تأیید احراز هویت}: \lr{\mbox{AUSF}} به \lr{\mbox{AMF}} تأیید می‌کند، \lr{\mbox{\ensuremath{K_{\mathrm{SEAF}}}}} را فراهم می‌کند؛ \lr{\mbox{AMF}} مقدار \lr{\mbox{\ensuremath{K_{\mathrm{AMF}}}}} را مشتق می‌کند
+\item
+  \textbf{امنیت \lr{\mbox{NAS}}}: \lr{\mbox{AMF}} یک \lr{Security Mode Command} می‌فرستد (الگوریتم‌های انتخاب‌شده)؛ \lr{\mbox{UE}} با \lr{Security Mode Complete} پاسخ می‌دهد
+\item
+  \textbf{ثبت‌نام در \lr{\mbox{UDM}}}: \lr{\mbox{AMF}} در \lr{\mbox{UDM}} ثبت‌نام می‌کند \lr{(Nudm\_\allowbreak{}UECM\_\allowbreak{}Registration)}
+\item
+  \textbf{بازیابی اشتراک}: \lr{\mbox{AMF}} داده اشتراک را از \lr{\mbox{UDM}} بازیابی می‌کند \lr{(Nudm\_\allowbreak{}SDM\_\allowbreak{}Get)}
+\item
+  \textbf{انجمن سیاست}: \lr{\mbox{AMF}} انجمن سیاست \lr{\mbox{AM}} را با \lr{\mbox{PCF}} برقرار می‌کند
+\item
+  \textbf{پذیرش ثبت‌نام}: \lr{\mbox{AMF}} یک \lr{Registration Accept} می‌فرستد (\lr{\mbox{5G-GUTI}}، \lr{\mbox{TAI List}}، \lr{Allowed NSSAI}، ناحیه ثبت‌نام)
+\item
+  \textbf{تکمیل ثبت‌نام}: \lr{\mbox{UE}} با \lr{Registration Complete} تأیید می‌کند؛ \lr{\mbox{5G-GUTI}} جدید را ذخیره می‌کند
+\end{enumerate}
+
+\CNkeepfig{m20-registration-1}{3}
+
+\CNsubsection{}{نمودار توالی تفصیلی}
+
+\CNfigure{m20-registration-1}{ثبت‌نام اولیه \lr{(TS 23.502 §4.2.2.2)}\CNpart{1}{3}}
+
+\CNfigure{m20-registration-2}{ثبت‌نام اولیه \lr{(TS 23.502 §4.2.2.2)}\CNpart{2}{3}}
+
+\CNfigure{m20-registration-3}{ثبت‌نام اولیه \lr{(TS 23.502 §4.2.2.2)}\CNpart{3}{3}}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{پاسخ شبکه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+شکست احراز هویت & اعتبارنامه نامعتبر، \lr{\mbox{SQN}} از همگام‌سازی خارج & \lr{Authentication Reject} یا \lr{Sync Failure} \\
+رد ثبت‌نام & بدون اشتراک، رومینگ مجاز نیست & \lr{Registration Reject} (علت: \lr{\#}11، \lr{\#}15) \\
+\lr{\mbox{PLMN}} مجاز نیست & \lr{\mbox{UE}} برای \lr{\mbox{PLMN}} بازدیدشده اشتراک ندارد & \lr{Registration Reject} (علت: \lr{\#}11) \\
+ازدحام & اضافه‌بار شبکه & \lr{Registration Reject} (علت: \lr{\#}22) + تایمر عقب‌نشینی \\
+شکست بررسی یکپارچگی & شکست \lr{\mbox{NAS MAC}} & رد بی‌صدا یا احراز هویت مجدد \\
+\lr{\mbox{UDM}} غیرقابل دسترس & شکست ارتباط \lr{\mbox{SBI}} & \lr{Registration Reject} یا تلاش مجدد \lr{\mbox{AMF}} \\
+برش در دسترس نیست & \lr{\mbox{S-NSSAI}} درخواستی پشتیبانی نمی‌شود & \lr{Registration Accept} با \lr{Allowed NSSAI} کاهش‌یافته \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{احراز هویت \lr{\mbox{(5G-AKA)}}}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه \lr{\mbox{5G-AKA}} (احراز هویت و توافق کلید) احراز هویت متقابل بین \lr{\mbox{UE}} و شبکه را فراهم می‌کند و کلیدهای رمزنگاری مشترک را برقرار می‌سازد. تضمین می‌کند شبکه هویت مشترک را تأیید می‌کند و \lr{\mbox{UE}} تأیید می‌کند که با شبکه‌ای مشروع در ارتباط است. این رویه کلید لنگر \lr{\mbox{(\ensuremath{K_{\mathrm{AUSF}}})}} را تولید می‌کند که تمام کلیدهای امنیتی بعدی از آن مشتق می‌شوند.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} ثبت‌نام را آغاز کرده یا احراز هویت مجدد فعال شده است
+\item
+  \lr{\mbox{UE}} یک \lr{\mbox{USIM}} معتبر با کلید بلندمدت \lr{\mbox{K}} و \lr{OP/\allowbreak{}OPc} دارد
+\item
+  \lr{\mbox{AUSF}} از \lr{\mbox{AMF}} خدمات‌دهنده قابل دسترس است
+\item
+  \lr{UDM/\allowbreak{}ARPF} اعتبارنامه‌های اشتراک معتبر برای مشترک دارد
+\item
+  \lr{\mbox{SUCI}} ارایه شده است (یا از \lr{\mbox{UE}} یا حل‌شده از \lr{\mbox{5G-GUTI}})
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{UE (USIM)} & کلید دایمی \lr{\mbox{K}} را نگه می‌دارد؛ \lr{\mbox{AUTN}} را تأیید می‌کند؛ \lr{\mbox{RES*}} را محاسبه می‌کند \\
+\lr{AMF (SEAF)} & لنگر امنیتی؛ پیام‌های احراز هویت را رله می‌کند؛ \lr{\mbox{\ensuremath{K_{\mathrm{AMF}}}}} را مشتق می‌کند \\
+\lr{\mbox{AUSF}} & \lr{\mbox{RES*}} را در برابر \lr{\mbox{XRES*}} تأیید می‌کند؛ \lr{\mbox{\ensuremath{K_{\mathrm{SEAF}}}}} را مشتق می‌کند \\
+\lr{UDM/\allowbreak{}ARPF} & بردارهای احراز هویت را تولید می‌کند؛ کلید دایمی \lr{\mbox{K}} را نگه می‌دارد \\
+\lr{\mbox{SIDF}} (درون \lr{\mbox{UDM}}) & \lr{\mbox{SUCI}} را برای به‌دست آوردن \lr{\mbox{SUPI}} رمزگشایی می‌کند \\
+\end{longtable}
+}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} & \CNth{پارامترهای کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{N12}} & \lr{Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Request} & \lr{SUCI/\allowbreak{}SUPI}، نام شبکه خدمات‌دهنده \\
+2 & \lr{\mbox{N13}} & \lr{Nudm\_\allowbreak{}UEAuthentication\_\allowbreak{}Get Request} & \lr{SUCI/\allowbreak{}SUPI}، نام شبکه خدمات‌دهنده \\
+3 & \lr{\mbox{N13}} & \lr{Nudm\_\allowbreak{}UEAuthentication\_\allowbreak{}Get Response} & \lr{\mbox{5G HE AV}} (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{XRES*}}، \lr{\mbox{\ensuremath{K_{\mathrm{AUSF}}}}}) \\
+4 & \lr{\mbox{N12}} & \lr{Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Response} & \lr{\mbox{5G SE AV}} (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{HXRES*}}) \\
+5 & \lr{\mbox{NAS}} & \lr{Authentication Request} & \lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{ngKSI}} \\
+6 & \lr{\mbox{NAS}} & \lr{Authentication Response} & \lr{\mbox{RES*}} \\
+7 & \lr{\mbox{N12}} & \lr{Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate} & \lr{\mbox{RES*}} \\
+8 & \lr{\mbox{N12}} & \lr{Nausf\_\allowbreak{}UEAuthentication\_\allowbreak{}Authenticate Response} & \lr{\mbox{Result}}، \lr{\mbox{\ensuremath{K_{\mathrm{SEAF}}}}}، \lr{\mbox{SUPI}} \\
+\end{longtable}
+}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{محرک}: \lr{\mbox{AMF}} تعیین می‌کند احراز هویت لازم است (ثبت‌نام اولیه، احراز هویت مجدد دوره‌ای، یا تحویل بین-\lr{\mbox{AMF}})
+\item
+  \textbf{انتخاب \lr{\mbox{AUSF}}}: \lr{\mbox{AMF}} بر اساس شبکه خانگی \lr{\mbox{SUPI}} یک \lr{\mbox{AUSF}} انتخاب می‌کند (از طریق \lr{\mbox{NRF}})
+\item
+  \textbf{آغاز احراز هویت}: \lr{\mbox{AMF}} مقدار \lr{\mbox{SUCI}} و نام شبکه خدمات‌دهنده \lr{(SN-name)} را به \lr{\mbox{AUSF}} می‌فرستد
+\item
+  \textbf{درخواست \lr{\mbox{UDM}}}: \lr{\mbox{AUSF}} درخواست را با \lr{\mbox{SUCI}} و \lr{\mbox{SN-name}} به \lr{\mbox{UDM}} ارسال می‌کند
+\item
+  \textbf{رمزگشایی \lr{\mbox{SUCI}}}: \lr{\mbox{SIDF}} (درون \lr{\mbox{UDM}}) \lr{\mbox{SUCI}} را با کلید خصوصی شبکه خانگی رمزگشایی می‌کند \ensuremath{\leftarrow} \lr{\mbox{SUPI}} را به‌دست می‌آورد
+\item
+  \textbf{تولید \lr{\mbox{AV}}}: \lr{\mbox{ARPF}} یک \lr{\mbox{5G HE AV}} با استفاده از موارد زیر تولید می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{RAND}} (چالش تصادفی)
+  \item
+    \lr{AUTN = SQN\ensuremath{\oplus}AK \textbar{}\textbar{} AMF \textbar{}\textbar{} MAC} (نشانه احراز هویت شبکه)
+  \item
+    \lr{XRES* = KDF(CK, IK, SN-name, RAND, RES)} (پاسخ مورد انتظار)
+  \item
+    \lr{\ensuremath{K_{\mathrm{AUSF}}} = KDF(CK, IK, SN-name, SQN\ensuremath{\oplus}AK)} (کلید لنگر)
+  \end{itemize}
+\item
+  \textbf{\lr{\mbox{AV}} به \lr{\mbox{AUSF}}}: \lr{\mbox{UDM}} مقدار \lr{\mbox{5G HE AV}} را به \lr{\mbox{AUSF}} بازمی‌گرداند
+\item
+  \textbf{پردازش \lr{\mbox{AUSF}}}: \lr{\mbox{AUSF}} مقدار \lr{\mbox{XRES*}} را ذخیره می‌کند، \lr{HXRES* = SHA-256(XRES\emph{\lr{[128..255] \textbar{}\textbar{} XRES}})} را محاسبه می‌کند، \lr{\mbox{\ensuremath{K_{\mathrm{SEAF}}}}} را از \lr{\mbox{\ensuremath{K_{\mathrm{AUSF}}}}} مشتق می‌کند
+\item
+  \textbf{\lr{\mbox{SE AV}} به \lr{\mbox{AMF}}}: \lr{\mbox{AUSF}} مقدار \lr{\mbox{5G SE AV}} (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{HXRES*}}) را به \lr{\mbox{AMF}} می‌فرستد
+\item
+  \textbf{چالش به \lr{\mbox{UE}}}: \lr{\mbox{AMF}} یک \lr{Authentication Request} (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{ngKSI}}) به \lr{\mbox{UE}} می‌فرستد
+\item
+  \textbf{تأیید \lr{\mbox{UE}}}: \lr{\mbox{USIM}} مقدار \lr{\mbox{AUTN}} را تأیید می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{AK}} را از \lr{\mbox{RAND}} با استفاده از \lr{\mbox{f5}} استخراج می‌کند، \lr{\mbox{SQN}} را بازیابی می‌کند
+  \item
+    \lr{\mbox{XMAC}} را محاسبه و تأیید می‌کند \lr{XMAC == MAC} (احراز هویت شبکه)
+  \item
+    تأیید می‌کند \lr{\mbox{SQN}} در محدوده قابل قبول است (محافظت از بازپخش)
+  \end{itemize}
+\item
+  \textbf{مشتق‌سازی کلید در \lr{\mbox{UE}}}: \lr{\mbox{UE}} موارد زیر را محاسبه می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{RES}}، \lr{\mbox{CK}}، \lr{\mbox{IK}} از \lr{\mbox{RAND}} با استفاده از \lr{\mbox{f2}}، \lr{\mbox{f3}}، \lr{\mbox{f4}}
+  \item
+    \lr{RES* = KDF(CK, IK, SN-name, RAND, RES)}
+  \item
+    \lr{\ensuremath{K_{\mathrm{AUSF}}} = KDF(CK, IK, SN-name, SQN\ensuremath{\oplus}AK)}
+  \item
+    \lr{\ensuremath{K_{\mathrm{SEAF}}} = KDF(\ensuremath{K_{\mathrm{AUSF}}}, SN-name)}
+  \item
+    \lr{\ensuremath{K_{\mathrm{AMF}}} = KDF(\ensuremath{K_{\mathrm{SEAF}}}, SUPI, ABBA)}
+  \end{itemize}
+\item
+  \textbf{پاسخ}: \lr{\mbox{UE}} یک \lr{Authentication Response} با \lr{\mbox{RES*}} به \lr{\mbox{AMF}} می‌فرستد
+\item
+  \textbf{تأیید \lr{\mbox{AMF}}}: \lr{\mbox{AMF}} مقدار \lr{\mbox{HRES*}} را محاسبه و تأیید می‌کند \lr{HRES* == HXRES*}
+\item
+  \textbf{تأیید \lr{\mbox{AUSF}}}: \lr{\mbox{AMF}} مقدار \lr{\mbox{RES*}} را به \lr{\mbox{AUSF}} ارسال می‌کند؛ \lr{\mbox{AUSF}} تأیید می‌کند \lr{RES* == XRES*}
+\item
+  \textbf{موفقیت}: \lr{\mbox{AUSF}} موفقیت، \lr{\mbox{\ensuremath{K_{\mathrm{SEAF}}}}} و \lr{\mbox{SUPI}} تأییدشده را به \lr{\mbox{AMF}} بازمی‌گرداند
+\item
+  \textbf{مشتق‌سازی \lr{\mbox{\ensuremath{K_{\mathrm{AMF}}}}}}: \lr{\mbox{AMF}} مقدار \lr{\ensuremath{K_{\mathrm{AMF}}} = KDF(\ensuremath{K_{\mathrm{SEAF}}}, SUPI, ABBA)} را مشتق می‌کند
+\end{enumerate}
+
+\CNkeepfig{m20-key-hierarchy}{3}
+
+\CNsubsection{}{سلسله‌مراتب کلید مشتق‌شده}
+
+\CNfigure{m20-key-hierarchy}{سلسله‌مراتب کلیدهای استخراج‌شده در \lr{\mbox{5G-AKA}}}
+
+\CNkeepfig{m20-5g-aka-1}{3}
+
+\CNsubsection{}{نمودار توالی تفصیلی}
+
+\CNfigure{m20-5g-aka-1}{احراز هویت \lr{5G-AKA (TS 33.501)}\CNpart{1}{2}}
+
+\CNfigure{m20-5g-aka-2}{احراز هویت \lr{5G-AKA (TS 33.501)}\CNpart{2}{2}}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{اقدام \lr{\mbox{UE}}} & \CNth{اقدام شبکه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+شکست \lr{\mbox{MAC}} & تأیید \lr{\mbox{AUTN}} شکست می‌خورد (\lr{\mbox{K}} اشتباه یا دستکاری‌شده) & ارسال \lr{Auth Failure} (شکست \lr{\mbox{MAC}}) & \lr{\mbox{AMF}} به \lr{\mbox{AUSF}} اطلاع می‌دهد؛ ممکن است تلاش مجدد کند \\
+شکست همگام‌سازی \lr{\mbox{SQN}} & \lr{\mbox{SQN}} خارج از محدوده قابل قبول & ارسال \lr{Auth Failure} (شکست همگام‌سازی) + \lr{\mbox{AUTS}} & \lr{\mbox{UDM}} مقدار \lr{\mbox{SQN}} را همگام‌سازی مجدد می‌کند، \lr{\mbox{AV}} جدید تولید می‌کند \\
+شکست احراز هویت شبکه & \lr{\mbox{UE}} نمی‌تواند هویت شبکه را تأیید کند & لغو احراز هویت & \lr{\mbox{—}} \\
+عدم تطابق \lr{\mbox{RES*}} & پاسخ \lr{\mbox{UE}} با مورد انتظار مطابقت ندارد & \lr{\mbox{—}} & \lr{\mbox{AUSF}} شکست را گزارش می‌دهد؛ \lr{\mbox{AMF}} ثبت‌نام را رد می‌کند \\
+عدم تطابق \lr{\mbox{HXRES*}} & بررسی اولیه در \lr{\mbox{AMF}} شکست می‌خورد & \lr{\mbox{—}} & \lr{\mbox{AMF}} همچنان برای تصمیم نهایی به \lr{\mbox{AUSF}} ارسال می‌کند \\
+اتمام زمان \lr{\mbox{AUSF}} & \lr{\mbox{AUSF}} غیرقابل دسترس & \lr{\mbox{—}} & \lr{\mbox{AMF}} ممکن است \lr{\mbox{AUSF}} جایگزین انتخاب کند یا رد کند \\
+شکست رمزگشایی \lr{\mbox{SUCI}} & قالب \lr{\mbox{SUCI}} نامعتبر یا کلید \lr{\mbox{HN}} اشتباه & \lr{\mbox{—}} & \lr{\mbox{UDM}} خطا را گزارش می‌دهد؛ ثبت‌نام شکست می‌خورد \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{برقراری امنیت}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه برقراری امنیت، امنیت \lr{\mbox{NAS}} و \lr{\mbox{AS}} را بین \lr{\mbox{UE}} و شبکه فعال می‌کند. الگوریتم‌های رمزگذاری و محافظت یکپارچگی را هم برای سیگنالینگ \lr{\mbox{NAS}} (بین \lr{\mbox{UE}} و \lr{\mbox{AMF}}) و هم برای سیگنالینگ \lr{\mbox{AS}}/\allowbreak{}صفحه کاربر (بین \lr{\mbox{UE}} و \lr{\mbox{gNB}}) انتخاب و فعال می‌کند. این رویه تضمین می‌کند تمام ارتباطات بعدی در برابر شنود و دستکاری محافظت می‌شوند.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  احراز هویت با موفقیت کامل شده است
+\item
+  \lr{\mbox{\ensuremath{K_{\mathrm{AMF}}}}} در هر دو \lr{\mbox{UE}} و \lr{\mbox{AMF}} مشتق شده است
+\item
+  قابلیت‌های امنیتی \lr{\mbox{UE}} به \lr{\mbox{AMF}} ارایه شده است
+\item
+  \lr{\mbox{ngKSI}} برقرار شده است (زمینه امنیتی فعال را شناسایی می‌کند)
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE}} & کلیدهای \lr{NAS/\allowbreak{}AS} را مشتق می‌کند، انتخاب الگوریتم را تأیید می‌کند \\
+\lr{\mbox{AMF}} & الگوریتم‌های \lr{\mbox{NAS}} را انتخاب می‌کند، \lr{Security Mode Command} می‌فرستد، کلیدهای \lr{\mbox{NAS}} را مشتق می‌کند \\
+\lr{\mbox{gNB}} & الگوریتم‌های \lr{\mbox{AS}} را انتخاب می‌کند، امنیت \lr{RRC/\allowbreak{}UP} را فعال می‌کند \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} & \CNth{پارامترهای کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{NAS}} & \lr{Security Mode Command} & الگوریتم‌های \lr{\mbox{NAS}}، \lr{\mbox{ngKSI}}، \lr{Replayed UE Sec Cap}، درخواست \lr{\mbox{IMEISV}} \\
+2 & \lr{\mbox{NAS}} & \lr{Security Mode Complete} & \lr{\mbox{IMEISV}} (در صورت درخواست)، محفظه پیام \lr{\mbox{NAS}} \\
+3 & \lr{\mbox{N2}} & \lr{Initial Context Setup Request} & \lr{\mbox{\ensuremath{K_{\mathrm{gNB}}}}}، قابلیت‌های امنیتی \lr{\mbox{UE}} \\
+4 & \lr{\mbox{RRC}} & \lr{SecurityModeCommand} & الگوریتم‌های \lr{\mbox{AS}} (رمزگذاری + یکپارچگی) \\
+5 & \lr{\mbox{RRC}} & \lr{SecurityModeComplete} & \lr{\mbox{—}} \\
+6 & \lr{\mbox{N2}} & \lr{Initial Context Setup Response} & \lr{\mbox{—}} \\
+\end{longtable}
+}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{انتخاب الگوریتم \lr{\mbox{NAS}}}: \lr{\mbox{AMF}} الگوریتم‌های امنیتی \lr{\mbox{NAS}} را بر اساس قابلیت‌های امنیتی \lr{\mbox{UE}} و سیاست \lr{\mbox{AMF}} انتخاب می‌کند (الگوریتم با بالاترین اولویت که هر دو پشتیبانی می‌کنند)
+\item
+  \textbf{مشتق‌سازی کلید \lr{NAS (AMF)}}: \lr{\mbox{AMF}} موارد زیر را مشتق می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\ensuremath{K_{\mathrm{NASint}}} = KDF(\ensuremath{K_{\mathrm{AMF}}}, NAS-int-alg-ID, alg-type)}
+  \item
+    \lr{\ensuremath{K_{\mathrm{NASenc}}} = KDF(\ensuremath{K_{\mathrm{AMF}}}, NAS-enc-alg-ID, alg-type)}
+  \end{itemize}
+\item
+  \lr{\textbf{\lr{Security Mode Command}}: AMF} یک \lr{NAS Security Mode Command} می‌فرستد (محافظت‌شده با یکپارچگی با \lr{\mbox{\ensuremath{K_{\mathrm{NASint}}}}} اما \textbf{رمزگذاری‌نشده}):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    الگوریتم رمزگذاری \lr{\mbox{NAS}} انتخاب‌شده (مثلاً \lr{\mbox{NEA1}}، \lr{\mbox{NEA2}})
+  \item
+    الگوریتم یکپارچگی \lr{\mbox{NAS}} انتخاب‌شده (مثلاً \lr{\mbox{NIA1}}، \lr{\mbox{NIA2}})
+  \item
+    \lr{\mbox{ngKSI}}، قابلیت‌های امنیتی \lr{\mbox{UE}} بازپخش‌شده، درخواست \lr{\mbox{IMEISV}}
+  \end{itemize}
+\item
+  \textbf{تأیید \lr{\mbox{UE}}}: \lr{\mbox{UE}} موارد زیر را تأیید می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    قابلیت‌های امنیتی \lr{\mbox{UE}} بازپخش‌شده با آنچه فرستاده شده مطابقت دارند (ضد-\lr{\mbox{MITM}})
+  \item
+    محافظت یکپارچگی پیام با استفاده از \lr{\mbox{\ensuremath{K_{\mathrm{NASint}}}}} مشتق‌شده
+  \end{itemize}
+\item
+  \textbf{مشتق‌سازی کلید \lr{\mbox{NAS (UE)}}}: \lr{\mbox{UE}} مقدار \lr{\mbox{\ensuremath{K_{\mathrm{NASint}}}}} و \lr{\mbox{\ensuremath{K_{\mathrm{NASenc}}}}} را با همان \lr{\mbox{KDF}} مشتق می‌کند
+\item
+  \lr{\textbf{\lr{Security Mode Complete}}: UE} یک \lr{NAS Security Mode Complete} می‌فرستد (محافظت‌شده با یکپارچگی \textbf{و} رمزگذاری‌شده)
+\item
+  \textbf{فعال‌شدن امنیت \lr{\mbox{NAS}}}: زمینه امنیتی \lr{\mbox{NAS}} اکنون در هر دو جهت فعال است
+\item
+  \textbf{مشتق‌سازی \lr{\mbox{\ensuremath{K_{\mathrm{gNB}}}}}}: \lr{\mbox{AMF}} مقدار \lr{\ensuremath{K_{\mathrm{gNB}}} = KDF(\ensuremath{K_{\mathrm{AMF}}}, NAS UL COUNT)} را مشتق و از طریق \lr{Initial Context Setup Request} به \lr{\mbox{gNB}} می‌فرستد
+\item
+  \textbf{انتخاب الگوریتم \lr{\mbox{AS}}}: \lr{\mbox{gNB}} الگوریتم‌های \lr{\mbox{AS}} را بر اساس قابلیت‌های امنیتی \lr{\mbox{UE}} و سیاست \lr{\mbox{gNB}} انتخاب می‌کند
+\item
+  \textbf{مشتق‌سازی کلید \lr{\mbox{AS}}}: \lr{\mbox{gNB}} موارد زیر را مشتق می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\ensuremath{K_{\mathrm{RRCint}}} = KDF(\ensuremath{K_{\mathrm{gNB}}}, RRC-int-alg-ID)}
+  \item
+    \lr{\ensuremath{K_{\mathrm{RRCenc}}} = KDF(\ensuremath{K_{\mathrm{gNB}}}, RRC-enc-alg-ID)}
+  \item
+    \lr{\ensuremath{K_{\mathrm{UPenc}}} = KDF(\ensuremath{K_{\mathrm{gNB}}}, UP-enc-alg-ID)}
+  \item
+    \lr{\ensuremath{K_{\mathrm{UPint}}} = KDF(\ensuremath{K_{\mathrm{gNB}}}, UP-int-alg-ID)} [اختیاری برای \lr{\mbox{DRB}}ها]
+  \end{itemize}
+\item
+  \lr{\textbf{\lr{RRC Security Mode Command}}: gNB} یک \lr{RRC SecurityModeCommand} به \lr{\mbox{UE}} می‌فرستد (محافظت‌شده با یکپارچگی)
+\item
+  \textbf{مشتق‌سازی کلید \lr{\mbox{AS}} در \lr{\mbox{UE}}}: \lr{\mbox{UE}} همان کلیدهای \lr{\mbox{AS}} را از \lr{\mbox{\ensuremath{K_{\mathrm{gNB}}}}} مشتق می‌کند
+\item
+  \lr{\textbf{\lr{RRC Security Mode Complete}}: UE} با یک \lr{RRC SecurityModeComplete} پاسخ می‌دهد (رمزگذاری‌شده + محافظت‌شده با یکپارچگی)
+\item
+  \textbf{فعال‌شدن امنیت \lr{\mbox{AS}}}: امنیت کامل \lr{\mbox{AS}} اکنون فعال است
+\end{enumerate}
+
+\CNkeepfig{m20-key-derivation}{3}
+
+\CNsubsection{}{نمودار سلسله‌مراتب کلید}
+
+\CNfigure{m20-key-derivation}{استخراج کلیدهای \lr{\mbox{NAS}} و \lr{\mbox{AS}}}
+
+\CNkeepfig{m20-security}{3}
+
+\CNsubsection{}{نمودار توالی فشرده}
+
+\CNfigure{m20-security}{برقراری امنیت \lr{\mbox{NAS}} و \lr{\mbox{AS}}}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{پاسخ} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+عدم تطابق قابلیت‌های امنیتی \lr{\mbox{UE}} & قابلیت‌های بازپخش‌شده مطابقت ندارند (حمله کاهش تدریجی) & \lr{\mbox{UE}} یک \lr{Security Mode Reject} می‌فرستد \\
+شکست تأیید یکپارچگی & بررسی \lr{\mbox{MAC}} روی \lr{Security Mode Command} شکست می‌خورد & \lr{\mbox{UE}} یک \lr{Security Mode Reject} می‌فرستد \\
+الگوریتم پشتیبانی نمی‌شود & الگوریتم انتخاب‌شده در قابلیت‌های \lr{\mbox{UE}} نیست & \lr{\mbox{UE}} یک \lr{Security Mode Reject} می‌فرستد \\
+رد حالت امنیتی \lr{\mbox{NAS}} & هر شکست \lr{\mbox{NAS SMC}} & \lr{\mbox{AMF}} ممکن است دوباره تلاش کند یا ثبت‌نام را رد کند \\
+شکست حالت امنیتی \lr{\mbox{AS}} & بررسی یکپارچگی \lr{\mbox{RRC SMC}} شکست می‌خورد & \lr{\mbox{gNB}} شکست را گزارش می‌دهد؛ ممکن است اتصال را آزاد کند \\
+یکپارچگی تهی مجاز نیست & \lr{\mbox{NIA0}} انتخاب‌شده در حالی که مجاز نیست & \lr{\mbox{UE}} رد می‌کند (\lr{\mbox{NIA0}} فقط برای اضطراری) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{برقراری نشست \lr{\mbox{PDU}}}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه برقراری نشست \lr{\mbox{PDU}} یک نشست اتصال داده بین \lr{\mbox{UE}} و یک شبکه داده \lr{\mbox{(DN)}} ایجاد می‌کند. یک آدرس \lr{\mbox{IP}} (یا نوع \lr{\mbox{PDU}} دیگر) تخصیص می‌دهد، قواعد و جریان‌های \lr{\mbox{QoS}} را تنظیم می‌کند، تونل‌های \lr{\mbox{GTP-U}} روی واسط‌های \lr{N3 (gNB\ensuremath{\leftrightarrow}UPF)} و \lr{N9 (UPF\ensuremath{\leftrightarrow}UPF)} برقرار می‌کند و نشست‌های \lr{\mbox{PFCP}} روی \lr{N4 (SMF\ensuremath{\leftrightarrow}UPF)} را پیکربندی می‌کند. این به \lr{\mbox{UE}} امکان می‌دهد داده صفحه کاربر بفرستد و دریافت کند.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} در \lr{\mbox{5GC}} ثبت‌نام کرده است (رویه ثبت‌نام کامل شده)
+\item
+  \lr{\mbox{UE}} در حالت \lr{CM-CONNECTED} است (اتصال \lr{\mbox{RRC}} فعال)
+\item
+  زمینه امنیتی \lr{\mbox{NAS}} برقرار شده است
+\item
+  \lr{\mbox{UE}} اشتراک معتبر برای \lr{\mbox{DNN}} و \lr{\mbox{S-NSSAI}} درخواستی دارد
+\item
+  منابع \lr{\mbox{SMF}} و \lr{\mbox{UPF}} برای برش درخواستی در دسترس هستند
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE}} & درخواست نشست را آغاز می‌کند، \lr{DNN/\allowbreak{}S-NSSAI}/\allowbreak{}نوع \lr{\mbox{PDU}} را ارایه می‌دهد \\
+\lr{\mbox{gNB}} & \lr{\mbox{NAS}} را ارسال می‌کند، تونل \lr{\mbox{GTP-U}} در \lr{\mbox{N3}} را برقرار می‌کند \\
+\lr{\mbox{AMF}} & پیام‌های \lr{\mbox{NAS}} مربوط به \lr{\mbox{SM}} را مسیریابی می‌کند، \lr{\mbox{SMF}} را انتخاب می‌کند \\
+\lr{\mbox{SMF}} & مدیریت نشست، تخصیص \lr{\mbox{IP}}، سیاست \lr{\mbox{QoS}}، انتخاب/\allowbreak{}کنترل \lr{\mbox{UPF}} \\
+\lr{\mbox{UPF}} & ارسال صفحه کاربر، تشخیص/\allowbreak{}اجرای بسته \\
+\lr{\mbox{PCF}} & سیاست‌های \lr{\mbox{SM}} و قواعد \lr{\mbox{PCC}} را فراهم می‌کند \\
+\lr{\mbox{UDM}} & داده اشتراک مدیریت نشست را فراهم می‌کند \\
+\lr{\mbox{DN-AAA}} & احراز هویت خارجی (در صورت نیاز \lr{\mbox{DN}}) \\
+\lr{\mbox{CHF}} & تابع صورت‌حساب \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{NAS}} & \lr{PDU Session Establishment Request} (در \lr{UL NAS Transport}) \\
+2 & \lr{\mbox{N11}} & \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}CreateSMContext Request} \\
+3 & \lr{\mbox{N10}} & \lr{Nudm\_\allowbreak{}SDM\_\allowbreak{}Get (SM Subscription Data)} \\
+4 & \lr{\mbox{N7}} & \lr{Npcf\_\allowbreak{}SMPolicyControl\_\allowbreak{}Create} \\
+5 & \lr{\mbox{N4}} & \lr{PFCP Session Establishment Request} \\
+6 & \lr{\mbox{N4}} & \lr{PFCP Session Establishment Response} \\
+7 & \lr{\mbox{N11}} & \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}CreateSMContext Response} \\
+8 & \lr{\mbox{N11}} & \lr{Namf\_\allowbreak{}Communication\_\allowbreak{}N1N2MessageTransfer} \\
+9 & \lr{\mbox{N2}} & \lr{NGAP PDU Session Resource Setup Request} \\
+10 & \lr{\mbox{RRC}} & \lr{RRCReconfiguration} (راه‌اندازی \lr{\mbox{DRB}}) \\
+11 & \lr{\mbox{RRC}} & \lr{RRCReconfigurationComplete} \\
+12 & \lr{\mbox{N2}} & \lr{NGAP PDU Session Resource Setup Response} \\
+13 & \lr{\mbox{N11}} & \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext} (اطلاعات \lr{\mbox{N2}}) \\
+14 & \lr{\mbox{N4}} & \lr{PFCP Session Modification Request} (اطلاعات تونل \lr{\mbox{DL}}) \\
+15 & \lr{\mbox{NAS}} & \lr{PDU Session Establishment Accept} \\
+\end{longtable}
+}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{درخواست \lr{\mbox{UE}}}: \lr{\mbox{UE}} یک \lr{PDU Session Establishment Request} می‌فرستد شامل:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    شناسه نشست \lr{\mbox{PDU}}، نوع \lr{PDU (IPv4/\allowbreak{}IPv6/\allowbreak{}IPv4v6/\allowbreak{}Ethernet/\allowbreak{}Unstructured)}
+  \item
+    \lr{\mbox{DNN}} درخواستی، \lr{\mbox{S-NSSAI}}، حالت \lr{\mbox{SSC}}
+  \item
+    محفظه درخواست \lr{\mbox{DN}} در \lr{\mbox{PDU}} مربوط به \lr{\mbox{SM}} (اختیاری)
+  \item
+    قواعد \lr{\mbox{QoS}} و توصیف‌های جریان \lr{\mbox{QoS}} درخواستی
+  \end{itemize}
+\item
+  \textbf{انتقال \lr{\mbox{NAS}}}: \lr{\mbox{AMF}} پیام \lr{UL NAS Transport} با محفظه \lr{\mbox{NAS}} مربوط به \lr{\mbox{SM}} را دریافت می‌کند
+\item
+  \textbf{انتخاب \lr{\mbox{SMF}}}: \lr{\mbox{AMF}} بر اساس \lr{\mbox{DNN}}، \lr{\mbox{S-NSSAI}}، \lr{\mbox{PLMN}} و کشف \lr{\mbox{NRF}} یک \lr{\mbox{SMF}} انتخاب می‌کند
+\item
+  \textbf{ایجاد زمینه \lr{\mbox{SM}}}: \lr{\mbox{AMF}} یک \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}CreateSMContext} به \lr{\mbox{SMF}} انتخاب‌شده می‌فرستد
+\item
+  \textbf{داده اشتراک}: \lr{\mbox{SMF}} داده اشتراک مدیریت نشست را از \lr{\mbox{UDM}} بازیابی می‌کند \lr{(Nudm\_\allowbreak{}SDM\_\allowbreak{}Get)}
+\item
+  \textbf{ثبت‌نام \lr{\mbox{SMF}}}: \lr{\mbox{SMF}} برای نشست \lr{\mbox{PDU}} در \lr{\mbox{UDM}} ثبت‌نام می‌کند
+\item
+  \textbf{انجمن سیاست}: \lr{\mbox{SMF}} انجمن سیاست \lr{\mbox{SM}} را با \lr{\mbox{PCF}} ایجاد می‌کند \lr{(Npcf\_\allowbreak{}SMPolicyControl\_\allowbreak{}Create)}
+\item
+  \textbf{پاسخ \lr{\mbox{PCF}}}: \lr{\mbox{PCF}} قواعد \lr{\mbox{PCC}}، سیاست‌های \lr{\mbox{QoS}} و قواعد صورت‌حساب را بازمی‌گرداند
+\item
+  \textbf{انتخاب \lr{\mbox{UPF}}}: \lr{\mbox{SMF}} بر اساس مکان \lr{\mbox{UE}}، \lr{\mbox{DNN}}، برش و نیازمندی‌های مسیر داده \lr{\mbox{UPF(\rl{های})}} مناسب را انتخاب می‌کند
+\item
+  \textbf{تخصیص \lr{\mbox{IP}}}: \lr{\mbox{SMF}} آدرس/\allowbreak{}پیشوند \lr{\mbox{IP}} را تخصیص می‌دهد (از استخر محلی، استخر \lr{\mbox{UPF}}، یا \lr{DHCP/\allowbreak{}AAA} خارجی)
+\item
+  \textbf{برقراری نشست \lr{\mbox{N4}}}: \lr{\mbox{SMF}} یک \lr{PFCP Session Establishment Request} به \lr{\mbox{UPF}} می‌فرستد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{PDR}}ها (قواعد تشخیص بسته)، \lr{\mbox{FAR}}ها (قواعد اقدام ارسال)
+  \item
+    \lr{\mbox{QER}}ها (قواعد اجرای \lr{\mbox{QoS}})، \lr{\mbox{URR}}ها (قواعد گزارش‌دهی مصرف)
+  \item
+    نقطه انتهایی تونل \lr{\mbox{UL}} (\lr{\mbox{F-TEID}} روی \lr{\mbox{UPF}} برای \lr{\mbox{N3}})
+  \end{itemize}
+\item
+  \textbf{پاسخ \lr{\mbox{UPF}}}: \lr{\mbox{UPF}} با \lr{\mbox{F-TEID}} تخصیص‌یافته پاسخ می‌دهد (نقطه انتهایی \lr{\mbox{UL}} در \lr{\mbox{N3}})
+\item
+  \textbf{انتقال پیام \lr{\mbox{N1N2}}}: \lr{\mbox{SMF}} به \lr{\mbox{AMF}} می‌فرستد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    محفظه \lr{\mbox{N1 SM}}: \lr{PDU Session Establishment Accept} (آدرس \lr{\mbox{IP}}، قواعد \lr{\mbox{QoS}}، \lr{\mbox{S-NSSAI}})
+  \item
+    محفظه \lr{\mbox{N2 SM}}: \lr{PDU Session Resource Setup Request Transfer} (\lr{\mbox{TEID}} مربوط به \lr{\mbox{N3}} در \lr{\mbox{UPF}}، پروفایل \lr{\mbox{QoS}})
+  \end{itemize}
+\item
+  \textbf{راه‌اندازی \lr{\mbox{RAN}}}: \lr{\mbox{AMF}} از طریق \lr{NGAP PDU Session Resource Setup Request} به \lr{\mbox{gNB}} ارسال می‌کند
+\item
+  \textbf{برقراری \lr{\mbox{DRB}}}: \lr{\mbox{gNB}} جریان‌های \lr{\mbox{QoS}} را به \lr{\mbox{DRB}}ها نگاشت می‌کند، \lr{RRCReconfiguration} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \textbf{پیکربندی \lr{\mbox{UE}}}: \lr{\mbox{UE}} قواعد \lr{\mbox{QoS}} را اعمال می‌کند، \lr{\mbox{DRB}}ها را پیکربندی می‌کند، با \lr{RRCReconfigurationComplete} پاسخ می‌دهد
+\item
+  \textbf{پاسخ \lr{\mbox{gNB}}}: \lr{\mbox{gNB}} یک \lr{NGAP PDU Session Resource Setup Response} می‌فرستد (\lr{\mbox{F-TEID}} مربوط به \lr{\mbox{N3}} در \lr{\mbox{gNB}} برای \lr{\mbox{DL}})
+\item
+  \textbf{به‌روزرسانی مسیر}: \lr{\mbox{AMF}} اطلاعات تونل \lr{\mbox{DL}} مربوط به \lr{\mbox{gNB}} را به \lr{\mbox{SMF}} ارسال می‌کند \lr{(Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext)}
+\item
+  \textbf{اصلاح \lr{\mbox{N4}}}: \lr{\mbox{SMF}} یک \lr{PFCP Session Modification} با نقطه انتهایی تونل \lr{\mbox{DL}} (\lr{\mbox{F-TEID}} مربوط به \lr{\mbox{gNB}}) به \lr{\mbox{UPF}} می‌فرستد
+\item
+  \textbf{نشست فعال}: مسیر صفحه کاربر سرتاسری برقرار است: \lr{UE\ensuremath{\leftrightarrow}gNB\ensuremath{\leftrightarrow}UPF\ensuremath{\leftrightarrow}DN}
+\end{enumerate}
+
+\CNkeepfig{m20-pdu-establish-1}{3}
+
+\CNsubsection{}{نمودار توالی تفصیلی}
+
+\CNfigure{m20-pdu-establish-1}{برقراری نشست \lr{PDU (TS 23.502 §4.3.2)}\CNpart{1}{3}}
+
+\CNfigure{m20-pdu-establish-2}{برقراری نشست \lr{PDU (TS 23.502 §4.3.2)}\CNpart{2}{3}}
+
+\CNfigure{m20-pdu-establish-3}{برقراری نشست \lr{PDU (TS 23.502 §4.3.2)}\CNpart{3}{3}}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{پاسخ} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+منابع ناکافی & هیچ آدرس \lr{\mbox{IP}} در دسترس نیست یا \lr{\mbox{UPF}} اضافه‌بار دارد & \lr{PDU Session Establishment Reject} (علت: \lr{\#}26) \\
+\lr{\mbox{DNN}} اشتراک‌نشده & \lr{\mbox{UE}} برای \lr{\mbox{DNN}} درخواستی مجاز نیست & \lr{\mbox{Reject}} (علت: \lr{\#}27) \\
+\lr{\mbox{S-NSSAI}} نامعتبر & برش در \lr{Allowed NSSAI} نیست & \lr{\mbox{Reject}} (علت: \lr{\#}62) \\
+\lr{\mbox{SMF}} در دسترس نیست & هیچ \lr{\mbox{SMF}} برای \lr{\mbox{DNN}}/\allowbreak{}برش در دسترس نیست & \lr{\mbox{AMF}} درخواست را رد می‌کند \\
+شکست انتخاب \lr{\mbox{UPF}} & هیچ \lr{\mbox{UPF}} مناسبی یافت نشد & \lr{\mbox{SMF}} نشست را رد می‌کند \\
+رد سیاست \lr{\mbox{PCF}} & \lr{\mbox{PCF}} نشست را بر اساس سیاست رد می‌کند & \lr{\mbox{SMF}} نشست را رد می‌کند \\
+شکست برقراری \lr{\mbox{N4}} & \lr{\mbox{PFCP}} به \lr{\mbox{UPF}} شکست می‌خورد & \lr{\mbox{SMF}} دوباره تلاش می‌کند یا رد می‌کند \\
+شکست راه‌اندازی \lr{\mbox{DRB}} & \lr{\mbox{gNB}} نمی‌تواند منابع رادیویی تخصیص دهد & راه‌اندازی منابع جزیی/\allowbreak{}شکست‌خورده به \lr{\mbox{AMF}} گزارش می‌شود \\
+رسیدن به حداکثر نشست‌ها & محدودیت اشتراک \lr{\mbox{UE}} تجاوز شده & \lr{\mbox{Reject}} (علت: \lr{\#}65) \\
+شکست شبکه & مسیله شبکه انتقال & اتمام زمان برقراری نشست \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{آزادسازی نشست \lr{\mbox{PDU}}}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه آزادسازی نشست \lr{\mbox{PDU}} یک نشست \lr{\mbox{PDU}} موجود را تخریب می‌کند و تمام منابع مرتبط شامل آدرس \lr{\mbox{IP}}، تونل‌های \lr{GTP-U (N3/\allowbreak{}N9)}، نشست‌های \lr{PFCP (N4)}، جریان‌های \lr{\mbox{QoS}} و \lr{\mbox{DRB}}ها را آزاد می‌کند. می‌تواند توسط \lr{\mbox{UE}} (کاربر دیگر به اتصال نیاز ندارد)، \lr{\mbox{SMF}} (تایمر بی‌فعالیتی، سیاست) یا \lr{\mbox{AMF}} (لغو ثبت‌نام) آغاز شود.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  یک نشست \lr{\mbox{PDU}} فعال وجود دارد (زمینه \lr{\mbox{SM}} در \lr{\mbox{SMF}}، نشست \lr{\mbox{N4}} در \lr{\mbox{UPF}})
+\item
+  \lr{\mbox{UE}} در شبکه ثبت‌نام کرده است
+\item
+  زمینه امنیتی \lr{\mbox{NAS}} فعال است
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE}} & آزادسازی را آغاز می‌کند (با محرک \lr{\mbox{UE}}) یا تأیید می‌کند \\
+\lr{\mbox{gNB}} & \lr{\mbox{DRB}}ها و منابع تونل \lr{\mbox{N3}} را آزاد می‌کند \\
+\lr{\mbox{AMF}} & پیام‌های \lr{\mbox{NAS}} مربوط به \lr{\mbox{SM}} را مسیریابی می‌کند \\
+\lr{\mbox{SMF}} & آزادسازی را هماهنگ می‌کند، زمینه \lr{\mbox{SM}} را حذف می‌کند \\
+\lr{\mbox{UPF}} & نشست \lr{\mbox{PFCP}} را حذف می‌کند، تونل‌ها را آزاد می‌کند \\
+\lr{\mbox{PCF}} & انجمن سیاست \lr{\mbox{SM}} را خاتمه می‌دهد \\
+\lr{\mbox{UDM}} & نشست \lr{\mbox{PDU}} را لغو ثبت‌نام می‌کند \\
+\lr{\mbox{CHF}} & رکورد صورت‌حساب نهایی \\
+\end{longtable}
+}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{NAS}} & \lr{PDU Session Release Request} (با محرک \lr{\mbox{UE}}) \\
+2 & \lr{\mbox{N11}} & \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext (Release)} \\
+3 & \lr{\mbox{N4}} & \lr{PFCP Session Deletion Request} \\
+4 & \lr{\mbox{N4}} & \lr{PFCP Session Deletion Response} \\
+5 & \lr{\mbox{N7}} & \lr{Npcf\_\allowbreak{}SMPolicyControl\_\allowbreak{}Delete} \\
+6 & \lr{\mbox{N2}} & \lr{NGAP PDU Session Resource Release Command} \\
+7 & \lr{\mbox{NAS}} & \lr{PDU Session Release Command} \\
+8 & \lr{\mbox{RRC}} & \lr{RRCReconfiguration} (آزادسازی \lr{\mbox{DRB}}) \\
+9 & \lr{\mbox{N2}} & \lr{NGAP PDU Session Resource Release Response} \\
+10 & \lr{\mbox{NAS}} & \lr{PDU Session Release Complete} \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\CNchained\CNsubsubsection{آزادسازی با محرک \lr{\mbox{UE}}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE}} یک \lr{PDU Session Release Request} می‌فرستد (شناسه نشست \lr{\mbox{PDU}}، علت)
+\item
+  \lr{\mbox{AMF}} به \lr{\mbox{SMF}} ارسال می‌کند \lr{(Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext)}
+\item
+  \lr{\mbox{SMF}} پاک‌سازی منابع را آغاز می‌کند
+\item
+  \lr{\mbox{SMF}} یک \lr{PFCP Session Deletion Request} به \lr{\mbox{UPF}} می‌فرستد
+\item
+  \lr{\mbox{UPF}} تونل‌ها را آزاد می‌کند، با \lr{PFCP Session Deletion Response} پاسخ می‌دهد
+\item
+  \lr{\mbox{SMF}} انجمن سیاست \lr{\mbox{PCF}} را خاتمه می‌دهد
+\item
+  \lr{\mbox{SMF}} نشست را از \lr{\mbox{UDM}} لغو ثبت‌نام می‌کند
+\item
+  \lr{\mbox{SMF}} یک \lr{PDU Session Release Command} به \lr{\mbox{UE}} می‌فرستد (از طریق انتقال \lr{\mbox{N1N2}} در \lr{\mbox{AMF}})
+\item
+  \lr{\mbox{AMF}} یک \lr{NGAP PDU Session Resource Release Command} به \lr{\mbox{gNB}} می‌فرستد
+\item
+  \lr{\mbox{gNB DRB}}ها را آزاد می‌کند، \lr{RRCReconfiguration} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \lr{\mbox{gNB}} با \lr{PDU Session Resource Release Response} پاسخ می‌دهد
+\item
+  \lr{\mbox{UE}} یک \lr{PDU Session Release Complete} می‌فرستد
+\end{enumerate}
+
+\CNsubsubsection{آزادسازی با محرک شبکه}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{SMF}} تصمیم به آزادسازی می‌گیرد (بی‌فعالیتی، تغییر سیاست، لغو اشتراک)
+\item
+  \lr{\mbox{SMF}} یک \lr{PDU Session Release Command} از طریق \lr{\mbox{AMF}} به \lr{\mbox{UE}} می‌فرستد
+\item
+  گام‌های باقی‌مانده مشابه آزادسازی با محرک \lr{\mbox{UE}} از گام 9 است
+\end{enumerate}
+
+\CNkeepfig{m20-pdu-release}{3}
+
+\CNsubsection{}{نمودار توالی فشرده}
+
+\CNfigure{m20-pdu-release}{آزادسازی نشست \lr{\mbox{PDU}}}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{پاسخ} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UPF}} غیرقابل دسترس & شکست مسیر \lr{\mbox{N4}} & \lr{\mbox{SMF}} دوباره تلاش می‌کند؛ پاک‌سازی محلی پس از اتمام زمان \\
+\lr{\mbox{UE}} غیرقابل دسترس \lr{(CM-IDLE)} & \lr{\mbox{UE}} در حالت بیکار & \lr{\mbox{SMF}} پاک‌سازی سمت شبکه را ادامه می‌دهد \\
+انقضای تایمر & بدون پاسخ از \lr{\mbox{UE}} & آزادسازی ضمنی؛ پاک‌سازی منابع محلی \\
+آزادسازی جزیی & برخی منابع آزاد نمی‌شوند & \lr{\mbox{SMF}} پاک‌سازی منابع باقی‌مانده را انجام می‌دهد \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{درخواست خدمات}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه درخواست خدمات به \lr{\mbox{UE}} در حالت \lr{\mbox{CM-IDLE}} (یا \lr{CM-CONNECTED} با صفحه کاربر غیرفعال) امکان می‌دهد اتصالات سیگنالینگ و/\allowbreak{}یا صفحه کاربر را زمانی که داده یا سیگنالینگ پیوند بالاسو باید فرستاده شود، دوباره برقرار کند. گذار از \lr{RRC\_\allowbreak{}IDLE/\allowbreak{}RRC\_\allowbreak{}INACTIVE} به \lr{RRC\_\allowbreak{}CONNECTED} را فعال می‌کند و مسیر صفحه کاربر (تونل‌های \lr{\mbox{GTP-U}} در \lr{\mbox{N3}}) را برای نشست‌های \lr{\mbox{PDU}} موجود دوباره فعال می‌کند.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} با زمینه ثبت‌نام معتبر ثبت‌نام کرده است
+\item
+  \lr{\mbox{UE}} در حالت \lr{\mbox{CM-IDLE}} (\lr{RRC\_\allowbreak{}IDLE} یا \lr{RRC\_\allowbreak{}INACTIVE}) است
+\item
+  \lr{\mbox{UE}} حداقل یک نشست \lr{\mbox{PDU}} فعال دارد (منابع \lr{\mbox{UP}} برای فعال‌سازی مجدد)
+\item
+  زمینه امنیتی \lr{\mbox{NAS}} وجود دارد (\lr{\mbox{\ensuremath{K_{\mathrm{AMF}}}}}، \lr{\mbox{\ensuremath{K_{\mathrm{NASint}}}}}، \lr{\mbox{\ensuremath{K_{\mathrm{NASenc}}}}} در دسترس)
+\item
+  \lr{\mbox{UE}} داده پیوند بالاسو یا سیگنالینگ \lr{\mbox{NAS}} برای فرستادن دارد
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE}} & هنگام رسیدن داده \lr{\mbox{UL}} درخواست خدمات را فعال می‌کند \\
+\lr{\mbox{gNB}} & اتصال \lr{\mbox{RRC}} را برقرار می‌کند، \lr{\mbox{DRB}}ها را تخصیص می‌دهد \\
+\lr{\mbox{AMF}} & درخواست خدمات را پردازش می‌کند، فعال‌سازی مجدد \lr{\mbox{UP}} را هماهنگ می‌کند \\
+\lr{\mbox{SMF}} & نشست \lr{\mbox{N4}} را با اطلاعات تونل \lr{\mbox{DL}} جدید به‌روزرسانی می‌کند \\
+\lr{\mbox{UPF}} & \lr{\mbox{FAR}} به‌روزشده برای ارسال \lr{\mbox{DL}} را دریافت می‌کند \\
+\end{longtable}
+}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{Uu}} & \lr{RRC Resume/\allowbreak{}Setup Request} (اگر \lr{RRC\_\allowbreak{}INACTIVE/\allowbreak{}IDLE}) \\
+2 & \lr{\mbox{NAS}} & \lr{Service Request} (\lr{\mbox{ngKSI}}، وضعیت نشست \lr{\mbox{PDU}}) \\
+3 & \lr{\mbox{N2}} & \lr{NGAP Initial UE Message} یا \lr{UE Context Resume} \\
+4 & \lr{\mbox{N2}} & \lr{NGAP Initial Context Setup /\allowbreak{} PDU Session Resource Setup} \\
+5 & \lr{\mbox{N11}} & \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext} (فعال‌سازی \lr{\mbox{UP}}) \\
+6 & \lr{\mbox{N4}} & \lr{PFCP Session Modification} (\lr{\mbox{TEID}} جدید \lr{\mbox{DL}}) \\
+7 & \lr{\mbox{RRC}} & \lr{RRCReconfiguration} (فعال‌سازی مجدد \lr{\mbox{DRB}}) \\
+8 & \lr{\mbox{NAS}} & \lr{Service Accept} \\
+\end{longtable}
+}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{محرک}: کاربرد \lr{\mbox{UE}} داده پیوند بالاسو تولید می‌کند؛ لایه \lr{\mbox{NAS}} حالت \lr{\mbox{CM-IDLE}} را تشخیص می‌دهد
+\item
+  \textbf{اتصال \lr{\mbox{RRC}}}: \lr{\mbox{UE}} اتصال \lr{\mbox{RRC}} را آغاز می‌کند (\lr{RRC Setup} از \lr{\mbox{IDLE}} یا \lr{RRC Resume} از \lr{\mbox{INACTIVE}})
+\item
+  \textbf{درخواست خدمات}: \lr{\mbox{UE}} یک \lr{NAS Service Request} می‌فرستد (محافظت‌شده با یکپارچگی با \lr{\mbox{\ensuremath{K_{\mathrm{NASint}}}}}):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{ngKSI}}، نوع خدمات (سیگنالینگ/\allowbreak{}داده/\allowbreak{}با مقصد موبایل)
+  \item
+    وضعیت نشست \lr{\mbox{PDU}}، وضعیت داده پیوند بالاسو
+  \end{itemize}
+\item
+  \textbf{پردازش \lr{\mbox{AMF}}}: \lr{\mbox{AMF}} یکپارچگی را تأیید می‌کند، نشست‌های \lr{\mbox{PDU}} فعال را شناسایی می‌کند
+\item
+  \textbf{فعال‌سازی امنیت}: \lr{\mbox{AMF}} یک \lr{\mbox{\ensuremath{K_{\mathrm{gNB}}}}} جدید به \lr{\mbox{gNB}} می‌فرستد (\lr{Initial Context Setup} یا \lr{UE Context Resume})
+\item
+  \textbf{فعال‌سازی مجدد \lr{\mbox{UP}}}: برای هر نشست \lr{\mbox{PDU}} که باید دوباره فعال شود:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{AMF}} یک \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext} به \lr{\mbox{SMF}} می‌فرستد (اطلاعات \lr{\mbox{AN}} جدید لازم است)
+  \item
+    \lr{\mbox{gNB DRB}}ها را تخصیص می‌دهد، \lr{\mbox{TEID}} مربوط به \lr{\mbox{N3}} در \lr{\mbox{DL}} را اختصاص می‌دهد
+  \item
+    \lr{\mbox{SMF UPF}} را با اطلاعات تونل \lr{\mbox{DL}} جدید به‌روزرسانی می‌کند \lr{(PFCP Session Modification)}
+  \end{itemize}
+\item
+  \textbf{راه‌اندازی \lr{\mbox{DRB}}}: \lr{\mbox{gNB}} یک \lr{RRCReconfiguration} با پیکربندی \lr{\mbox{DRB}} به \lr{\mbox{UE}} می‌فرستد
+\item
+  \textbf{پذیرش خدمات}: \lr{\mbox{AMF}} یک \lr{Service Accept} به \lr{\mbox{UE}} می‌فرستد
+\item
+  \textbf{جریان داده}: مسیر صفحه کاربر دوباره برقرار می‌شود؛ داده \lr{\mbox{DL}} بافر‌شده ارسال می‌شود
+\end{enumerate}
+
+\CNkeepfig{m20-service-request}{3}
+
+\CNsubsection{}{نمودار توالی فشرده}
+
+\CNfigure{m20-service-request}{درخواست سرویس}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{پاسخ} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+شکست یکپارچگی & تأیید \lr{\mbox{NAS MAC}} شکست می‌خورد & \lr{\mbox{AMF}} رد می‌کند؛ ممکن است احراز هویت مجدد را فعال کند \\
+زمینه یافت نشد & \lr{\mbox{AMF}} زمینه \lr{\mbox{UE}} را ندارد (مثلاً راه‌اندازی مجدد \lr{\mbox{AMF}}) & \lr{Service Reject} (علت: \lr{\#}9) \ensuremath{\to} \lr{\mbox{UE}} دوباره ثبت‌نام می‌کند \\
+عدم تطابق نشست \lr{\mbox{PDU}} & ناسازگاری وضعیت بین \lr{\mbox{UE}} و شبکه & \lr{\mbox{AMF}} همگام‌سازی وضعیت نشست \lr{\mbox{PDU}} را فعال می‌کند \\
+منابع \lr{\mbox{RAN}} در دسترس نیست & \lr{\mbox{gNB}} نمی‌تواند \lr{\mbox{DRB}}ها را تخصیص دهد & پذیرش جزیی یا رد \\
+زمینه امنیتی نامعتبر & عدم تطابق \lr{\mbox{ngKSI}} یا زمینه منقضی & فعال‌سازی احراز هویت مجدد \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{صفحه‌بندی}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه صفحه‌بندی به شبکه امکان می‌دهد به \lr{\mbox{UE}} در حالت \lr{\mbox{CM-IDLE}} دسترسی یابد زمانی که داده یا سیگنالینگ پیوند پایین‌سو برای آن \lr{\mbox{UE}} می‌رسد. \lr{\mbox{AMF}} پیام‌های صفحه‌بندی را به تمام \lr{\mbox{gNB}}ها در ناحیه ثبت‌نام \lr{\mbox{UE}} (مجموعه‌ای از نواحی ردیابی) توزیع می‌کند و \lr{\mbox{UE}} با یک درخواست خدمات پاسخ می‌دهد تا اتصال را دوباره برقرار کند.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} در حالت \lr{\mbox{CM-IDLE}} است (\lr{RRC\_\allowbreak{}IDLE} یا \lr{RRC\_\allowbreak{}INACTIVE})
+\item
+  داده پیوند پایین‌سو در \lr{\mbox{UPF}} برای \lr{\mbox{UE}} می‌رسد، یا سیگنالینگ \lr{\mbox{MT}} در انتظار است
+\item
+  \lr{\mbox{AMF}} زمینه \lr{\mbox{UE}} معتبر با اطلاعات ناحیه ثبت‌نام دارد
+\item
+  \lr{\mbox{UE}} در سلول فعلی خود موقعیت‌های صفحه‌بندی را پایش می‌کند
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UPF}} & داده \lr{\mbox{DL}} برای \lr{\mbox{UE}} بیکار را تشخیص می‌دهد، اعلان می‌فرستد \\
+\lr{\mbox{SMF}} & اعلان داده را دریافت می‌کند، صفحه‌بندی را از طریق \lr{\mbox{AMF}} فعال می‌کند \\
+\lr{\mbox{AMF}} & صفحه‌بندی را به \lr{\mbox{gNB}}ها در ناحیه ثبت‌نام توزیع می‌کند \\
+\lr{\mbox{gNB(\rl{ها})}} & پیام صفحه‌بندی را روی واسط \lr{\mbox{Uu}} پخش می‌کند \\
+\lr{\mbox{UE}} & صفحه‌بندی را پایش می‌کند، درخواست خدمات را آغاز می‌کند \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{N4}} & \lr{Downlink Data Notification} (\lr{\mbox{UPF\ensuremath{\to}SMF}} از طریق \lr{\mbox{PFCP}}) \\
+2 & \lr{\mbox{N11}} & \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext} (داده \lr{\mbox{DL}} در انتظار) یا \lr{Namf\_\allowbreak{}Communication\_\allowbreak{}N1N2MessageTransfer} \\
+3 & \lr{\mbox{N2}} & \lr{NGAP Paging} (به تمام \lr{\mbox{gNB}}ها در ناحیه ثبت‌نام) \\
+4 & \lr{\mbox{Uu}} & پیام \lr{RRC Paging (5G-S-TMSI)} \\
+5 & \lr{\mbox{Uu}} & \lr{Service Request} (پاسخ \lr{\mbox{UE}}) \\
+\end{longtable}
+}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{رسیدن داده \lr{\mbox{DL}}}: یک بسته پیوند پایین‌سو در \lr{\mbox{UPF}} برای \lr{\mbox{UE}} در حالت \lr{\mbox{CM-IDLE}} می‌رسد
+\item
+  \textbf{اعلان داده}: \lr{\mbox{UPF}} بسته را بافر می‌کند و یک \lr{Downlink Data Notification} به \lr{\mbox{SMF}} می‌فرستد (از طریق \lr{\mbox{N4 PFCP}})
+\item
+  \textbf{محرک صفحه‌بندی}: \lr{\mbox{SMF}} یک \lr{Namf\_\allowbreak{}Communication\_\allowbreak{}N1N2MessageTransfer} یا اعلان \lr{\mbox{Nsmf}} به \lr{\mbox{AMF}} می‌فرستد که نشان می‌دهد داده \lr{\mbox{DL}} در انتظار است
+\item
+  \textbf{توزیع صفحه‌بندی}: \lr{\mbox{AMF}} یک پیام \lr{NGAP Paging} به تمام \lr{\mbox{gNB}}ها در ناحیه ثبت‌نام \lr{\mbox{UE}} می‌فرستد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{5G-S-TMSI} (برای شناسایی \lr{\mbox{UE}})
+  \item
+    فهرست \lr{\mbox{TAI}} (شناسه‌های ناحیه ردیابی)
+  \item
+    اولویت صفحه‌بندی (در صورت کاربرد)
+  \item
+    اطلاعات \lr{\mbox{DRX}} صفحه‌بندی
+  \end{itemize}
+\item
+  \textbf{صفحه‌بندی \lr{\mbox{RRC}}}: هر \lr{\mbox{gNB}} پیام \lr{RRC Paging} را روی \lr{\mbox{PCCH}} در موقعیت صفحه‌بندی \lr{\mbox{UE}} پخش می‌کند
+\item
+  \textbf{تشخیص \lr{\mbox{UE}}}: \lr{\mbox{UE}} در موقعیت صفحه‌بندی خود بیدار می‌شود (تعیین‌شده با \lr{5G-S-TMSI} و چرخه \lr{\mbox{DRX}})، هویت خود را تشخیص می‌دهد
+\item
+  \textbf{درخواست خدمات}: \lr{\mbox{UE}} رویه درخواست خدمات را آغاز می‌کند (بخش 6 را ببینید)
+\item
+  \textbf{تحویل داده}: پس از فعال‌سازی مجدد مسیر \lr{\mbox{UP}}، \lr{\mbox{UPF}} داده \lr{\mbox{DL}} بافر‌شده را ارسال می‌کند
+\item
+  \textbf{تلاش مجدد صفحه‌بندی}: اگر \lr{\mbox{UE}} در \lr{\mbox{T3513}} پاسخ ندهد، \lr{\mbox{AMF}} صفحه‌بندی را دوباره تلاش می‌کند (تا حداکثر بازارسال‌های پیکربندی‌شده)
+\end{enumerate}
+
+\CNkeepfig{m20-paging}{3}
+
+\CNsubsection{}{نمودار توالی فشرده}
+
+\CNfigure{m20-paging}{صفحه‌بندی \lr{\mbox{UE}} در حالت \lr{\mbox{CM-IDLE}}}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{پاسخ} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE}} پاسخ نمی‌دهد & \lr{\mbox{UE}} خاموش است، خارج از پوشش & \lr{\mbox{AMF}} دوباره تلاش می‌کند \lr{\mbox{(T3513)}}؛ در نهایت به \lr{\mbox{SMF}} اطلاع می‌دهد \\
+اتمام زمان صفحه‌بندی & رسیدن به حداکثر بازارسال‌ها & \lr{\mbox{AMF}} به \lr{\mbox{SMF}} اطلاع می‌دهد؛ \lr{\mbox{UPF}} ممکن است داده بافر‌شده را دور بریزد \\
+ناحیه ثبت‌نام اشتباه & \lr{\mbox{UE}} بدون به‌روزرسانی \lr{\mbox{TA}} جابه‌جا شده & صفحه‌بندی شکست می‌خورد؛ \lr{\mbox{UE}} در نهایت دوباره ثبت‌نام می‌کند \\
+سرریز بافر \lr{\mbox{UPF}} & داده \lr{\mbox{DL}} بافر‌شده بیش از حد & \lr{\mbox{UPF}} قدیمی‌ترین بسته‌ها را دور می‌ریزد \\
+ازدحام صفحه‌بندی & درخواست‌های صفحه‌بندی بیش از حد & \lr{\mbox{AMF}} محدودیت‌ها/\allowbreak{}اولویت‌های صفحه‌بندی را اعمال می‌کند \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{تحویل \lr{\mbox{Xn}}}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه تحویل \lr{\mbox{Xn}} اتصال \lr{\mbox{UE}} را از \lr{\mbox{gNB}} مبدأ به \lr{\mbox{gNB}} مقصد روی واسط \lr{\mbox{Xn}} بدون دخالت \lr{\mbox{AMF}} در تصمیم تحویل منتقل می‌کند. تحرک بی‌وقفه با حداقل وقفه سرویس فراهم می‌کند. \lr{\mbox{gNB}} مبدأ تصمیم تحویل را بر اساس گزارش‌های اندازه‌گیری می‌گیرد، \lr{\mbox{gNB}} مقصد را آماده می‌کند و مسیر صفحه کاربر در \lr{\mbox{UPF}} سوییچ می‌شود. این زمانی استفاده می‌شود که هر دو \lr{\mbox{gNB}} به همان \lr{\mbox{AMF}} متصل باشند و واسط \lr{\mbox{Xn}} بین آن‌ها وجود داشته باشد.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} در حالت \lr{RRC\_\allowbreak{}CONNECTED} با نشست‌های \lr{\mbox{PDU}} فعال است
+\item
+  واسط \lr{\mbox{Xn}} بین \lr{\mbox{gNB}}های مبدأ و مقصد وجود دارد
+\item
+  هر دو \lr{\mbox{gNB}} توسط همان \lr{\mbox{AMF}} خدمات‌دهی می‌شوند
+\item
+  گزارش‌های اندازه‌گیری \lr{\mbox{UE}} نشان می‌دهند سلول مقصد بهتر از مبدأ است
+\item
+  سلول مقصد به همان برش شبکه یا برش سازگار تعلق دارد
+\item
+  \lr{\mbox{gNB}} مبدأ زمینه امنیتی \lr{\mbox{UE}} و کلیدهای \lr{\mbox{AS}} فعال را دارد
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE}} & گزارش‌های اندازه‌گیری می‌فرستد، تحویل به مقصد را انجام می‌دهد \\
+\lr{\mbox{gNB}} مبدأ & تصمیم تحویل می‌گیرد، مقصد را آماده می‌کند، داده ارسال می‌کند \\
+\lr{\mbox{gNB}} مقصد & \lr{\mbox{UE}} را می‌پذیرد، منابع تخصیص می‌دهد، خدمات‌دهنده جدید می‌شود \\
+\lr{\mbox{AMF}} & زمینه \lr{\mbox{UE}} را با \lr{\mbox{gNB}} خدمات‌دهنده جدید به‌روزرسانی می‌کند (تغییر مسیر) \\
+\lr{\mbox{SMF}} & نشست \lr{\mbox{N4}} را برای تونل پیوند پایین‌سو جدید به‌روزرسانی می‌کند \\
+\lr{\mbox{UPF}} & مسیر پیوند پایین‌سو را به \lr{\mbox{gNB}} مقصد سوییچ می‌کند \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{Uu}} & \lr{RRC MeasurementReport} (\lr{\mbox{UE\ensuremath{\to}gNB}} مبدأ) \\
+2 & \lr{\mbox{Xn}} & \lr{Handover Request} (مبدأ\ensuremath{\leftarrow}مقصد) \\
+3 & \lr{\mbox{Xn}} & \lr{Handover Request Acknowledge} (مقصد\ensuremath{\leftarrow}مبدأ) \\
+4 & \lr{\mbox{Uu}} & \lr{RRC RRCReconfiguration} (فرمان تحویل) \\
+5 & \lr{\mbox{—}} & \lr{\mbox{UE}} از مبدأ جدا می‌شود، به مقصد همگام می‌شود \\
+6 & \lr{\mbox{Uu}} & \lr{RRC RRCReconfigurationComplete} (\lr{\mbox{UE}}\ensuremath{\leftarrow}مقصد) \\
+7 & \lr{\mbox{Xn}} & \lr{SN Status Transfer} (مبدأ\ensuremath{\leftarrow}مقصد) \\
+8 & \lr{\mbox{N2}} & \lr{NGAP Path Switch Request} (مقصد\ensuremath{\leftarrow}\lr{\mbox{AMF}}) \\
+9 & \lr{\mbox{N11}} & \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext (AMF\ensuremath{\to}SMF)} \\
+10 & \lr{\mbox{N4}} & \lr{PFCP Session Modification (SMF\ensuremath{\to}UPF)} \\
+11 & \lr{\mbox{N11}} & \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext Response} \\
+12 & \lr{\mbox{N2}} & \lr{NGAP Path Switch Request Acknowledge} (\lr{\mbox{AMF}}\ensuremath{\leftarrow}مقصد) \\
+13 & \lr{\mbox{Xn}} & \lr{UE Context Release} (مقصد\ensuremath{\leftarrow}مبدأ) \\
+\end{longtable}
+}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{پیکربندی اندازه‌گیری}: \lr{\mbox{gNB}} مبدأ \lr{\mbox{UE}} را با اشیای اندازه‌گیری و معیارهای گزارش‌دهی پیکربندی می‌کند
+\item
+  \textbf{گزارش اندازه‌گیری}: \lr{\mbox{UE}} تشخیص می‌دهد سیگنال سلول مقصد به آستانه می‌رسد؛ یک \lr{MeasurementReport} به \lr{\mbox{gNB}} مبدأ می‌فرستد
+\item
+  \textbf{تصمیم تحویل}: \lr{\mbox{gNB}} مبدأ گزارش اندازه‌گیری را ارزیابی می‌کند، سلول مقصد را انتخاب می‌کند، تصمیم به تحویل می‌گیرد
+\item
+  \textbf{آماده‌سازی تحویل}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{gNB}} مبدأ یک \lr{Handover Request} به \lr{\mbox{gNB}} مقصد روی \lr{\mbox{Xn}} می‌فرستد:
+
+    \begin{itemize}
+    \tightlist
+    \item
+      زمینه \lr{\mbox{UE}} (امنیت، قابلیت‌ها، اطلاعات نشست \lr{\mbox{PDU}})
+    \item
+      اطلاعات تاریخچه \lr{\mbox{UE}}
+    \item
+      محفظه شفاف مبدأ-به-مقصد (پیکربندی \lr{\mbox{RRC}})
+    \end{itemize}
+  \end{itemize}
+\item
+  \textbf{کنترل پذیرش}: \lr{\mbox{gNB}} مقصد کنترل پذیرش را انجام می‌دهد، منابع را تخصیص می‌دهد (\lr{\mbox{DRB}}ها، منابع رادیویی)
+\item
+  \textbf{تأیید درخواست تحویل}: \lr{\mbox{gNB}} مقصد با موارد زیر پاسخ می‌دهد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    محفظه شفاف مقصد-به-مبدأ (فرمان تحویل \lr{\mbox{RRC}})
+  \item
+    تونل‌های ارسال \lr{\mbox{DL}} تخصیص‌یافته (برای ارسال داده در حین تحویل)
+  \end{itemize}
+\item
+  \textbf{فرمان تحویل}: \lr{\mbox{gNB}} مبدأ یک \lr{RRCReconfiguration (mobilityControlInfo)} به \lr{\mbox{UE}} می‌فرستد شامل:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    شناسه سلول مقصد، \lr{\mbox{C-RNTI}} جدید
+  \item
+    پیکربندی الگوریتم امنیتی \lr{\mbox{gNB}} مقصد
+  \item
+    پیکربندی منابع رادیویی برای سلول مقصد
+  \end{itemize}
+\item
+  \textbf{ارسال داده}: \lr{\mbox{gNB}} مبدأ شروع به ارسال داده \lr{\mbox{DL}} بافر‌شده/\allowbreak{}ورودی به \lr{\mbox{gNB}} مقصد می‌کند (از طریق تونل ارسال \lr{\mbox{Xn}})
+\item
+  \textbf{انتقال وضعیت \lr{\mbox{SN}}}: \lr{\mbox{gNB}} مبدأ یک \lr{PDCP SN Status Transfer} به \lr{\mbox{gNB}} مقصد می‌فرستد (برای تحویل بدون‌اتلاف روی \lr{\mbox{DRB}}های \lr{\mbox{AM}})
+\item
+  \textbf{دسترسی تصادفی}: \lr{\mbox{UE}} به سلول مقصد همگام می‌شود (رویه \lr{\mbox{RACH}})
+\item
+  \textbf{تکمیل تحویل}: \lr{\mbox{UE}} یک \lr{RRCReconfigurationComplete} به \lr{\mbox{gNB}} مقصد می‌فرستد
+\item
+  \textbf{تغییر مسیر}: \lr{\mbox{gNB}} مقصد یک \lr{NGAP Path Switch Request} به \lr{\mbox{AMF}} می‌فرستد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    اطلاعات زمینه امنیتی جدید (\lr{NH/\allowbreak{}NCC} در صورت نیاز)
+  \item
+    اطلاعات تونل \lr{\mbox{N3}} جدید برای هر نشست \lr{\mbox{PDU}} (\lr{\mbox{F-TEID}} مربوط به \lr{\mbox{gNB}} مقصد)
+  \end{itemize}
+\item
+  \textbf{به‌روزرسانی مسیر \lr{\mbox{UP}}}: \lr{\mbox{AMF}} یک \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext} با اطلاعات تونل \lr{\mbox{AN}} جدید به \lr{\mbox{SMF}} می‌فرستد
+\item
+  \textbf{به‌روزرسانی \lr{\mbox{UPF}}}: \lr{\mbox{SMF}} یک \lr{PFCP Session Modification} به \lr{\mbox{UPF}} می‌فرستد \ensuremath{\leftarrow} \lr{\mbox{FAR}} مربوط به \lr{\mbox{DL}} را به‌سمت \lr{\mbox{gNB}} مقصد به‌روزرسانی می‌کند
+\item
+  \textbf{نشانگر پایان}: \lr{\mbox{UPF}} یک بسته نشانگر پایان روی تونل \lr{\mbox{N3}} قدیمی (به \lr{\mbox{gNB}} مبدأ) می‌فرستد تا نشان دهد مسیر \lr{\mbox{DL}} سوییچ شده است
+\item
+  \textbf{تأیید تغییر مسیر}: \lr{\mbox{AMF}} یک \lr{NGAP Path Switch Request Acknowledge} به \lr{\mbox{gNB}} مقصد می‌فرستد (\lr{\mbox{NH}}، \lr{\mbox{NCC}} جدید برای تحویل آینده)
+\item
+  \textbf{آزادسازی زمینه \lr{\mbox{UE}}}: \lr{\mbox{gNB}} مقصد یک \lr{UE Context Release} به \lr{\mbox{gNB}} مبدأ روی \lr{\mbox{Xn}} می‌فرستد
+\item
+  \textbf{پاک‌سازی مبدأ}: \lr{\mbox{gNB}} مبدأ زمینه و منابع \lr{\mbox{UE}} را آزاد می‌کند
+\end{enumerate}
+
+\CNkeepfig{m20-xn-handover-1}{3}
+
+\CNsubsection{}{نمودار توالی تفصیلی}
+
+\CNfigure{m20-xn-handover-1}{تحویل \lr{\mbox{Xn}}\CNpart{1}{3}}
+
+\CNfigure{m20-xn-handover-2}{تحویل \lr{\mbox{Xn}}\CNpart{2}{3}}
+
+\CNfigure{m20-xn-handover-3}{تحویل \lr{\mbox{Xn}}\CNpart{3}{3}}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{پاسخ} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+شکست آماده‌سازی تحویل & مقصد رد می‌کند (بدون منابع، کنترل پذیرش) & \lr{\mbox{gNB}} مبدأ هدف دیگری را امتحان می‌کند یا اتصال را حفظ می‌کند \\
+شکست تحویل (انقضای تایمر) & \lr{\mbox{UE}} در \lr{\mbox{RACH}} به مقصد در \lr{\mbox{T304}} شکست می‌خورد & \lr{\mbox{UE}} بازبرقراری \lr{\mbox{RRC}} را به مبدأ یا سلول دیگر آغاز می‌کند \\
+بازبرقراری \lr{\mbox{RRC}} & شکست پیوند رادیویی در حین تحویل & \lr{\mbox{UE}} بازبرقراری را تلاش می‌کند؛ ممکن است تحویل جدید را فعال کند \\
+شکست تغییر مسیر & \lr{AMF/\allowbreak{}SMF} در تغییر مسیر شکست می‌خورد & \lr{\mbox{AMF}} یک \lr{Path Switch Request Failure} می‌فرستد؛ مقصد ممکن است \lr{\mbox{UE}} را آزاد کند \\
+اتلاف داده & ازدحام تونل ارسال & برخی بسته‌ها در شکاف تحویل گم می‌شوند (حامل‌های \lr{\mbox{UM}}) \\
+تحویل خیلی-دیرهنگام & \lr{\mbox{UE}} مبدأ را پیش از فرمان تحویل از دست می‌دهد & \lr{\mbox{RLF}}؛ بازبرقراری \lr{\mbox{RRC}} لازم است \\
+تحویل خیلی-زودهنگام & تحویل پیش از اندازه‌گیری پایدار فعال می‌شود & \lr{\mbox{UE}} ممکن است در مقصد شکست بخورد؛ بازبرقراری \lr{\mbox{RRC}} به مبدأ \\
+شکست واسط \lr{\mbox{Xn}} & مسیله انتقال بین \lr{\mbox{gNB}}ها & بازگشت به تحویل \lr{\mbox{N2}} (بین-\lr{\mbox{AMF}}) از طریق \lr{\mbox{AMF}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{9}{تحویل \lr{\mbox{N2}} (بین-\lr{\mbox{AMF}})}
+
+\CNchained\CNsubsection{}{هدف}
+
+رویه تحویل \lr{\mbox{N2}} (بین-\lr{\mbox{AMF}}) تحرک را زمانی مدیریت می‌کند که \lr{\mbox{gNB}} مقصد توسط \lr{\mbox{AMF}} متفاوتی نسبت به مبدأ خدمات‌دهی می‌شود. این پیچیده‌تر از تحویل \lr{\mbox{Xn}} است زیرا نیازمند انتقال زمینه \lr{\mbox{UE}} بین \lr{\mbox{AMF}}ها، بازبرقراری انجمن‌های \lr{\mbox{NF}} (\lr{\mbox{SMF}}، \lr{\mbox{PCF}}) و به‌طور بالقوه احراز هویت مجدد است. زمانی استفاده می‌شود که هیچ واسط \lr{\mbox{Xn}} بین \lr{\mbox{gNB}}های مبدأ و مقصد وجود ندارد، یا زمانی که مقصد در ناحیه خدمات \lr{\mbox{AMF}} متفاوتی قرار می‌گیرد.
+
+\CNsubsection{}{پیش‌شرط‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} در حالت \lr{RRC\_\allowbreak{}CONNECTED} با نشست‌های \lr{\mbox{PDU}} فعال است
+\item
+  \lr{\mbox{gNB}} مبدأ تعیین می‌کند تحویل لازم است (گزارش‌های اندازه‌گیری)
+\item
+  \lr{\mbox{gNB}} مقصد توسط همان \lr{\mbox{AMF}} خدمات‌دهی \textbf{نمی‌شود} (منطقه/\allowbreak{}مجموعه \lr{\mbox{AMF}} متفاوت)
+\item
+  \textbf{یا} هیچ واسط \lr{\mbox{Xn}} بین \lr{\mbox{gNB}}های مبدأ و مقصد وجود ندارد
+\item
+  واسط \lr{\mbox{N2}} بین \lr{\mbox{gNB}} مبدأ و \lr{\mbox{AMF}} مبدأ در دسترس است
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{NF}}های درگیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع شبکه} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE}} & تحویل به سلول مقصد را انجام می‌دهد \\
+\lr{\mbox{gNB}} مبدأ & تحویل را آغاز می‌کند، \lr{HO Required} را به \lr{\mbox{AMF}} مبدأ می‌فرستد \\
+\lr{\mbox{gNB}} مقصد & \lr{\mbox{UE}} را می‌پذیرد، منابع تخصیص می‌دهد \\
+\lr{\mbox{AMF}} مبدأ & \lr{\mbox{AMF}} مقصد را شناسایی می‌کند، انتقال زمینه را آغاز می‌کند \\
+\lr{\mbox{AMF}} مقصد & زمینه \lr{\mbox{UE}} را دریافت می‌کند، \lr{\mbox{AMF}} خدمات‌دهنده جدید می‌شود \\
+\lr{\mbox{SMF}} & مسیر \lr{\mbox{UP}} را برای هر نشست \lr{\mbox{PDU}} به‌روزرسانی می‌کند \\
+\lr{\mbox{UPF}} & تونل \lr{\mbox{DL}} را به \lr{\mbox{gNB}} مقصد سوییچ می‌کند \\
+\lr{\mbox{UDM}} & ثبت‌نام \lr{\mbox{AMF}} را به‌روزرسانی می‌کند (\lr{\mbox{AMF}} جدید) \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{پیام‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{واسط} & \CNth{پیام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{Uu}} & \lr{MeasurementReport} (\lr{\mbox{UE\ensuremath{\to}gNB}} مبدأ) \\
+2 & \lr{\mbox{N2}} & \lr{NGAP Handover Required} (\lr{\mbox{gNB}} مبدأ\ensuremath{\leftarrow}\lr{\mbox{AMF}} مبدأ) \\
+3 & \lr{\mbox{N14}} & \lr{Namf\_\allowbreak{}Communication\_\allowbreak{}CreateUEContext} (\lr{\mbox{AMF}} مبدأ\ensuremath{\leftarrow}\lr{\mbox{AMF}} مقصد) \\
+4 & \lr{\mbox{N2}} & \lr{NGAP Handover Request} (\lr{\mbox{AMF}} مقصد\ensuremath{\leftarrow}\lr{\mbox{gNB}} مقصد) \\
+5 & \lr{\mbox{N2}} & \lr{NGAP Handover Request Acknowledge} (\lr{\mbox{gNB}} مقصد\ensuremath{\leftarrow}\lr{\mbox{AMF}} مقصد) \\
+6 & \lr{\mbox{N14}} & \lr{Namf\_\allowbreak{}Communication\_\allowbreak{}CreateUEContext Response} (\lr{\mbox{AMF}} مقصد\ensuremath{\leftarrow}\lr{\mbox{AMF}} مبدأ) \\
+7 & \lr{\mbox{N2}} & \lr{NGAP Handover Command} (\lr{\mbox{AMF}} مبدأ\ensuremath{\leftarrow}\lr{\mbox{gNB}} مبدأ) \\
+8 & \lr{\mbox{Uu}} & \lr{RRC RRCReconfiguration} (فرمان تحویل به \lr{\mbox{UE}}) \\
+9 & \lr{\mbox{Uu}} & \lr{RRC RRCReconfigurationComplete} (\lr{\mbox{UE\ensuremath{\to}gNB}} مقصد) \\
+10 & \lr{\mbox{N2}} & \lr{NGAP Handover Notify} (\lr{\mbox{gNB}} مقصد\ensuremath{\leftarrow}\lr{\mbox{AMF}} مقصد) \\
+11 & \lr{N14/\allowbreak{}N2} & \lr{UE Context Release} (پاک‌سازی) \\
+\end{longtable}
+}
+
+\CNsubsection{}{جریان گام-به-گام}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{تصمیم تحویل}: \lr{\mbox{gNB}} مبدأ بر اساس گزارش‌های اندازه‌گیری تصمیم تحویل می‌گیرد
+\item
+  \lr{\textbf{\lr{HO Required}}: gNB} مبدأ یک \lr{NGAP Handover Required} به \lr{\mbox{AMF}} مبدأ می‌فرستد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    شناسه مقصد (\lr{\mbox{gNB}} مقصد + \lr{\mbox{TAI}} مقصد)
+  \item
+    محفظه شفاف \lr{\mbox{RRC}} مبدأ-به-مقصد
+  \item
+    فهرست منابع نشست \lr{\mbox{PDU}}
+  \end{itemize}
+\item
+  \textbf{انتخاب \lr{\mbox{AMF}} مقصد}: \lr{\mbox{AMF}} مبدأ تعیین می‌کند \lr{\mbox{gNB}} مقصد توسط \lr{\mbox{AMF}} متفاوتی خدمات‌دهی می‌شود (بر اساس نگاشت \lr{\mbox{TAI\ensuremath{\to}AMF}})
+\item
+  \textbf{انتقال زمینه \lr{\mbox{UE}}}: \lr{\mbox{AMF}} مبدأ یک \lr{Namf\_\allowbreak{}Communication\_\allowbreak{}CreateUEContext} به \lr{\mbox{AMF}} مقصد می‌فرستد:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    زمینه \lr{\mbox{UE}} (\lr{\mbox{SUPI}}، زمینه امنیتی، فهرست نشست \lr{\mbox{PDU}})
+  \item
+    محفظه مبدأ-به-مقصد
+  \item
+    زمینه \lr{\mbox{MM}}، زمینه‌های \lr{\mbox{SM}}
+  \end{itemize}
+\item
+  \textbf{آماده‌سازی \lr{\mbox{gNB}} مقصد}: \lr{\mbox{AMF}} مقصد یک \lr{NGAP Handover Request} به \lr{\mbox{gNB}} مقصد می‌فرستد
+\item
+  \textbf{کنترل پذیرش}: \lr{\mbox{gNB}} مقصد پذیرش را انجام می‌دهد، منابع را تخصیص می‌دهد
+\item
+  \textbf{تأیید درخواست تحویل}: \lr{\mbox{gNB}} مقصد یک \lr{Handover Request Acknowledge} می‌فرستد (فرمان تحویل، اطلاعات تونل \lr{\mbox{DL}})
+\item
+  \textbf{پاسخ زمینه}: \lr{\mbox{AMF}} مقصد به \lr{\mbox{AMF}} مبدأ با فرمان تحویل پاسخ می‌دهد
+\item
+  \textbf{ارسال فرمان تحویل}: \lr{\mbox{AMF}} مبدأ یک \lr{NGAP Handover Command} به \lr{\mbox{gNB}} مبدأ می‌فرستد
+\item
+  \textbf{فرمان تحویل \lr{\mbox{RRC}}}: \lr{\mbox{gNB}} مبدأ فرمان تحویل را از طریق \lr{RRCReconfiguration} به \lr{\mbox{UE}} ارسال می‌کند
+\item
+  \textbf{ارسال داده}: \lr{\mbox{gNB}} مبدأ داده را به \lr{\mbox{gNB}} مقصد ارسال می‌کند (غیرمستقیم از طریق \lr{\mbox{UPF}} یا مستقیم در صورت امکان)
+\item
+  \textbf{تحویل \lr{\mbox{UE}}}: \lr{\mbox{UE}} از مبدأ جدا و به سلول مقصد متصل می‌شود
+\item
+  \textbf{تکمیل تحویل}: \lr{\mbox{UE}} یک \lr{RRCReconfigurationComplete} به \lr{\mbox{gNB}} مقصد می‌فرستد
+\item
+  \textbf{اعلان تحویل}: \lr{\mbox{gNB}} مقصد یک \lr{NGAP Handover Notify} به \lr{\mbox{AMF}} مقصد می‌فرستد
+\item
+  \textbf{به‌روزرسانی ثبت‌نام}: \lr{\mbox{AMF}} مقصد به‌عنوان \lr{\mbox{AMF}} خدمات‌دهنده جدید در \lr{\mbox{UDM}} ثبت‌نام می‌کند
+\item
+  \textbf{تغییر مسیر \lr{\mbox{UP}}}: \lr{\mbox{AMF}} مقصد برای هر نشست \lr{\mbox{PDU}} یک \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}UpdateSMContext} فعال می‌کند
+\item
+  \textbf{به‌روزرسانی \lr{\mbox{N4}}}: \lr{\mbox{SMF}} مقدار \lr{\mbox{UPF}} را با اطلاعات تونل \lr{\mbox{DL}} جدید (\lr{\mbox{TEID}} مربوط به \lr{\mbox{gNB}} مقصد) به‌روزرسانی می‌کند
+\item
+  \textbf{پاک‌سازی مبدأ}: \lr{\mbox{AMF}} مقصد\ensuremath{\leftarrow}\lr{\mbox{AMF}} مبدأ: \lr{UE Context Release}؛ \lr{\mbox{AMF}} مبدأ\ensuremath{\leftarrow}\lr{\mbox{gNB}} مبدأ: \lr{UE Context Release Command}
+\end{enumerate}
+
+\CNkeepfig{m20-n2-handover-1}{3}
+
+\CNsubsection{}{نمودار توالی فشرده}
+
+\CNfigure{m20-n2-handover-1}{تحویل \lr{\mbox{N2}} (بین-\lr{\mbox{AMF}})\CNpart{1}{2}}
+
+\CNfigure{m20-n2-handover-2}{تحویل \lr{\mbox{N2}} (بین-\lr{\mbox{AMF}})\CNpart{2}{2}}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{موارد شکست}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شکست} & \CNth{علت} & \CNth{پاسخ} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{AMF}} مقصد غیرقابل دسترس & شکست ارتباط \lr{\mbox{N14}} & \lr{\mbox{AMF}} مبدأ یک \lr{HO Preparation Failure} به \lr{\mbox{gNB}} می‌فرستد \\
+\lr{\mbox{gNB}} مقصد رد می‌کند & شکست کنترل پذیرش در مقصد & \lr{\mbox{AMF}} مقصد به \lr{\mbox{AMF}} مبدأ اطلاع می‌دهد؛ \lr{HO Preparation Failure} \\
+شکست تحویل (سمت \lr{\mbox{UE}}) & \lr{\mbox{UE}} نمی‌تواند به سلول مقصد برسد & \lr{\mbox{UE}} بازبرقراری \lr{\mbox{RRC}} را تلاش می‌کند \\
+شکست انتقال زمینه & زمینه \lr{\mbox{UE}} ناقص/\allowbreak{}خراب & \lr{\mbox{AMF}} مقصد رد می‌کند؛ مبدأ \lr{\mbox{UE}} را حفظ می‌کند \\
+انقضای تایمر \lr{\mbox{(TRELOCprep)}} & آماده‌سازی بیش از حد طول می‌کشد & \lr{\mbox{AMF}} مبدأ تحویل را لغو می‌کند \\
+انقضای تایمر \lr{(TRELOCoverall)} & تحویل کلی بیش از حد طول می‌کشد & \lr{\mbox{AMF}} مبدأ آزاد می‌کند، \lr{\mbox{AMF}} مقصد پاک‌سازی می‌کند \\
+شکست تغییر مسیر & به‌روزرسانی \lr{SMF/\allowbreak{}UPF} شکست می‌خورد & تحویل ممکن است موفق شود اما مسیر \lr{\mbox{UP}} شکسته است؛ بازیابی لازم است \\
+عدم تطابق زمینه امنیتی & کلیدها پس از انتقال مطابقت ندارند & \lr{\mbox{AMF}} مقصد احراز هویت مجدد را فعال می‌کند \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsection{}{خلاصه: جدول مقایسه رویه‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{محرک} & \CNth{\lr{\mbox{NF}}های کلیدی} & \CNth{بودجه تأخیر} & \CNth{مرجع \lr{\mbox{3GPP}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ثبت‌نام اولیه & روشن‌شدن \lr{UE /\allowbreak{} PLMN} جدید & \lr{\mbox{AMF}}، \lr{\mbox{AUSF}}، \lr{\mbox{UDM}}، \lr{\mbox{PCF}} & ثانیه‌ها & \lr{TS 23.502 §4.2.2.2} \\
+\lr{\mbox{5G-AKA}} & ثبت‌نام /\allowbreak{} احراز هویت مجدد & \lr{\mbox{AMF}}، \lr{\mbox{AUSF}}، \lr{\mbox{UDM}} & حدود \lr{\mbox{100ms}} (سمت شبکه) & \lr{TS 33.501 §6.1} \\
+برقراری امنیت & پس از احراز هویت & \lr{\mbox{AMF}}، \lr{\mbox{gNB}} & حدود \lr{\mbox{50ms}} & \lr{TS 33.501 §6.7} \\
+برقراری نشست \lr{\mbox{PDU}} & درخواست داده \lr{\mbox{UE}} & \lr{\mbox{AMF}}، \lr{\mbox{SMF}}، \lr{\mbox{UPF}}، \lr{\mbox{PCF}} & حدود \lr{200-500ms} & \lr{TS 23.502 §4.3.2} \\
+آزادسازی نشست \lr{\mbox{PDU}} & تصمیم \lr{\mbox{UE}}/\allowbreak{}شبکه & \lr{\mbox{SMF}}، \lr{\mbox{UPF}} & حدود \lr{\mbox{100ms}} & \lr{TS 23.502 §4.3.4} \\
+درخواست خدمات & داده \lr{\mbox{UL}} در \lr{\mbox{IDLE}} & \lr{\mbox{AMF}}، \lr{\mbox{SMF}}، \lr{\mbox{UPF}} & حدود \lr{\mbox{50-100ms}} & \lr{TS 23.502 §4.2.3} \\
+صفحه‌بندی & داده \lr{\mbox{DL}} برای \lr{\mbox{UE}} بیکار & \lr{\mbox{AMF}}، \lr{\mbox{gNB}}ها & حدود \lr{320ms-2s (DRX)} & \lr{TS 23.502 §4.2.3.3} \\
+تحویل \lr{\mbox{Xn}} & تحرک (همان \lr{\mbox{AMF}}) & \lr{\mbox{gNB}}ها، \lr{\mbox{AMF}}، \lr{\mbox{SMF}}، \lr{\mbox{UPF}} & وقفه حدود \lr{\mbox{30-50ms}} & \lr{TS 38.300 §9.2.3} \\
+تحویل \lr{\mbox{N2}} & تحرک (\lr{\mbox{AMF}} متفاوت) & \lr{\mbox{gNB}}ها، \lr{\mbox{AMF}}ها، \lr{\mbox{SMF}}، \lr{\mbox{UPF}}، \lr{\mbox{UDM}} & وقفه حدود \lr{\mbox{50-100ms}} & \lr{TS 23.502 §4.9.1.3} \\
+\end{longtable}
+}
+
+\CNsection{}{مراجع کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{3GPP TS 23.501}}: System Architecture for the 5G System (5GS)}
+\item
+  \lr{\textbf{\lr{3GPP TS 23.502}}: Procedures for the 5G System (5GS)}
+\item
+  \lr{\textbf{\lr{3GPP TS 33.501}}: Security architecture and procedures for 5G System}
+\item
+  \lr{\textbf{\lr{3GPP TS 38.300}}: NR; NR and NG-RAN Overall Description}
+\item
+  \lr{\textbf{\lr{3GPP TS 38.331}}: NR; Radio Resource Control (RRC) Protocol}
+\item
+  \lr{\textbf{\lr{3GPP TS 29.244}}: Interface between the Control Plane and the User Plane (PFCP)}
+\item
+  \lr{\textbf{\lr{3GPP TS 38.413}}: NG-RAN; NG Application Protocol (NGAP)}
+\item
+  \lr{\textbf{\lr{3GPP TS 38.423}}: NG-RAN; Xn Application Protocol (XnAP)}
+\end{itemize}

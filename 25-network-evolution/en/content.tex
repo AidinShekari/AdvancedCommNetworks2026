@@ -1,0 +1,563 @@
+\CNsection{1}{Introduction}
+
+This module provides a \textbf{comprehensive synthesis} of mobile network evolution from 1G analog systems through 5G and beyond. It serves as a master reference connecting all previous modules, showing how each generation solved specific problems while creating new challenges that motivated the next evolution.
+
+The evolution follows a clear trajectory:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Voice \ensuremath{\to} Data \ensuremath{\to} Everything}
+\item
+  \textbf{Circuit \ensuremath{\to} Packet \ensuremath{\to} All-IP \ensuremath{\to} Service-Based}
+\item
+  \textbf{Hierarchical \ensuremath{\to} Flat \ensuremath{\to} Cloud-Native}
+\item
+  \textbf{One-size-fits-all \ensuremath{\to} Network Slicing \ensuremath{\to} AI-Native}
+\end{itemize}
+
+\Needspace{28\baselineskip}
+
+\CNsection{2}{Master Comparison Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{GSM (2G)} & \CNth{GPRS (2.5G)} & \CNth{EDGE (2.75G)} & \CNth{UMTS (3G)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{3GPP Release} & Rel-96/\allowbreak{}97 & Rel-97/\allowbreak{}98 & Rel-99 & Rel-99/\allowbreak{}4 \\
+\textbf{Year} & 1991 & 2000 & 2003 & 2001 \\
+\textbf{Radio Access} & TDMA/\allowbreak{}FDMA & TDMA/\allowbreak{}FDMA & TDMA/\allowbreak{}FDMA (8PSK) & WCDMA \\
+\textbf{Core Network} & NSS (MSC/\allowbreak{}HLR/\allowbreak{}VLR) & NSS + SGSN/\allowbreak{}GGSN & NSS + SGSN/\allowbreak{}GGSN & CS + PS Core \\
+\textbf{Switching Type} & Circuit-Switched & CS + Packet-Switched & CS + PS & CS + PS \\
+\textbf{Peak DL Rate} & 9.6~kbps & 171.2~kbps & 473.6~kbps & 2~Mbps \\
+\textbf{Typical Latency} & 500~ms & 300-600~ms & 200-400~ms & 100-200~ms \\
+\textbf{Mobility Mechanism} & Handover (hard) & Cell reselection + HO & Cell reselection + HO & Soft handover \\
+\textbf{Signaling Protocol} & MAP/\allowbreak{}BSSAP & MAP/\allowbreak{}BSSGP & MAP/\allowbreak{}BSSGP & RANAP/\allowbreak{}MAP \\
+\textbf{User Plane Protocol} & PCM (64~kbps) & LLC/\allowbreak{}SNDCP/\allowbreak{}GTP-U & LLC/\allowbreak{}SNDCP/\allowbreak{}GTP-U & GTP-U/\allowbreak{}PDCP \\
+\textbf{Control Plane Protocol} & SS7/\allowbreak{}ISUP/\allowbreak{}MAP & SS7 + GTP-C & SS7 + GTP-C & SS7 + GTP-C \\
+\textbf{Main Innovation} & Digital voice, roaming & Always-on packet data & Higher modulation (8PSK) & Wideband data (5~MHz) \\
+\textbf{Main Limitation} & No data, low capacity & Slow data, shared TDMA & Still TDMA-limited & High latency, complex RNC \\
+\textbf{Subscribers (approx.)} & 1B (2003) & 1.5B (2005) & 2B (2006) & 2B (2007) \\
+\end{longtable}
+}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{HSPA (3.5G)} & \CNth{LTE (4G)} & \CNth{LTE-Advanced (4G+)} & \CNth{5G NSA} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{3GPP Release} & Rel-5/\allowbreak{}6/\allowbreak{}7 & Rel-8/\allowbreak{}9 & Rel-10/\allowbreak{}11/\allowbreak{}12 & Rel-15 \\
+\textbf{Year} & 2005-2008 & 2009 & 2011-2014 & 2018 \\
+\textbf{Radio Access} & WCDMA + AMC & OFDMA/\allowbreak{}SC-FDMA & OFDMA + CA + MIMO & NR + LTE \\
+\textbf{Core Network} & CS + PS Core & EPC (MME/\allowbreak{}SGW/\allowbreak{}PGW) & EPC Enhanced & EPC + NGC partial \\
+\textbf{Switching Type} & CS + PS (HSPA=PS) & All-IP (Packet) & All-IP & All-IP \\
+\textbf{Peak DL Rate} & 42~Mbps (HSPA+) & 300~Mbps & 3~Gbps & 2-4~Gbps \\
+\textbf{Typical Latency} & 50-100~ms & 10-30~ms & 10-20~ms & 4-10~ms \\
+\textbf{Mobility Mechanism} & Soft/\allowbreak{}Hard HO & X2 handover (hard) & X2/\allowbreak{}S1 handover + CoMP & Dual connectivity \\
+\textbf{Signaling Protocol} & RANAP/\allowbreak{}MAP & S1AP/\allowbreak{}GTP-C & S1AP/\allowbreak{}GTP-C v2 & X2AP + S1AP + NG-AP \\
+\textbf{User Plane Protocol} & GTP-U/\allowbreak{}PDCP/\allowbreak{}MAC & GTP-U/\allowbreak{}PDCP/\allowbreak{}RLC & GTP-U/\allowbreak{}PDCP/\allowbreak{}RLC & GTP-U (dual pipe) \\
+\textbf{Control Plane Protocol} & SS7 + GTP-C & Diameter/\allowbreak{}GTP-C & Diameter/\allowbreak{}GTP-C & GTP-C + NGAP \\
+\textbf{Main Innovation} & Fast scheduling, AMC & All-IP, flat arch, OFDM & Carrier Aggregation, 8\ensuremath{\times}8 MIMO & NR radio with LTE anchor \\
+\textbf{Main Limitation} & Still CS voice, complex & No native IoT, limited MIMO & Spectrum fragmentation & Depends on 4G core \\
+\textbf{Subscribers (approx.)} & 3B (2012) & 4B (2018) & 5B (2020) & 1B (2022) \\
+\end{longtable}
+}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{5G SA} & \CNth{5G Core (SBA)} & \CNth{6G (Future)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{3GPP Release} & Rel-15/\allowbreak{}16 & Rel-15/\allowbreak{}16/\allowbreak{}17 & Rel-20+ \\
+\textbf{Year} & 2020 & 2020-2022 & \textasciitilde{}2030 \\
+\textbf{Radio Access} & NR (standalone) & NR & Sub-THz, RIS, AI \\
+\textbf{Core Network} & 5GC (AMF/\allowbreak{}SMF/\allowbreak{}UPF) & 5GC SBA (NFs) & 6G Core (AI-native) \\
+\textbf{Switching Type} & All-IP & All-IP + SBA & All-IP + Compute \\
+\textbf{Peak DL Rate} & 20~Gbps & 20~Gbps & 1~Tbps \\
+\textbf{Typical Latency} & 1-4~ms & 1-4~ms & \textless{}0.1~ms \\
+\textbf{Mobility Mechanism} & Xn handover & Xn + SBI mobility & Predictive AI HO \\
+\textbf{Signaling Protocol} & NGAP & HTTP/\allowbreak{}2 + SBI & AI-native signaling \\
+\textbf{User Plane Protocol} & GTP-U/\allowbreak{}SDAP & GTP-U/\allowbreak{}SDAP & Semantic comms \\
+\textbf{Control Plane Protocol} & NGAP/\allowbreak{}NAS 5G & SBI (HTTP/\allowbreak{}2) & Intent-based \\
+\textbf{Main Innovation} & Independent 5G, slicing & Service-Based Architecture & AI-native, sensing \\
+\textbf{Main Limitation} & Coverage gaps (mmWave) & Complexity, energy & Undefined standards \\
+\textbf{Subscribers (approx.)} & 500M (2023) & 1B+ (2024) & TBD (\textasciitilde{}2030+) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{Generation-by-Generation Analysis}
+
+\CNchained\CNsubsection{3.1}{GSM (2G) — Digital Voice Revolution (1991)}
+
+\textbf{Problem Solved:} GSM replaced analog 1G systems (AMPS, TACS) with digital transmission, providing encryption, international roaming via SIM cards, and efficient spectrum use through TDMA. For the first time, a subscriber could travel across Europe and make calls with the same phone and number. The GSM MAP protocol enabled global mobility management, and the hierarchical NSS architecture (MSC/\allowbreak{}VLR/\allowbreak{}HLR/\allowbreak{}AuC) became the template for mobile networks.
+
+\textbf{What it couldn’t do:} GSM was fundamentally circuit-switched — a dedicated timeslot was allocated for the entire call duration regardless of actual data flow. Data services (CSD) were limited to 9.6~kbps, making internet access impractical. As the internet exploded in the late 1990s, operators needed packet-switched data without replacing their entire GSM infrastructure.
+
+\CNsubsection{3.2}{GPRS (2.5G) — Packet Data Overlay (2000)}
+
+\textbf{Problem Solved:} GPRS introduced packet-switching as an \textbf{overlay} on the existing GSM radio and core network. By adding SGSN and GGSN nodes, operators could offer ``always-on'' internet connectivity where users shared radio resources and were charged by data volume rather than connection time. GPRS introduced the PDP Context concept, IP addressing for mobile devices, and GTP tunneling — concepts that persist through 5G.
+
+\textbf{What it couldn’t do:} GPRS reused GSM’s TDMA radio interface, sharing timeslots that were still primarily allocated for voice. Theoretical peak of 171.2~kbps was rarely achieved (typical: 30-50~kbps). Latency remained high (300-600~ms) due to the TDMA frame structure. The radio interface was the bottleneck — you couldn’t fix it without changing the air interface technology.
+
+\CNsubsection{3.3}{EDGE (2.75G) — Enhanced Data on GSM (2003)}
+
+\textbf{Problem Solved:} EDGE introduced 8PSK modulation (vs. GMSK in GSM/\allowbreak{}GPRS), tripling the bits per symbol from 1 to 3. With adaptive modulation and coding (9 MCS schemes), EDGE could deliver up to 473.6~kbps theoretical peak. It was a pure software/\allowbreak{}transceiver upgrade requiring no new infrastructure, giving operators a cost-effective capacity boost while they planned 3G deployments.
+
+\textbf{What it couldn’t do:} EDGE was still constrained by the 200~kHz GSM carrier bandwidth and TDMA structure. Real-world speeds of 100-200~kbps couldn’t support video streaming or rich web applications. The fundamental limitation was the narrow-band radio interface — achieving true mobile broadband required a completely new wideband radio technology.
+
+\CNsubsection{3.4}{UMTS (3G) — Wideband Mobile Broadband (2001)}
+
+\textbf{Problem Solved:} UMTS introduced WCDMA with 5~MHz carriers, providing up to 2~Mbps peak data rates. The spread-spectrum approach offered better spectral efficiency, soft handover for improved cell-edge performance, and native support for simultaneous voice and data. The UTRAN architecture (Node B + RNC) provided centralized radio resource management, and the combined CS+PS core supported both circuit voice and packet data.
+
+\textbf{What it couldn’t do:} The RNC was a bottleneck and single point of failure. Latency remained high (100-200~ms round-trip) due to the complex protocol stack. The dedicated channel approach was inefficient for bursty data traffic. Voice still used circuit-switching, maintaining dual-domain complexity. The fixed spreading factor limited adaptation to varying channel conditions.
+
+\CNsubsection{3.5}{HSPA (3.5G) — High-Speed Packet Access (2005-2008)}
+
+\textbf{Problem Solved:} HSPA (HSDPA + HSUPA) introduced shared channels, fast scheduling at the Node B (2ms TTI), Adaptive Modulation and Coding (AMC), and HARQ — moving intelligence from the RNC to the base station. HSDPA delivered up to 14.4~Mbps (Rel-5), later HSPA+ reached 42~Mbps with 64-QAM and MIMO. This made mobile video streaming and app stores viable, launching the smartphone era.
+
+\textbf{What it couldn’t do:} HSPA was still built on WCDMA’s 5~MHz carrier, limiting peak rates. Voice remained circuit-switched (except VoIP experiments). The RNC still existed, adding latency and cost. The architecture couldn’t scale efficiently — each RNC managed hundreds of Node Bs, creating capacity planning challenges. Operators needed a clean-slate design.
+
+\CNsubsection{3.6}{LTE (4G) — All-IP Flat Architecture (2009)}
+
+\textbf{Problem Solved:} LTE made a revolutionary break: all-IP from day one (no circuit-switching), OFDMA for downlink (eliminating inter-cell interference issues), flat architecture (removed the RNC, eNodeB connects directly to EPC), and the Evolved Packet Core (MME/\allowbreak{}S-GW/\allowbreak{}P-GW separation). With 20~MHz bandwidth and 2\ensuremath{\times}2 MIMO, LTE delivered 150-300~Mbps peak. VoLTE replaced circuit-switched voice. The X2 interface enabled direct inter-eNodeB handovers without core involvement.
+
+\textbf{What it couldn’t do:} LTE lacked native support for massive IoT (NB-IoT came later in Rel-13), couldn’t achieve sub-millisecond latency for industrial applications, had limited MIMO (max 8 layers), and the EPC’s GTP-based point-to-point interfaces couldn’t scale for the cloud-native era. Network slicing wasn’t possible with monolithic EPC nodes.
+
+\CNsubsection{3.7}{LTE-Advanced (4G+) — Carrier Aggregation Era (2011-2014)}
+
+\textbf{Problem Solved:} LTE-Advanced introduced Carrier Aggregation (combining up to 5\ensuremath{\times}20~MHz = 100~MHz), 8\ensuremath{\times}8 MIMO (8 layers DL), enhanced inter-cell interference coordination (eICIC/\allowbreak{}FeICIC), relay nodes, and Coordinated Multi-Point (CoMP). Peak rates reached 3~Gbps (Rel-12). Heterogeneous Networks (HetNets) with small cells addressed capacity in dense areas. LAA (Licensed Assisted Access) added unlicensed spectrum.
+
+\textbf{What it couldn’t do:} LTE-A was an evolution, not revolution — it couldn’t fundamentally change the frame structure for ultra-low latency, couldn’t use mmWave spectrum, and the EPC remained monolithic. Supporting diverse verticals (automotive, industry, healthcare) with one network configuration was impossible. The industry needed a new radio AND a new core.
+
+\CNsubsection{3.8}{5G NSA — Non-Standalone (2018)}
+
+\textbf{Problem Solved:} 5G NSA (Option 3/\allowbreak{}3a/\allowbreak{}3x) deployed NR (New Radio) using the existing LTE core (EPC) as an anchor. This allowed operators to launch 5G services quickly without building an entirely new core network. Dual Connectivity (EN-DC) combined LTE and NR carriers, delivering multi-Gbps throughput using mmWave and sub-6~GHz NR spectrum while maintaining LTE for control plane and voice (VoLTE).
+
+\textbf{What it couldn’t do:} 5G NSA couldn’t deliver the full 5G promise: no network slicing (EPC doesn’t support it), no ultra-reliable low-latency (URLLC requires 5GC), no Service-Based Architecture, and the LTE anchor added latency. It was a ``5G radio with 4G brain'' — a necessary stepping stone, not the destination.
+
+\CNsubsection{3.9}{5G SA — Standalone (2020)}
+
+\textbf{Problem Solved:} 5G SA deployed NR with the 5G Core (5GC), eliminating LTE dependency. This enabled network slicing (isolated virtual networks per use case), URLLC with 1ms latency, native support for massive IoT (mMTC), edge computing (MEC) integration, and the Service-Based Architecture. The AMF/\allowbreak{}SMF/\allowbreak{}UPF separation allowed independent scaling, and the SBI (HTTP/\allowbreak{}2, JSON) enabled cloud-native deployments.
+
+\textbf{What it couldn’t do:} mmWave coverage remains limited (short range, blockage-sensitive), energy consumption is significantly higher than 4G, the complexity of managing network slices across operators is unsolved, and true deterministic latency for industrial automation requires further enhancements. Migration from NSA to SA requires significant investment with uncertain near-term ROI.
+
+\CNsubsection{3.10}{5G Core — Service-Based Architecture (2020-2022)}
+
+\textbf{Problem Solved:} The 5G Core replaced point-to-point interfaces with a Service-Based Architecture where Network Functions (NFs) expose services via RESTful APIs (HTTP/\allowbreak{}2). NRF enables service discovery, NSSF manages slice selection, PCF provides policy, and UDM unifies subscriber data. Cloud-native principles (microservices, stateless design, containerization) enable elastic scaling, multi-vendor interoperability, and rapid feature deployment.
+
+\textbf{What it couldn’t do:} SBA complexity challenges smaller operators. Inter-PLMN roaming with SBA (SEPP) is still maturing. Energy efficiency of distributed cloud infrastructure is a concern. True end-to-end automation (zero-touch provisioning) requires AI/\allowbreak{}ML integration that’s still evolving. The architecture is ready for 6G evolution but needs AI-native capabilities built in from the ground up.
+
+\CNsubsection{3.11}{6G (Future) — AI-Native Networks (\textasciitilde{}2030)}
+
+\textbf{Problem Solved (Expected):} 6G aims to deliver 1~Tbps peak rates using sub-THz frequencies (100 GHz–3~THz), sub-0.1~ms latency, integrated sensing and communication (ISAC), AI-native air interface and network management, Reconfigurable Intelligent Surfaces (RIS) for programmable propagation, non-terrestrial networks (NTN) integration for global coverage, and semantic/\allowbreak{}goal-oriented communications that transmit meaning rather than bits.
+
+\textbf{What it couldn’t do (Anticipated challenges):} Sub-THz propagation is extremely limited (meters to tens of meters), requiring ultra-dense deployments. Energy efficiency at these frequencies is poor. Standardization of AI-native protocols is unprecedented. Privacy concerns with pervasive sensing. Regulatory frameworks for sub-THz spectrum allocation are undefined. Commercial viability for many proposed features remains unproven.
+
+\CNkeepfig{m25-generations-gantt}{5}
+
+\CNsection{4}{Timeline Diagram}
+
+\CNfigure{m25-generations-gantt}{Mobile network generations on a timeline}
+
+\CNkeepfig{m25-architecture-evolution}{5}
+
+\CNsection{5}{Architecture Evolution Diagram}
+
+\CNfigure{m25-architecture-evolution}{Architecture evolution from GSM to the 5G service-based core}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Architecture Element Evolution Map}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1579}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1974}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1974}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1974}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{2G Element} & \CNth{3G Equivalent} & \CNth{4G Equivalent} & \CNth{5G Equivalent} & \CNth{Evolution Pattern} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BTS & Node B & eNodeB & gNB & More intelligence pushed to edge \\
+BSC & RNC & — (removed) & — & Eliminated (functions in eNB/\allowbreak{}gNB) \\
+MSC & MSC Server & MME & AMF & Control plane separated from user plane \\
+HLR & HSS & HSS & UDM/\allowbreak{}UDR & Unified data management \\
+GMSC & GMSC & — & — & Eliminated (all-IP, no PSTN gateway needed) \\
+VLR & VLR & MME (integrated) & AMF (stateless) & From stateful to stateless \\
+SGSN & SGSN & S-GW (partial) & SMF+UPF & Split into control + user plane \\
+GGSN & GGSN & P-GW & UPF & Pure user plane forwarding \\
+— & — & PCRF & PCF & Policy and charging \\
+— & — & — & NRF & Service discovery (new in 5G) \\
+— & — & — & NSSF & Slice selection (new in 5G) \\
+\end{longtable}
+}
+
+\CNkeepfig{m25-data-rates}{5}
+
+\CNsection{6}{Data Rate Evolution Graph (Exponential Growth)}
+
+\CNfigure{m25-data-rates}{Peak downlink data rate of each generation (logarithmic scale)}
+
+\Needspace{21\baselineskip}
+
+\textbf{Growth pattern:} about 10\ensuremath{\times} every 5 years (1000\ensuremath{\times} per decade).
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Improvement} & \CNth{Peak rate} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+GSM \ensuremath{\to} GPRS & 18\ensuremath{\times} & 9.6~kbps \ensuremath{\to} 171~kbps \\
+GPRS \ensuremath{\to} EDGE & 2.8\ensuremath{\times} & 171~kbps \ensuremath{\to} 473~kbps \\
+EDGE \ensuremath{\to} UMTS & 4.2\ensuremath{\times} & 473~kbps \ensuremath{\to} 2~Mbps \\
+UMTS \ensuremath{\to} HSPA & 21\ensuremath{\times} & 2~Mbps \ensuremath{\to} 42~Mbps \\
+HSPA \ensuremath{\to} LTE & 7\ensuremath{\times} & 42~Mbps \ensuremath{\to} 300~Mbps \\
+LTE \ensuremath{\to} LTE-A & 10\ensuremath{\times} & 300~Mbps \ensuremath{\to} 3~Gbps \\
+LTE-A \ensuremath{\to} 5G & 6.7\ensuremath{\times} & 3~Gbps \ensuremath{\to} 20~Gbps \\
+5G \ensuremath{\to} 6G & 50\ensuremath{\times} & 20~Gbps \ensuremath{\to} 1~Tbps \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{23\baselineskip}
+
+\CNsection{7}{Key Lessons Learned from Each Transition}
+
+\CNchained\CNsubsection{7.1}{GSM \ensuremath{\to} GPRS: Overlay Packet on Circuit}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Lesson} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Strategy} & You don’t need to replace everything — overlay new capability on existing infrastructure \\
+\textbf{Architecture} & Added SGSN/\allowbreak{}GGSN alongside MSC without disrupting voice service \\
+\textbf{Risk Management} & Incremental deployment: operators could add packet capability node by node \\
+\textbf{Trade-off} & Shared radio resources meant neither voice nor data was optimal \\
+\textbf{Legacy Impact} & GTP tunneling protocol invented here persists through 5G \\
+\textbf{Key Principle} & \textbf{``Evolution over revolution when the installed base is massive''} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.2}{GPRS \ensuremath{\to} UMTS: New Radio, Keep Core}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Lesson} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Strategy} & When the radio is the bottleneck, change the radio but keep the proven core \\
+\textbf{Architecture} & WCDMA replaced TDMA, but SGSN/\allowbreak{}GGSN/\allowbreak{}HLR remained largely unchanged \\
+\textbf{Risk Management} & Operators could run 2G and 3G simultaneously with shared core \\
+\textbf{Trade-off} & New spectrum required (2100~MHz band) — massive licensing costs \\
+\textbf{Legacy Impact} & RNC architecture created a new bottleneck that took a decade to remove \\
+\textbf{Key Principle} & \textbf{``Change one major subsystem at a time to manage risk''} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.3}{UMTS \ensuremath{\to} LTE: Flatten, All-IP, Remove RNC}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Lesson} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Strategy} & Sometimes you must break backward compatibility for fundamental improvement \\
+\textbf{Architecture} & Eliminated RNC (functions distributed to eNodeB), all-IP (eliminated circuit-switching) \\
+\textbf{Risk Management} & VoLTE took years to mature — interim CSFB to 2G/\allowbreak{}3G for voice \\
+\textbf{Trade-off} & Clean-slate design required parallel networks for many years \\
+\textbf{Legacy Impact} & Flat architecture proved far more scalable and cost-effective \\
+\textbf{Key Principle} & \textbf{``Flatten the hierarchy — push intelligence to the edge, simplify the core''} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.4}{LTE \ensuremath{\to} LTE-Advanced: Carrier Aggregation, More MIMO}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Lesson} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Strategy} & Combine existing resources more cleverly before seeking new ones \\
+\textbf{Architecture} & CA bonds fragmented spectrum; MIMO multiplies spatial capacity \\
+\textbf{Risk Management} & Backward compatible — LTE devices work alongside LTE-A \\
+\textbf{Trade-off} & Complexity in scheduler and UE increases significantly \\
+\textbf{Legacy Impact} & Established that spectrum aggregation is key to capacity scaling \\
+\textbf{Key Principle} & \textbf{``Maximize what you have through intelligent combination before building new''} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.5}{LTE \ensuremath{\to} 5G: New Radio + New Core, Slicing, SBA}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Lesson} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Strategy} & When requirements diverge (eMBB vs. URLLC vs. mMTC), one configuration cannot serve all \\
+\textbf{Architecture} & NR provides flexible numerology; 5GC SBA enables per-slice customization \\
+\textbf{Risk Management} & NSA deployment (Option 3x) as stepping stone before SA \\
+\textbf{Trade-off} & Enormous complexity; operators must justify ROI for diverse verticals \\
+\textbf{Legacy Impact} & SBA and cloud-native principles prepare for continuous software evolution \\
+\textbf{Key Principle} & \textbf{``Design for diversity — network slicing lets one physical network serve many purposes''} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.6}{5G \ensuremath{\to} 6G: AI-Native, Sensing, Sub-THz}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Lesson} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Strategy} & The network itself becomes intelligent — AI is not an add-on but a fundamental design principle \\
+\textbf{Architecture} & Digital twin of the network, predictive resource management, semantic communications \\
+\textbf{Risk Management} & Research phase allows exploration of feasibility before standardization \\
+\textbf{Trade-off} & Sub-THz range is extremely limited; cost of ultra-dense deployment is unknown \\
+\textbf{Legacy Impact} & May redefine what ``communication'' means (sensing + computing + communicating) \\
+\textbf{Key Principle} & \textbf{``Converge communication, computation, and sensing into a unified intelligent fabric''} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{17\baselineskip}
+
+\CNsection{8}{Summary of Evolutionary Patterns}
+
+\CNchained\CNsubsection{}{Pattern 1: Alternating Radio and Core Innovation}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}cccccccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Generation} & \CNth{2G} & \CNth{2.5G} & \CNth{3G} & \CNth{3.5G} & \CNth{4G} & \CNth{4G+} & \CNth{5G} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Focus & Radio & Core & Radio & Radio & Both & Radio & Both \\
+Key innovation & TDMA & SGSN & WCDMA & HSPA & OFDMA & CA & NR + SBA \\
+\end{longtable}
+}
+
+\CNkeepfig{m25-complexity-cycle}{3}
+
+\CNsubsection{}{Pattern 2: Complexity Cycle}
+
+\CNfigure{m25-complexity-cycle}{The complexity cycle of mobile network architectures}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{Pattern 3: Control/\allowbreak{}User Plane Separation Timeline}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Generation} & \CNth{Control/\allowbreak{}user-plane arrangement} & \CNth{Result} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2G & MSC handles both & Inefficient \\
+3G & MSC-Server + MGW split (Rel-4) & Partial CUPS \\
+4G & MME (CP) + S-GW/\allowbreak{}P-GW (UP) & Architectural CUPS \\
+5G & AMF/\allowbreak{}SMF (CP) + UPF (UP) & Complete CUPS \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Pattern 4: Where Intelligence Resides}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Generation} & \CNth{Where the intelligence resides} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2G & BSC/\allowbreak{}MSC (centralised) \\
+3G & RNC (centralised) \\
+4G & eNodeB (distributed to the edge) \\
+5G & gNB + edge computing (distributed + edge cloud) \\
+6G & Everywhere (AI at every layer) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{31\baselineskip}
+
+\CNsection{9}{Exam Preparation Quick Reference}
+
+\CNchained\CNsubsection{}{Must-Know Facts per Generation}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.2632}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.7368}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Gen} & \CNth{Remember This} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+GSM & TDMA, 200~kHz carrier, 8 timeslots, circuit-switched, MAP/\allowbreak{}SS7, HLR/\allowbreak{}VLR/\allowbreak{}MSC \\
+GPRS & Added SGSN+GGSN, PDP Context, GTP tunnel, packet overlay on CS \\
+EDGE & 8PSK modulation (3 bits/\allowbreak{}symbol vs 1), 9 MCS schemes, software upgrade \\
+UMTS & WCDMA, 5~MHz, spreading codes, RNC, soft handover, Rake receiver \\
+HSPA & Shared channel, 2ms TTI, AMC, HARQ, fast scheduling at Node B \\
+LTE & OFDMA, flat (no RNC), all-IP, EPC (MME/\allowbreak{}SGW/\allowbreak{}PGW), X2 interface \\
+LTE-A & CA (5\ensuremath{\times}20~MHz), 8\ensuremath{\times}8 MIMO, CoMP, HetNets, Relay \\
+5G NSA & EN-DC, LTE anchor, NR secondary, Option 3x, EPC core \\
+5G SA & AMF/\allowbreak{}SMF/\allowbreak{}UPF, NGAP, network slicing, URLLC, mMTC \\
+5GC & SBA, HTTP/\allowbreak{}2, NRF discovery, NSSF, stateless NFs, cloud-native \\
+6G & Sub-THz, RIS, AI-native, ISAC, semantic comms, 1~Tbps \\
+\end{longtable}
+}
+
+\CNkeepfig{m25-stacks}{3}
+
+\CNsubsection{}{Key Protocol Stack Evolution}
+
+\CNfigure{m25-stacks}{User-plane protocol stack of each generation}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{Critical Comparison: 4G EPC vs 5G Core}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3462}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3077}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3462}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{4G EPC} & \CNth{5G Core} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Interface type & Point-to-point (GTP-C, Diameter) & Service-Based (HTTP/\allowbreak{}2 REST) \\
+Discovery & Static configuration & NRF dynamic discovery \\
+Scaling & Vertical (bigger boxes) & Horizontal (more instances) \\
+Deployment & Appliance-based & Cloud-native (containers, K8s) \\
+Slicing & Not supported & Native (NSSF, per-slice NFs) \\
+State & Stateful nodes & Stateless NFs + external state (UDSF) \\
+Mobility anchor & GTP tunnel (S-GW) & UPF (can be distributed) \\
+Policy & PCRF (Diameter) & PCF (SBI) \\
+Subscriber data & HSS (Diameter) & UDM/\allowbreak{}UDR (SBI) \\
+Authentication & MME + HSS (EAP-AKA) & AUSF + UDM (5G-AKA, EAP) \\
+\end{longtable}
+}
+
+\CNsection{10}{Conclusion}
+
+The evolution from GSM to 6G represents one of the most remarkable engineering journeys in history — from 9.6~kbps voice calls to terabit-per-second intelligent networks in four decades. Each generation solved the previous generation’s limitations while introducing new complexity that demanded the next evolution.
+
+\textbf{The three constants across all generations:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Demand always exceeds supply} — users always find ways to consume available capacity
+\item
+  \textbf{Simplification follows complexity} — every overly complex architecture is eventually flattened
+\item
+  \textbf{The boundary between network and computing blurs} — from dumb pipes to intelligent platforms
+\end{enumerate}
+
+Understanding this evolution is not just historical knowledge — it teaches us how to evaluate future technologies, predict architectural decisions, and design systems that can gracefully evolve.
+
+\emph{Module 25 — Network Evolution Grand Synthesis}\CNbr{}\emph{Advanced Communication Networks Course}\CNbr{}\emph{Last updated: August 2026}

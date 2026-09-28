@@ -1,0 +1,13 @@
+% Module 4 — soft handover: two radio legs combined in the RNC
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ue) at (0,0) {UE};
+\node[CNran] (n1) at (4,1.1) {Node B 1}; \node[CNran] (n2) at (4,-1.1) {Node B 2};
+\node[CNran, line width=1.4pt] (rnc) at (8,0) {RNC}; \node[CNcp] (cn) at (10.8,0) {CN};
+\draw[CNdata, ->] (ue.east) -- ++(0.8,0) |- node[pos=0.2, CNelab, left, fill=none] {radio} (n1.west);
+\draw[CNdata, ->] (ue.east) -- ++(0.8,0) |- (n2.west);
+\draw[CNlink, ->] (n1.east) -| ([xshift=-0.8cm]rnc.west) -- (rnc.west);
+\draw[CNlink, ->] (n2.east) -| ([xshift=-0.8cm]rnc.west);
+\draw[CNlink, ->] (rnc) -- (cn);
+\node[CNnote, anchor=north] (n) at (8,-1.3) {\CNL{combining}{ترکیب}\\(\CNL{selection or MRC}{انتخاب یا \lr{MRC}})};
+\draw[CNsig, ->, line width=0.9pt] (n.north) -- (rnc.south);
+\end{tikzpicture}

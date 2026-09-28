@@ -1,0 +1,1325 @@
+\Needspace{25\baselineskip}
+
+\CNsection{9.1}{چرا \lr{\mbox{EPC}} طراحی شد}
+
+هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}} در نسخه 8 گروه \lr{\mbox{3GPP}} به‌عنوان شبکه هسته برای \lr{LTE/\allowbreak{}4G} معرفی شد. طراحی آن توسط محدودیت‌های بنیادی شبکه‌های هسته قدیمی (دامنه‌های سوییچینگ مداری + سوییچینگ بسته‌ای نسل \lr{2G/\allowbreak{}3G}) هدایت شد.
+
+\CNsubsection{}{اصول طراحی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3750}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{اصل} & \CNth{مسیله قدیمی} & \CNth{راه‌حل \lr{\mbox{EPC}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{معماری تمام-\lr{\mbox{IP}}} & دامنه‌های جداگانه \lr{\mbox{CS}} و \lr{\mbox{PS}}، انتقال \lr{\mbox{TDM}} & هسته واحد مسطح مبتنی بر \lr{\mbox{IP}} برای تمام خدمات (صدا از طریق \lr{VoLTE/\allowbreak{}IMS}) \\
+\textbf{معماری مسطح} & سلسله‌مراتب عمیق (\lr{\mbox{RNC}}، \lr{\mbox{SGSN}}، \lr{\mbox{GGSN}}) که تأخیر اضافه می‌کند & کاهش تعداد گره؛ \lr{\mbox{eNB}} مستقیماً به \lr{\mbox{EPC}} متصل می‌شود \\
+\textbf{جداسازی کنترل/\allowbreak{}صفحه کاربر} & \lr{CP/\allowbreak{}UP} ترکیبی در \lr{SGSN/\allowbreak{}GGSN} & \lr{\mbox{MME}} (فقط \lr{\mbox{CP}})، \lr{S-GW/\allowbreak{}P-GW} (\lr{\mbox{UP}} با \lr{\mbox{CP}} حداقلی) \\
+\textbf{پشتیبانی چند-\lr{\mbox{RAT}}} & هسته‌های جداگانه در هر \lr{\mbox{RAT}} & \lr{\mbox{EPC}} واحد به \lr{\mbox{LTE}}، \lr{\mbox{WCDMA}}، \lr{\mbox{CDMA2000}}، \lr{\mbox{Wi-Fi}} خدمات می‌دهد \\
+\textbf{تحرک ساده‌شده} & تحویل پیچیده با گره‌های زیاد & لنگرگذاری مبتنی بر \lr{\mbox{GTP}} با گام‌های کمتر \\
+\textbf{همگرایی سیاست و صورت‌حساب} & سیاست/\allowbreak{}صورت‌حساب تکه‌تکه & معماری \lr{\mbox{PCC}} یکپارچه \lr{(PCRF/\allowbreak{}PCEF)} \\
+\end{longtable}
+}
+
+\CNsubsection{}{مزایای کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تأخیر کمتر}: مسیر صفحه کاربر کوتاه‌تر است (\lr{eNB \ensuremath{\leftarrow} S-GW \ensuremath{\leftarrow} P-GW} \ensuremath{\leftarrow} اینترنت)
+\item
+  \textbf{توان عملیاتی بالاتر}: بدون گلوگاه \lr{\mbox{RNC}}؛ زمان‌بندی توزیع‌شده در \lr{\mbox{eNB}}
+\item
+  \textbf{مقیاس‌پذیری}: گره‌های ارسال بدون حالت؛ \lr{\mbox{CP}} مستقل مقیاس می‌یابد
+\item
+  \textbf{چابکی خدمات}: \lr{\mbox{QoS}} پویا از طریق حامل‌های اختصاصی و قواعد \lr{\mbox{PCC}}
+\item
+  \textbf{کارایی هزینه}: انتقال \lr{\mbox{IP}} در سراسر شبکه؛ سخت‌افزار عمومی
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m09-epc-architecture}{8}
+
+\CNsection{9.2}{مرور معماری \lr{\mbox{EPC}}}
+
+\CNchained\CNsubsection{}{نمودار معماری کامل}
+
+\CNfigure{m09-epc-architecture}{معماری کامل \lr{\mbox{EPC}} به همراه واسط‌ها و پروتکل‌ها}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{خلاصه واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{نقاط انتهایی} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{S1-MME}} & \lr{eNB \ensuremath{\leftrightarrow} MME} & \lr{S1AP over SCTP} & سیگنالینگ صفحه کنترل \\
+\lr{\mbox{S1-U}} & \lr{eNB \ensuremath{\leftrightarrow} S-GW} & \lr{GTP-U over UDP} & داده صفحه کاربر \\
+\lr{\mbox{X2}} & \lr{eNB \ensuremath{\leftrightarrow} eNB} & \lr{X2AP + GTP-U} & تحویل، مدیریت بار \\
+\lr{\mbox{S11}} & \lr{MME \ensuremath{\leftrightarrow} S-GW} & \lr{\mbox{GTPv2-C}} & مدیریت نشست/\allowbreak{}حامل \\
+\lr{S5/\allowbreak{}S8} & \lr{S-GW \ensuremath{\leftrightarrow} P-GW} & \lr{\mbox{GTP (S5)}} یا \lr{PMIP (S8)} & صفحه کاربر + \lr{\mbox{CP}} \\
+\lr{\mbox{S6a}} & \lr{MME \ensuremath{\leftrightarrow} HSS} & \lr{\mbox{Diameter}} & احراز هویت، اشتراک \\
+\lr{\mbox{S10}} & \lr{MME \ensuremath{\leftrightarrow} MME} & \lr{\mbox{GTPv2-C}} & جابه‌جایی \lr{\mbox{MME}} \\
+\lr{\mbox{S3}} & \lr{MME \ensuremath{\leftrightarrow} SGSN} & \lr{\mbox{GTPv2-C}} & تحرک بین-\lr{\mbox{RAT}} \\
+\lr{\mbox{Gx}} & \lr{PCRF \ensuremath{\leftrightarrow} P-GW} & \lr{\mbox{Diameter}} & قواعد سیاست و صورت‌حساب \\
+\lr{\mbox{Gy}} & \lr{P-GW \ensuremath{\leftrightarrow} OCS} & \lr{\mbox{Diameter}} & صورت‌حساب آنلاین \\
+\lr{\mbox{Rx}} & \lr{PCRF \ensuremath{\leftrightarrow} AF/\allowbreak{}IMS} & \lr{\mbox{Diameter}} & درخواست \lr{\mbox{QoS}} در سطح سرویس \\
+\lr{\mbox{SGi}} & \lr{P-GW \ensuremath{\leftrightarrow} PDN} & \lr{\mbox{IP}} & شبکه داده خارجی \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\CNsection{9.3}{توابع شبکه \lr{\mbox{EPC}}}
+
+\CNchained\CNsubsection{9.3.1}{\lr{\mbox{MME}} \lr{—} موجودیت مدیریت تحرک}
+
+\CNchained\CNsubsubsection{هدف}
+
+\lr{\mbox{MME}} \textbf{گره اصلی صفحه کنترل} در \lr{\mbox{EPC}} است. تمام سیگنالینگ بین \lr{\mbox{UE}} و شبکه هسته را مدیریت می‌کند و تحرک، امنیت و برقراری نشست را کنترل می‌کند. \lr{\mbox{MME}} هرگز به داده صفحه کاربر دست نمی‌زند.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{سیگنالینگ \lr{\mbox{NAS}}}: پروتکل‌های لایه غیر-دسترسی (\lr{\mbox{EMM}} و \lr{\mbox{ESM}}) را با \lr{\mbox{UE}} پایان می‌دهد
+\item
+  \textbf{احراز هویت و امنیت}: \lr{\mbox{EPS-AKA}} را آغاز می‌کند، کلیدها را مشتق می‌کند \lr{(\ensuremath{K_{\mathrm{ASME}}} \ensuremath{\to} \ensuremath{K_{\mathrm{eNB}}})}، الگوریتم‌های امنیت \lr{\mbox{NAS}} را انتخاب می‌کند
+\item
+  \textbf{مدیریت تحرک}: مکان \lr{\mbox{UE}} را ردیابی می‌کند \lr{\mbox{(TAI)}}، حالت‌های \lr{\mbox{ECM}} را مدیریت می‌کند، سیگنالینگ تحویل را انجام می‌دهد
+\item
+  \textbf{مدیریت حامل}: حامل‌های \lr{\mbox{EPS}} را از طریق سیگنالینگ \lr{\mbox{S11}} به \lr{\mbox{S-GW}} ایجاد/\allowbreak{}اصلاح/\allowbreak{}حذف می‌کند
+\item
+  \textbf{صفحه‌بندی}: \lr{\mbox{UE}}ها را در حالت \lr{\mbox{ECM-IDLE}} هنگام رسیدن داده پیوند پایین‌سو صفحه‌بندی می‌کند
+\item
+  \textbf{انتخاب و استخر \lr{\mbox{MME}}}: چندین \lr{\mbox{MME}} به یک ناحیه استخر خدمات می‌دهند؛ توازن بار از طریق وزن‌دهی \lr{\mbox{S1AP}}
+\item
+  \textbf{تحرک بین-\lr{\mbox{RAT}}}: تحویل به/\allowbreak{}از \lr{2G/\allowbreak{}3G} را از طریق واسط \lr{\mbox{S3}} به \lr{\mbox{SGSN}} انجام می‌دهد
+\item
+  \textbf{رهگیری قانونی}: سیگنالینگ برای محرک‌های \lr{\mbox{LI}} فراهم می‌کند
+\end{enumerate}
+
+\Needspace{19\baselineskip}
+
+\CNsubsubsection{واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{همتا} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{S1-MME}} & \lr{\mbox{eNB}} & \lr{S1AP/\allowbreak{}SCTP} & صفحه کنترل \lr{\mbox{RAN}} \\
+\lr{\mbox{S11}} & \lr{\mbox{S-GW}} & \lr{\mbox{GTPv2-C}} & مدیریت حامل/\allowbreak{}نشست \\
+\lr{\mbox{S6a}} & \lr{\mbox{HSS}} & \lr{\mbox{Diameter}} & بردارهای احراز هویت، داده اشتراک \\
+\lr{\mbox{S10}} & \lr{\mbox{MME}} & \lr{\mbox{GTPv2-C}} & جابه‌جایی \lr{\mbox{MME}} (تحویل) \\
+\lr{\mbox{S3}} & \lr{\mbox{SGSN}} & \lr{\mbox{GTPv2-C}} & تحرک بین-\lr{\mbox{RAT}} \\
+\lr{\mbox{S13}} & \lr{\mbox{EIR}} & \lr{\mbox{Diameter}} & بررسی هویت تجهیزات \\
+\lr{\mbox{NAS}} & \lr{\mbox{UE}} & \lr{EMM/\allowbreak{}ESM (over S1AP)} & سیگنالینگ مستقیم \lr{\mbox{UE}} \\
+\end{longtable}
+}
+
+\CNsubsubsection{پروتکل‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{S1AP}}}}}: پروتکل کاربرد برای واسط \lr{\mbox{S1}} (کدگذاری \lr{\mbox{ASN.1}}، انتقال \lr{\mbox{SCTP}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{GTPv2-C}}}}}: پروتکل تونل‌سازی \lr{\mbox{GPRS}} نسخه 2 کنترل (پورت \lr{\mbox{UDP 2123}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Diameter}}}}}: برای \lr{\mbox{S6a}} (احراز هویت)، \lr{\mbox{S13}} (بررسی \lr{\mbox{EIR}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{NAS}}}: EMM}} (مدیریت تحرک \lr{\mbox{EPS}}) + \lr{\mbox{ESM}} (مدیریت نشست \lr{\mbox{EPS}})
+\end{itemize}
+
+\CNsubsubsection{تأثیر شکست}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{فوری}: تمام \lr{\mbox{UE}}هایی که توسط \lr{\mbox{MME}} شکست‌خورده خدمات می‌گیرند، اتصال سیگنالینگ خود را از دست می‌دهند
+\item
+  \textbf{آزادسازی اتصالات \lr{\mbox{S1}}}: \lr{\mbox{eNB}}ها شکست را از طریق انقضای ضربان \lr{\mbox{SCTP}} تشخیص می‌دهند
+\item
+  \textbf{بازیابی}: \lr{\mbox{UE}}های در \lr{ECM-CONNECTED} به \lr{\mbox{ECM-IDLE}} می‌روند، سپس به \lr{\mbox{MME}} دیگری در استخر دوباره متصل می‌شوند
+\item
+  \textbf{کاهش اثر}: استخر \lr{\mbox{MME}} تضمین می‌کند \lr{\mbox{MME}}های باقیمانده بار را جذب می‌کنند؛ زمینه \lr{\mbox{UE}} را می‌توان از \lr{\mbox{HSS}} بازیابی کرد
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.2}{\lr{\mbox{HSS}} \lr{—} سرور مشترک خانگی}
+
+\CNchained\CNsubsubsection{هدف}
+
+\lr{\mbox{HSS}} \textbf{پایگاه داده مرکزی مشترکین} برای \lr{\mbox{EPC}} است. این تحول \lr{HLR/\allowbreak{}AuC} از نسل \lr{2G/\allowbreak{}3G} است که تمام اطلاعات دایمی مشترک، اعتبارنامه‌های احراز هویت و پروفایل‌های خدمات را ذخیره می‌کند.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{پایگاه داده مشترکین}: \lr{\mbox{IMSI}}، \lr{\mbox{MSISDN}}، اشتراک‌های خدمات، پیکربندی‌های \lr{\mbox{APN}} را ذخیره می‌کند
+\item
+  \textbf{تولید بردار احراز هویت}: بردارهای احراز هویت \lr{\mbox{EPS}} (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{XRES}}، \lr{\mbox{\ensuremath{K_{\mathrm{ASME}}}}}) را با استفاده از کلید دایمی \lr{\mbox{K}} و شماره ترتیب \lr{\mbox{SQN}} تولید می‌کند
+\item
+  \textbf{مدیریت مکان}: آدرس \lr{\mbox{MME}} فعلی را برای هر مشترک نگه می‌دارد؛ ثبت‌نام/\allowbreak{}لغو ثبت‌نام را انجام می‌دهد
+\item
+  \textbf{پروفایل‌های اشتراک}: \lr{\mbox{APN}}های مجاز، پروفایل‌های \lr{\mbox{QoS}} (\lr{\mbox{AMBR}} مشترک‌شده، \lr{\mbox{QCI}} پیش‌فرض)، محدودیت‌های رومینگ را ذخیره می‌کند
+\item
+  \textbf{ویژگی‌های صورت‌حساب}: پیکربندی صورت‌حساب در هر مشترک
+\item
+  \textbf{مجوزدهی خدمات}: تعیین می‌کند \lr{\mbox{UE}} مجاز به کدام خدمات است
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3056}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1667}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2778}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{همتا} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{S6a}} & \lr{\mbox{MME}} & \lr{\mbox{Diameter}} & بردارهای احراز هویت، به‌روزرسانی مکان، داده اشتراک \\
+\lr{\mbox{S6d}} & \lr{\mbox{SGSN}} & \lr{\mbox{Diameter}} & معادل \lr{2G/\allowbreak{}3G} برای \lr{\mbox{S6a}} \\
+\lr{Cx/\allowbreak{}Dx} & \lr{IMS (CSCF)} & \lr{\mbox{Diameter}} & ثبت‌نام \lr{\mbox{IMS}}، مسیریابی \\
+\lr{\mbox{Sh}} & \lr{\mbox{AS}} & \lr{\mbox{Diameter}} & داده خدمات برای سرورهای کاربردی \\
+\end{longtable}
+}
+
+\CNsubsubsection{پروتکل‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Diameter}}}}}: تمام واسط‌های \lr{\mbox{HSS}} از \lr{Diameter (RFC 6733)} با کاربردهای مشخص استفاده می‌کنند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{S6a}}: کاربرد \lr{\mbox{Diameter}} گروه \lr{\mbox{3GPP}} (\lr{\mbox{AVP}}های اختصاصی سازنده)
+  \item
+    \lr{Authentication-Information-Request/\allowbreak{}Answer (AIR/\allowbreak{}AIA)}
+  \item
+    \lr{Update-Location-Request/\allowbreak{}Answer (ULR/\allowbreak{}ULA)}
+  \item
+    \lr{Cancel-Location-Request (CLR)} برای پاک‌سازی \lr{\mbox{MME}} قدیمی
+  \end{itemize}
+\end{itemize}
+
+\CNsubsubsection{تأثیر شکست}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{اتصالات جدید شکست می‌خورند}: هیچ بردار احراز هویتی برای \lr{\mbox{UE}}های جدید در دسترس نیست
+\item
+  \textbf{نشست‌های موجود زنده می‌مانند}: \lr{\mbox{MME}} بردارهای احراز هویت را ذخیره می‌کند (معمولاً 5 در هر \lr{\mbox{UE}})
+\item
+  \textbf{تحویل‌ها تحت تأثیر قرار می‌گیرند}: اگر \lr{\mbox{MME}} جدید نتواند پروفایل مشترک را بگیرد
+\item
+  \textbf{کاهش اثر}: \lr{\mbox{HSS}} معمولاً به‌عنوان یک جفت همسان با افزونگی جغرافیایی و تکرار پایگاه داده مستقر می‌شود
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.3}{\lr{\mbox{S-GW}} \lr{—} دروازه خدمات‌دهنده}
+
+\CNchained\CNsubsubsection{هدف}
+
+\lr{\mbox{S-GW}} \textbf{لنگر صفحه کاربر} بین شبکه رادیویی و هسته است. به‌عنوان لنگر تحرک محلی برای تحویل‌های بین-\lr{\mbox{eNB}} عمل می‌کند و تداوم صفحه کاربر را در حین جابه‌جایی \lr{\mbox{UE}} بین ایستگاه‌های پایه تضمین می‌کند.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{ارسال صفحه کاربر}: داده کاربر را بین \lr{\mbox{eNB}} و \lr{\mbox{P-GW}} از طریق تونل‌های \lr{\mbox{GTP-U}} مسیریابی می‌کند
+\item
+  \textbf{لنگر تحرک محلی}: در حین تحویل \lr{\mbox{X2}}، \lr{\mbox{S-GW}} بدون تغییر می‌ماند؛ فقط نقطه انتهایی \lr{\mbox{GTP-U}} پیوند پایین‌سو به \lr{\mbox{eNB}} مقصد تغییر می‌کند
+\item
+  \textbf{بافرینگ داده پیوند پایین‌سو}: وقتی \lr{\mbox{UE}} در \lr{\mbox{ECM-IDLE}} است، \lr{\mbox{S-GW}} بسته‌های ورودی را بافر می‌کند و \lr{\mbox{MME}} را برای صفحه‌بندی \lr{\mbox{UE}} فعال می‌کند
+\item
+  \textbf{صورت‌حساب در هر \lr{\mbox{UE}}}: داده صورت‌حساب (\lr{\mbox{CDR}}ها) را در هر حامل جمع‌آوری و به سیستم صورت‌حساب گزارش می‌کند
+\item
+  \textbf{رهگیری قانونی}: نقطه کپی صفحه کاربر برای رهگیری قانونی
+\item
+  \textbf{لنگر بین-\lr{\mbox{RAT}}}: صفحه کاربر را در حین تحویل بین \lr{\mbox{LTE}} و \lr{2G/\allowbreak{}3G} لنگر می‌کند (با \lr{\mbox{SGSN}})
+\item
+  \textbf{علامت‌گذاری سطح انتقال}: علامت‌گذاری \lr{\mbox{DSCP}} بر اساس \lr{\mbox{QCI}} حامل اعمال می‌کند
+\end{enumerate}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{همتا} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{S1-U}} & \lr{\mbox{eNB}} & \lr{\mbox{GTP-U}} & صفحه کاربر از \lr{\mbox{RAN}} \\
+\lr{\mbox{S11}} & \lr{\mbox{MME}} & \lr{\mbox{GTPv2-C}} & مدیریت حامل/\allowbreak{}تونل \\
+\lr{S5/\allowbreak{}S8} & \lr{\mbox{P-GW}} & \lr{GTP-U + GTPv2-C} & صفحه کاربر + سیگنالینگ به \lr{\mbox{P-GW}} \\
+\lr{\mbox{S4}} & \lr{\mbox{SGSN}} & \lr{\mbox{GTP}} & صفحه کاربر بین-\lr{RAT (2G/\allowbreak{}3G)} \\
+\lr{\mbox{S12}} & \lr{\mbox{UTRAN}} & \lr{\mbox{GTP-U}} & تونل مستقیم \lr{\mbox{(3G)}} \\
+\end{longtable}
+}
+
+\CNsubsubsection{پروتکل‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{GTP-U}}}}} (پورت \lr{\mbox{UDP 2152}}): بسته‌های \lr{\mbox{IP}} کاربر را در سرآیندهای \lr{\mbox{GTP}} با \lr{\mbox{TEID}} کپسوله می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{GTPv2-C}}}}} (پورت \lr{\mbox{UDP 2123}}): پیام‌های \lr{Create/\allowbreak{}Modify/\allowbreak{}Delete Session} از \lr{\mbox{MME}}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{DSCP}}}}}: علامت‌گذاری سرآیند \lr{\mbox{IP}} بیرونی برای \lr{\mbox{QoS}} انتقال
+\end{itemize}
+
+\CNsubsubsection{تأثیر شکست}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{نشست‌های فعال مختل می‌شوند}: جریان‌های داده در جریان قطع می‌شوند
+\item
+  \textbf{تغییر مسیر لازم است}: \lr{\mbox{MME}} شکست را تشخیص می‌دهد، \lr{\mbox{S-GW}} جدید انتخاب می‌کند، تونل‌های \lr{\mbox{GTP}} را دوباره برقرار می‌کند
+\item
+  \textbf{داده بافر‌شده از دست می‌رود}: هر بسته \lr{\mbox{DL}} بافر‌شده برای \lr{\mbox{UE}}های \lr{\mbox{IDLE}} از دست می‌رود
+\item
+  \textbf{کاهش اثر}: \lr{\mbox{S-GW}} معمولاً با افزونگی \lr{\mbox{N+1}} مستقر می‌شود؛ \lr{\mbox{ICGW}} (کاهش سیگنالینگ حالت بیکار) حالت را کمینه می‌کند
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.4}{\lr{\mbox{P-GW}} \lr{—} دروازه \lr{\mbox{PDN}}}
+
+\CNchained\CNsubsubsection{هدف}
+
+\lr{\mbox{P-GW}} \textbf{نقطه اتصال متقابل} بین \lr{\mbox{EPC}} و شبکه‌های داده بسته‌ای خارجی (\lr{\mbox{PDN}}ها) است. این نقطه لنگر \lr{\mbox{IP}} برای نشست‌های \lr{\mbox{UE}} است \lr{—} آدرس \lr{\mbox{IP}} کاربر تا زمانی که اتصال \lr{\mbox{PDN}} وجود دارد ثابت می‌ماند، بدون توجه به تحرک.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{تخصیص آدرس \lr{\mbox{IP}}}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{IPv4}}: \lr{\mbox{DHCPv4}} یا تخصیص ایستا از استخرهای پیکربندی‌شده
+  \item
+    \lr{\mbox{IPv6}}: پیکربندی خودکار آدرس بدون حالت \lr{\mbox{(SLAAC)}} از طریق اعلام مسیریاب؛ تخصیص پیشوند /\allowbreak{}\lr{\mbox{64}}
+  \item
+    دو-پشته: هر دو به‌طور همزمان
+  \end{itemize}
+\item
+  \textbf{اجرای سیاست \lr{\mbox{(PCEF)}}}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    قواعد \lr{\mbox{PCC}} دریافتی از \lr{\mbox{PCRF}} را اعمال می‌کند
+  \item
+    قالب‌های جریان ترافیک \lr{\mbox{(TFT)}}: فیلترهای بسته که جریان‌های \lr{\mbox{IP}} را به حامل‌ها نگاشت می‌کنند
+  \item
+    فیلترهای جریان داده خدمات \lr{\mbox{(SDF)}}: تطبیق 5-گانه برای \lr{\mbox{QoS}}/\allowbreak{}صورت‌حساب
+  \end{itemize}
+\item
+  \textbf{صورت‌حساب}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    آفلاین (واسط \lr{\mbox{Gz}} \ensuremath{\leftarrow} تولید \lr{\mbox{CDR}})
+  \item
+    آنلاین (واسط \lr{\mbox{Gy}} \ensuremath{\leftarrow} کنترل اعتبار بلادرنگ با \lr{\mbox{OCS}})
+  \end{itemize}
+\item
+  \textbf{واسط \lr{\mbox{SGi}}}: اتصال به شبکه‌های خارجی (اینترنت، \lr{\mbox{IMS}}، \lr{\mbox{VPN}} سازمانی)
+\item
+  \lr{\textbf{\lr{NAT/\allowbreak{}NAPT}}}: ترجمه آدرس شبکه اختیاری برای \lr{\mbox{IPv4}}
+\item
+  \textbf{لنگرگذاری \lr{\mbox{GTP}}}: تونل‌های \lr{\mbox{GTP}} در \lr{S5/\allowbreak{}S8} از \lr{\mbox{S-GW}} را پایان می‌دهد
+\end{enumerate}
+
+\Needspace{17\baselineskip}
+
+\CNsubsubsection{واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{همتا} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{S5/\allowbreak{}S8} & \lr{\mbox{S-GW}} & \lr{\mbox{GTP}} & صفحه کاربر + صفحه کنترل \\
+\lr{\mbox{Gx}} & \lr{\mbox{PCRF}} & \lr{\mbox{Diameter}} & دانلود قاعده \lr{\mbox{PCC}} \\
+\lr{\mbox{Gy}} & \lr{\mbox{OCS}} & \lr{Diameter (Ro)} & صورت‌حساب آنلاین \\
+\lr{\mbox{Gz}} & \lr{\mbox{OFCS}} & \lr{GTP’ (CDRs)} & صورت‌حساب آفلاین \\
+\lr{\mbox{SGi}} & \lr{\mbox{PDN}}/\allowbreak{}اینترنت & \lr{\mbox{IP}} & اتصال خارجی \\
+\lr{S2a/\allowbreak{}S2b} & \lr{ePDG/\allowbreak{}TWAG} & \lr{GTP/\allowbreak{}PMIP} & تخلیه \lr{\mbox{Wi-Fi}} \\
+\end{longtable}
+}
+
+\CNsubsubsection{پروتکل‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{GTP-U/\allowbreak{}GTPv2-C}}}: مدیریت تونل و نشست به‌سمت \lr{\mbox{S-GW}}
+\item
+  \lr{\textbf{\lr{Diameter Gx}}}: کنترل سیاست و صورت‌حساب (نصب/\allowbreak{}حذف قواعد \lr{\mbox{PCC}})
+\item
+  \lr{\textbf{\lr{Diameter Gy (Ro)}}: Credit-Control-Request/\allowbreak{}Answer} برای صورت‌حساب آنلاین
+\item
+  \lr{\textbf{\lr{DHCPv4/\allowbreak{}ICMPv6}}}: تخصیص آدرس \lr{\mbox{IP}} به \lr{\mbox{UE}}
+\item
+  \lr{\textbf{\lr{RADIUS/\allowbreak{}Diameter}}: AAA} ممکن برای \lr{\mbox{APN}}های سازمانی
+\end{itemize}
+
+\CNsubsubsection{تأثیر شکست}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{از دست رفتن نشست}: تمام اتصالات \lr{\mbox{PDN}} از طریق \lr{\mbox{P-GW}} شکست‌خورده از دست می‌روند (آدرس‌های \lr{\mbox{IP}} آزاد می‌شوند)
+\item
+  \textbf{\lr{\mbox{UE}} باید دوباره برقرار کند}: درخواست اتصال \lr{\mbox{PDN}} جدید \ensuremath{\leftarrow} آدرس \lr{\mbox{IP}} جدید (نشست‌های \lr{\mbox{TCP}} در جریان را می‌شکند)
+\item
+  \textbf{تأثیر حیاتی برای \lr{\mbox{VoLTE}}}: تماس‌های صوتی فعال قطع می‌شوند
+\item
+  \textbf{کاهش اثر}: خوشه‌بندی \lr{\mbox{P-GW}}، تکرار نشست، \lr{\mbox{ICSR}} (بازیابی نشست بین-شاسی)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.5}{\lr{\mbox{PCRF}} \lr{—} تابع قواعد سیاست و صورت‌حساب}
+
+\CNchained\CNsubsubsection{هدف}
+
+\lr{\mbox{PCRF}} \textbf{نقطه تصمیم سیاست} در معماری \lr{\mbox{PCC}} است. تصمیمات بلادرنگ درباره مجوزدهی \lr{\mbox{QoS}}، دروازه‌بندی و قواعد صورت‌حساب بر اساس پروفایل مشترک، شرایط شبکه و نیازمندی‌های کاربرد می‌گیرد.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{تولید قاعده \lr{\mbox{PCC}}}: قواعد کنترل سیاست و صورت‌حساب شامل موارد زیر ایجاد می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    فیلترهای \lr{\mbox{SDF}} (کدام ترافیک)
+  \item
+    پارامترهای \lr{\mbox{QoS}} (\lr{\mbox{QCI}}، \lr{\mbox{GBR}}، \lr{\mbox{MBR}})
+  \item
+    کلیدها و روش‌های صورت‌حساب
+  \item
+    وضعیت دروازه (باز/\allowbreak{}بسته)
+  \end{itemize}
+\item
+  \textbf{مجوزدهی \lr{\mbox{QoS}}}: \lr{\mbox{QoS}} درخواستی را در برابر اشتراک و سیاست شبکه اعتبارسنجی می‌کند
+\item
+  \textbf{سیاست پویا}: تغییرات سیاست بلادرنگ (مثلاً وقتی تماس \lr{\mbox{VoLTE}} شروع می‌شود \ensuremath{\leftarrow} نصب قاعده حامل \lr{\mbox{GBR}})
+\item
+  \textbf{پردازش واسط \lr{\mbox{Rx}}}: اطلاعات نشست را از \lr{AF/\allowbreak{}IMS} (توصیف رسانه، پهنای باند) دریافت و به قواعد \lr{\mbox{PCC}} ترجمه می‌کند
+\item
+  \textbf{محدودیت‌های هزینه}: با \lr{\mbox{OCS}} برای تصمیمات سیاست بر اساس اعتبار باقیمانده ارتباط برقرار می‌کند
+\item
+  \textbf{سیاست مبتنی بر اشتراک}: قواعد بر اساس لایه مشترک اعمال می‌کند (مثلاً طرح‌های طلایی/\allowbreak{}نقره‌ای/\allowbreak{}برنزی)
+\end{enumerate}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{همتا} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{Gx}} & \lr{P-GW (PCEF)} & \lr{\mbox{Diameter}} & نصب/\allowbreak{}حذف قواعد \lr{\mbox{PCC}} \\
+\lr{\mbox{Rx}} & \lr{AF /\allowbreak{} IMS (P-CSCF)} & \lr{\mbox{Diameter}} & اطلاعات سطح سرویس \lr{\mbox{(SDP)}} \\
+\lr{\mbox{Sp}} & \lr{\mbox{SPR}} & \lr{\mbox{Diameter}}/\allowbreak{}اختصاصی & بازیابی پروفایل مشترک \\
+\lr{\mbox{Sy}} & \lr{\mbox{OCS}} & \lr{\mbox{Diameter}} & گزارش‌دهی محدودیت هزینه \\
+\lr{\mbox{Sd}} & \lr{\mbox{TDF}} & \lr{\mbox{Diameter}} & قواعد تابع تشخیص ترافیک \\
+\end{longtable}
+}
+
+\CNsubsubsection{پروتکل‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{کاربرد \lr{Diameter Gx}}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{CC-Request/\allowbreak{}Answer (CCR/\allowbreak{}CCA)}: \lr{\mbox{Initial}}، \lr{\mbox{Update}}، \lr{\mbox{Terminate}}
+  \item
+    \lr{Re-Auth-Request (RAR)}: ارسال تغییرات قاعده به \lr{\mbox{PCEF}}
+  \end{itemize}
+\item
+  \textbf{کاربرد \lr{Diameter Rx}}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{AA-Request/\allowbreak{}Answer (AAR/\allowbreak{}AAA)}: برقراری نشست \lr{\mbox{AF}}
+  \item
+    \lr{Session-Termination-Request (STR)}: تخریب نشست \lr{\mbox{AF}}
+  \item
+    \lr{Abort-Session-Request (ASR)}: حذف با شروع شبکه
+  \end{itemize}
+\end{itemize}
+
+\CNsubsubsection{تأثیر شکست}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{قواعد ایستا ادامه می‌یابند}: قواعد \lr{\mbox{PCC}} نصب‌شده قبلی در \lr{\mbox{P-GW}} فعال می‌مانند
+\item
+  \textbf{بدون سیاست پویا}: درخواست‌های خدمات جدید (مثلاً \lr{\mbox{VoLTE}}) نمی‌توانند مجوز حامل اختصاصی بگیرند
+\item
+  \textbf{فقط \lr{\mbox{QoS}} پیش‌فرض}: نشست‌های جدید فقط حامل پیش‌فرض با سیاست ایستا می‌گیرند
+\item
+  \textbf{کاهش اثر}: \lr{\mbox{PCRF}} در جفت‌های فعال/\allowbreak{}آماده مستقر می‌شود؛ عامل مسیریابی \lr{Diameter (DRA)} برای تغییر مسیر
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.3.6}{\lr{\mbox{PCEF}} \lr{—} تابع اجرای سیاست و صورت‌حساب}
+
+\CNchained\CNsubsubsection{هدف}
+
+\lr{\mbox{PCEF}} \textbf{نقطه اجرای سیاست} است که هم‌مکان با \lr{\mbox{P-GW}} قرار دارد. قواعد \lr{\mbox{PCC}} دریافتی از \lr{\mbox{PCRF}} را با اعمال فیلترکردن بسته، اجرای \lr{\mbox{QoS}} و اقدامات صورت‌حساب روی هر بسته صفحه کاربر اجرا می‌کند.
+
+\CNsubsubsection{توابع کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{اجرای فیلتر \lr{\mbox{SDF}}}: بسته‌های \lr{\mbox{IP}} ورودی/\allowbreak{}خروجی را با فیلترهای جریان داده خدمات تطبیق می‌دهد (5-گانه: \lr{\mbox{IP}} مبدأ، \lr{\mbox{IP}} مقصد، پورت مبدأ، پورت مقصد، پروتکل)
+\item
+  \textbf{کنترل دروازه}: دروازه را برای \lr{\mbox{SDF}}های مشخص باز یا بسته می‌کند (مسدودکردن/\allowbreak{}اجازه ترافیک)
+\item
+  \textbf{اجرای \lr{\mbox{QoS}}}: محدودسازی نرخ در هر جریان را اعمال می‌کند:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{GBR}} (نرخ بیت تضمین‌شده): نرخ حداقلی تضمین‌شده
+  \item
+    \lr{\mbox{MBR}} (حداکثر نرخ بیت): سقف سخت در هر حامل
+  \item
+    \lr{\mbox{AMBR}} (حداکثر نرخ بیت تجمیعی): سقف در سراسر تمام حامل‌های غیر-\lr{\mbox{GBR}}
+  \end{itemize}
+\item
+  \textbf{اتصال حامل}: فیلترهای \lr{\mbox{SDF}} را به حامل‌های \lr{\mbox{EPS}} مناسب نگاشت می‌کند
+\item
+  \textbf{اجرای صورت‌حساب}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    کلیدهای صورت‌حساب را به ترافیک اعمال می‌کند
+  \item
+    اندازه‌گیری حجم/\allowbreak{}زمان در هر گروه نرخ‌گذاری
+  \item
+    صورت‌حساب آنلاین: مصرف را گزارش می‌دهد، محدودیت‌های اعتبار را اجرا می‌کند
+  \item
+    صورت‌حساب آفلاین: \lr{\mbox{CDR}}ها را تولید می‌کند
+  \end{itemize}
+\item
+  \textbf{پایش مصرف}: آستانه‌های حجم را به \lr{\mbox{PCRF}} برای تصمیمات سیاست گزارش می‌دهد
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{واسط‌ها}
+
+\lr{\mbox{PCEF}} درون \lr{\mbox{P-GW}} یکپارچه شده است، بنابراین واسط خارجی آن عمدتاً:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{همتا} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{Gx}} & \lr{\mbox{PCRF}} & \lr{\mbox{Diameter}} & دریافت قواعد \lr{\mbox{PCC}} \\
+\lr{\mbox{Gy}} & \lr{\mbox{OCS}} & \lr{Diameter (Ro)} & کنترل اعتبار صورت‌حساب آنلاین \\
+\lr{\mbox{Gz}} & \lr{\mbox{OFCS}} & \lr{\mbox{GTP’}} & تحویل \lr{\mbox{CDR}} آفلاین \\
+\end{longtable}
+}
+
+\CNsubsubsection{پروتکل‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{Diameter Gx}}: AVP}های \lr{Charging-Rule-Install/\allowbreak{}Remove} حاوی قواعد \lr{\mbox{PCC}} را دریافت می‌کند
+\item
+  \textbf{بازرسی عمیق بسته \lr{\mbox{(DPI)}}}: اختیاری؛ کاربردها را برای صورت‌حساب آگاه به کاربرد شناسایی می‌کند
+\item
+  \textbf{سبد توکن /\allowbreak{} سبد نشت‌کننده}: الگوریتم‌های اجرای نرخ برای پلیسینگ \lr{GBR/\allowbreak{}MBR}
+\end{itemize}
+
+\CNsubsubsection{تأثیر شکست}
+
+\begin{itemize}
+\tightlist
+\item
+  چون \lr{\mbox{PCEF}} هم‌مکان با \lr{\mbox{P-GW}} است، شکست \lr{\mbox{PCEF}} = شکست \lr{\mbox{P-GW}} (به بخش \CNnum{9.3.4} مراجعه کنید)
+\item
+  \textbf{حالت تخریب‌شده}: اگر فقط موتور سیاست شکست بخورد، ترافیک ممکن است بدون پلیسینگ عبور کند \lr{(fail-open)} یا مسدود شود \lr{(fail-close)} بسته به پیاده‌سازی
+\item
+  \textbf{کاهش اثر}: افزونگی سخت‌افزاری درون شاسی \lr{\mbox{P-GW}}؛ ارتقاهای نرم‌افزاری بدون وقفه
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{9.4}{حامل‌های \lr{\mbox{EPC}}}
+
+\CNchained\CNsubsection{}{مفهوم حامل}
+
+یک حامل \lr{\mbox{EPS}} یک \textbf{کانال منطقی سرتاسری} بین \lr{\mbox{UE}} و \lr{\mbox{P-GW}} با ویژگی‌های \lr{\mbox{QoS}} مشخص است. هر حامل توسط سه مؤلفه تعریف می‌شود:
+
+\CNdisplay{\text{\rl{حامل}} = \{\,\mathrm{TFT} + \text{\rl{پارامترهای QoS}} + \text{\rl{تونل(های) GTP}}\,\}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{TFT}} (قالب جریان ترافیک)}: فیلترهای بسته (5-گانه) که طبقه‌بندی می‌کنند کدام بسته‌های \lr{\mbox{IP}} به این حامل تعلق دارند
+\item
+  \textbf{پارامترهای \lr{\mbox{QoS}}}: \lr{\mbox{QCI}}، \lr{\mbox{ARP}}، \lr{GBR/\allowbreak{}MBR} (برای حامل‌های \lr{\mbox{GBR}})، \lr{\mbox{AMBR}} (تجمیعی)
+\item
+  \textbf{تونل \lr{\mbox{GTP}}}: شناسایی‌شده با \lr{\mbox{TEID}} (شناسه نقطه انتهایی تونل) در هر گام:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{S1-U: eNB \ensuremath{\leftrightarrow} S-GW}
+  \item
+    \lr{S5/\allowbreak{}S8: S-GW \ensuremath{\leftrightarrow} P-GW}
+  \end{itemize}
+\end{itemize}
+
+\CNkeepfig{m09-bearers}{3}
+
+\CNsubsection{}{نمودار ساختار حامل}
+
+\CNfigure{m09-bearers}{حامل‌های پیش‌فرض و اختصاصی: \lr{\mbox{TFT}}، \lr{\mbox{QoS}} و تونل \lr{\mbox{GTP-U}} هر حامل}
+
+\CNsubsection{9.4.1}{حامل پیش‌فرض}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{به‌طور خودکار ایجاد می‌شود} در حین اتصال \lr{\mbox{PDN}} (\lr{\mbox{Attach}} یا درخواست اتصال \lr{\mbox{PDN}} اضافی)
+\item
+  \textbf{همیشه فعال}: برای کل مدت اتصال \lr{\mbox{PDN}} وجود دارد
+\item
+  \textbf{غیر-\lr{\mbox{GBR}}}: بدون نرخ بیت تضمین‌شده؛ بهترین تلاش با سقف \lr{\mbox{AMBR}}
+\item
+  \textbf{\lr{\mbox{TFT}} تطبیق-همه}: تمام ترافیکی را حمل می‌کند که با \lr{\mbox{TFT}} هیچ حامل اختصاصی مطابقت ندارد
+\item
+  \textbf{\lr{\mbox{QoS}} از اشتراک}: مقادیر \lr{\mbox{QCI}} و \lr{\mbox{AMBR}} از پروفایل اشتراک \lr{\mbox{HSS}} می‌آیند
+\item
+  \textbf{یکی در هر اتصال \lr{\mbox{PDN}}}: هر \lr{\mbox{APN}} دقیقاً یک حامل پیش‌فرض می‌گیرد (\lr{\mbox{EBI}} = شناسه حامل \lr{\mbox{EPS}} تخصیص‌یافته)
+\end{itemize}
+
+\CNsubsection{9.4.2}{حامل اختصاصی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{در صورت نیاز ایجاد می‌شود}: با محرک درخواست خدمات (قاعده \lr{\mbox{PCRF}}) یا درخواست \lr{\mbox{UE}}/\allowbreak{}شبکه
+\item
+  \textbf{\lr{\mbox{QoS}} مشخص}: می‌تواند \lr{\mbox{GBR}} (تضمین‌شده) یا غیر-\lr{\mbox{GBR}} (بهترین تلاش اولویت‌دار) باشد
+\item
+  \textbf{\lr{\mbox{TFT}} مشخص}: فیلترهای بسته ترافیک منطبق را به این حامل هدایت می‌کنند
+\item
+  \textbf{مرتبط با حامل پیش‌فرض}: همان اتصال \lr{\mbox{PDN}} را به اشتراک می‌گذارد (همان آدرس \lr{\mbox{IP}})
+\item
+  \textbf{چرخه عمر}: از طریق تخصیص منابع حامل \ensuremath{\leftarrow} تصمیم \lr{PCRF \ensuremath{\to} P-GW} فعال‌سازی حامل اختصاصی را آغاز می‌کند
+\item
+  \textbf{محرک‌های نمونه}: شروع تماس \lr{VoLTE (QCI 1)}، پخش جریانی ویدیو \lr{\mbox{(QCI 4)}}، بازی \lr{\mbox{(QCI 3)}}
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{9.4.3}{جدول \lr{\mbox{QCI}} (مقادیر استانداردشده)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.0562}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1573}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1124}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2247}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2584}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1910}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{QCI}}} & \CNth{نوع منبع} & \CNth{اولویت} & \CNth{بودجه تأخیر بسته} & \CNth{نرخ افت خطای بسته} & \CNth{خدمات نمونه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{GBR}} & 2 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-2}}} & صدای گفتگویی \lr{\mbox{(VoLTE)}} \\
+2 & \lr{\mbox{GBR}} & 4 & \lr{\mbox{150~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & ویدیوی گفتگویی (زنده) \\
+3 & \lr{\mbox{GBR}} & 3 & \lr{\mbox{50~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & بازی بلادرنگ \\
+4 & \lr{\mbox{GBR}} & 5 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیوی غیرگفتگویی (پخش جریانی بافر‌شده) \\
+5 & غیر-\lr{\mbox{GBR}} & 1 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & سیگنالینگ \lr{IMS (SIP)} \\
+6 & غیر-\lr{\mbox{GBR}} & 6 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو (بافر‌شده)، خدمات مبتنی بر \lr{\mbox{TCP}} (وب، ایمیل) \\
+7 & غیر-\lr{\mbox{GBR}} & 7 & \lr{\mbox{100~ms}} & \lr{\mbox{10\textsuperscript{-3}}} & صدا، ویدیو (زنده)، بازی تعاملی \\
+8 & غیر-\lr{\mbox{GBR}} & 8 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو (بافر‌شده)، مبتنی بر \lr{\mbox{TCP}} (ممتاز) \\
+9 & غیر-\lr{\mbox{GBR}} & 9 & \lr{\mbox{300~ms}} & \lr{\mbox{10\textsuperscript{-6}}} & ویدیو (بافر‌شده)، مبتنی بر \lr{\mbox{TCP}} (پیش‌فرض/\allowbreak{}بهترین تلاش) \\
+\end{longtable}
+}
+
+\textbf{پارامترهای کلیدی \lr{\mbox{QoS}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{QCI}} (شناسه کلاس \lr{\mbox{QoS}})}: مقدار اسکالر \CNnum{(1-9)} که به رفتار بسته استانداردشده نگاشت می‌شود
+\item
+  \textbf{\lr{\mbox{ARP}} (اولویت تخصیص و نگهداری)}: سطح اولویت \CNnum{(1-15)}، قابلیت/\allowbreak{}آسیب‌پذیری پیش‌گیری
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{GBR}}}}}: نرخ بیت حداقلی تضمین‌شده (فقط برای \lr{\mbox{QCI 1-4}})
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MBR}}}}}: حداکثر نرخ بیت (سقف حامل‌های \lr{\mbox{GBR}})
+\item
+  \lr{\textbf{\lr{\mbox{UE-AMBR}}}: MBR} تجمیعی در سراسر تمام حامل‌های غیر-\lr{\mbox{GBR}} یک \lr{\mbox{UE}}
+\item
+  \lr{\textbf{\lr{\mbox{APN-AMBR}}}: MBR} تجمیعی در سراسر تمام حامل‌های غیر-\lr{\mbox{GBR}} یک \lr{\mbox{APN}}
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m09-eps-aka}{12}
+
+\CNsection{9.5}{احراز هویت در \lr{\mbox{EPC}}}
+
+\CNchained\CNsubsection{9.5.1}{\lr{\mbox{EPS-AKA}} (احراز هویت و توافق کلید \lr{\mbox{EPS}})}
+
+\lr{\mbox{EPS-AKA}} \textbf{احراز هویت متقابل} بین \lr{\mbox{UE}} و شبکه را فراهم می‌کند. هر دو طرف دانش کلید دایمی \lr{\mbox{K}} (ذخیره‌شده در \lr{\mbox{USIM}} و \lr{\mbox{HSS}}) را بدون ارسال آن اثبات می‌کنند.
+
+\CNsubsubsection{جریان \lr{\mbox{EPS-AKA}}}
+
+\CNfigure{m09-eps-aka}{احراز هویت \lr{\mbox{EPS-AKA}} و فعال‌سازی امنیت \lr{NAS/\allowbreak{}AS}}
+
+\CNsubsubsection{موارد شکست احراز هویت}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{شکست \lr{\mbox{MAC}}} (\lr{\mbox{UE AUTN}} را رد می‌کند): شبکه اصیل نیست \ensuremath{\leftarrow} \lr{\mbox{UE}} یک \lr{Authentication Failure} می‌فرستد (علت: شکست \lr{\mbox{MAC}})
+\item
+  \textbf{\lr{\mbox{SQN}} خارج از محدوده}: شکست همگام‌سازی \ensuremath{\leftarrow} \lr{\mbox{UE}} برای همگام‌سازی مجدد \lr{\mbox{AUTS}} می‌فرستد
+\item
+  \textbf{عدم تطابق \lr{\mbox{XRES}}}: \lr{\mbox{UE}} اصیل نیست \ensuremath{\leftarrow} \lr{\mbox{MME}} یک \lr{Authentication Reject} می‌فرستد
+\end{itemize}
+
+\CNsubsection{9.5.2}{مشتق‌سازی \lr{\mbox{\ensuremath{K_{\mathrm{ASME}}}}}}
+
+\lr{\mbox{\textbf{\lr{\mbox{\ensuremath{K_{\mathrm{ASME}}}}}}}} (کلید برای موجودیت مدیریت امنیت دسترسی) کلید اصلی برای تمام امنیت \lr{\mbox{EPC}} است:
+
+\CNdisplay{K_{\mathrm{ASME}} = \mathrm{KDF}\left(\mathrm{CK} \,\|\, \mathrm{IK},\ \CNmtext{SN-ID},\ \mathrm{SQN} \oplus \mathrm{AK}\right)}
+
+که در آن:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{KDF}} = تابع استخراج کلید مبتنی بر \lr{HMAC-SHA-256}
+\item
+  \lr{\mbox{CK}} = کلید رمز = \lr{f3(K, RAND)}
+\item
+  \lr{\mbox{IK}} = کلید یکپارچگی = \lr{f4(K, RAND)}
+\item
+  \lr{\mbox{SN-ID}} = شناسه شبکه خدمت‌دهنده \lr{(MCC \ensuremath{\|} MNC)}
+\item
+  \lr{\mbox{SQN}} = شماره توالی
+\item
+  \lr{\mbox{AK}} = کلید گمنامی = \lr{f5(K, RAND)}
+\end{itemize}
+
+\CNkeepfig{m09-key-hierarchy}{2}
+
+\CNsubsubsection{سلسله‌مراتب کلید}
+
+\CNfigure{m09-key-hierarchy}{سلسله‌مراتب کلیدهای \lr{\mbox{EPS}}}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{9.5.3}{امنیت \lr{\mbox{NAS}}}
+
+امنیت \lr{\mbox{NAS}} بین \lr{\mbox{UE}} و \lr{\mbox{MME}} عمل می‌کند (شفاف نسبت به \lr{\mbox{eNB}}):
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2895}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4737}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2368}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{حفاظت} & \CNth{گزینه‌های الگوریتم} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+یکپارچگی (اجباری) & \lr{EIA1 (SNOW 3G)}، \lr{EIA2 (AES)}، \lr{EIA3 (ZUC)} & از دستکاری پیام جلوگیری می‌کند \\
+رمزگذاری (اختیاری) & \lr{\mbox{EEA0}} (تهی)، \lr{EEA1 (SNOW 3G)}، \lr{EEA2 (AES)}، \lr{EEA3 (ZUC)} & از شنود جلوگیری می‌کند \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{NAS COUNT}}}: شمارنده 32 بیتی از حملات بازپخش جلوگیری می‌کند (شمارنده‌های جداگانه \lr{UL/\allowbreak{}DL})
+\item
+  \lr{\textbf{\lr{Security Mode Command}}}: الگوریتم‌ها را برقرار می‌کند؛ خودش محافظت‌شده با یکپارچگی است
+\item
+  \textbf{پیام‌های محافظت‌شده}: تمام پیام‌های \lr{\mbox{NAS}} پس از \lr{\mbox{SMC}} محافظت‌شده با یکپارچگی هستند؛ اکثر آن‌ها رمزگذاری می‌شوند
+\end{itemize}
+
+\CNsubsection{9.5.4}{امنیت \lr{\mbox{AS}} (لایه دسترسی)}
+
+امنیت \lr{\mbox{AS}} بین \lr{\mbox{UE}} و \lr{\mbox{eNB}} عمل می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{\ensuremath{K_{\mathrm{eNB}}}}}}}}: مشتق‌شده از \lr{\mbox{\ensuremath{K_{\mathrm{ASME}}}}} در \lr{\mbox{MME}}، در \lr{Initial Context Setup} به \lr{\mbox{eNB}} فرستاده می‌شود
+\item
+  \textbf{حفاظت \lr{\mbox{RRC}}}: هم یکپارچگی و هم رمزگذاری (\lr{\mbox{SRB1}}، \lr{\mbox{SRB2}})
+\item
+  \textbf{صفحه کاربر}: فقط رمزگذاری (بدون یکپارچگی به دلایل عملکردی در \lr{\mbox{LTE}})
+\item
+  \textbf{تازه‌سازی کلید}: \lr{\mbox{\ensuremath{K_{\mathrm{eNB}}}}} جدید در حین تحویل مشتق می‌شود \lr{(\ensuremath{K_{\mathrm{eNB}}}* = KDF(\ensuremath{K_{\mathrm{eNB}}}, PCI, freq))}
+\item
+  \textbf{فعال‌سازی از طریق}: \lr{SecurityModeCommand} (سطح \lr{\mbox{RRC}}، متمایز از \lr{\mbox{SMC}} در \lr{\mbox{NAS}})
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{9.6}{مدیریت نشست}
+
+\CNchained\CNsubsection{9.6.1}{اتصال \lr{\mbox{PDN}} (برقراری حامل پیش‌فرض)}
+
+اتصال \lr{\mbox{PDN}} \textbf{حامل پیش‌فرض \lr{\mbox{EPS}}} را ایجاد می‌کند و یک آدرس \lr{\mbox{IP}} به \lr{\mbox{UE}} تخصیص می‌دهد.
+
+\CNsubsubsection{جریان رویه}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\textbf{\lr{\mbox{UE \ensuremath{\to} MME}}}: ESM PDN Connectivity Request} (\lr{\mbox{APN}}، نوع \lr{\mbox{PDN}}: \lr{IPv4/\allowbreak{}IPv6/\allowbreak{}IPv4v6})
+\item
+  \lr{\textbf{\lr{MME \ensuremath{\to} S-GW}}: Create Session Request} (\lr{\mbox{IMSI}}، \lr{\mbox{QoS}} حامل از پروفایل \lr{\mbox{HSS}}، \lr{\mbox{APN}})
+\item
+  \lr{\textbf{\lr{S-GW \ensuremath{\to} P-GW}}: Create Session Request} (با \lr{\mbox{F-TEID}} مربوط به \lr{\mbox{S-GW}} ارسال می‌شود)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{P-GW}}}}}: آدرس \lr{\mbox{IP}} را تخصیص می‌دهد، با \lr{\mbox{PCRF}} تماس می‌گیرد (\lr{CCR-Initial} روی \lr{\mbox{Gx}})، قواعد \lr{\mbox{PCC}} پیش‌فرض را نصب می‌کند
+\item
+  \lr{\textbf{\lr{P-GW \ensuremath{\to} S-GW}}: Create Session Response} (آدرس \lr{\mbox{IP}}، زمینه حامل، \lr{\mbox{TFT}})
+\item
+  \lr{\textbf{\lr{S-GW \ensuremath{\to} MME}}: Create Session Response} (\lr{\mbox{F-TEID}} مربوط به \lr{\mbox{S-GW}}، زمینه حامل)
+\item
+  \lr{\textbf{\lr{MME \ensuremath{\to} eNB}}: Initial Context Setup Request} (زمینه حامل، \lr{\mbox{\ensuremath{K_{\mathrm{eNB}}}}}، \lr{\mbox{NAS}}: \lr{Attach Accept + Activate Default Bearer})
+\item
+  \lr{\textbf{\lr{\mbox{eNB \ensuremath{\to} UE}}}: RRC Connection Reconfiguration} (برقراری \lr{\mbox{DRB}}) + پیام‌های \lr{\mbox{NAS}}
+\item
+  \lr{\textbf{\lr{UE \ensuremath{\to} eNB \ensuremath{\to} MME}}: Attach Complete /\allowbreak{} Activate Default EPS Bearer Context Accept}
+\item
+  \lr{\textbf{\lr{MME \ensuremath{\to} S-GW}}: Modify Bearer Request} (\lr{\mbox{F-TEID}} مربوط به \lr{\mbox{eNB}} برای پیوند پایین‌سو)
+\end{enumerate}
+
+\textbf{نتیجه}: حامل سرتاسری برقرار می‌شود: \lr{UE \ensuremath{\leftrightarrow} eNB \ensuremath{\leftrightarrow} S-GW \ensuremath{\leftrightarrow} P-GW} \ensuremath{\leftrightarrow} اینترنت
+
+\CNsubsection{9.6.2}{فعال‌سازی حامل اختصاصی}
+
+حامل‌های اختصاصی \textbf{با شروع شبکه} فعال می‌شوند (با محرک قاعده \lr{\mbox{PCRF}} یا سیاست اپراتور):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\textbf{\lr{PCRF \ensuremath{\to} P-GW}}: Re-Auth-Request (RAR)} با قاعده \lr{\mbox{PCC}} (\lr{\mbox{QCI}}، \lr{\mbox{GBR}}، فیلترهای \lr{\mbox{TFT}})
+\item
+  \lr{\textbf{\lr{P-GW \ensuremath{\to} S-GW}}: Create Bearer Request} (\lr{\mbox{EBI}}، \lr{\mbox{TFT}}، \lr{\mbox{QoS}}، \lr{\mbox{F-TEID}} مربوط به \lr{\mbox{S5}})
+\item
+  \lr{\textbf{\lr{S-GW \ensuremath{\to} MME}}: Create Bearer Request} (با \lr{\mbox{F-TEID}} مربوط به \lr{\mbox{S1-U}} ارسال می‌شود)
+\item
+  \lr{\textbf{\lr{MME \ensuremath{\to} eNB \ensuremath{\to} UE}}: Bearer Setup Request (NAS: Activate Dedicated Bearer Context Request)}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}}: می‌پذیرد، \lr{\mbox{TFT}} را برای طبقه‌بندی پیوند بالاسو ذخیره می‌کند
+\item
+  \lr{\textbf{\lr{UE \ensuremath{\to} eNB \ensuremath{\to} MME}}: Activate Dedicated EPS Bearer Context Accept}
+\item
+  \lr{\textbf{\lr{MME \ensuremath{\to} S-GW \ensuremath{\to} P-GW}}: Create Bearer Response} (اکنون تمام \lr{\mbox{TEID}}ها متصل شده‌اند)
+\end{enumerate}
+
+\CNsubsection{9.6.3}{اصلاح حامل}
+
+اصلاح حامل \lr{\mbox{QoS}} یا \lr{\mbox{TFT}} یک حامل موجود را تغییر می‌دهد:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{با شروع شبکه}: \lr{\mbox{PCRF}} قاعده \lr{\mbox{PCC}} را به‌روزرسانی می‌کند \ensuremath{\leftarrow} \lr{\mbox{P-GW}} یک \lr{Update Bearer Request} می‌فرستد
+\item
+  \textbf{با شروع \lr{\mbox{UE}}}: \lr{\mbox{UE}} یک \lr{Bearer Resource Modification Request} به \lr{\mbox{MME}} می‌فرستد
+\item
+  \textbf{مثال‌ها}: ارتقای کیفیت ویدیو (افزایش \lr{\mbox{GBR}})، افزودن فیلتر \lr{\mbox{SDF}} جدید، تغییر وضعیت دروازه
+\end{itemize}
+
+\CNsubsection{9.6.4}{غیرفعال‌سازی حامل}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{با شروع شبکه}: \lr{\mbox{PCRF}} قاعده \lr{\mbox{PCC}} را حذف می‌کند \ensuremath{\leftarrow} \lr{\mbox{P-GW}} یک \lr{Delete Bearer Request} می‌فرستد
+\item
+  \textbf{با شروع \lr{\mbox{UE}}}: \lr{\mbox{UE}} یک \lr{Deactivate EPS Bearer Context Request} می‌فرستد
+\item
+  \textbf{غیرفعال‌سازی حامل پیش‌فرض}: تمام حامل‌های اختصاصی مرتبط را حذف + آدرس \lr{\mbox{IP}} را آزاد می‌کند
+\item
+  \textbf{قطع اتصال \lr{\mbox{PDN}}}: زمانی فعال می‌شود که آخرین حامل پیش‌فرض غیرفعال شود
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{17\baselineskip}
+
+\CNsection{9.7}{مدیریت تحرک}
+
+\CNchained\CNsubsection{9.7.1}{حالت‌های \lr{\mbox{ECM}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1429}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2449}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3878}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2245}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{حالت} & \CNth{توضیح} & \CNth{مکان \lr{\mbox{UE}} معلوم است؟} & \CNth{منابع} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{ECM-IDLE}}}}} & بدون اتصال سیگنالینگ \lr{\mbox{NAS}}؛ \lr{\mbox{UE}} صفحه‌بندی را پایش می‌کند & فقط در سطح \lr{\mbox{TA}} (فهرست \lr{\mbox{TAI}}) & بدون اتصال \lr{\mbox{S1}}، بدون \lr{\mbox{DRB}}؛ \lr{\mbox{S-GW}} داده \lr{\mbox{DL}} را بافر می‌کند \\
+\lr{\textbf{\lr{ECM-CONNECTED}}} & سیگنالینگ \lr{\mbox{NAS}} فعال از طریق \lr{\mbox{S1-MME}} & در سطح سلول \lr{\mbox{(ECGI)}} & تونل \lr{\mbox{S1-U}} فعال؛ \lr{\mbox{DRB}}ها برقرار \\
+\end{longtable}
+}
+
+\textbf{گذارهای حالت:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{IDLE \ensuremath{\to} CONNECTED}: \lr{Service Request} (با محرک \lr{\mbox{UE}}) یا \lr{Paging Response} (با محرک شبکه)
+\item
+  \lr{CONNECTED \ensuremath{\to} IDLE}: آزادسازی \lr{\mbox{S1}} (انقضای تایمر عدم فعالیت یا آزادسازی صریح)
+\end{itemize}
+
+\CNsubsection{9.7.2}{به‌روزرسانی ناحیه ردیابی \lr{\mbox{(TAU)}}}
+
+\lr{\mbox{TAU}} شبکه را از مکان تقریبی \lr{\mbox{UE}} در حالت \lr{\mbox{ECM-IDLE}} مطلع نگه می‌دارد:
+
+\textbf{زمانی که \lr{\mbox{TAU}} فعال می‌شود:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UE}} وارد ناحیه ردیابی \lr{\mbox{(TA)}} جدیدی می‌شود که در فهرست \lr{\mbox{TAI}} آن نیست
+\item
+  تایمر \lr{\mbox{TAU}} دوره‌ای منقضی می‌شود (قابل پیکربندی، معمولاً 54 دقیقه)
+\item
+  پس از فعال‌سازی \lr{\mbox{ISR}} (کاهش سیگنالینگ حالت بیکار)
+\end{itemize}
+
+\textbf{رویه \lr{\mbox{TAU}}:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE \ensuremath{\to} MME}}: \lr{Tracking Area Update Request} (\lr{\mbox{GUTI}} قدیمی، \lr{\mbox{TAI}} بازدیدشده)
+\item
+  \lr{\mbox{MME}}: هویت را تأیید می‌کند، به‌صورت اختیاری احراز هویت می‌کند
+\item
+  \lr{MME \ensuremath{\to} HSS}: \lr{Update Location} (اگر \lr{\mbox{MME}} جدید باشد)
+\item
+  \lr{MME \ensuremath{\to} MME} قدیمی: انتقال زمینه (اگر \lr{\mbox{MME}} تغییر کرده باشد)
+\item
+  \lr{\mbox{MME \ensuremath{\to} UE}}: \lr{TAU Accept} (\lr{\mbox{GUTI}} جدید، فهرست \lr{\mbox{TAI}} جدید)
+\item
+  \lr{MME \ensuremath{\to} S-GW}: \lr{Modify Bearer} (اگر \lr{\mbox{S-GW}} تغییر کرده باشد)
+\end{enumerate}
+
+\textbf{فهرست \lr{\mbox{TAI}}}: \lr{\mbox{MME}} یک فهرست از \lr{\mbox{TA}}ها تخصیص می‌دهد تا فراوانی \lr{\mbox{TAU}} را کاهش دهد (مبادله توازن بار در برابر هزینه صفحه‌بندی)
+
+\CNsubsection{9.7.3}{تحویل \lr{\mbox{X2}} (درون-\lr{\mbox{LTE}}، بدون تغییر \lr{\mbox{MME}})}
+
+\textbf{سریع‌ترین تحویل} در \lr{\mbox{LTE}} \lr{—} سیگنالینگ مستقیم \lr{\mbox{eNB}}-به-\lr{\mbox{eNB}} بدون دخالت \lr{\mbox{MME}} برای ارسال داده:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\lr{\mbox{eNB}} مبدأ}: گزارش‌های اندازه‌گیری نشان می‌دهند سلول مقصد بهتر است
+\item
+  \textbf{مبدأ \ensuremath{\leftarrow} \lr{\mbox{eNB}} مقصد} \lr{\mbox{(X2)}}: \lr{Handover Request} (زمینه \lr{\mbox{UE}}، حامل‌ها، \lr{\mbox{QoS}})
+\item
+  \textbf{\lr{\mbox{eNB}} مقصد}: \lr{\mbox{UE}} را می‌پذیرد، منابع را تخصیص می‌دهد
+\item
+  \textbf{مقصد \ensuremath{\leftarrow} \lr{\mbox{eNB}} مبدأ} \lr{\mbox{(X2)}}: \lr{Handover Request Acknowledge} (آدرس ارسال \lr{\mbox{DL}})
+\item
+  \textbf{\lr{\mbox{eNB}} مبدأ \ensuremath{\leftarrow} \lr{\mbox{UE}}}: \lr{RRC Connection Reconfiguration} (فرمان تحویل)
+\item
+  \textbf{\lr{\mbox{eNB}} مبدأ}: شروع ارسال داده بافر‌شده + داده \lr{\mbox{DL}} جدید به \lr{\mbox{eNB}} مقصد از طریق \lr{\mbox{X2}}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}}: از مبدأ جدا می‌شود، با سلول مقصد همگام می‌شود
+\item
+  \textbf{\lr{\mbox{UE \ensuremath{\to} eNB}} مقصد}: \lr{RRC Connection Reconfiguration Complete}
+\item
+  \textbf{\lr{\mbox{eNB}} مقصد \ensuremath{\leftarrow} \lr{\mbox{MME}}}: \lr{Path Switch Request} (\lr{\mbox{ECGI}} جدید، \lr{\mbox{TEID}}های جدید)
+\item
+  \lr{\textbf{\lr{MME \ensuremath{\to} S-GW}}: Modify Bearer Request} (آدرس \lr{\mbox{eNB}} مقصد)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{S-GW}}}}}: مسیر \lr{\mbox{DL}} را به \lr{\mbox{eNB}} مقصد تغییر می‌دهد (نشانگر پایان به مبدأ)
+\item
+  \textbf{\lr{MME \ensuremath{\to} eNB} مقصد}: \lr{Path Switch Request Acknowledge}
+\item
+  \textbf{مقصد \ensuremath{\leftarrow} \lr{\mbox{eNB}} مبدأ}: \lr{UE Context Release} (پاک‌سازی)
+\end{enumerate}
+
+\begin{CNinsight}
+
+\textbf{نکته کلیدی}: \lr{\mbox{S-GW}} بدون تغییر است (لنگر تحرک محلی). فقط نقطه انتهایی \lr{\mbox{S1-U}} جابه‌جا می‌شود.
+
+\end{CNinsight}
+
+\CNsubsection{9.7.4}{تحویل \lr{\mbox{S1}} (با تغییر \lr{MME/\allowbreak{}S-GW})}
+
+زمانی استفاده می‌شود که \lr{\mbox{X2}} در دسترس نیست یا جابه‌جایی \lr{MME/\allowbreak{}S-GW} لازم است:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\lr{\mbox{eNB}} مبدأ \ensuremath{\leftarrow} \lr{\mbox{MME}} مبدأ}: \lr{Handover Required} (شناسه مقصد، علت)
+\item
+  \textbf{\lr{\mbox{MME}} مبدأ \ensuremath{\leftarrow} \lr{\mbox{MME}} مقصد}: \lr{Forward Relocation Request} (زمینه \lr{\mbox{UE}}) [اگر \lr{\mbox{MME}} تغییر کند]
+\item
+  \textbf{\lr{\mbox{MME}} مقصد \ensuremath{\leftarrow} \lr{\mbox{eNB}} مقصد}: \lr{Handover Request} (برقراری حامل)
+\item
+  \textbf{\lr{\mbox{eNB}} مقصد \ensuremath{\leftarrow} \lr{\mbox{MME}} مقصد}: \lr{Handover Request Acknowledge}
+\item
+  \textbf{\lr{\mbox{MME}} مقصد \ensuremath{\leftarrow} \lr{\mbox{MME}} مبدأ}: \lr{Forward Relocation Response}
+\item
+  \textbf{\lr{\mbox{MME}} مبدأ \ensuremath{\leftarrow} \lr{\mbox{eNB}} مبدأ}: \lr{Handover Command}
+\item
+  \textbf{\lr{\mbox{eNB}} مبدأ \ensuremath{\leftarrow} \lr{\mbox{UE}}}: \lr{RRC Connection Reconfiguration}
+\item
+  \textbf{\lr{\mbox{UE \ensuremath{\to} eNB}} مقصد}: \lr{Handover Confirm}
+\item
+  \textbf{\lr{\mbox{eNB}} مقصد \ensuremath{\leftarrow} \lr{\mbox{MME}} مقصد}: \lr{Handover Notify}
+\item
+  \textbf{\lr{\mbox{MME}} مقصد \ensuremath{\leftarrow} \lr{\mbox{S-GW}}}: \lr{Modify Bearer /\allowbreak{} Create Session} (اگر \lr{\mbox{S-GW}} تغییر کند)
+\end{enumerate}
+
+\textbf{ارسال غیرمستقیم داده}: داده \lr{\mbox{DL}} در حین شکاف تحویل از \lr{\mbox{eNB}} مبدأ \ensuremath{\leftarrow} \lr{\mbox{S-GW}} مبدأ \ensuremath{\leftarrow} \lr{\mbox{S-GW}} مقصد \ensuremath{\leftarrow} \lr{\mbox{eNB}} مقصد ارسال می‌شود.
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{9.7.5}{تحرک بین-\lr{RAT (LTE \ensuremath{\leftrightarrow} 3G)}}
+
+\CNchained\CNsubsubsection{\lr{\mbox{LTE \ensuremath{\to} 3G}} (تحویل \lr{\mbox{PS}})}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{MME}} تحویل به \lr{\mbox{UTRAN}} را فعال می‌کند (گزارش‌های اندازه‌گیری یا پوشش)
+\item
+  \lr{MME \ensuremath{\to} SGSN (S3)}: \lr{Forward Relocation Request} (زمینه‌های \lr{\mbox{PDP}} نگاشت‌شده از حامل‌های \lr{\mbox{EPS}})
+\item
+  \lr{SGSN \ensuremath{\to} RNC: Relocation Request}
+\item
+  پس از تحویل: \lr{\mbox{S-GW}} صفحه کاربر را از طریق \lr{\mbox{S4}} به \lr{\mbox{SGSN}} (یا تونل مستقیم از طریق \lr{\mbox{S12}} به \lr{\mbox{RNC}}) تغییر مسیر می‌دهد
+\item
+  \lr{\mbox{QoS}} حامل نگاشت می‌شود: \lr{\mbox{QCI}} \ensuremath{\leftarrow} کلاس ترافیک \lr{\mbox{UMTS}} (گفتگویی/\allowbreak{}پخش جریانی/\allowbreak{}تعاملی/\allowbreak{}پس‌زمینه)
+\end{enumerate}
+
+\CNsubsubsection{\lr{\mbox{3G \ensuremath{\to} LTE}}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{SGSN}} قابلیت \lr{\mbox{LTE}} را تشخیص می‌دهد؛ تحویل را آغاز می‌کند
+\item
+  \lr{SGSN \ensuremath{\to} MME (S3): Forward Relocation Request}
+\item
+  \lr{\mbox{MME}} حامل‌ها را فعال می‌کند، مسیر \lr{\mbox{S1}} را برقرار می‌کند
+\item
+  زمینه‌های \lr{\mbox{PDP}} به حامل‌های \lr{\mbox{EPS}} نگاشت می‌شوند
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\Needspace{23\baselineskip}
+
+\CNsection{9.8}{سناریوهای شکست}
+
+\CNchained\CNsubsection{9.8.1}{شکست \lr{\mbox{MME}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{تأثیر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{تشخیص} & \lr{\mbox{eNB}} از طریق شکست انجمن \lr{\mbox{SCTP}} تشخیص می‌دهد (انقضای ضربان حدود \lr{\mbox{30s}}) \\
+\textbf{اثر فوری} & تمام اتصالات \lr{\mbox{S1-MME}} به \lr{\mbox{MME}} شکست‌خورده از دست می‌روند \\
+\textbf{\lr{\mbox{UE}}های \lr{ECM-CONNECTED}} & به \lr{\mbox{ECM-IDLE}} می‌روند؛ \lr{\mbox{eNB}} منابع رادیویی را آزاد می‌کند \\
+\textbf{اقدام بازیابی} & \lr{\mbox{UE}} یک \lr{Service Request /\allowbreak{} Attach} به \lr{\mbox{MME}} جدید می‌فرستد (انتخاب‌شده از طریق وزن‌دهی \lr{\mbox{S1AP}} از استخر \lr{\mbox{MME}}) \\
+\textbf{بازیابی زمینه} & \lr{\mbox{MME}} جدید اشتراک را از \lr{\mbox{HSS}} می‌گیرد؛ حامل‌های فعال از طریق \lr{Create Session} جدید به \lr{\mbox{S-GW}} دوباره برقرار می‌شوند \\
+\textbf{از دست رفتن داده} & لحظه‌ای \lr{—} نشست‌های \lr{\mbox{TCP}} در جریان ممکن است زنده بمانند (آدرس \lr{\mbox{IP}} در \lr{\mbox{P-GW}} حفظ می‌شود)؛ نشست‌های \lr{\mbox{UDP}}/\allowbreak{}بلادرنگ مختل می‌شوند \\
+\end{longtable}
+}
+
+\textbf{راهبردهای کاهش اثر:}
+
+\begin{itemize}
+\tightlist
+\item
+  استخر \lr{\mbox{MME}} (چندین \lr{\mbox{MME}} در هر ناحیه ردیابی)
+\item
+  فعال/\allowbreak{}آماده با تکرار وضعیت نشست
+\item
+  انتقال زمینه مبتنی بر \lr{\mbox{S10}} از گره پشتیبان
+\item
+  انتخاب \lr{\mbox{MME}} مبتنی بر \lr{\mbox{DNS}} برای توزیع بار
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{9.8.2}{شکست \lr{\mbox{S-GW}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{تأثیر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{تشخیص} & \lr{\mbox{MME}} از طریق انقضای \lr{\mbox{Echo}} در \lr{\mbox{GTPv2-C}} روی \lr{\mbox{S11}} تشخیص می‌دهد؛ \lr{\mbox{eNB}} از طریق شکست مسیر \lr{\mbox{GTP-U}} روی \lr{\mbox{S1-U}} تشخیص می‌دهد \\
+\textbf{اثر فوری} & صفحه کاربر برای تمام \lr{\mbox{UE}}هایی که توسط \lr{\mbox{S-GW}} شکست‌خورده خدمات می‌گیرند قطع می‌شود \\
+\textbf{اقدام بازیابی} & \lr{\mbox{MME S-GW}} جدید انتخاب می‌کند، \lr{Modify Bearer} را به \lr{\mbox{P-GW}} با آدرس \lr{\mbox{S-GW}} جدید می‌فرستد \\
+\textbf{تغییر مسیر} & \lr{\mbox{P-GW}} تونل \lr{\mbox{S5}} را به \lr{\mbox{S-GW}} جدید تغییر مسیر می‌دهد؛ \lr{\mbox{MME eNB}} را با \lr{\mbox{TEID}} جدید \lr{\mbox{S1-U}} به‌روزرسانی می‌کند \\
+\textbf{از دست رفتن داده} & داده \lr{\mbox{DL}} بافر‌شده (برای \lr{\mbox{UE}}های \lr{\mbox{IDLE}}) در \lr{\mbox{S-GW}} شکست‌خورده از دست می‌رود \\
+\end{longtable}
+}
+
+\textbf{راهبردهای کاهش اثر:}
+
+\begin{itemize}
+\tightlist
+\item
+  استخر \lr{\mbox{S-GW}} با انتخاب مبتنی بر \lr{\mbox{DNS}} (رکوردهای وزن‌دار)
+\item
+  تشخیص شکست مسیر \lr{GTP-U (Echo Request/\allowbreak{}Response)}
+\item
+  افزونگی \lr{\mbox{N+1}}؛ \lr{\mbox{ICSR}} بین جفت‌های شاسی
+\item
+  زمینه‌های \lr{\mbox{GTP}} پشتیبان پیش‌برقرار
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{9.8.3}{شکست \lr{\mbox{P-GW}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{تأثیر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{تشخیص} & \lr{\mbox{S-GW}} از طریق شکست مسیر \lr{\mbox{GTP}} روی \lr{\mbox{S5}} تشخیص می‌دهد؛ \lr{\mbox{PCRF}} از طریق شکست انتقال \lr{\mbox{Diameter}} روی \lr{\mbox{Gx}} تشخیص می‌دهد \\
+\textbf{اثر فوری} & تمام اتصالات \lr{\mbox{PDN}} از طریق \lr{\mbox{P-GW}} شکست‌خورده از دست می‌روند \\
+\textbf{از دست رفتن آدرس \lr{\mbox{IP}}} & آدرس‌های \lr{\mbox{IP}} کاربر آزاد می‌شوند \lr{—} قابل بازیابی نیستند \\
+\textbf{تأثیر بر نشست} & تمام نشست‌های \lr{TCP/\allowbreak{}UDP} خاتمه می‌یابند؛ تماس‌های \lr{\mbox{VoLTE}} قطع می‌شوند \\
+\textbf{اقدام بازیابی} & \lr{\mbox{UE}} باید اتصال \lr{\mbox{PDN}} جدید برقرار کند (حامل پیش‌فرض جدید، آدرس \lr{\mbox{IP}} جدید) \\
+\textbf{تأثیر بر کاربرد} & خدمات مبتنی بر \lr{\mbox{DNS}} بازیابی می‌شوند؛ نشست‌های طولانی‌مدت (\lr{\mbox{VPN}}، \lr{\mbox{SSH}}) می‌شکنند \\
+\end{longtable}
+}
+
+\textbf{راهبردهای کاهش اثر:}
+
+\begin{itemize}
+\tightlist
+\item
+  بازیابی نشست بین-شاسی \lr{\mbox{(ICSR)}}: جفت \lr{\mbox{P-GW}} فعال/\allowbreak{}آماده با همگام‌سازی وضعیت نشست
+\item
+  شمارنده راه‌اندازی مجدد \lr{\mbox{GTP-C}}: \lr{\mbox{S-GW}} راه‌اندازی مجدد \lr{\mbox{P-GW}} را تشخیص می‌دهد، به \lr{\mbox{MME}} گزارش می‌دهد
+\item
+  تکرار استخر آدرس \lr{\mbox{IP}} بین \lr{\mbox{P-GW}}های جفت‌شده
+\item
+  انتخاب \lr{\mbox{P-GW}} از طریق \lr{\mbox{DNS}} با پایش سلامت
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{9.8.4}{\lr{\mbox{HSS}} غیرقابل دسترس}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{تأثیر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{تشخیص} & \lr{\mbox{MME}} از طریق شکست انتقال \lr{\mbox{Diameter}} یا انقضای نگهبان روی \lr{\mbox{S6a}} تشخیص می‌دهد \\
+\textbf{نشست‌های موجود} & به‌طور عادی ادامه می‌یابند \lr{—} وضعیت حامل در \lr{MME/\allowbreak{}S-GW/\allowbreak{}P-GW} است \\
+\textbf{احراز هویت} & \lr{\mbox{MME}} از \textbf{بردارهای احراز هویت ذخیره‌شده} استفاده می‌کند (معمولاً 5 بردار در هر \lr{\mbox{UE}} که در آخرین \lr{\mbox{AIR}} گرفته شده) \\
+\textbf{اتصالات جدید} & با تمام‌شدن بردارهای ذخیره‌شده شکست می‌خورند \lr{—} هیچ \lr{\mbox{UE}} جدیدی نمی‌تواند احراز هویت شود \\
+\textbf{تحویل به \lr{\mbox{MME}} جدید} & تحت تأثیر \lr{—} \lr{\mbox{MME}} جدید نمی‌تواند پروفایل اشتراک را بگیرد \\
+\textbf{تحمل مدت} & به عمق ذخیره بستگی دارد؛ معمولاً عملیات را از چند دقیقه تا چند ساعت حفظ می‌کند \\
+\end{longtable}
+}
+
+\textbf{راهبردهای کاهش اثر:}
+
+\begin{itemize}
+\tightlist
+\item
+  جفت \lr{\mbox{HSS}} با افزونگی جغرافیایی (فعال/\allowbreak{}فعال یا فعال/\allowbreak{}آماده)
+\item
+  عامل مسیریابی \lr{Diameter (DRA)} برای تغییر مسیر خودکار
+\item
+  افزایش اندازه دسته بردار احراز هویت (مثلاً 10 به‌جای 5)
+\item
+  ذخیره‌سازی اشتراک در سطح \lr{\mbox{MME}} با \lr{\mbox{TTL}}
+\end{itemize}
+
+\Needspace{20\baselineskip}
+
+\CNsection{9.9}{خلاصه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مؤلفه} & \CNth{صفحه} & \CNth{نقش اصلی} & \CNth{واسط کلیدی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{MME}} & کنترل & سیگنالینگ، احراز هویت، تحرک & \lr{\mbox{S1-MME}}، \lr{\mbox{S11}}، \lr{\mbox{S6a}} \\
+\lr{\mbox{HSS}} & کنترل & پایگاه داده مشترک، بردارهای احراز هویت & \lr{\mbox{S6a}} \\
+\lr{\mbox{S-GW}} & کاربر + کنترل & لنگر \lr{\mbox{UP}} محلی، بافرینگ & \lr{\mbox{S1-U}}، \lr{S5/\allowbreak{}S8} \\
+\lr{\mbox{P-GW}} & کاربر + کنترل & لنگر \lr{\mbox{IP}}، اجرای سیاست & \lr{S5/\allowbreak{}S8}، \lr{\mbox{SGi}}، \lr{\mbox{Gx}} \\
+\lr{\mbox{PCRF}} & کنترل & تصمیم سیاست & \lr{\mbox{Gx}}، \lr{\mbox{Rx}} \\
+\lr{\mbox{PCEF}} & کاربر & اجرای سیاست & \lr{\mbox{Gx}} (در \lr{\mbox{P-GW}}) \\
+\end{longtable}
+}
+
+\CNsubsection{}{نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\lr{\mbox{EPC}} سوییچینگ مداری را حذف می‌کند}: تمام خدمات (شامل صدا) روی حامل‌های \lr{\mbox{IP}}
+\item
+  \textbf{تقسیم کنترل/\allowbreak{}صفحه کاربر}: مقیاس‌پذیری مستقل و تحول به‌سمت \lr{\mbox{5G}} را ممکن می‌سازد
+\item
+  \textbf{\lr{\mbox{QoS}} مبتنی بر حامل}: کیفیت قطعی برای خدمات بلادرنگ \lr{(QCI 1-4 = GBR)}
+\item
+  \textbf{امنیت از پایه}: احراز هویت متقابل \lr{(EPS-AKA)}، مشتق‌سازی کلید لایه‌ای، یکپارچگی اجباری
+\item
+  \textbf{تحرک بدون اختلال}: لنگرگذاری \lr{\mbox{GTP}} در \lr{\mbox{S-GW}} (محلی) و \lr{\mbox{P-GW}} (جهانی) نشست‌های \lr{\mbox{IP}} را حفظ می‌کند
+\item
+  \textbf{معماری سیاست}: \lr{PCRF/\allowbreak{}PCEF} رفتار ترافیک بلادرنگ و آگاه به مشترک را ممکن می‌سازند
+\item
+  \textbf{تاب‌آوری از طریق استخرسازی}: استخرهای \lr{\mbox{MME}}، استخرهای \lr{\mbox{S-GW}} و افزونگی \lr{\mbox{HSS}} نقاط شکست واحد را کمینه می‌کنند
+\end{enumerate}
+
+\emph{ماژول 9 \lr{—} پایان}

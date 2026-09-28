@@ -1,0 +1,7 @@
+% Module 24 — LTE RRC states
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNbox, text width=3.4cm, align=left] (i) at (0,0) {\textbf{RRC\_IDLE}\\[2pt]{\scriptsize\textbullet{} \CNL{cell selection/reselection}{انتخاب/انتخاب مجدد سلول}\\\textbullet{} \CNL{paging}{صفحه‌بندی}\\\textbullet{} \CNL{no UE context}{بدون زمینه \lr{UE}}}};
+\node[CNok, text width=3.4cm, align=left] (c) at (7.4,0) {\textbf{RRC\_CONNECTED}\\[2pt]{\scriptsize\textbullet{} \CNL{active data}{داده فعال}\\\textbullet{} \CNL{measurements}{اندازه‌گیری‌ها}\\\textbullet{} \CNL{handover}{تحویل}\\\textbullet{} \CNL{UE context}{زمینه \lr{UE}}}};
+\draw[CNlink, ->] ([yshift=3mm]i.east) -- node[CNelab, above=1pt, fill=none] {Setup} ([yshift=3mm]c.west);
+\draw[CNlink, ->] ([yshift=-3mm]c.west) -- node[CNelab, below=1pt, fill=none] {Release} ([yshift=-3mm]i.east);
+\end{tikzpicture}

@@ -1,0 +1,13 @@
+% Module 13 — CUPS splits S-GW and P-GW into control-plane and user-plane parts
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle] at (0,1.1) {\CNL{Traditional}{سنتی}}; \node[CNtitle] at (6.2,1.1) {CUPS};
+\foreach \g/\y/\cpn/\upn/\sx in {S-GW/0/{GTPv2-C}/{\CNL{GTP-U forwarding}{ارسال \lr{GTP-U}}}/Sxa, P-GW/-3.6/{Gx, GTPv2-C}/{\CNL{GTP-U, policy enforcement}{\lr{GTP-U}، اعمال سیاست}}/Sxb}{
+  \node[CNbox, minimum width=2.2cm, minimum height=1.3cm] (t) at (0,\y-0.6) {\textbf{\g}};
+  \node[CNtiny, anchor=north] at (t.south) {(CP+UP \CNL{combined}{ترکیبی})};
+  \node[CNcp, minimum width=2.4cm] (c) at (6.2,\y) {\textbf{\g-C}};
+  \node[CNup, minimum width=2.4cm] (u) at (6.2,\y-1.9) {\textbf{\g-U}};
+  \draw[CNsigl, ->] (c) -- node[CNelab, right=2pt, fill=none] {\sx{} (PFCP)} (u);
+  \node[CNtiny, anchor=west] at (7.7,\y) {$\leftarrow$ \CNL{control plane}{صفحه کنترل} (\cpn)};
+  \node[CNtiny, anchor=west] at (7.7,\y-1.9) {$\leftarrow$ \CNL{user plane}{صفحه کاربر} (\upn)};
+  \draw[CNlink, ->, CNmuted, dash pattern=on 3pt off 2pt] (t.east) -- ([xshift=-0.3cm]c.west |- t.east) node[midway, above, CNtiny] {\CNL{split}{تفکیک}};}
+\end{tikzpicture}

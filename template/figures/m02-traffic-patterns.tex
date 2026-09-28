@@ -1,0 +1,16 @@
+% Module 2 — occupancy of a reserved circuit over time: voice vs bursty data
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \row/\lab/\pat/\note [count=\r from 0] in {
+    v/{\CNL{Voice}{صدا}}/1111111111111111111111111111/{\CNL{continuous, symmetric}{پیوسته، متقارن}},
+    w/{\CNL{Web browsing}{وب‌گردی}}/1100000011000000001100000000/{\CNL{bursty, asymmetric}{انفجاری، نامتقارن}},
+    e/{\CNL{Email}{ایمیل}}/1000000000000000000000000000/{\CNL{very short burst}{انفجار بسیار کوتاه}}}{
+  \node[anchor=east, font=\sffamily\small] at (-0.2,-\r*0.8) {\lab};
+  \StrLen{\pat}[\n]
+  \foreach \k in {1,...,28}{
+    \StrChar{\pat}{\k}[\c]
+    \ifnum\c=1 \fill[CNcyan] ({(\k-1)*0.27},{-\r*0.8-0.22}) rectangle ++(0.25,0.44);
+    \else \fill[CNline!60] ({(\k-1)*0.27},{-\r*0.8-0.22}) rectangle ++(0.25,0.44); \fi}
+  \node[CNtiny, anchor=west] at (7.75,-\r*0.8) {\note};
+}
+\draw[CNlink, ->] (0,-2.05) -- node[CNtiny, below=2pt] {\CNL{time}{زمان}} (7.55,-2.05);
+\end{tikzpicture}

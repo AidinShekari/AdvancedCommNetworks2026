@@ -1,0 +1,547 @@
+\Needspace{22\baselineskip}
+
+\CNsection{1}{Why NFV?}
+
+Traditional telecom networks rely on \textbf{proprietary hardware appliances} for every network function:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Problem} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{High CAPEX} & Each function requires dedicated, expensive hardware (firewall appliance, load balancer, DPI box, etc.) \\
+\textbf{High OPEX} & Power, cooling, rack space, vendor maintenance contracts for each appliance \\
+\textbf{Slow Scaling} & Need more capacity? Order hardware, wait weeks for delivery, rack-and-stack, configure \\
+\textbf{Underutilization} & Hardware sized for peak load; average utilization often 20-30\% \\
+\textbf{Vendor Dependency} & Locked into vendor hardware lifecycle, upgrade timelines, and pricing \\
+\textbf{Rigid Deployment} & Cannot easily move functions, resize, or replicate on demand \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{The Core Insight}: If network functions (firewall, router, load balancer) are just software, why not run them on standard servers as VMs or containers?
+
+\end{CNquote}
+
+\textbf{NFV was initiated by a group of telecom operators (AT\&T, BT, Deutsche Telekom, etc.) who published the ETSI NFV white paper in 2012.}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m16-traditional}{8}
+
+\CNsection{2}{Traditional vs NFV Comparison}
+
+\CNchained\CNsubsection{}{Traditional Approach}
+
+\CNfigure{m16-traditional}{Traditional approach: one proprietary appliance per function}
+
+\CNkeepfig{m16-nfv-approach}{3}
+
+\CNsubsection{}{NFV Approach}
+
+\CNfigure{m16-nfv-approach}{NFV approach: virtual functions on shared commodity hardware}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3077}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1923}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Traditional} & \CNth{NFV} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Hardware & Proprietary, purpose-built & COTS (Commercial Off-The-Shelf) servers \\
+Software & Embedded in appliance & Decoupled, runs as VM/\allowbreak{}container \\
+Scaling & Buy more hardware & Spin up more instances (minutes) \\
+Cost & High CAPEX + OPEX & Lower (commodity HW + SW licenses) \\
+Flexibility & Fixed function & Any function on any server \\
+Lifecycle & 5-7 year hardware refresh & Continuous software updates \\
+\end{longtable}
+}
+
+\CNkeepfig{m16-etsi-nfv}{5}
+
+\CNsection{3}{ETSI NFV Architecture}
+
+\CNfigure{m16-etsi-nfv}{ETSI NFV reference architecture}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{Three Main Components:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6471}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3529}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Component} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{NFVI} & The infrastructure: hardware + virtualization layer that hosts VNFs \\
+\textbf{VNF} & Software implementation of a network function running on NFVI \\
+\textbf{MANO} & Management and Orchestration: lifecycle, resources, service chaining \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsection{4}{NFV Infrastructure (NFVI)}
+
+NFVI provides the environment where VNFs execute.
+
+\CNsubsection{4.1}{Hardware Resources}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Resource} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Compute} & x86/\allowbreak{}ARM CPUs, GPU accelerators, NUMA topology \\
+\textbf{Storage} & Local SSD/\allowbreak{}NVMe, SAN, distributed storage (Ceph) \\
+\textbf{Network} & NICs (10/\allowbreak{}25/\allowbreak{}100G), SmartNICs, switches, SR-IOV capable \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{4.2}{Virtualization Layer}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4800}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5200}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Technology} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Hypervisor} & KVM, VMware ESXi, Xen — creates VMs \\
+\textbf{Container Runtime} & Docker, containerd, CRI-O — creates containers \\
+\textbf{Kubernetes} & Container orchestration platform (for CNFs) \\
+\end{longtable}
+}
+
+\CNsubsection{4.3}{COTS Servers}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Commercial Off-The-Shelf} servers (Dell, HP, Supermicro)
+\item
+  Standard x86 architecture — no proprietary hardware
+\item
+  High-volume, competitive pricing
+\item
+  Performance enhanced with: SR-IOV, DPDK, huge pages, CPU pinning, NUMA awareness
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{4.4}{Acceleration Technologies}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Technology} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{SR-IOV} & Bypass hypervisor for direct NIC access (low latency) \\
+\textbf{DPDK} & User-space packet processing (bypass kernel) \\
+\textbf{SmartNIC/\allowbreak{}DPU} & Offload networking to NIC hardware \\
+\textbf{FPGA} & Programmable hardware acceleration \\
+\textbf{Huge Pages} & Reduce TLB misses for high-throughput workloads \\
+\end{longtable}
+}
+
+\CNkeepfig{m16-vnf-vs-cnf}{5}
+
+\CNsection{5}{VNF vs CNF}
+
+\CNfigure{m16-vnf-vs-cnf}{VNF (virtual machines) versus CNF (containers)}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{Comparison}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1739}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3478}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4783}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{VNF (VM-based)} & \CNth{CNF (Container-based)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Runtime} & Hypervisor (KVM, VMware) & Container runtime (K8s) \\
+\textbf{Size} & GBs (full OS image) & MBs (shared kernel) \\
+\textbf{Boot Time} & Minutes & Seconds \\
+\textbf{Architecture} & Monolithic & Microservices \\
+\textbf{State} & Stateful (local state in VM) & Stateless (external state store) \\
+\textbf{Scaling} & Vertical (bigger VM) or slow horizontal & Fast horizontal (replicas) \\
+\textbf{Updates} & Disruptive (VM restart) & Rolling updates, canary \\
+\textbf{Lifecycle} & VNFM manages & Kubernetes manages (Helm, Operators) \\
+\textbf{Density} & Low (few VMs per server) & High (hundreds of containers) \\
+\textbf{CI/\allowbreak{}CD} & Difficult & Native (GitOps, pipelines) \\
+\end{longtable}
+}
+
+\CNsubsection{}{5G Core = CNFs}
+
+The 3GPP 5G Core (5GC) is designed as a \textbf{Service-Based Architecture (SBA)} with cloud-native principles:
+
+\begin{itemize}
+\tightlist
+\item
+  Each Network Function (AMF, SMF, UPF, NRF, etc.) is a \textbf{CNF}
+\item
+  Deployed on \textbf{Kubernetes}
+\item
+  Communicates via \textbf{HTTP/\allowbreak{}2 + REST APIs}
+\item
+  Stateless design with external data stores (e.g., UDSF)
+\item
+  Horizontal scaling, rolling upgrades, self-healing
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{22\baselineskip}
+
+\CNsection{6}{MANO (Management and Orchestration)}
+
+\CNchained\CNsubsection{6.1}{NFVO (NFV Orchestrator)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Service Orchestration} & Composes end-to-end network services from multiple VNFs \\
+\textbf{Lifecycle Management} & Onboard, instantiate, scale, update, terminate services \\
+\textbf{Resource Coordination} & Requests resources from VIM across multiple data centers \\
+\textbf{Catalog Management} & Stores NSD (Network Service Descriptors) and VNF packages \\
+\textbf{Policy Management} & Placement, affinity, anti-affinity rules \\
+\end{longtable}
+}
+
+Examples: ONAP, OSM (Open Source MANO), Cloudify, Nokia CloudBand
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{6.2}{VNFM (VNF Manager)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Instantiate} & Deploy VNF from package (image + descriptor) \\
+\textbf{Scale} & Scale out (add instances) or scale in (remove) \\
+\textbf{Heal} & Detect failure and restart/\allowbreak{}replace VNF instances \\
+\textbf{Terminate} & Graceful shutdown and resource release \\
+\textbf{Update/\allowbreak{}Upgrade} & Apply new software version \\
+\textbf{Configure} & Day-0 (initial), Day-1 (service), Day-2 (operational) config \\
+\end{longtable}
+}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{6.3}{VIM (Virtualized Infrastructure Manager)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Compute Management} & Create/\allowbreak{}delete VMs or containers, CPU/\allowbreak{}memory allocation \\
+\textbf{Network Management} & Virtual networks, subnets, ports, security groups \\
+\textbf{Storage Management} & Volumes, snapshots, object storage \\
+\textbf{Resource Monitoring} & Utilization, capacity, alarms \\
+\end{longtable}
+}
+
+Examples:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{OpenStack} — most common VIM for VNFs (Nova, Neutron, Cinder)
+\item
+  \textbf{Kubernetes} — VIM for CNFs (native container orchestration)
+\item
+  \textbf{VMware vCenter} — enterprise virtualization
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{7}{NFV in Telecom (Real Examples)}
+
+\CNchained\CNsubsection{7.1}{vEPC (Virtualized Evolved Packet Core)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Component} & \CNth{Traditional} & \CNth{Virtualized} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MME & Dedicated chassis & VM running MME software \\
+S-GW & Proprietary appliance & VM/\allowbreak{}container with S-GW logic \\
+P-GW & Proprietary appliance & VM/\allowbreak{}container with P-GW logic \\
+HSS & Dedicated server & VM with database \\
+\end{longtable}
+}
+
+Benefits: scale MME independently during mass events, deploy regional instances
+
+\CNsubsection{7.2}{vIMS (Virtualized IP Multimedia Subsystem)}
+
+\begin{itemize}
+\tightlist
+\item
+  P-CSCF, S-CSCF, I-CSCF as VNFs
+\item
+  Scales voice/\allowbreak{}video capacity on demand
+\item
+  Deploy in new markets without shipping hardware
+\end{itemize}
+
+\CNkeepfig{m16-k8s-5gc}{3}
+
+\CNsubsection{7.3}{5G Core as CNFs on Kubernetes}
+
+\CNfigure{m16-k8s-5gc}{5G core functions as CNFs on Kubernetes}
+
+\begin{itemize}
+\tightlist
+\item
+  Each 5G NF is a Kubernetes deployment with multiple replicas
+\item
+  Helm charts or Operators manage lifecycle
+\item
+  GitOps pipelines for CI/\allowbreak{}CD
+\item
+  Horizontal Pod Autoscaler for dynamic scaling
+\end{itemize}
+
+\CNkeepfig{m16-evolution}{5}
+
+\CNsection{8}{Evolution: Physical \ensuremath{\to} Virtual \ensuremath{\to} Cloud-Native}
+
+\CNfigure{m16-evolution}{From physical appliances to cloud-native functions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2069}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2241}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2586}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1552}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1552}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Generation} & \CNth{Form Factor} & \CNth{Orchestration} & \CNth{Scaling} & \CNth{Updates} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Physical} & Proprietary appliance & Manual /\allowbreak{} NMS & Buy hardware & Firmware upgrade (downtime) \\
+\textbf{Virtual (VNF)} & VM on hypervisor & MANO (NFVO/\allowbreak{}VNFM) & New VMs (minutes) & VM image replacement \\
+\textbf{Cloud-Native (CNF)} & Container on K8s & Kubernetes + GitOps & Pod replicas (seconds) & Rolling /\allowbreak{} Canary /\allowbreak{} Blue-Green \\
+\end{longtable}
+}
+
+\CNsubsection{}{Why the Industry Moved to CNF:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Faster scaling}: Seconds vs. minutes
+\item
+  \textbf{Higher density}: More functions per server
+\item
+  \textbf{DevOps native}: CI/\allowbreak{}CD, GitOps, automated testing
+\item
+  \textbf{Resilience}: Self-healing, stateless design
+\item
+  \textbf{Portability}: Run anywhere Kubernetes runs (on-prem, public cloud, edge)
+\end{enumerate}
+
+\Needspace{26\baselineskip}
+
+\CNsection{9}{Benefits of NFV}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Benefit} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Flexibility} & Deploy any function on any server; relocate workloads \\
+\textbf{Elastic Scaling} & Scale out/\allowbreak{}in based on demand (auto-scaling) \\
+\textbf{Multi-tenancy} & Multiple tenants share infrastructure securely \\
+\textbf{CI/\allowbreak{}CD} & Continuous integration and deployment of network functions \\
+\textbf{Cost Reduction} & 40-60\% CAPEX reduction, 30-50\% OPEX reduction (industry estimates) \\
+\textbf{Speed to Market} & New services in days/\allowbreak{}weeks vs. months/\allowbreak{}years \\
+\textbf{Vendor Diversity} & Mix VNFs from different vendors on same infrastructure \\
+\textbf{Geographic Flexibility} & Deploy at edge, regional DC, or central cloud \\
+\textbf{Resource Efficiency} & Better utilization through sharing and dynamic allocation \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{10}{Challenges of NFV}
+
+\CNchained\CNsubsection{10.1}{Performance (Packet Processing)}
+
+\begin{itemize}
+\tightlist
+\item
+  VMs/\allowbreak{}containers add overhead vs. bare-metal ASIC processing
+\item
+  \textbf{Mitigation}: DPDK, SR-IOV, SmartNICs, CPU pinning, huge pages
+\item
+  UPF and other data-plane VNFs are most sensitive
+\end{itemize}
+
+\CNsubsection{10.2}{Orchestration Complexity}
+
+\begin{itemize}
+\tightlist
+\item
+  MANO stack is complex to deploy and operate
+\item
+  Multi-vendor VNF interoperability issues
+\item
+  Descriptor standardization still evolving (TOSCA, SOL001/\allowbreak{}006)
+\item
+  Day-2 operations (monitoring, healing, scaling policies) are hard
+\end{itemize}
+
+\CNsubsection{10.3}{State Management}
+
+\begin{itemize}
+\tightlist
+\item
+  VNFs often designed as stateful monoliths (ported from appliances)
+\item
+  Stateful VMs are hard to scale horizontally or migrate
+\item
+  CNF approach: externalize state (Redis, etcd, databases)
+\item
+  Challenge: latency of external state access for high-throughput functions
+\end{itemize}
+
+\CNsubsection{10.4}{Reliability and Availability}
+
+\begin{itemize}
+\tightlist
+\item
+  Software failures more frequent than hardware failures
+\item
+  Need robust health monitoring, auto-healing, redundancy
+\item
+  Carrier-grade availability (99.999\%) requires careful design
+\end{itemize}
+
+\CNsubsection{10.5}{Security}
+
+\begin{itemize}
+\tightlist
+\item
+  Larger attack surface (hypervisor, orchestration APIs, shared infrastructure)
+\item
+  Multi-tenant isolation must be enforced at multiple layers
+\item
+  Container escape vulnerabilities
+\end{itemize}
+
+\CNsubsection{10.6}{Skills Gap}
+
+\begin{itemize}
+\tightlist
+\item
+  Operators must learn cloud technologies (OpenStack, K8s, CI/\allowbreak{}CD)
+\item
+  Telecom + IT convergence requires new organizational models
+\end{itemize}
+
+\CNboxsection{Key Takeaways}
+
+\begin{CNbox}[unbreakable]{sum}{Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  NFV \textbf{decouples network functions from proprietary hardware} \ensuremath{\to} software on COTS
+\item
+  ETSI NFV architecture: \textbf{NFVI + VNF + MANO}
+\item
+  \textbf{VNFs} (VM-based) are being replaced by \textbf{CNFs} (container-based, cloud-native)
+\item
+  \textbf{5G Core is designed as CNFs} on Kubernetes from the start
+\item
+  \textbf{MANO} orchestrates the full lifecycle: instantiate, scale, heal, terminate
+\item
+  Evolution: Physical \ensuremath{\to} Virtual (VNF) \ensuremath{\to} \textbf{Cloud-Native (CNF)}
+\item
+  Key challenges: \textbf{performance, orchestration complexity, and state management}
+\item
+  NFV + SDN together enable \textbf{fully programmable, automated telecom networks}
+\end{enumerate}
+
+\end{CNbox}

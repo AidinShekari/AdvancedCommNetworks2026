@@ -1,0 +1,748 @@
+\Needspace{19\baselineskip}
+
+\CNsection{1}{Why Network Slicing?}
+
+Traditional mobile networks deploy a single, monolithic infrastructure designed for a ``one-size-fits-all'' service model. However, 5G must simultaneously serve radically different requirements:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2941}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3824}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3235}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Use Case} & \CNth{Requirement} & \CNth{Challenge} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Enhanced Mobile Broadband (eMBB) & High throughput (Gbps), moderate latency & Bandwidth-hungry \\
+Ultra-Reliable Low Latency (URLLC) & Sub-1ms latency, 99.999\% reliability & Deterministic guarantees \\
+Massive IoT (MIoT) & Millions of devices/\allowbreak{}km\textsuperscript{2}, ultra-low power & Scale and efficiency \\
+Vehicle-to-Everything (V2X) & Low latency + high reliability + mobility & Safety-critical \\
+\end{longtable}
+}
+
+\textbf{Network slicing} solves this by allowing \textbf{one physical network} to serve all these diverse requirements simultaneously through multiple logical networks, each optimized for its specific purpose.
+
+\textbf{Key drivers:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Economic efficiency}: Share expensive infrastructure (spectrum, towers, fiber) across services
+\item
+  \textbf{Service differentiation}: Offer tailored SLAs to different verticals (automotive, healthcare, industry)
+\item
+  \textbf{Operational agility}: Deploy new services without building new physical networks
+\item
+  \textbf{Multi-tenancy}: Enable MVNOs and enterprises to operate isolated virtual networks
+\end{itemize}
+
+\CNsection{2}{Network Slicing Concept}
+
+A \textbf{network slice} is a complete, logical end-to-end network built on top of shared physical infrastructure.
+
+\CNsubsection{2.1}{End-to-End Scope}
+
+Each slice spans the entire network:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{RAN Slice}: Radio resource allocation, scheduling policies, beamforming configuration
+\item
+  \textbf{Transport Slice}: Bandwidth guarantees, routing paths, latency bounds in backhaul/\allowbreak{}midhaul
+\item
+  \textbf{Core Slice}: Dedicated or shared Network Functions (SMF, UPF, PCF, etc.)
+\end{itemize}
+
+\CNsubsection{2.2}{Isolation Between Slices}
+
+Three dimensions of isolation:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Resource Isolation}: Dedicated spectrum, compute, storage, and bandwidth per slice
+\item
+  \textbf{Security Isolation}: Separate security contexts, key hierarchies, access controls
+\item
+  \textbf{Failure Isolation}: A fault in one slice does not propagate to another
+\end{enumerate}
+
+\CNsubsection{2.3}{Customization Per Slice}
+
+Each slice can be independently customized:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Network Functions}: Choose which NFs are deployed (e.g., URLLC may skip certain NFs)
+\item
+  \textbf{Topology}: Define the placement of NFs (e.g., edge UPF for URLLC)
+\item
+  \textbf{QoS Parameters}: Configure slice-specific 5QI values, AMBR, priority levels
+\item
+  \textbf{Policies}: Independent charging, access control, and mobility management rules
+\end{itemize}
+
+\CNfigure{m21-slice-layers}{End-to-end slices across RAN, transport and core}
+
+\Needspace{14\baselineskip}
+
+\Needspace{21\baselineskip}
+
+\CNsection{3}{Slice Identification}
+
+\CNchained\CNsubsection{3.1}{S-NSSAI (Single Network Slice Selection Assistance Information)}
+
+The fundamental identifier for a network slice consists of two components:
+
+\CNdisplay{\text{S-NSSAI} = \mathrm{SST} + \mathrm{SD}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2692}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Field} & \CNth{Size} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{SST} (Slice/\allowbreak{}Service Type) & 8~bits & Indicates the expected behavior of the slice (service characteristics) \\
+\textbf{SD} (Slice Differentiator) & 24~bits (optional) & Differentiates among slices of the same SST (e.g., different tenants) \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{3.2}{Standardized SST Values}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{SST Value} & \CNth{Slice Type} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & eMBB & Enhanced Mobile Broadband \\
+2 & URLLC & Ultra-Reliable Low Latency Communications \\
+3 & MIoT & Massive IoT \\
+4 & V2X & Vehicle-to-Everything \\
+5–127 & Reserved & For future standardized use \\
+128–255 & Operator-specific & Custom slice types \\
+\end{longtable}
+}
+
+\Needspace{19\baselineskip}
+
+\CNsubsection{3.3}{NSSAI (Network Slice Selection Assistance Information)}
+
+\textbf{NSSAI} = a collection (set) of S-NSSAIs. Multiple NSSAI types exist in the system:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3429}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{NSSAI Type} & \CNth{Where Stored} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Configured NSSAI} & UE (from HPLMN) & All S-NSSAIs the UE is subscribed to \\
+\textbf{Requested NSSAI} & Sent by UE in Registration & S-NSSAIs the UE wants to use now \\
+\textbf{Allowed NSSAI} & Returned by network & S-NSSAIs the UE is permitted to use in current PLMN \\
+\textbf{Rejected NSSAI} & Returned by network & S-NSSAIs denied (with rejection cause) \\
+\textbf{Pending NSSAI} & AMF internal & S-NSSAIs requiring additional authorization \\
+\end{longtable}
+}
+
+\CNsubsection{3.4}{Example}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+UE Subscription:
+  Configured NSSAI = { S-NSSAI(SST=1), S-NSSAI(SST=1,SD=0x000001),
+                       S-NSSAI(SST=2), S-NSSAI(SST=3) }
+
+Registration Request:
+  Requested NSSAI = { S-NSSAI(SST=1), S-NSSAI(SST=2) }
+
+Network Response:
+  Allowed NSSAI = { S-NSSAI(SST=1), S-NSSAI(SST=2) }
+  Rejected NSSAI = {}
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNkeepfig{m21-slice-selection}{10}
+
+\CNsection{4}{Slice Selection (NSSF Role)}
+
+The \textbf{Network Slice Selection Function (NSSF)} is the dedicated NF responsible for determining the appropriate network slice instance(s) for a UE.
+
+\CNsubsection{4.1}{Slice Selection Procedure}
+
+\CNfigure{m21-slice-selection}{Slice selection with the NSSF and AMF re-allocation}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{4.2}{NSSF Functions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Slice selection} & Determine Allowed NSSAI based on subscription, PLMN policies, and availability \\
+\textbf{AMF set determination} & Identify the set of AMFs capable of serving the selected slices \\
+\textbf{NRF redirection} & Provide NRF endpoint for slice-specific NF discovery \\
+\textbf{Roaming support} & Map between HPLMN and VPLMN S-NSSAIs \\
+\end{longtable}
+}
+
+\CNsubsection{4.3}{Slice Selection Inputs}
+
+The NSSF considers:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Requested NSSAI} from UE
+\item
+  \textbf{Subscribed S-NSSAIs} from UDM (subscription data)
+\item
+  \textbf{PLMN policies} (which slices are available in this area)
+\item
+  \textbf{Tracking Area} (slice availability may vary by location)
+\item
+  \textbf{Roaming agreements} (mapping between home and visited PLMN slices)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m21-shared-dedicated}{8}
+
+\CNsection{5}{Slice Architecture}
+
+\CNchained\CNsubsection{5.1}{Dedicated vs. Shared NFs}
+
+\CNfigure{m21-shared-dedicated}{Shared network functions and slice-specific network functions}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{5.2}{NF Deployment Model}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.0952}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.6429}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2619}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{NF} & \CNth{Typically Shared/\allowbreak{}Dedicated} & \CNth{Rationale} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{AMF} & Shared (or per-slice set) & Handles initial access for all UEs; may have slice-specific AMF sets \\
+\textbf{NSSF} & Shared & Central slice selection logic \\
+\textbf{NRF} & Shared (with slice-aware discovery) & NF registry, supports slice-based queries \\
+\textbf{UDM/\allowbreak{}AUSF} & Shared & Subscription/\allowbreak{}authentication is per-UE, not per-slice \\
+\textbf{SMF} & Dedicated per slice & Session management varies significantly between slice types \\
+\textbf{UPF} & Dedicated per slice & Data plane customization (edge vs. central, throughput vs. latency) \\
+\textbf{PCF} & Dedicated per slice & Policies differ drastically between eMBB and URLLC \\
+\textbf{CHF} & Dedicated or shared & Charging models may differ per slice \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{5.3}{Slice-Specific Customization}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1818}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2955}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2727}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{eMBB Slice} & \CNth{URLLC Slice} & \CNth{MIoT Slice} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{UPF Placement} & Central DC & Edge (MEC) & Central DC \\
+\textbf{QoS Priority} & Medium (5QI=9) & Highest (5QI=80-82) & Low (5QI=79) \\
+\textbf{Redundancy} & Standard & Dual connectivity, redundant paths & Minimal \\
+\textbf{Mobility} & Full handover support & Conditional handover, DAPS & Rarely mobile \\
+\textbf{Charging} & Volume-based & Latency SLA-based & Per-device flat rate \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsection{6}{Slice Isolation}
+
+Slice isolation ensures that slices behave as independent networks despite sharing physical infrastructure.
+
+\CNsubsection{6.1}{Resource Isolation}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3448}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6552}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Resource} & \CNth{Isolation Mechanism} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Spectrum} & Dedicated carriers, BWP (Bandwidth Parts), scheduling isolation \\
+\textbf{Compute} & Dedicated VMs/\allowbreak{}containers, CPU pinning, NUMA allocation \\
+\textbf{Storage} & Separate volumes, IOPS guarantees \\
+\textbf{Transport} & VLAN/\allowbreak{}VxLAN segmentation, FlexE, dedicated wavelengths \\
+\textbf{Core NFs} & Separate instances (pods/\allowbreak{}VMs) per slice \\
+\end{longtable}
+}
+
+\CNsubsection{6.2}{Security Isolation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Separate security domains}: Each slice can have independent security policies
+\item
+  \textbf{Key hierarchy isolation}: Potential for separate key derivation per slice
+\item
+  \textbf{Access control}: Slice-specific authentication/\allowbreak{}authorization (e.g., enterprise slice with additional EAP)
+\item
+  \textbf{Traffic encryption}: Separate encryption contexts between slices
+\item
+  \textbf{Audit trails}: Independent logging and compliance per slice
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{6.3}{Failure Isolation}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4062}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5938}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Failure Type} & \CNth{Isolation Approach} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+NF crash & Slice-dedicated NFs don’t affect other slices \\
+Overload & Resource quotas prevent one slice from starving others \\
+Security breach & Compromised slice cannot access another slice’s data/\allowbreak{}control \\
+Configuration error & Slice-scoped config limits blast radius \\
+Hardware failure & Slice-aware redundancy and recovery \\
+\end{longtable}
+}
+
+\CNkeepfig{m21-isolation}{3}
+
+\CNsubsection{6.4}{Isolation Levels}
+
+\CNfigure{m21-isolation}{Three levels of slice isolation}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m21-lifecycle}{8}
+
+\CNsection{7}{Slice Lifecycle Management}
+
+\CNchained\CNsubsection{7.1}{Lifecycle Phases}
+
+\CNfigure{m21-lifecycle}{Network slice life cycle}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{7.2}{Management Functions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6250}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3750}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{CSMF} (Communication Service Mgmt Function) & Translates customer requirements into slice requirements \\
+\textbf{NSMF} (Network Slice Mgmt Function) & Manages the overall slice lifecycle \\
+\textbf{NSSMF} (Network Slice Subnet Mgmt Function) & Manages individual slice subnets (RAN, Core, Transport) \\
+\end{longtable}
+}
+
+\CNkeepfig{m21-mgmt-chain}{2}
+
+\textbf{Hierarchy:}
+
+\CNfigure{m21-mgmt-chain}{Slice-management hierarchy}
+
+\CNsubsection{7.3}{Intent-Based Slice Management}
+
+Instead of specifying low-level parameters, operators express \textbf{intents}:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{YAML}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Example Slice Intent}
+\FunctionTok{slice\_intent}\KeywordTok{:}
+\AttributeTok{  }\FunctionTok{name}\KeywordTok{:}\AttributeTok{ }\StringTok{"Enterprise{-}Manufacturing"}
+\AttributeTok{  }\FunctionTok{service\_type}\KeywordTok{:}\AttributeTok{ URLLC}
+\AttributeTok{  }\FunctionTok{requirements}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{latency}\KeywordTok{:}\AttributeTok{ }\StringTok{"\textless{} 5ms"}
+\AttributeTok{    }\FunctionTok{reliability}\KeywordTok{:}\AttributeTok{ }\StringTok{"99.999\%"}
+\AttributeTok{    }\FunctionTok{throughput}\KeywordTok{:}\AttributeTok{ }\StringTok{"\textgreater{} 100 Mbps"}
+\AttributeTok{    }\FunctionTok{isolation}\KeywordTok{:}\AttributeTok{ }\StringTok{"dedicated"}
+\AttributeTok{    }\FunctionTok{coverage}\KeywordTok{:}\AttributeTok{ }\StringTok{"Factory Floor Building A"}
+\AttributeTok{  }\FunctionTok{constraints}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{max\_devices}\KeywordTok{:}\AttributeTok{ }\DecValTok{500}
+\AttributeTok{    }\FunctionTok{mobility}\KeywordTok{:}\AttributeTok{ }\StringTok{"low"}
+\AttributeTok{    }\FunctionTok{security}\KeywordTok{:}\AttributeTok{ }\StringTok{"enhanced"}
+\end{Highlighting}
+\end{Shaded}
+
+The management system automatically translates this intent into:
+
+\begin{itemize}
+\tightlist
+\item
+  NF deployment configurations
+\item
+  Resource allocation decisions
+\item
+  RAN scheduling parameters
+\item
+  Transport path computation
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{23\baselineskip}
+
+\CNsection{8}{Slice Use Cases}
+
+\CNchained\CNsubsection{8.1}{eMBB Slice}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Attribute} & \CNth{Configuration} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Goal} & Maximum throughput for mobile broadband \\
+\textbf{SST} & 1 \\
+\textbf{RAN} & Shared spectrum, wide bandwidth (100 MHz+), MIMO \\
+\textbf{UPF} & Central data center, high-capacity \\
+\textbf{Typical Services} & Video streaming, AR/\allowbreak{}VR, web browsing \\
+\textbf{SLA} & DL: 100~Mbps guaranteed, latency \textless{} 20ms \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{8.2}{URLLC Slice}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4400}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5600}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Attribute} & \CNth{Configuration} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Goal} & Deterministic ultra-low latency and high reliability \\
+\textbf{SST} & 2 \\
+\textbf{RAN} & Dedicated spectrum, mini-slots, configured grant \\
+\textbf{UPF} & Edge deployment (MEC), co-located with gNB \\
+\textbf{Typical Services} & Industrial automation, remote surgery, autonomous driving \\
+\textbf{SLA} & Latency \textless{} 1ms, reliability 99.999\% \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{8.3}{MIoT Slice}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4400}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5600}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Attribute} & \CNth{Configuration} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Goal} & Support massive number of low-power devices \\
+\textbf{SST} & 3 \\
+\textbf{RAN} & NB-IoT/\allowbreak{}LTE-M carrier, relaxed scheduling \\
+\textbf{UPF} & Central, optimized for small packets \\
+\textbf{Typical Services} & Smart meters, sensors, environmental monitoring \\
+\textbf{SLA} & Supports 1M+ devices/\allowbreak{}km\textsuperscript{2}, battery life \textgreater{} 10 years \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{8.4}{Enterprise Slice (Private Network)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4400}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5600}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Attribute} & \CNth{Configuration} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Goal} & Fully isolated private network for enterprise \\
+\textbf{SST} & Operator-specific (e.g., 128) \\
+\textbf{RAN} & Dedicated small cells on enterprise premises \\
+\textbf{UPF} & On-premises (local breakout) \\
+\textbf{Typical Services} & Campus connectivity, industrial IoT, private LAN \\
+\textbf{SLA} & Full SLA customization, dedicated resources \\
+\textbf{Isolation} & Level 3 (physical isolation where possible) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m21-slice-dnn-qos}{8}
+
+\CNsection{9}{Slicing vs. QoS vs. DNN}
+
+\CNchained\CNsubsection{9.1}{Conceptual Comparison}
+
+\CNfigure{m21-slice-dnn-qos}{Slices contain DNNs, DNNs contain QoS flows}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{9.2}{Detailed Comparison}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3200}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.4200}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Network Slicing} & \CNth{QoS (5QI/\allowbreak{}QoS Flows)} & \CNth{DNN} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Scope} & End-to-end logical network & Per-flow packet treatment & Connectivity endpoint (PDU Session) \\
+\textbf{Granularity} & Entire network (RAN + Core + Transport) & Individual data flows & Per PDU Session \\
+\textbf{Identifier} & S-NSSAI (SST + SD) & 5QI, QFI, ARP & DNN string (e.g., ``internet'') \\
+\textbf{Isolation} & Full (resource, security, failure) & No isolation (shared NFs) & No isolation \\
+\textbf{Customization} & NF topology, placement, policies & Scheduling priority, rate, latency & Routing to specific data network \\
+\textbf{Analogy} & Separate highway systems & Lane priorities on a highway & Highway exit (destination) \\
+\textbf{Who decides} & Network (NSSF) at registration & PCF/\allowbreak{}SMF per session/\allowbreak{}flow & UE requests in PDU Session Establishment \\
+\textbf{Number} & Few per PLMN (max 8 per UE) & Many per slice (up to 64 per session) & Multiple per slice \\
+\textbf{Relationship} & Contains DNNs and QoS & Exists within a slice & Exists within a slice \\
+\end{longtable}
+}
+
+\CNkeepfig{m21-slice-tree}{3}
+
+\CNsubsection{9.3}{Hierarchical Relationship}
+
+\CNfigure{m21-slice-tree}{A slice contains DNNs, a DNN contains PDU sessions and QoS flows}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{9.4}{When to Use What}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5652}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4348}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Requirement} & \CNth{Solution} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Different vertical industries on same network & \textbf{Network Slicing} \\
+Prioritize voice over web traffic & \textbf{QoS} (different 5QI values) \\
+Connect to different external data networks & \textbf{DNN} \\
+Isolate enterprise traffic from consumer & \textbf{Network Slicing} \\
+Differentiate video streaming from file download & \textbf{QoS} \\
+Route to MEC application vs. central cloud & \textbf{DNN} (+ UPF selection) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{22\baselineskip}
+
+\CNsection{10}{RAN Slicing}
+
+\CNchained\CNsubsection{10.1}{Radio Resource Partitioning}
+
+RAN slicing divides radio resources among slices using different strategies:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2941}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3824}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3235}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Strategy} & \CNth{Description} & \CNth{Trade-off} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Hard Partitioning} & Dedicated PRBs/\allowbreak{}carriers per slice & Strong isolation, lower multiplexing gain \\
+\textbf{Soft Partitioning} & Minimum guaranteed + shared pool & Good isolation + statistical multiplexing \\
+\textbf{Priority-based} & Shared resources with priority scheduling & Maximum efficiency, weakest isolation \\
+\textbf{BWP-based} & Assign Bandwidth Parts per slice & Clean separation at physical layer \\
+\end{longtable}
+}
+
+\CNkeepfig{m21-scheduler}{5}
+
+\CNsubsection{10.2}{Slice-Aware Scheduling}
+
+The gNB MAC scheduler must support multi-slice operation:
+
+\CNfigure{m21-scheduler}{Two-level slice-aware scheduling in the gNB}
+
+\textbf{Two-level scheduling:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Inter-slice scheduler}: Allocates resources (PRBs, slots) to each slice based on SLA
+\item
+  \textbf{Intra-slice scheduler}: Schedules individual UEs within a slice using slice-appropriate algorithms
+\end{enumerate}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{10.3}{RAN Slice SLA Enforcement}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{SLA Parameter} & \CNth{Enforcement Mechanism} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Minimum throughput & Reserved PRBs (guaranteed minimum) \\
+Maximum latency & Priority scheduling, configured grants, mini-slots \\
+Reliability target & HARQ configuration, repetition, diversity \\
+Maximum UE count & Admission control per slice \\
+Isolation level & BWP separation or hard partitioning \\
+\end{longtable}
+}
+
+\CNsubsection{10.4}{RAN Slicing Signaling}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{S-NSSAI in RRC}: UE provides S-NSSAI during RRC setup, gNB maps to appropriate slice
+\item
+  \textbf{Slice-aware DRB mapping}: QoS flows from same slice map to common DRBs
+\item
+  \textbf{RAN slice descriptors}: O-RAN defines slice-level radio resource management policies
+\item
+  \textbf{NSSI (Network Slice Subnet Instance)}: RAN maintains per-slice subnet instances
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsection{}{Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Concept} & \CNth{Key Point} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Network Slice} & Logical end-to-end network (RAN + Transport + Core) on shared infrastructure \\
+\textbf{S-NSSAI} & SST (8-bit type) + SD (24-bit differentiator) identifies a slice \\
+\textbf{NSSF} & Selects appropriate slice for UE during registration \\
+\textbf{Isolation} & Resource + Security + Failure isolation between slices \\
+\textbf{Lifecycle} & Design \ensuremath{\to} Commission \ensuremath{\to} Operate \ensuremath{\to} Decommission (managed by NSMF/\allowbreak{}NSSMF) \\
+\textbf{RAN Slicing} & Radio resource partitioning with two-level scheduling \\
+\textbf{Slice vs QoS vs DNN} & Slice (whole network) \ensuremath{\supset} DNN (connectivity) \ensuremath{\supset} QoS (per-flow treatment) \\
+\end{longtable}
+}
+
+\CNboxsection{Key Takeaways}
+
+\begin{CNbox}[unbreakable]{sum}{Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Network slicing is the defining feature of 5G architecture} — it transforms a single physical network into multiple purpose-built logical networks
+\item
+  \textbf{S-NSSAI = SST + SD} is the fundamental slice identifier; UE provides Requested NSSAI, network returns Allowed NSSAI
+\item
+  \textbf{NSSF is the brain of slice selection} — it determines which slices a UE can access and which AMF should serve it
+\item
+  \textbf{Isolation is multi-dimensional} — resource, security, and failure isolation must all be addressed
+\item
+  \textbf{RAN slicing requires two-level scheduling} — inter-slice allocation followed by intra-slice per-UE scheduling
+\item
+  \textbf{Slicing \ensuremath{\neq} QoS} — slicing provides end-to-end logical network separation; QoS provides per-flow treatment within a slice
+\item
+  \textbf{Lifecycle management} automates slice creation through decommissioning, driven by intent-based specifications
+\end{enumerate}
+
+\end{CNbox}

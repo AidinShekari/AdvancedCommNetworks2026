@@ -1,0 +1,506 @@
+\CNsection{1}{User Plane Concept}
+
+The \textbf{User Plane} (also called the \textbf{Data Plane} or \textbf{U-Plane}) is responsible for carrying actual user data through the mobile network. This includes:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{IP packets} (web browsing, app data, file transfers)
+\item
+  \textbf{Voice data} (VoLTE/\allowbreak{}VoNR encoded speech frames)
+\item
+  \textbf{Video streams} (real-time video, streaming content)
+\item
+  \textbf{Any application-layer payload}
+\end{itemize}
+
+The user plane is distinct from the control plane — while the control plane sets up, manages, and tears down connections, the user plane is the ``pipe'' through which data actually flows once those connections are established.
+
+\textbf{Key characteristics:}
+
+\begin{itemize}
+\tightlist
+\item
+  High throughput requirement
+\item
+  Low latency sensitivity
+\item
+  Stateless forwarding (once tunnels are established)
+\item
+  QoS-aware packet handling
+\item
+  Transparent to signaling — carries data without interpreting it
+\end{itemize}
+
+\CNkeepfig{m23-gtpu-header}{12}
+
+\CNsection{2}{GTP-U Protocol (GPRS Tunneling Protocol — User Plane)}
+
+GTP-U (3GPP TS 29.281) is the core tunneling protocol used to transport user data between network nodes across all generations (3G, 4G, 5G).
+
+\CNsubsection{2.1}{Header Structure}
+
+The GTP-U header has an \textbf{8-byte mandatory portion} plus optional extension headers:
+
+\CNfigure{m23-gtpu-header}{GTP-U header}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Field} & \CNth{Bits} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Version & 3 & Always \CNcode{001} (GTPv1) \\
+PT (Protocol Type) & 1 & \CNcode{1} = GTP, \CNcode{0} = GTP’ (charging) \\
+Reserved (*) & 1 & Must be 0 \\
+E (Extension Header) & 1 & Extension header follows \\
+S (Sequence Number) & 1 & Sequence number field present \\
+PN (N-PDU Number) & 1 & N-PDU number field present \\
+Message Type & 8 & \CNcode{0xFF} = T-PDU (user data), others = signaling \\
+Length & 16 & Payload length (excludes mandatory 8~bytes) \\
+TEID & 32 & Tunnel Endpoint Identifier \\
+\end{longtable}
+}
+
+\CNsubsection{2.2}{TEID (Tunnel Endpoint Identifier)}
+
+The \textbf{TEID} is a 32-bit value that uniquely identifies a GTP tunnel endpoint at a receiving node:
+
+\begin{itemize}
+\tightlist
+\item
+  Each direction of a tunnel has its own TEID
+\item
+  The \textbf{receiving node} assigns the TEID (tells the sender ``use this TEID when sending to me'')
+\item
+  TEID = 0 is reserved for control plane initial messages
+\item
+  A node may have thousands of TEIDs active simultaneously (one per bearer/\allowbreak{}session per direction)
+\end{itemize}
+
+\textbf{Example:}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+gNB tells UPF: "For downlink data to UE-X, use TEID = 0x00A1B2C3 on N3"
+UPF tells gNB: "For uplink data from UE-X, use TEID = 0x00D4E5F6 on N3"
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNkeepfig{m23-gtpu-encap}{5}
+
+\CNsubsection{2.3}{Encapsulation /\allowbreak{} Decapsulation}
+
+At each GTP-U hop, the user’s IP packet is \textbf{encapsulated} inside:
+
+\CNfigure{m23-gtpu-encap}{GTP-U encapsulation at each hop}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Encapsulation} (sending node): Prepends GTP-U header + UDP + outer IP
+\item
+  \textbf{Decapsulation} (receiving node): Strips outer IP + UDP + GTP-U header, forwards inner IP
+\item
+  At intermediate nodes: may decapsulate and re-encapsulate with new TEID
+\end{itemize}
+
+\CNsubsection{2.4}{Sequence Numbers and Extension Headers}
+
+\textbf{Sequence Numbers (16-bit):}
+
+\begin{itemize}
+\tightlist
+\item
+  Optional but used for reordering at tunnel endpoints
+\item
+  Critical during handover (ensures no packet loss/\allowbreak{}reorder)
+\item
+  Incremented per PDU per tunnel
+\end{itemize}
+
+\textbf{Extension Headers:}
+
+\begin{itemize}
+\tightlist
+\item
+  Chained via ``Next Extension Header Type'' field
+\item
+  Each extension: \CNcode{[Length (1 byte)][Content (variable)][Next Ext Hdr Type (1 byte)]}
+\end{itemize}
+
+\Needspace{12\baselineskip}
+
+Common extension headers:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4286}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Type} & \CNth{Name} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0x85 & PDU Session Container & 5G QoS Flow Identifier (QFI), reflective QoS \\
+0xC0 & PDCP PDU Number & For lossless handover \\
+0x40 & UDP Port & Additional multiplexing \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m23-lte-path}{8}
+
+\CNsection{3}{User Plane in LTE (4G)}
+
+\CNchained\CNsubsection{3.1}{End-to-End Path}
+
+\CNfigure{m23-lte-path}{End-to-end LTE user-plane path}
+
+\CNkeepfig{m23-lte-segments}{3}
+
+\CNsubsection{3.2}{Packet Headers at Each Segment}
+
+\CNfigure{m23-lte-segments}{Packet headers on each LTE user-plane segment}
+
+\CNsubsection{3.3}{LTE Bearer Model}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Default Bearer}: Always-on, established at attach (one per PDN connection)
+\item
+  \textbf{Dedicated Bearer}: Additional QoS, established on demand (e.g., VoLTE)
+\item
+  Each bearer = unique set of TEIDs on S1-U and S5
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m23-5g-path}{8}
+
+\CNsection{4}{User Plane in 5G}
+
+\CNchained\CNsubsection{4.1}{End-to-End Path}
+
+\CNfigure{m23-5g-path}{End-to-end 5G user-plane path}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{4.2}{5G Reference Points for User Plane}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Between} & \CNth{Transport} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{N3} & gNB \ensuremath{\leftrightarrow} UPF & GTP-U over UDP/\allowbreak{}IP & RAN to Core user data \\
+\textbf{N9} & UPF \ensuremath{\leftrightarrow} UPF & GTP-U over UDP/\allowbreak{}IP & Inter-UPF forwarding \\
+\textbf{N6} & UPF \ensuremath{\leftrightarrow} DN & Native IP & Exit to data network \\
+\end{longtable}
+}
+
+\CNkeepfig{m23-nr-stack}{5}
+
+\CNsubsection{4.3}{SDAP Layer (Service Data Adaptation Protocol)}
+
+The \textbf{SDAP} layer is new in 5G NR (not present in LTE) and sits above PDCP:
+
+\CNfigure{m23-nr-stack}{NR user-plane stack with the new SDAP layer}
+
+\textbf{SDAP Functions:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Downlink:} QoS Flow \ensuremath{\to} DRB mapping (based on QFI in GTP-U extension header)
+\item
+  \textbf{Uplink:} DRB \ensuremath{\to} QoS Flow marking (stamps QFI on uplink packets)
+\item
+  \textbf{Reflective QoS:} UE mirrors the DL mapping for UL without explicit signaling
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{4.4}{Multiple UPFs Architecture}
+
+5G supports \textbf{UPF chaining} for flexible traffic routing:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3846}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3846}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{UPF Type} & \CNth{Role} & \CNth{Use Case} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{I-UPF} (Intermediate) & Transit/\allowbreak{}branching point & Handover anchor, traffic steering \\
+\textbf{PSA-UPF} (PDU Session Anchor) & Session anchor, IP allocation & Stable IP address point \\
+\end{longtable}
+}
+
+\CNfigure{m23-upf-chain}{UPF chaining with a local breakout to the edge}
+
+\Needspace{24\baselineskip}
+
+\CNsection{5}{UPF Functions (3GPP TS 23.501)}
+
+The UPF is controlled by the SMF via the \textbf{N4 interface} using the \textbf{PFCP protocol} (Packet Forwarding Control Protocol, TS 29.244).
+
+\CNsubsection{5.1}{PFCP Rules}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3600}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Rule} & \CNth{Acronym} & \CNth{Function} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Packet Detection Rule} & PDR & Match incoming packets (by TEID, IP, port, QFI, etc.) \\
+\textbf{Forwarding Action Rule} & FAR & What to do (forward, drop, buffer, duplicate) \\
+\textbf{QoS Enforcement Rule} & QER & Rate limiting (MBR/\allowbreak{}GBR), gating, marking \\
+\textbf{Usage Reporting Rule} & URR & Volume/\allowbreak{}time measurement, triggers for reporting \\
+\textbf{Buffering Action Rule} & BAR & Buffer DL packets when UE is idle, notify SMF \\
+\end{longtable}
+}
+
+\CNkeepfig{m23-pdr-rules}{3}
+
+\CNsubsection{5.2}{How Rules Work Together}
+
+\CNfigure{m23-pdr-rules}{How the PFCP rules work together in the UPF}
+
+\CNsubsection{5.3}{N4/\allowbreak{}PFCP Interface}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SMF \ensuremath{\to} UPF:} Session Establishment/\allowbreak{}Modification/\allowbreak{}Deletion Request
+\item
+  \textbf{UPF \ensuremath{\to} SMF:} Session Report (usage reports, DL data notification)
+\item
+  PFCP uses \textbf{SEID} (Session Endpoint Identifier) — analogous to TEID but for control
+\item
+  Runs over UDP port 8805
+\end{itemize}
+
+\CNsubsection{5.4}{Complete UPF Function List}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Packet routing \& forwarding
+\item
+  Packet inspection (DPI for application detection)
+\item
+  UL/\allowbreak{}DL rate enforcement (per QoS flow)
+\item
+  Traffic usage reporting (for charging)
+\item
+  DL packet buffering \& notification
+\item
+  QoS handling (DSCP marking, policing)
+\item
+  Lawful intercept (UP collection)
+\item
+  Transport level packet marking (outer header DSCP)
+\end{enumerate}
+
+\CNkeepfig{m23-dl-steps}{10}
+
+\CNsection{6}{Packet Trace Example: Downlink Data}
+
+\textbf{Scenario:} Server on Internet sends data to UE
+
+\CNsubsection{6.1}{Step-by-Step}
+
+\CNfigure{m23-dl-steps}{A downlink packet at each step from the Internet to the UE}
+
+\CNkeepfig{m23-encapsulation}{3}
+
+\CNsubsection{6.2}{Encapsulation Layer Diagram}
+
+\CNfigure{m23-encapsulation}{Headers of a downlink packet at each hop}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m23-split-bearer}{10}
+
+\CNsection{7}{User Plane Optimization}
+
+\CNchained\CNsubsection{7.1}{Dual Connectivity (DC) — Split Bearer}
+
+In \textbf{EN-DC} (E-UTRA–NR Dual Connectivity) or \textbf{NR-DC}:
+
+\CNfigure{m23-split-bearer}{Dual connectivity with a split bearer}
+
+\Needspace{12\baselineskip}
+
+\textbf{Split Bearer types:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1935}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4194}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3871}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Type} & \CNth{Description} & \CNth{GTP-U path} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MCG Bearer & Data only via Master Node & UPF \ensuremath{\leftrightarrow} MN \\
+SCG Bearer & Data only via Secondary Node & UPF \ensuremath{\leftrightarrow} SN \\
+Split Bearer & Data split across both nodes & UPF \ensuremath{\leftrightarrow} MN \ensuremath{\leftrightarrow} SN (MN routes) \\
+\end{longtable}
+}
+
+\begin{itemize}
+\tightlist
+\item
+  Increases throughput by aggregating radio resources from two nodes
+\item
+  PDCP layer at MN handles reordering for split bearers
+\end{itemize}
+
+\CNsubsection{7.2}{Multi-Path UPF}
+
+Multiple UPFs in the data path for:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Load balancing}: Distribute traffic across UPFs
+\item
+  \textbf{Redundancy}: N9 links between UPFs for resiliency
+\item
+  \textbf{Geographic optimization}: Route traffic through nearest UPF
+\end{itemize}
+
+\CNkeepfig{m23-ulcl}{7}
+
+\CNsubsection{7.3}{Edge Computing (Local Breakout)}
+
+5G enables \textbf{traffic steering} for MEC (Multi-access Edge Computing):
+
+\textbf{UL Classifier (UL CL):}
+
+\CNfigure{m23-ulcl}{Uplink classifier for edge breakout}
+
+\begin{itemize}
+\tightlist
+\item
+  UL CL inspects UL packets and routes matching traffic to local DN
+\item
+  Non-matching traffic continues to central DN
+\item
+  \textbf{Same UE IP address} for both paths (transparent to UE)
+\end{itemize}
+
+\CNkeepfig{m23-branching}{2}
+
+\textbf{Branching Point:}
+
+\CNfigure{m23-branching}{Branching point for IPv6 multi-homing}
+
+\begin{itemize}
+\tightlist
+\item
+  Different PDU session anchors for local vs. remote
+\item
+  May use different UE IP addresses
+\end{itemize}
+
+\textbf{Benefits of Edge Computing:}
+
+\begin{itemize}
+\tightlist
+\item
+  Ultra-low latency (\textless{} 10~ms RTT)
+\item
+  Reduced backhaul bandwidth
+\item
+  Local data processing (privacy, compliance)
+\item
+  Use cases: AR/\allowbreak{}VR, autonomous driving, industrial IoT
+\end{itemize}
+
+\CNkeepfig{m23-up-path}{5}
+
+\CNsection{}{Complete 5G User Plane Path Diagram}
+
+\CNfigure{m23-up-path}{Complete 5G user-plane path}
+
+\Needspace{26\baselineskip}
+
+\CNsection{}{Summary Table: User Plane Across Generations}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{3G (UMTS)} & \CNth{4G (LTE)} & \CNth{5G (NR)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Tunnel Protocol & GTP-U & GTP-U & GTP-U \\
+RAN\ensuremath{\to}Core Interface & Iu-PS & S1-U & N3 \\
+Core Internal & Gn (SGSN\ensuremath{\leftrightarrow}GGSN) & S5/\allowbreak{}S8 (SGW\ensuremath{\leftrightarrow}PGW) & N9 (UPF\ensuremath{\leftrightarrow}UPF) \\
+Core\ensuremath{\to}DN & Gi & SGi & N6 \\
+QoS Mechanism & Traffic classes & Bearers (QCI) & QoS Flows (QFI) \\
+Radio QoS Layer & — & — & SDAP \\
+Gateway Function & GGSN & P-GW & UPF \\
+Control of UP & — & — & PFCP (N4) \\
+Edge Support & No & Limited & Native (UL CL, BP) \\
+\end{longtable}
+}
+
+\CNboxsection{Key Takeaways}
+
+\begin{CNbox}[unbreakable]{sum}{Key Takeaways}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{GTP-U} is the universal user plane tunnel — same protocol from 3G to 5G
+\item
+  \textbf{TEID} identifies each tunnel endpoint — assigned by the receiver
+\item
+  \textbf{5G separates control and user plane} (CUPS) — SMF controls UPF via PFCP/\allowbreak{}N4
+\item
+  \textbf{SDAP} is the new 5G layer that maps QoS flows to radio bearers
+\item
+  \textbf{UPF rules (PDR/\allowbreak{}FAR/\allowbreak{}QER/\allowbreak{}URR/\allowbreak{}BAR)} provide programmable packet processing
+\item
+  \textbf{Edge computing} is natively supported via UL Classifier and Branching Point
+\item
+  User plane optimization (DC, multi-UPF, edge) enables diverse 5G use cases
+\end{enumerate}
+
+\end{CNbox}

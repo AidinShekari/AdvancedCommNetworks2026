@@ -1,0 +1,8 @@
+% Module 8 — SSB-to-RACH mapping: each beam has its own PRACH occasion
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \i/\y in {0/0, 1/-0.9, 2/-1.8, N/-3.3}{
+  \node[CNran, minimum width=2.6cm] (s\i) at (0,\y) {SSB index \i};
+  \node[CNcp, minimum width=4.2cm] (p\i) at (5.4,\y) {\CNL{PRACH occasion \i\ (beam \i)}{فرصت \lr{PRACH} شماره \i{} (پرتو \i)}};
+  \draw[CNlink, ->] (s\i) -- (p\i);}
+\node[text=CNmuted] at (0,-2.5) {$\vdots$}; \node[text=CNmuted] at (5.4,-2.5) {$\vdots$};
+\end{tikzpicture}

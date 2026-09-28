@@ -1,0 +1,13 @@
+% Module 7 — eight parallel stop-and-wait HARQ processes keep the pipeline full
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \t in {0,...,11}{
+  \pgfmathtruncatemacro{\p}{mod(\t,8)}
+  \ifnum\t=8 \def\fc{CNsig!25}\else\def\fc{CNcyan!12}\fi
+  \node[draw=CNinkL!70, fill=\fc, minimum width=1.05cm, minimum height=0.7cm, font=\sffamily\small] (s\t) at ({\t*1.1},0) {P\p};
+  \node[CNtiny] at ({\t*1.1},0.65) {\t};}
+\node[CNtiny, anchor=east] at (-0.7,0.65) {\CNL{time (ms)}{زمان (\lr{ms})}};
+\node[CNtiny, anchor=east] at (-0.7,0) {\CNL{process}{فرایند}};
+\node[CNnote, anchor=north] (n) at (8.8,-1.0) {\CNL{P0 retransmission (if NACK at t = 4)}{ارسال مجدد \lr{P0} (در صورت \lr{NACK} در \lr{t = 4})}};
+\draw[CNsig, ->] (n.north) -- (s8.south);
+\draw[CNsig, ->, bend left=35] (s0.north) to (s8.north);
+\end{tikzpicture}

@@ -1,0 +1,10 @@
+% Module 23 — IPv6 multi-homing branching point
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNran] (g) at (0,0) {gNB}; \node[CNup] (b) at (3.0,0) {BP (I-UPF)}; \node[CNup] (p) at (6.6,0) {PSA-UPF}; \node[CNext] (dn) at (10.0,0) {Central DN};
+\node[CNup] (l) at (6.6,-1.6) {Local PSA-UPF}; \node[CNext] (e) at (10.0,-1.6) {Edge DN};
+\draw[CNdata, ->] (g) -- node[CNelab, above=1pt, fill=none] {N3} (b);
+\draw[CNdata, ->] (b) -- node[CNelab, above=1pt, fill=none] {N9} (p);
+\draw[CNdata, ->] (p) -- node[CNelab, above=1pt, fill=none] {N6} (dn);
+\draw[CNdata, ->] (b) |- node[pos=0.75, CNelab, above=1pt, fill=none] {N9} (l);
+\draw[CNdata, ->] (l) -- node[CNelab, above=1pt, fill=none] {N6} (e);
+\end{tikzpicture}

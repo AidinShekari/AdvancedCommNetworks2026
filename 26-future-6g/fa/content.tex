@@ -1,0 +1,1663 @@
+\CNsection{}{\lr{\mbox{\CNwarn{}}} سلب مسیولیت مهم}
+
+\begin{CNquote}
+
+\textbf{این ماژول فناوری‌هایی را در مراحل مختلف بلوغ مورد بحث قرار می‌دهد.} بسیاری از مفاهیم ارایه‌شده در اینجا حدسی، در مرحله پژوهش اولیه یا در فازهای مطالعه مقدماتی استانداردسازی هستند. استاندارد \lr{\mbox{6G}} هنوز وجود ندارد \lr{—} چارچوب \lr{ITU IMT-2030} در حال توسعه است و \lr{\mbox{3GPP}} کار رسمی مشخصات \lr{\mbox{6G}} را آغاز نکرده است (انتظار می‌رود حدود \CNnum{2025-2028).} اطلاعات بر اساس پژوهش‌های منتشرشده، موارد مطالعه \lr{\mbox{3GPP}} و نقشه‌های راه صنعت تا سال‌های \CNnum{2024-2025} است.
+
+\end{CNquote}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{طبقه‌بندی بلوغ مورد استفاده در این ماژول}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4375}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5625}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{برچسب} & \CNth{معنا} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{STANDARDIZED}}}}} & در مشخصات فنی \lr{\mbox{3GPP}} تعیین‌شده، قابل استقرار \\
+\lr{\textbf{\lr{STUDY ITEM}}} & به‌طور رسمی در \lr{\mbox{3GPP}} مطالعه‌شده (اسناد \lr{\mbox{TR}})، ممکن است به موارد کار تبدیل شود \\
+\lr{\mbox{\textbf{\lr{\mbox{CANDIDATE}}}}} & اجماع قوی صنعت، احتمالاً وارد استانداردسازی می‌شود \\
+\lr{\mbox{\textbf{\lr{\mbox{RESEARCH}}}}} & پژوهش فعال دانشگاهی/\allowbreak{}صنعتی، بدون استانداردسازی رسمی \\
+\lr{\mbox{\textbf{\lr{\mbox{SPECULATIVE}}}}} & مفاهیم مرحله اولیه، امکان‌سنجی به‌طور کامل اثبات نشده \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{}{مرور: راه به‌سوی \lr{\mbox{6G}}}
+
+\CNchained\CNsubsection{}{چشم‌انداز \lr{IMT-2030 (ITU-R)}}
+
+گروه کاری \lr{\mbox{5D}} اتحادیه مخابرات بین‌المللی-بخش مخابرات رادیویی چارچوب \lr{\mbox{IMT-2030}} را با این سناریوهای کاربرد ترسیم کرده است:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ارتباط غوطه‌ور} (تحول \lr{\mbox{eMBB}})
+\item
+  \textbf{ارتباط فرا-قابل اعتماد و کم-تأخیر} (تحول \lr{\mbox{URLLC}})
+\item
+  \textbf{ارتباط انبوه} (تحول \lr{\mbox{mMTC}})
+\item
+  \textbf{اتصال همه‌جاگیر} (جدید)
+\item
+  \textbf{\lr{\mbox{AI}} و ارتباط یکپارچه} (جدید)
+\item
+  \textbf{سنجش و ارتباط یکپارچه} (جدید)
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{قابلیت‌های \lr{\mbox{5G}} در برابر اهداف \lr{6G (IMT-2030)}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{KPI}}} & \CNth{\lr{5G (IMT-2020)}} & \CNth{هدف \lr{6G (IMT-2030)}} & \CNth{بهبود} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+حداکثر نرخ داده & \lr{\mbox{20~Gbps}} & بیش از \lr{\mbox{200~Gbps}} & \lr{\mbox{10\ensuremath{\times}}} \\
+نرخ تجربه‌شده کاربر & \lr{\mbox{100~Mbps}} & \lr{1-10~Gbps} & \lr{\mbox{10-100\ensuremath{\times}}} \\
+تأخیر (صفحه کاربر) & \lr{\mbox{1~ms}} & \lr{\mbox{0.1~ms}} & \lr{\mbox{10\ensuremath{\times}}} \\
+قابلیت اطمینان & \CNnum{99.999\%} & \CNnum{99.99999\%} & \lr{\mbox{100\ensuremath{\times}}} \\
+چگالی اتصال & \lr{\mbox{10\textsuperscript{6}}} دستگاه/\allowbreak{}\lr{\mbox{km\textsuperscript{2}}} & \lr{\mbox{10\textsuperscript{7}-10\textsuperscript{8}}} دستگاه/\allowbreak{}\lr{\mbox{km\textsuperscript{2}}} & \lr{\mbox{10-100\ensuremath{\times}}} \\
+تحرک & \lr{500 km/\allowbreak{}h} & بیش از \lr{1000 km/\allowbreak{}h} & \lr{\mbox{2\ensuremath{\times}}} \\
+کارایی طیفی & \lr{\mbox{1}}\ensuremath{\times} (خط پایه) & \lr{\mbox{3-5\ensuremath{\times}}} & \lr{\mbox{3-5\ensuremath{\times}}} \\
+کارایی انرژی & \lr{\mbox{1}}\ensuremath{\times} (خط پایه) & \lr{\mbox{10-100\ensuremath{\times}}} & \lr{\mbox{10-100\ensuremath{\times}}} \\
+دقت مکان‌یابی & حدود \lr{1~m (R16)} & \lr{\mbox{1-10~cm}} & \lr{\mbox{10-100\ensuremath{\times}}} \\
+یکپارچگی \lr{\mbox{AI}} & خارجی/\allowbreak{}\lr{\mbox{OTT}} & بومی/\allowbreak{}ذاتی & تغییر پارادایم \\
+قابلیت سنجش & پشتیبانی نمی‌شود & یکپارچه & قابلیت جدید \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsection{1}{شبکه‌های بومی-\lr{AI /\allowbreak{} AI-RAN}}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNamber}}} مورد مطالعه (نسخه 18)}
+
+\CNchained\CNsubsection{}{چیست}
+
+شبکه‌های بومی-\lr{\mbox{AI}} هوش مصنوعی را به‌عنوان یک اصل طراحی بنیادی به‌جای یک لایه بهینه‌سازی افزودنی یکپارچه می‌کنند. الگوریتم‌های \lr{AI/\allowbreak{}ML} مستقیماً در شبکه دسترسی رادیویی \lr{\mbox{(AI-RAN)}} در هر لایه پروتکل تعبیه می‌شوند.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  الگوریتم‌های سنتی مبتنی بر مدل (\lr{\mbox{MMSE}}، \lr{\mbox{LMMSE}}) در کانال‌های پیچیده به محدودیت عملکرد می‌رسند
+\item
+  بهینه‌سازی دستی شبکه نمی‌تواند به استقرارهای فوق-متراکم ناهمگون مقیاس یابد
+\item
+  فضای پارامتر \lr{\mbox{NR}} در \lr{\mbox{5G}} عظیم است (شکل‌دهی پرتو، زمان‌بندی، کنترل توان)
+\item
+  نیاز به شبکه‌های خود-بهینه‌شونده و خود-ترمیم‌شو
+\end{itemize}
+
+\CNkeepfig{m26-ai-layers}{3}
+
+\CNsubsection{}{یکپارچگی \lr{\mbox{AI}} در لایه‌های پروتکل}
+
+\CNfigure{m26-ai-layers}{هوش مصنوعی در لایه‌های پروتکل}
+
+\CNsubsection{}{پیشرفت \lr{\mbox{3GPP}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{TR 38.843}}}: مطالعه \lr{AI/\allowbreak{}ML} برای واسط رادیویی \lr{\mbox{NR}} (نسخه 18)
+\item
+  \textbf{موارد استفاده مطالعه‌شده}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    بهبود بازخورد \lr{\mbox{CSI}} (فشرده‌سازی مبتنی بر \lr{\mbox{AI}})
+  \item
+    مدیریت پرتو (پیش‌بینی پرتو مبتنی بر \lr{\mbox{AI}})
+  \item
+    بهبود مکان‌یابی (مبتنی بر \lr{AI/\allowbreak{}ML})
+  \end{itemize}
+\item
+  \lr{\textbf{\lr{TR 38.844}}}: مطالعه \lr{AI/\allowbreak{}ML} برای \lr{\mbox{NG-RAN}} (سطح شبکه)
+\item
+  \textbf{یافته کلیدی}: بهبودهای عملکرد نشان داده شد اما پیچیدگی استقرار بالاست
+\end{itemize}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  بهبود \CNnum{10-30\%} توان عملیاتی در سناریوهای پیچیده
+\item
+  کاهش سربار بازخورد \lr{\mbox{CSI}} (تا 50\% فشرده‌سازی)
+\item
+  کسب سریع‌تر پرتو (کاهش جاروب پرتو)
+\item
+  رفتار شبکه خود-بهینه‌شونده
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{داده آموزش}: نیازمند مجموعه‌داده‌های عظیم و نماینده
+\item
+  \textbf{تعمیم}: مدل‌ها ممکن است بین محیط‌ها منتقل نشوند
+\item
+  \textbf{هزینه محاسباتی}: تأخیر استنتاج در برابر نیازمندی‌های بلادرنگ
+\item
+  \textbf{استانداردسازی}: چگونه مدل‌های \lr{\mbox{AI}} را در یک استاندارد تعیین کنیم؟
+\item
+  \textbf{هم‌کنش‌گری}: مدل‌های سازندگان مختلف باید همزیستی کنند
+\item
+  \textbf{قابلیت توضیح}: تصمیمات جعبه-سیاه در سناریوهای حیاتی برای ایمنی
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  معماری \lr{\mbox{O-RAN}} در \lr{\mbox{5G}} چارچوب \lr{\mbox{RIC}} فراهم می‌کند \lr{(xApp/\allowbreak{}rApp)}
+\item
+  مطالعات \lr{\mbox{R18}} پایه‌گذاری می‌کنند؛ مشخصات واقعی در \lr{\mbox{R19-R20}} انتظار می‌رود
+\item
+  تحول از «کمک‌شده با \lr{\mbox{AI» (5G)}} به «بومی-\lr{\mbox{AI» (6G)}}
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  چگونه به‌روزرسانی مدل روی هوا مدیریت شود؟
+\item
+  تقسیم درست بین مبتنی بر مدل و داده-محور چیست؟
+\item
+  چگونه استحکام در برابر حملات خصمانه تضمین شود؟
+\item
+  مدل استاندارد شود یا فقط واسط؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{2}{\lr{\mbox{MIMO}} بسیار بزرگ \lr{(XL-MIMO)}}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNred}}} پژوهش}
+
+\CNchained\CNsubsection{}{چیست}
+
+\lr{\mbox{XL-MIMO}} آرایه‌های آنتن را به هزاران یا ده‌ها هزار عنصر مقیاس می‌دهد و دهانه‌های الکتریکی بسیار بزرگ ایجاد می‌کند. برخلاف \lr{massive MIMO} متعارف \CNnum{(64-256} عنصر)، \lr{\mbox{XL-MIMO}} تا حدی در رژیم \textbf{میدان نزدیک} عمل می‌کند و ویژگی‌های انتشار را به‌طور بنیادی تغییر می‌دهد.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  بهره‌های \lr{massive MIMO} با اندازه‌های آرایه متعارف اشباع می‌شوند
+\item
+  نیاز به چندگانه‌سازی مکانی شدید (بیش از 100 جریان همزمان)
+\item
+  فرکانس‌های بالاتر نیازمند آرایه‌های بزرگ‌تر برای بهره شکل‌دهی پرتو معادل هستند
+\item
+  پشتیبانی از نرخ‌های داده فوق‌العاده بالا در \lr{\mbox{6G}}
+\end{itemize}
+
+\CNsubsection{}{فیزیک کلیدی: میدان نزدیک در برابر میدان دور}
+
+مرز میدان دور (فاصله فراونهوفر):
+
+\CNdisplay{d_F = \frac{2D^2}{\lambda}}
+
+مثال: برای آرایه‌ای با \lr{$D = 2$ m} در \lr{30~GHz ($\lambda = 10$ mm)} داریم \lr{$d_F = \dfrac{2 \times 4}{0.01} = 800$ m}؛ پس \textbf{بیشتر کاربران در میدان نزدیک آرایه‌های بزرگ قرار دارند!}
+
+\textbf{ویژگی‌های میدان نزدیک:}
+
+\begin{itemize}
+\tightlist
+\item
+  جبهه‌موج کروی (نه مسطح)
+\item
+  تمرکز پرتو (نه فقط هدایت) \lr{—} انرژی در نقطه‌ای در فضا متمرکز می‌شود
+\item
+  شکل‌دهی پرتو وابسته به فاصله
+\item
+  غیرایستایی مکانی: همه عناصر آرایه کانال یکسانی را «نمی‌بینند»
+\end{itemize}
+
+\CNkeepfig{m26-visibility}{3}
+
+\CNsubsection{}{غیرایستایی مکانی}
+
+\CNfigure{m26-visibility}{ناایستایی مکانی: هر کاربر فقط بخشی از آرایه را می‌بیند}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  تمرکز پرتو تقسیم مکانی را حتی برای کاربران در زاویه یکسان ممکن می‌سازد
+\item
+  \lr{\mbox{MIMO}} میدان نزدیک درجات آزادی اضافی فراهم می‌کند
+\item
+  کارایی طیفی شدید از طریق چندگانه‌سازی مکانی انبوه
+\item
+  سرکوب ذاتی تداخل
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  پیچیدگی تخمین کانال: سربار پایلوت \lr{$O(N^2)$} بدون بهره‌گیری از ساختار
+\item
+  سخت‌افزار: هزینه، توان، اتصال برای هزاران زنجیره \lr{\mbox{RF}}
+\item
+  پردازش سیگنال: پردازش متمرکز غیرعملی \ensuremath{\leftarrow} معماری‌های توزیع‌شده
+\item
+  مدل‌سازی کانال: مدل‌های \lr{\mbox{3GPP}} میدان دور را فرض می‌کنند؛ مدل‌های جدید لازم است
+\item
+  کالیبراسیون: جفت‌شدگی متقابل، نقص‌های آرایه در مقیاس
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  گسترش \lr{massive MIMO} در \lr{\mbox{5G}} (\lr{\mbox{R15-R17}}: تا 256 عنصر)
+\item
+  رویکردهای مبتنی بر کدبوک و \lr{Type-II CSI} در \lr{\mbox{5G}} مقیاس نمی‌یابند
+\item
+  نیازمند مدل‌های کانال جدید فراتر از \lr{3GPP TR 38.901}
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  هندسه آرایه بهینه (مسطح، استوانه‌ای، منطبق)؟
+\item
+  چگونه از ویژگی‌های میدان نزدیک در پروتکل‌های استاندارد بهره بگیریم؟
+\item
+  معماری‌های آنالوگ/\allowbreak{}دیجیتال ترکیبی در این مقیاس؟
+\item
+  پیاده‌سازی‌های کارآمد انرژی؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{3}{\lr{Massive MIMO} بدون سلول}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNred}}} پژوهش (پیش‌درآمدهای \lr{5G-Advanced} وجود دارد)}
+
+\CNchained\CNsubsection{}{چیست}
+
+\lr{Massive MIMO} بدون سلول مفهوم سلول‌ها را حذف می‌کند. تعداد زیادی نقطه دسترسی توزیع‌شده \lr{\mbox{(AP)}}، متصل از طریق فرانت‌هال به واحدهای پردازش مرکزی \lr{\mbox{(CPU)}}، به‌طور همدوس به تمام تجهیزات کاربر \lr{\mbox{(UE)}} در ناحیه بدون مرزهای سلولی خدمت می‌دهند.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  مسیله لبه سلول: کاربران در مرزهای سلول از تداخل و \lr{\mbox{SINR}} پایین رنج می‌برند
+\item
+  توزیع ناهموار \lr{\mbox{QoS}} در شبکه‌های سلولی (صدمین صدک در برابر میانه)
+\item
+  تداخل بین-سلولی محدودیت بنیادی معماری سلولی است
+\item
+  نیاز به پوشش یکنواخت و همه‌جاگیر
+\end{itemize}
+
+\CNkeepfig{m26-cell-free}{3}
+
+\CNsubsection{}{معماری}
+
+\CNfigure{m26-cell-free}{\lr{\mbox{MIMO}} انبوه بدون سلول: همه \lr{\mbox{AP}}ها به همه \lr{\mbox{UE}}ها خدمت می‌دهند}
+
+\CNsubsection{}{اصول کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{تمام \lr{\mbox{AP}}ها به تمام \lr{\mbox{UE}}ها خدمت می‌دهند} (در اصل؛ سیستم‌های عملی از انتخاب \lr{\mbox{AP}} استفاده می‌کنند)
+\item
+  \textbf{ارسال/\allowbreak{}دریافت مشترک همدوس} در \lr{\mbox{AP}}های توزیع‌شده
+\item
+  \textbf{بدون تحویل} \lr{—} \lr{\mbox{UE}} همیشه توسط «بهترین» خوشه \lr{\mbox{AP}} خدمات می‌گیرد
+\item
+  \textbf{خوشه‌بندی کاربر-محور} \lr{—} هر \lr{\mbox{UE}} سلول مجازی خود را دارد
+\end{enumerate}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  بهبود توان عملیاتی صدک 95: \lr{\mbox{5-10}}\ensuremath{\times} نسبت به سلولی
+\item
+  حذف اثر لبه سلول
+\item
+  تنوع کلان: مقاوم در برابر انسداد و سایه‌اندازی
+\item
+  مدیریت طبیعی تداخل از طریق هماهنگی
+\item
+  کیفیت پوشش یکنواخت
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{نیازمندی‌های فرانت‌هال}: تبادل داده انبوه بین \lr{\mbox{AP}}ها و \lr{\mbox{CPU}}
+\item
+  \textbf{همگام‌سازی}: تمام \lr{\mbox{AP}}ها باید برای ارسال همدوس همگام-فاز باشند
+\item
+  \textbf{مقیاس‌پذیری}: پیچیدگی محاسباتی با تعداد \lr{\mbox{AP \ensuremath{\times} UE}} رشد می‌کند
+\item
+  \textbf{تخمین کانال}: آلودگی پایلوت در نواحی بزرگ
+\item
+  \textbf{استقرار عملی}: هزینه زیرساخت \lr{\mbox{AP}} متراکم
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{پیاده‌سازی‌های مقیاس‌پذیر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{سطح} & \CNth{پردازش} & \CNth{فرانت‌هال} & \CNth{عملکرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+سطح 1 & \lr{\mbox{MMSE}} کاملاً متمرکز & بسیار بالا & حداکثر \\
+سطح 2 & \lr{\mbox{MMSE}} محلی + ترکیب مرکزی & بالا & نزدیک-بهینه \\
+سطح 3 & \lr{\mbox{MF}} محلی + \lr{\mbox{LSFD}} مرکزی & متوسط & خوب \\
+سطح 4 & \lr{\mbox{MF}} محلی، بدون همکاری & کم & خط پایه \\
+\end{longtable}
+}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{CoMP}} در \lr{\mbox{5G}} (چند-نقطه هماهنگ) پیش‌درآمد محدودی است
+\item
+  \lr{5G-Advanced (R18)}: بهبودهای چند-\lr{\mbox{TRP}} به‌سمت مفاهیم بدون سلول حرکت می‌کنند
+\item
+  معماری \lr{\mbox{C-RAN}} پایه زیرساختی فراهم می‌کند
+\item
+  واسط‌های فرانت‌هال \lr{\mbox{O-RAN}} (\lr{\mbox{F1}}، \lr{\mbox{eCPRI}}) پردازش توزیع‌شده را ممکن می‌سازند
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  چگالی و مکان‌یابی بهینه \lr{\mbox{AP}}؟
+\item
+  چگونه تحرک را به‌طور کارآمد مدیریت کنیم؟
+\item
+  کنترل توان در \lr{\mbox{AP}}های توزیع‌شده؟
+\item
+  قابلیت اقتصادی در برابر استقرار سنتی؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{4}{سنجش و ارتباط یکپارچه \lr{(ISAC /\allowbreak{} JCS)}}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNamber}}} مورد مطالعه (نسخه 19)}
+
+\CNchained\CNsubsection{}{چیست}
+
+\lr{\mbox{ISAC}} (که سنجش و ارتباط مشترک، \lr{\mbox{JCS}} نیز نامیده می‌شود) از یک شکل‌موج مشترک، سخت‌افزار مشترک و طیف مشترک برای انجام همزمان ارتباط بی‌سیم و سنجش شبه-رادار (تشخیص، اندازه‌گیری فاصله، تخمین سرعت، تصویربرداری) استفاده می‌کند.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  سیستم‌های رادار و ارتباط جداگانه طیف و سخت‌افزار را هدر می‌دهند
+\item
+  خودروهای خودران، پهپادها، ربات‌های صنعتی هم به اتصال و هم به آگاهی محیطی نیاز دارند
+\item
+  کمبود طیف استفاده دوگانه از باندهای تخصیص‌یافته را ایجاب می‌کند
+\item
+  شکل‌موج \lr{\mbox{NR}} در \lr{5G (OFDM)} با اصلاحات از قبل برای سنجش مناسب است
+\end{itemize}
+
+\CNkeepfig{m26-isac}{3}
+
+\CNsubsection{}{قابلیت‌های سنجش}
+
+\CNfigure{m26-isac}{حسگری و ارتباط یکپارچه با یک شکل موج}
+
+پارامترهای حسگری استخراج‌شده:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{برد:} \lr{$R = c\,\tau/2$} (از تأخیر \lr{$\tau$})
+\item
+  \textbf{سرعت:} \lr{$v = \lambda f_d / 2$} (از جابه‌جایی داپلر \lr{$f_d$})
+\item
+  \textbf{زاویه:} \lr{$\theta$} از پردازش آرایه‌ای \lr{(AoA/\allowbreak{}AoD)}
+\end{itemize}
+
+\CNkeepfig{m26-ofdm-radar}{3}
+
+\CNsubsection{}{پردازش رادار \lr{\mbox{OFDM}}}
+
+\CNfigure{m26-ofdm-radar}{پردازش رادار \lr{\mbox{OFDM}} روی شبکه منابع}
+
+\CNsubsection{}{پیشرفت \lr{\mbox{3GPP}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مورد مطالعه \lr{\mbox{R19}}}: «مطالعه سنجش و ارتباط یکپارچه» (تصویب‌شده 2024)
+\item
+  حوزه‌های مطالعه کلیدی:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    مدل کانال برای سنجش (دوستانی، تک‌ایستگاهی)
+  \item
+    طراحی شکل‌موج و تخصیص منابع
+  \item
+    ارتباط کمک‌شده با سنجش (مثلاً پیش‌بینی پرتو از سنجش)
+  \item
+    جنبه‌های حریم خصوصی و مقرراتی سنجش مبتنی بر شبکه
+  \end{itemize}
+\item
+  موارد استفاده: تشخیص ژست، ردیابی شیء، تشخیص نفوذ، پایش آب‌وهوا
+\end{itemize}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  کارایی طیفی: استفاده دوگانه از همان منابع
+\item
+  استفاده مجدد سخت‌افزاری: آرایه‌های آنتن و زنجیره‌های \lr{\mbox{RF}} مشترک
+\item
+  هم‌افزایی: سنجش به ارتباط کمک می‌کند (شکل‌دهی پرتو پیش‌بینانه) و برعکس
+\item
+  خدمات جدید: شبکه به‌عنوان حسگر (\lr{\mbox{NaaS}} \lr{—} شبکه به‌عنوان حسگر)
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مبادله شکل‌موج}: بهینه برای ارتباط \lr{\mbox{\ensuremath{\neq}}} بهینه برای سنجش
+\item
+  \textbf{خود-تداخل}: سنجش تک‌ایستگاهی نیازمند قابلیت دوپلکس کامل است
+\item
+  \textbf{شلوغی}: تمایز اهداف از محیط
+\item
+  \textbf{حریم خصوصی}: شبکه می‌تواند افراد را بدون دستگاه‌هایشان حس کند
+\item
+  \textbf{مقررات}: سنجش در باندهای ارتباطی مجاز نیازمند چارچوب‌های جدید است
+\item
+  \textbf{معیارهای عملکرد}: چگونه نرخ ارتباط و دقت سنجش را به‌طور مشترک بهینه کنیم؟
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  مکان‌یابی \lr{\mbox{NR}} در \lr{5G (R16/\allowbreak{}R17)} پیش‌درآمد محدودی است
+\item
+  شکل‌موج \lr{\mbox{OFDM}} در \lr{\mbox{5G}} با پردازش مناسب قابلیت سنجش دارد
+\item
+  مطالعه \lr{\mbox{R19}} برای موارد کار \lr{\mbox{R20}} آماده‌سازی می‌کند
+\item
+  \lr{5G-Advanced} چارچوب را اضافه می‌کند؛ \lr{\mbox{6G}} آن را بومی می‌سازد
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  سنجش تک‌ایستگاهی در برابر دوستانی در برابر شبکه‌ای \lr{—} کدام معماری؟
+\item
+  چگونه منابع بین سنجش و ارتباط به‌طور بهینه تخصیص یابد؟
+\item
+  چه عملکرد سنجشی با شکل‌موج‌های ارتباطی قابل دستیابی است؟
+\item
+  چارچوب مقرراتی برای سنجش غیرفعال افراد؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{5}{سطوح هوشمند قابل بازپیکربندی \lr{\mbox{(RIS)}}}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNamber}}} مورد مطالعه (نسخه \CNnum{18-19)}}
+
+\CNchained\CNsubsection{}{چیست}
+
+سطوح هوشمند قابل بازپیکربندی \lr{\mbox{(RIS)}} ساختارهای مسطحی هستند که از بسیاری عناصر زیر-طول‌موج تشکیل شده‌اند و می‌توانند به‌صورت الکترونیکی کنترل شوند تا امواج الکترومغناطیسی ورودی را به جهات دلخواه بازتاب (یا شکست) دهند. آن‌ها محیط انتشار بی‌سیم را بدون تولید سیگنال جدید بازشکل می‌دهند.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  سیگنال‌های \lr{mmWave/\allowbreak{}Sub-THz} از انسداد شدید رنج می‌برند
+\item
+  رله‌های سنتی نیازمند زنجیره‌های \lr{\mbox{RF}} کامل هستند (گران، پرمصرف)
+\item
+  شکاف‌های پوشش \lr{\mbox{NLoS}} در محیط‌های شهری متراکم
+\item
+  نیاز به گسترش پوشش کارآمد از نظر انرژی
+\end{itemize}
+
+\CNkeepfig{m26-ris}{3}
+
+\CNsubsection{}{اصل عملکرد}
+
+\CNfigure{m26-ris}{سطح هوشمند بازپیکربندی‌پذیر پرتو را به \lr{\mbox{UE}} پشت مانع هدایت می‌کند}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{انواع \lr{\mbox{RIS}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{ویژگی‌ها} & \CNth{بهره} & \CNth{پیچیدگی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{RIS}} غیرفعال & فقط تغییر فاز، بدون تقویت & متوسط & کم \\
+\lr{\mbox{RIS}} فعال & تغییر فاز + تقویت & بالا & متوسط \\
+\lr{\mbox{STAR-RIS}} & ارسال و بازتاب همزمان & بالا & بالا \\
+\lr{\mbox{RIS}} ترکیبی & برخی عناصر فعال، برخی غیرفعال & قابل پیکربندی & متوسط \\
+\end{longtable}
+}
+
+\CNsubsection{}{مدل تلفات مسیر}
+
+برای یک \lr{\mbox{RIS}} غیرفعال با \lr{$N$} عنصر:
+
+\CNdisplay{P_{\mathrm{Rx}} \propto N^2 \times L_{\mathrm{BS}\rightarrow\mathrm{RIS}} \times L_{\mathrm{RIS}\rightarrow\mathrm{UE}}}
+
+\begin{itemize}
+\tightlist
+\item
+  تلفات مسیر «حاصل‌ضرب فاصله» (ضربی، نه جمعی بر حسب \lr{\mbox{dB}})
+\item
+  \ensuremath{\leftarrow} \lr{\mbox{RIS}} باید برای بهترین عملکرد نزدیک \lr{\mbox{BS}} یا نزدیک \lr{\mbox{UE}} قرار گیرد
+\item
+  \ensuremath{\leftarrow} بهره \lr{\mbox{SNR}} متناسب با \lr{$N^2$} رشد می‌کند (ترکیب همدوس)
+\end{itemize}
+
+\CNsubsection{}{پیشرفت \lr{\mbox{3GPP}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{TR 38.857}}}: مطالعه تکرارکننده‌های کنترل‌شده توسط شبکه \lr{\mbox{NR (R18)}} \lr{—} شامل مفاهیم تکرارکننده هوشمند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{R19}}}}}: مطالعه بیشتر روی \lr{\mbox{NR}} کمک‌شده با \lr{\mbox{RIS}}
+\item
+  حوزه‌های مطالعه: مدل‌سازی کانال با \lr{\mbox{RIS}}، سناریوهای استقرار، سیگنالینگ کنترل
+\end{itemize}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  عملکرد تقریباً غیرفعال (فقط مدار کنترل به توان نیاز دارد)
+\item
+  هزینه کم در هر عنصر (فناوری مدار چاپی)
+\item
+  استقرار انعطاف‌پذیر (دیوارها، سقف‌ها، تیرهای چراغ)
+\item
+  گسترش پوشش بدون بک‌هال
+\item
+  ارتباط سبز: مصرف انرژی حداقلی
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تخمین کانال}: باید کانال‌های \lr{\mbox{BS\ensuremath{\to}RIS}} و \lr{\mbox{RIS\ensuremath{\to}UE}} را جداگانه تخمین زد
+\item
+  \textbf{سربار کنترل}: پیکربندی صدها/\allowbreak{}هزاران عنصر به‌صورت بلادرنگ
+\item
+  \textbf{پاسخ باریک-باند}: تغییر فازها معمولاً تخت-فرکانسی هستند \ensuremath{\leftarrow} محدودیت پهن-باند
+\item
+  \textbf{استقرار}: مکان‌یابی، جهت‌گیری، چگالی بهینه
+\item
+  \textbf{تلفات مسیر ضربی}: تلفات مسیر دوگانه می‌تواند بهره‌های عملی را محدود کند
+\item
+  \textbf{نقص‌های سخت‌افزاری}: تغییر فازهای گسسته، جفت‌شدگی عناصر
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  تکرارکننده‌های کنترل‌شده توسط شبکه در \lr{\mbox{5G (R18)}} پیش‌درآمد هستند
+\item
+  استقرارهای \lr{\mbox{mmWave}} در \lr{\mbox{5G}} مسیله انسداد را که \lr{\mbox{RIS}} برطرف می‌کند برجسته می‌کنند
+\item
+  مطالعات \lr{\mbox{R18-R19}} به مشخصات بالقوه \lr{\mbox{R20}} اطلاع می‌دهند
+\item
+  ممکن است مکمل (نه جانشین) سلول‌های کوچک و رله‌ها باشد
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  چند عنصر برای بهره معنادار در عمل لازم است؟
+\item
+  چه کسی \lr{\mbox{RIS}} را کنترل می‌کند \lr{—} اپراتور، شخص سوم، خودکار؟
+\item
+  چگونه تحرک مدیریت شود (سرعت بازپیکربندی بلادرنگ)؟
+\item
+  غیرفعال در برابر فعال: کدام در تحلیل هزینه-فایده برنده است؟
+\item
+  آیا \lr{\mbox{RIS}} می‌تواند برای سیگنال‌های پهن‌باند به‌طور مؤثر کار کند؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{6}{ارتباطات \lr{Sub-THz /\allowbreak{} THz}}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNred}}} پژوهش}
+
+\CNchained\CNsubsection{}{چیست}
+
+ارتباطات \lr{Sub-THz (100-300~GHz)} و \lr{THz (300~GHz - 3~THz)} از طیف وسیع استفاده‌نشده برای نرخ‌های داده شدید بهره می‌گیرند. کانال‌های با پهنای باند بیش از \lr{\mbox{10~GHz}} در دسترس می‌شوند و به‌طور بالقوه بیش از \lr{\mbox{100~Gbps}} در هر پیوند را ممکن می‌سازند.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  پهنای باند \lr{mmWave (400~MHz - 2~GHz)} برای اهداف نرخ اوج \lr{\mbox{6G}} (بیش از \lr{\mbox{200~Gbps}}) کافی نیست
+\item
+  طیف زیر \lr{\mbox{100~GHz}} به‌طور فزاینده اشباع می‌شود
+\item
+  کاربردهای برد کوتاه (کیوسک داده، ارتباط درون-دستگاهی) نیازمند توان عملیاتی شدید هستند
+\item
+  بک‌هال/\allowbreak{}فرانت‌هال برای شبکه‌های متراکم نیازمند جانشین‌های بی‌سیم برای فیبر است
+\end{itemize}
+
+\CNkeepfig{m26-thz-bands}{3}
+
+\CNsubsection{}{باندهای فرکانسی مورد علاقه}
+
+\CNfigure{m26-thz-bands}{باندهای \lr{\mbox{Sub-THz}} و \lr{\mbox{THz}}: پهنای باند، برد و کاربردها}
+
+پنجره‌های کلیدی جذب جوی:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{130–175~GHz} (جذب متوسط)
+\item
+  \lr{200–320~GHz} (چند پنجره بین خطوط جذب)
+\item
+  خطوط جذب بخار آب در 183 و \lr{\mbox{325~GHz}}
+\end{itemize}
+
+\CNsubsection{}{چالش بودجه پیوند}
+
+تلفات مسیر فضای آزاد در \lr{\mbox{300~GHz}} در برابر \lr{\mbox{30~GHz}} (فاصله یکسان، \lr{\mbox{100~m}}):
+
+\CNdisplay{\mathrm{FSPL} = 20 \log_{10}\!\left(\frac{4\pi d}{\lambda}\right)}
+
+\begin{itemize}
+\tightlist
+\item
+  در \lr{\mbox{30~GHz}}: \lr{FSPL = 91.5~dB}
+\item
+  در \lr{\mbox{300~GHz}}: \lr{FSPL = 111.5~dB (\textbf{\lr{\mbox{+20 dB!}}})}
+\item
+  جذب مولکولی \lr{1–10 dB/\allowbreak{}100~m} دیگر می‌افزاید (وابسته به فرکانس)
+\end{itemize}
+
+جبران آن نیازمند آنتن‌های با بهره بسیار زیاد (پرتوهای مدادی)، آرایه‌های بزرگ (\lr{$\lambda$} کوچک \ensuremath{\leftarrow} عناصر زیاد در سطح کوچک) و فاصله‌های کوتاه است.
+
+\CNsubsection{}{فناوری‌های کلیدی توانمندساز \lr{\mbox{THz}}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{نیمه‌هادی‌های \lr{\mbox{III-V}}} (\lr{\mbox{InP}}، \lr{\mbox{GaN}}): تقویت‌کننده‌های توان تا \lr{\mbox{300~GHz}}
+\item
+  \textbf{مبتنی بر سیلیکون \lr{(CMOS/\allowbreak{}SiGe)}}: هزینه کمتر، توان کمتر، تا حدود \lr{\mbox{200~GHz}}
+\item
+  \textbf{رویکردهای فوتونیکی}: تبدیل نوری به \lr{\mbox{THz}}
+\item
+  \textbf{دستگاه‌های مبتنی بر گرافن}: پتانسیل نظری برای الکترونیک \lr{\mbox{THz}}
+\item
+  \textbf{آرایه‌های انبوه}: بیش از 1000 عنصر به دلیل طول‌موج کوچک ممکن است
+\end{enumerate}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  پهنای باند در دسترس عظیم (کانال‌های \lr{10-100+ GHz})
+\item
+  طول‌موج بسیار کوچک آرایه‌های انبوه را در قالب فشرده ممکن می‌سازد
+\item
+  امنیت ذاتی (به‌شدت جهت‌دار، برد کوتاه)
+\item
+  قابلیت سنجش با تفکیک‌پذیری بالا (تفکیک زیر-\lr{\mbox{mm}})
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تلفات مسیر شدید}: نیازمند \lr{\mbox{LoS}} و برد بسیار کوتاه
+\item
+  \textbf{جذب اتمسفری}: محوشدگی انتخابی-فرکانسی از رزونانس‌های مولکولی
+\item
+  \textbf{سخت‌افزار}: توان خروجی محدود، رقم نویز بالا در فرکانس‌های \lr{\mbox{THz}}
+\item
+  \textbf{نویز فاز}: پایداری نوسان‌ساز در صدها \lr{\mbox{GHz}}
+\item
+  \textbf{انسداد}: حتی یک دست می‌تواند یک پیوند \lr{\mbox{THz}} را کاملاً مسدود کند
+\item
+  \textbf{هزینه}: فرآیندهای نیمه‌هادی عجیب
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{FR2}} در \lr{5G (24-52~GHz)} امکان‌پذیری دسترسی موبایل فرکانس بالا را نشان داد
+\item
+  درس‌های مدیریت پرتو \lr{\mbox{mmWave}} در \lr{\mbox{5G}} برای \lr{\mbox{Sub-THz}} قابل اعمال است
+\item
+  \lr{\mbox{WRC-23}} باندهای بالای \lr{\mbox{100~GHz}} را برای مطالعه شناسایی کرد (هنوز برای موبایل تخصیص نیافته)
+\item
+  \lr{\mbox{6G}} ممکن است ابتدا \lr{100-300~GHz (Sub-THz)} را هدف بگیرد پیش از حرکت به بالاتر
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  آیا دسترسی موبایل بالای \lr{\mbox{100~GHz}} امکان‌پذیر است، یا فقط ثابت/\allowbreak{}برد کوتاه؟
+\item
+  حداکثر برد عملی برای ارتباط مفید چیست؟
+\item
+  چگونه ردیابی پرتو در عرض پرتو \lr{\mbox{THz}} (کمتر از \lr{\mbox{1\ensuremath{^{\circ}}}}) مدیریت شود؟
+\item
+  آیا راه‌حل‌های مبتنی بر سیلیکون می‌توانند توان کافی در این فرکانس‌ها دست یابند؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{7}{شبکه‌های غیرزمینی \lr{\mbox{(NTN)}}}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNgreen}}} استانداردشده (پایه \lr{\mbox{R17}}) /\allowbreak{} \lr{\mbox{\CNdot{CNamber}}} مطالعه (ویژگی‌های پیشرفته)}
+
+\CNchained\CNsubsection{}{چیست}
+
+شبکه‌های غیرزمینی پلتفرم‌های ماهواره‌ای و هوایی را در معماری شبکه \lr{\mbox{3GPP}} یکپارچه می‌کنند. \lr{\mbox{NR}} و \lr{\mbox{IoT-NTN}} ارتباط مستقیم بین \lr{\mbox{UE}}های استاندارد (شامل گوشی‌های هوشمند) و ماهواره‌های \lr{LEO/\allowbreak{}MEO/\allowbreak{}GEO} یا سیستم‌های پلتفرم ارتفاع بالا \lr{\mbox{(HAPS)}} را ممکن می‌سازند.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  حدود 90\% سطح زمین فاقد پوشش موبایل زمینی است
+\item
+  نواحی دریایی، هوانوردی و دورافتاده هیچ اتصالی ندارند
+\item
+  تاب‌آوری در بلایا نیازمند پشتیبان غیرزمینی است
+\item
+  اتصال \lr{\mbox{IoT}} جهانی (کشاورزی، لجستیک، پایش محیطی)
+\end{itemize}
+
+\CNkeepfig{m26-ntn-altitudes}{3}
+
+\CNsubsection{}{انواع پلتفرم \lr{\mbox{NTN}}}
+
+\CNfigure{m26-ntn-altitudes}{سکوهای شبکه غیرزمینی بر حسب ارتفاع}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{پیشرفت استانداردسازی \lr{\mbox{3GPP}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسخه} & \CNth{ویژگی} & \CNth{وضعیت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{R15-R16}} & موارد مطالعه (\lr{TR 38.811}، \CNnum{38.821)} & تکمیل‌شده \\
+\lr{\mbox{R17}} & \lr{\mbox{NR-NTN}} پایه (بار شفاف، \lr{GEO/\allowbreak{}LEO}) & \lr{\mbox{\textbf{\lr{\mbox{STANDARDIZED}}}}} \\
+\lr{\mbox{R17}} & \lr{\mbox{IoT-NTN}} (\lr{NB-IoT/\allowbreak{}eMTC} روی ماهواره) & \lr{\mbox{\textbf{\lr{\mbox{STANDARDIZED}}}}} \\
+\lr{\mbox{R18}} & بهبودهای \lr{\mbox{NTN}} (تحرک، پوشش) & \lr{\mbox{\textbf{\lr{\mbox{STANDARDIZED}}}}} \\
+\lr{\mbox{R18}} & \lr{\mbox{NR-NTN}} روی \lr{\mbox{FR2}} (بالای \lr{\mbox{10~GHz}}) & مطالعه \\
+\lr{\mbox{R19}} & بارهای بازتولیدی، ذخیره-و-ارسال & مطالعه \\
+\lr{\mbox{R19}} & مستقیم-به-سلول (ماهواره-گوشی هوشمند) & مطالعه/\allowbreak{}مورد کار \\
+\end{longtable}
+}
+
+\CNsubsection{}{چالش‌های فنی کلیدی حل‌شده در \lr{\mbox{R17}}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{پیشروی زمانی}: تأخیر انتشار زیاد (تا \lr{\mbox{540~ms}} برای \lr{\mbox{GEO}}) \ensuremath{\leftarrow} پیش-جبران با استفاده از \lr{\mbox{GNSS}} در \lr{\mbox{UE}}
+\item
+  \textbf{جابه‌جایی دوپلر}: \lr{\mbox{LEO}} با \lr{7.5 km/\allowbreak{}s} \ensuremath{\leftarrow} تا \lr{\mbox{\ensuremath{\pm}24 ppm}} در باند \lr{\mbox{S}} \ensuremath{\leftarrow} پیش-جبران
+\item
+  \textbf{سلول‌های بزرگ}: پرتوهای ماهواره صدها \lr{\mbox{km}} را پوشش می‌دهند \ensuremath{\leftarrow} دیفرانسیل پیشروی زمانی درون سلول
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{HARQ}}}}}: غیرفعال یا اصلاح‌شده به دلیل \lr{\mbox{RTT}} طولانی (بازخورد خیلی دیر می‌رسد)
+\end{enumerate}
+
+\CNkeepfig{m26-ntn-payload}{3}
+
+\CNsubsection{}{گزینه‌های معماری}
+
+\CNfigure{m26-ntn-payload}{محموله ماهواره‌ای شفاف در برابر بازتولیدی}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  پوشش جهانی همه‌جاگیر
+\item
+  تاب‌آوری در بلایا و ارتباط اضطراری
+\item
+  مستقیم-به-سلول: گوشی‌های هوشمند بدون تغییر به ماهواره متصل می‌شوند
+\item
+  پوشش \lr{\mbox{IoT}} در نواحی دورافتاده (کشاورزی، کشتیرانی، خطوط لوله)
+\item
+  افزونگی شبکه و چند-اتصالی
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{بودجه پیوند}: فاصله‌های بسیار طولانی نیازمند بهره آنتن بالا هستند
+\item
+  \textbf{هماهنگی طیف}: همزیستی با شبکه‌های زمینی
+\item
+  \textbf{تحویل}: ماهواره‌های \lr{\mbox{LEO}} سریع حرکت می‌کنند (پنجره دید \CNnum{4-8} دقیقه)
+\item
+  \textbf{تداخل}: پرتوهای ماهواره با سلول‌های زمینی همپوشانی دارند
+\item
+  \textbf{ظرفیت}: توان عملیاتی محدود در هر کاربر از ماهواره
+\item
+  \textbf{هزینه صورت‌فلکی}: هزاران ماهواره برای پوشش جهانی \lr{\mbox{LEO}} لازم است
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{NTN}} \textbf{بخشی از} \lr{5G-Advanced} است (مشخصات \lr{\mbox{R17-R18}} وجود دارند)
+\item
+  مستقیم-به-سلول (گوشی-ماهواره) تجاری در حال راه‌اندازی است (\lr{T-Mobile/\allowbreak{}SpaceX}، \lr{AST SpaceMobile})
+\item
+  \lr{\mbox{6G}} یکپارچگی تنگاتنگ‌تری را هدف می‌گیرد: تحویل بی‌وقفه زمینی/\allowbreak{}\lr{\mbox{NTN}}، \lr{\mbox{NTN}} چند-لایه
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  چگونه تحویل بی‌وقفه بین ماهواره‌های \lr{\mbox{LEO}} دست یابیم؟
+\item
+  بار بازتولیدی در برابر شفاف \lr{—} کدام از نظر اقتصادی برنده است؟
+\item
+  ماهواره چه مقدار ظرفیت در هر کاربر می‌تواند فراهم کند؟
+\item
+  یکپارچگی با زمینی برای توازن بار در نواحی متراکم؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{8}{ارتباطات معنایی}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNred}}} پژوهش /\allowbreak{} \lr{\mbox{\CNdot{CNviolet}}} حدسی}
+
+\CNchained\CNsubsection{}{چیست}
+
+ارتباطات معنایی \textbf{معنا} (معناشناسی) اطلاعات را به‌جای توالی دقیق بیت‌ها منتقل می‌کنند. به‌جای تضمین دریافت صحیح هر بیت، سیستم تضمین می‌کند معنای مقصود یا نتیجه وظیفه حفظ می‌شود که به‌طور بالقوه نیازمند بیت‌های ارسالی بسیار کمتری است.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  نظریه شانون انتقال بیت را بهینه می‌کند، نه سودمندی اطلاعات
+\item
+  بیشتر داده ارسالی افزونگی دارد که کدگذاری کلاسیک از آن بهره نمی‌گیرد
+\item
+  تماس ویدیویی: بیش از 90\% پیکسل‌ها بین فریم‌ها تغییر نمی‌کنند
+\item
+  ارتباط ماشین-به-ماشین نیازمند قالب‌های قابل خواندن توسط انسان نیست
+\item
+  نزدیک شدن به محدودیت‌های ظرفیت شانون \ensuremath{\leftarrow} نیاز به پارادایم جدید برای بهره‌های بیشتر
+\end{itemize}
+
+\CNkeepfig{m26-semantic}{3}
+
+\CNsubsection{}{چارچوب مفهومی}
+
+\CNfigure{m26-semantic}{ارتباط کلاسیک در برابر ارتباط معنایی}
+
+\CNsubsection{}{فناوری‌های کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{کدگذاری مشترک منبع-کانال عمیق \lr{\mbox{(DeepJSCC)}}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    یک شبکه عصبی واحد جایگزین کدگذاری منبع و کانال جداگانه می‌شود
+  \item
+    تخریب تدریجی (بدون اثر پرتگاه)
+  \item
+    به‌طور پیوسته با کیفیت کانال تطبیق می‌یابد
+  \end{itemize}
+\item
+  \textbf{گراف‌های دانش /\allowbreak{} پایگاه دانش مشترک}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    فرستنده و گیرنده دانش پس‌زمینه را به اشتراک می‌گذارند
+  \item
+    فقط اطلاعات جدید/\allowbreak{}غیرمنتظره نیازمند انتقال است
+  \item
+    فشرده‌سازی چشمگیر برای زمینه‌های شناخته‌شده
+  \end{itemize}
+\item
+  \textbf{ارتباط وظیفه-محور}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    بهینه‌سازی برای وظیفه پایین‌دستی (طبقه‌بندی، کنترل) نه بازسازی
+  \item
+    فقط ویژگی‌های مرتبط با وظیفه را منتقل می‌کند
+  \item
+    مثال: رانندگی خودران \ensuremath{\leftarrow} انتقال موقعیت اشیاء، نه ویدیوی کامل
+  \end{itemize}
+\end{enumerate}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{صرفه‌جویی بالقوه پهنای باند}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کاربرد} & \CNth{کلاسیک} & \CNth{معنایی} & \CNth{کاهش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+متن (وظیفه ترجمه) & بیت‌های جمله کامل & قصد + موجودیت‌ها & \lr{\mbox{10-100\ensuremath{\times}}} \\
+تصویر (طبقه‌بندی) & تمام پیکسل‌ها \lr{\mbox{(JPEG)}} & بردار ویژگی & \lr{100-1000\ensuremath{\times}} \\
+ویدیو (نظارتی) & فریم‌های کامل \lr{\mbox{(H.265)}} & رویدادها + تغییرات & \lr{\mbox{10-50\ensuremath{\times}}} \\
+کنترل (رباتیک) & جریان داده حسگر & فرمان‌های اقدام & \lr{\mbox{50-500\ensuremath{\times}}} \\
+\end{longtable}
+}
+
+\emph{یادداشت: این‌ها برآوردهای نظری/\allowbreak{}آزمایشی هستند، نه اثبات‌شده در مقیاس}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  فشرده‌سازی شدید فراتر از محدودیت‌های شانون برای وظایف مشخص
+\item
+  تخریب تدریجی در شرایط کانال ضعیف
+\item
+  یکپارچگی طبیعی با \lr{\mbox{AI}} در نقاط انتهایی
+\item
+  ارتباط کارآمد ماشین-به-ماشین
+\item
+  تأخیر کاهش‌یافته (بیت‌های کمتر برای انتقال)
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{بدون چارچوب ریاضی}: نظریه شانون معناشناسی را پوشش نمی‌دهد
+\item
+  \textbf{فرض دانش مشترک}: فرستنده و گیرنده باید بر مدل معنایی توافق کنند
+\item
+  \textbf{تعمیم}: وظایف مختلف نیازمند کدگذارهای معنایی مختلف هستند
+\item
+  \textbf{امنیت}: حملات معنایی (نمونه‌های خصمانه که بیت‌ها را حفظ می‌کنند اما معنا را خراب می‌کنند)
+\item
+  \textbf{استانداردسازی}: چگونه پروتکل‌های معنایی را تعیین کنیم؟
+\item
+  \textbf{سازگاری رو به عقب}: نمی‌تواند به‌راحتی با سیستم‌های کلاسیک همزیستی کند
+\item
+  \textbf{معیارهای ارزیابی}: چه چیزی جایگزین \lr{BER/\allowbreak{}BLER} برای سیستم‌های معنایی می‌شود؟
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{5G}} هیچ ویژگی ارتباط معنایی ندارد
+\item
+  از نظر مفهومی متعامد با استانداردهای فعلی
+\item
+  ممکن است ابتدا در لایه کاربرد ظاهر شود (نه استاندارد رادیویی)
+\item
+  ممکن است در نهایت طراحی بنیادی \lr{\mbox{PHY}} در \lr{\mbox{6G}}+ را تغییر دهد
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  آیا یک زبان معنایی جهانی ممکن است، یا همیشه وظیفه-خاص؟
+\item
+  چگونه محتوای معنایی ناشناخته/\allowbreak{}جدید مدیریت شود؟
+\item
+  آیا ارتباط معنایی و کلاسیک می‌توانند روی همان کانال همزیستی کنند؟
+\item
+  چه کسی مدل معنایی را تعریف می‌کند \lr{—} نهاد استانداردسازی، آموزش \lr{\mbox{AI}}؟
+\item
+  خط زمانی: این فناوری \lr{\mbox{6G}} است یا \lr{\mbox{7G}}؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{9}{دوقلوهای دیجیتال برای شبکه‌ها}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNred}}} پژوهش}
+
+\CNchained\CNsubsection{}{چیست}
+
+دوقلوی دیجیتال شبکه یک تکرار مجازی بلادرنگ و با وفاداری بالا از یک شبکه فیزیکی است که به‌طور پیوسته با شبکه زنده همگام می‌شود. تحلیل چه-اگر، بهینه‌سازی پیش‌بینانه و مدیریت خودکار شبکه را با شبیه‌سازی تغییرات پیش از استقرار آن‌ها ممکن می‌سازد.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  بهینه‌سازی شبکه واکنشی است (تعمیر پس از شکست)
+\item
+  آزمایش تغییرات روی شبکه‌های زنده پرخطر است
+\item
+  پیچیدگی شبکه \lr{5G/\allowbreak{}6G} از توانایی انسان برای مدیریت فراتر می‌رود
+\item
+  نیاز به نگهداری پیش‌بینانه و بهینه‌سازی فعالانه
+\item
+  آموزش مدل‌های \lr{AI/\allowbreak{}ML} نیازمند محیط‌های ایمن است
+\end{itemize}
+
+\CNkeepfig{m26-digital-twin}{3}
+
+\CNsubsection{}{معماری}
+
+\CNfigure{m26-digital-twin}{دوقلوی دیجیتال شبکه در حلقه بسته}
+
+\CNsubsection{}{موارد استفاده}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{نگهداری پیش‌بینانه}: تشخیص تخریب پیش از شکست
+\item
+  \textbf{بهینه‌سازی پیکربندی}: آزمایش تغییرات پارامتر در شبیه‌سازی
+\item
+  \textbf{برنامه‌ریزی ظرفیت}: شبیه‌سازی سناریوهای رشد آینده
+\item
+  \textbf{آموزش \lr{AI/\allowbreak{}ML}}: تولید ایمن داده آموزش مصنوعی
+\item
+  \textbf{تشخیص ناهنجاری}: مقایسه پیش‌بینی دوقلو با واقعیت
+\item
+  \textbf{بازیابی از بلایا}: پیش-برنامه‌ریزی پیکربندی‌های تغییر مسیر
+\item
+  \textbf{شبکه‌بندی}: شبیه‌سازی انطباق \lr{\mbox{SLA}} پیش از تأمین
+\end{enumerate}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  آزمایش بدون ریسک روی شبکه مجازی
+\item
+  بهینه‌سازی پیوسته بدون اختلال سرویس
+\item
+  توسعه و اعتبارسنجی سریع‌تر مدل \lr{\mbox{AI}}
+\item
+  کاهش \lr{\mbox{OPEX}} از طریق خودکارسازی و پیش‌بینی
+\item
+  دیدپذیری جامع شبکه
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{وفاداری}: دوقلو باید رفتار شبکه فیزیکی را به‌طور دقیق نمایندگی کند
+\item
+  \textbf{همگام‌سازی بلادرنگ}: تأخیر جمع‌آوری داده و به‌روزرسانی مدل
+\item
+  \textbf{مقیاس}: مدل‌سازی میلیون‌ها دستگاه به‌صورت بلادرنگ از نظر محاسباتی گران است
+\item
+  \textbf{اعتبارسنجی}: چگونه تأیید کنیم دوقلو با واقعیت مطابقت دارد؟
+\item
+  \textbf{نیازمندی‌های داده}: جریان‌های داده تله‌متری عظیم
+\item
+  \textbf{استانداردسازی}: هنوز مدل داده یا استاندارد واسط توافق‌شده‌ای وجود ندارد
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{O-RAN}} در \lr{\mbox{5G}} واسط‌های داده (\lr{\mbox{E2}}، \lr{\mbox{O1}}، \lr{\mbox{O2}}) را فراهم می‌کند که دوقلوها را تغذیه می‌کنند
+\item
+  خودکارسازی شبکه در \lr{\mbox{5G (SON)}} پیش‌درآمد ساده‌تری است
+\item
+  برخی سازندگان امروز محصولات «دوقلوی دیجیتال» ارایه می‌دهند (عمدتاً شبیه‌سازی آفلاین)
+\item
+  \lr{\mbox{6G}} دوقلوهای دیجیتال بلادرنگ و حلقه-بسته را هدف می‌گیرد
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  چه سطحی از وفاداری برای موارد استفاده مختلف «به‌قدر کافی خوب» است؟
+\item
+  چگونه عدم قطعیت مدل و اعتبارسنجی مدیریت شود؟
+\item
+  معماری دوقلوی متمرکز در برابر توزیع‌شده؟
+\item
+  مدل‌های داده و \lr{\mbox{API}}های استانداردشده؟
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsection{10}{مکان‌یابی پیشرفته (سطح سانتی‌متر)}
+
+\CNchained\CNsubsection{}{وضعیت: \lr{\mbox{\CNdot{CNamber}}} مورد مطالعه (بهبودهای مکان‌یابی نسخه 18)}
+
+\CNchained\CNsubsection{}{چیست}
+
+\lr{\mbox{6G}} دقت مکان‌یابی در سطح سانتی‌متر \lr{(1-10~cm)} را با استفاده از تکنیک‌های مکان‌یابی و ارتباط مشترک، پردازش سیگنال پیشرفته و کمک \lr{AI/\allowbreak{}ML} هدف می‌گیرد. این بسیار فراتر از \lr{\mbox{GPS}} (حدود \lr{\mbox{1-5~m}}) و مکان‌یابی \lr{\mbox{R16}} در \lr{\mbox{5G}} (حدود \lr{\mbox{1~m}} در فضای باز) است.
+
+\CNsubsection{}{چرا /\allowbreak{} مسیله حل‌شده}
+
+\begin{itemize}
+\tightlist
+\item
+  مکان‌یابی داخلی حل‌نشده باقی مانده است (\lr{\mbox{GPS}} در دسترس نیست)
+\item
+  خودکارسازی صنعتی نیازمند دقت \lr{\mbox{mm-cm}} است
+\item
+  سیستم‌های خودران (پهپادها، ربات‌ها، خودروها) نیازمند مکان‌یابی دقیق هستند
+\item
+  کاربردهای \lr{AR/\allowbreak{}XR} نیازمند ردیابی \lr{\mbox{6DoF}} در سطح \lr{\mbox{cm}} هستند
+\item
+  ردیابی دارایی در انبارها، بیمارستان‌ها، کارخانه‌ها
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{تحول تکنیک‌های مکان‌یابی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسخه} & \CNth{دقت} & \CNth{فنون} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{R16}} (مبنای \lr{\mbox{5G}}) & \lr{\mbox{\textasciitilde{}3–10~m}} & \lr{\mbox{DL-TDoA}}، \lr{\mbox{UL-TDoA}}، \lr{multi-RTT} \\
+\lr{\mbox{R17}} (بهبود) & \lr{\mbox{\textasciitilde{}0.5–3~m}} & \lr{\mbox{DL-PRS}} بهبودیافته، مکان‌یابی \lr{\mbox{NR}} \\
+\lr{\mbox{R18}} (مطالعه) & \lr{\mbox{\textasciitilde{}0.2–1~m}} & فاز حامل، \lr{\mbox{sidelink}}، \lr{AI/\allowbreak{}ML} \\
+\lr{\mbox{R19}}+ /\allowbreak{} هدف \lr{\mbox{6G}} & \lr{\textasciitilde{}0.01–0.1~m} & در حد سانتی‌متر، \lr{\mbox{6DoF}} \\
+\end{longtable}
+}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{فناوری‌های کلیدی برای دقت سطح سانتی‌متر}
+
+\CNchained\CNsubsubsection{مکان‌یابی فاز حامل}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{فاصله‌یابی استاندارد} از پوش سیگنال استفاده می‌کند: تفکیک‌پذیری \lr{$\sim c/BW$}؛ برای \lr{$BW = 100$ MHz} حدود \lr{\mbox{3~m}} (پیش از بهره پردازش).
+\item
+  \textbf{فاصله‌یابی فاز حامل} از طول‌موج حامل \lr{$\lambda$} استفاده می‌کند: در \lr{\mbox{3.5 GHz}}، \lr{$\lambda = 8.6$ cm} (امکان دقت زیرسانتی‌متر)؛ در \lr{\mbox{28 GHz}}، \lr{$\lambda = 1.07$ cm} (امکان دقت میلی‌متری).
+\item
+  \textbf{چالش:} حل ابهام عدد صحیح. فاز اندازه‌گیری‌شده
+\end{itemize}
+
+\CNdisplay{\varphi = \frac{2\pi}{\lambda}\,d + 2\pi N + \text{\rl{نویز}}}
+
+است و برای به دست آوردن فاصله مطلق باید \lr{$N$} حل شود.
+
+\CNsubsubsection{چند-\lr{\mbox{RTT}} با پهنای باند بزرگ}
+
+\begin{itemize}
+\tightlist
+\item
+  اندازه‌گیری زمان رفت-و-برگشت با پهنای باند \lr{400~MHz - 2~GHz}
+\item
+  تفکیک‌پذیری زمان‌بندی زیر-نانوثانیه
+\item
+  چندین ایستگاه پایه برای مثلث‌بندی
+\end{itemize}
+
+\CNsubsubsection{مکان‌یابی کمک‌شده با \lr{AI/\allowbreak{}ML}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{اثر انگشت}: مدل‌های \lr{\mbox{ML}} ویژگی‌های کانال را به مکان نگاشت می‌کنند
+\item
+  \textbf{شناسایی \lr{\mbox{NLOS}}}: \lr{\mbox{AI}} مسیرهای \lr{\mbox{LoS}} در برابر \lr{\mbox{NLoS}} را طبقه‌بندی می‌کند
+\item
+  \textbf{همجوشی حسگر}: ترکیب رادیو با \lr{\mbox{IMU}}، دوربین، \lr{\mbox{LiDAR}}
+\item
+  \textbf{نقشه‌برداری کانال}: یادگیری بدون نظارت هندسه رادیویی
+\end{itemize}
+
+\CNsubsubsection{مکان‌یابی و ارتباط مشترک}
+
+\begin{itemize}
+\tightlist
+\item
+  همان شکل‌موج به هدف دوگانه خدمت می‌کند
+\item
+  \lr{\mbox{PRS}} (سیگنال‌های مرجع مکان‌یابی) با انتقال داده یکپارچه شده است
+\item
+  هم‌افزایی \lr{\mbox{ISAC}}: قابلیت‌های سنجش مکان‌یابی را تقویت می‌کنند
+\end{itemize}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{مقایسه دقت در برابر تکنیک}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3030}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1818}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1818}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تکنیک} & \CNth{دقت} & \CNth{مزایا} & \CNth{معایب} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{DL-TDoA (R16)} & \lr{\mbox{3-10~m}} & استاندارد، مبتنی بر \lr{\mbox{UE}} & نیازمند همگام‌سازی ساعت \\
+\lr{Multi-RTT (R16)} & \lr{\mbox{1-5~m}} & بدون نیاز به همگام‌سازی & چندین \lr{\mbox{gNB}} \\
+\lr{DL-AoD (R16)} & \lr{\mbox{5-15~m}} & تک \lr{\mbox{gNB}} ممکن & نیازمند کالیبراسیون آنتن \\
+بهبودیافته \lr{\mbox{(R17)}} & \lr{\mbox{0.5-3~m}} & \lr{\mbox{PRS}} بهبودیافته & محدود به پهنای باند \\
+فاز حامل \lr{\mbox{(R18)}} & \lr{\mbox{1-10~cm}} & دقت بسیار بالا & حل ابهام \\
+کمک‌شده با \lr{AI (R18+)} & \lr{\mbox{0.3-3~m}} & در \lr{\mbox{NLOS}} کار می‌کند & نیازمند داده آموزش \\
+هدف \lr{\mbox{6G}} & \lr{\mbox{1-10~cm}} & بومی، بلادرنگ & بازطراحی کامل سیستم \\
+\end{longtable}
+}
+
+\CNsubsection{}{پیشرفت \lr{\mbox{3GPP}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{R16}}}}}: مکان‌یابی پایه \lr{\mbox{NR}} (\lr{TS 38.305}، \CNnum{38.455)}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{R17}}}}}: بهبودهای مکان‌یابی (دقت بهبودیافته، تأخیر کاهش‌یافته)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{R18}}}}}: مطالعه \lr{AI/\allowbreak{}ML} برای مکان‌یابی، فاز حامل، مکان‌یابی سایدلینک
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{R18}}}}}: نیازمندی‌های یکپارچگی و قابلیت اطمینان برای مکان‌یابی
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{R19}}}}}: بهبودهای دقت بیشتر، مکان‌یابی مبتنی بر \lr{\mbox{ISAC}}
+\end{itemize}
+
+\CNsubsection{}{مزایا}
+
+\begin{itemize}
+\tightlist
+\item
+  مکان‌یابی سطح سانتی‌متر همه‌جاگیر (داخلی و خارجی)
+\item
+  بدون زیرساخت اضافی (از شبکه ارتباطی استفاده مجدد می‌کند)
+\item
+  ردیابی \lr{\mbox{6DoF}} (موقعیت + جهت‌گیری) برای \lr{XR/\allowbreak{}AR}
+\item
+  کاربردهای جدید را ممکن می‌سازد: دوقلوهای دیجیتال، ناوبری خودران
+\end{itemize}
+
+\CNsubsection{}{چالش‌ها}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ابهام فاز حامل}: حل ابهام عدد صحیح در سناریوهای متحرک دشوار است
+\item
+  \textbf{چندمسیری}: بازتاب‌ها اندازه‌گیری‌های فاصله را خراب می‌کنند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{NLOS}}}}}: غالب در محیط‌های داخلی
+\item
+  \textbf{همگام‌سازی}: دقت زمان‌بندی شبکه مکان‌یابی قابل دستیابی را محدود می‌کند
+\item
+  \textbf{پیچیدگی \lr{\mbox{UE}}}: نیازمندی‌های پردازش برای مکان‌یابی با دقت بالا
+\item
+  \textbf{مصرف توان}: مکان‌یابی پیوسته باتری موبایل را تخلیه می‌کند
+\end{itemize}
+
+\CNsubsection{}{رابطه با \lr{\mbox{5G}}}
+
+\begin{itemize}
+\tightlist
+\item
+  مکان‌یابی \lr{\mbox{NR}} در \lr{5G (R16-R17)} پایه را فراهم می‌کند
+\item
+  هر نسخه به‌طور تدریجی دقت را بهبود می‌دهد
+\item
+  \lr{\mbox{6G}} مکان‌یابی را به‌عنوان یک سرویس بومی یکپارچه می‌کند (نه یک افزودنی)
+\item
+  تکنیک‌های فاز حامل و \lr{\mbox{AI}} در \lr{\mbox{R18}} برای مشخصات بالقوه \lr{\mbox{R19}} مطالعه می‌شوند
+\end{itemize}
+
+\CNsubsection{}{پرسش‌های باز}
+
+\begin{itemize}
+\tightlist
+\item
+  آیا فاز حامل می‌تواند در محیط‌های متحرک به‌طور قابل اعتماد کار کند؟
+\item
+  چگونه ابهام عدد صحیح را به‌صورت بلادرنگ با تحرک مدیریت کنیم؟
+\item
+  چه چگالی زیرساختی برای پوشش داخلی سطح \lr{\mbox{cm}} لازم است؟
+\item
+  چگونه دقت مکان‌یابی را در برابر عملکرد ارتباط متعادل کنیم؟
+\end{itemize}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{ماتریس بلوغ فناوری}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.0526}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1930}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1053}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2281}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.4211}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\#}} & \CNth{فناوری} & \CNth{\lr{\mbox{TRL*}}} & \CNth{وضعیت \lr{\mbox{3GPP}}} & \CNth{خط زمانی استانداردسازی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & شبکه‌های بومی-\lr{AI /\allowbreak{} AI-RAN} & \CNnum{4-5} & مورد مطالعه \lr{(R18 TR 38.843)} & موارد کار \lr{\mbox{R19-R20}} \\
+2 & \lr{\mbox{XL-MIMO}} & \CNnum{2-3} & هنوز مطالعه نشده & \lr{R21+ (6G)} \\
+3 & \lr{Massive MIMO} بدون سلول & \CNnum{3-4} & هنوز مطالعه نشده (پیش‌درآمد \lr{\mbox{CoMP}}) & \lr{\mbox{R20-R21}} \\
+4 & \lr{\mbox{ISAC}} & \CNnum{3-4} & مورد مطالعه \lr{\mbox{(R19)}} & موارد کار \lr{\mbox{R20}} \\
+5 & \lr{\mbox{RIS}} & \CNnum{3-4} & مورد مطالعه \lr{(R18-19 TR 38.857)} & موارد کار \lr{\mbox{R20}} \\
+6 & ارتباطات \lr{\mbox{Sub-THz}} & \CNnum{2-3} & هنوز مطالعه نشده & \lr{R21+ (6G)} \\
+7 & \lr{\mbox{NTN}} (پایه) & \CNnum{7-8} & \textbf{استانداردشده} \lr{\mbox{(R17)}} & مستقر \\
+7 & \lr{\mbox{NTN}} (پیشرفته) & \CNnum{4-5} & مطالعه/\allowbreak{}مورد کار \lr{\mbox{(R18-19)}} & \lr{\mbox{R19-R20}} \\
+8 & ارتباطات معنایی & \CNnum{1-2} & مطالعه نشده & \lr{\mbox{R22}}+ (پس-\lr{\mbox{6G}}؟) \\
+9 & دوقلوهای دیجیتال برای شبکه‌ها & \CNnum{3-4} & هنوز مطالعه نشده & \lr{\mbox{R20-R21}} \\
+10 & مکان‌یابی پیشرفته \lr{\mbox{(cm)}} & \CNnum{4-5} & مورد مطالعه \lr{\mbox{(R18)}} & \lr{\mbox{R19-R20}} \\
+\end{longtable}
+}
+
+\lr{\mbox{*TRL}} = سطح آمادگی فناوری (1 = پژوهش پایه، 9 = مستقر)
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{مرجع مقیاس \lr{\mbox{TRL}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{TRL}}} & \CNth{معنا} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & مشاهده اصول پایه \\
+2 & تدوین مفهوم فناوری \\
+3 & اثبات تجربی مفهوم \\
+4 & اعتبارسنجی فناوری در آزمایشگاه \\
+5 & اعتبارسنجی فناوری در محیط مرتبط \\
+6 & نمایش فناوری در محیط مرتبط \\
+7 & نمایش نمونه اولیه سیستم در محیط عملیاتی \\
+8 & سیستم کامل و واجد صلاحیت \\
+9 & اثبات سیستم در محیط عملیاتی (مستقر) \\
+\end{longtable}
+}
+
+\CNkeepfig{m26-roadmap}{5}
+
+\CNsection{}{خط زمانی پیش‌بینی‌شده: نسخه‌های \lr{\mbox{3GPP}} و فناوری‌های \lr{\mbox{6G}}}
+
+\CNfigure{m26-roadmap}{خط زمانی پیش‌بینی‌شده نسخه‌های \lr{\mbox{3GPP}} و فناوری‌های \lr{\mbox{6G}}}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{انتظار در هر نسخه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2093}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2326}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5581}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسخه} & \CNth{خط زمانی} & \CNth{ویژگی‌های کلیدی مرتبط با \lr{\mbox{6G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\textbf{\lr{\mbox{R19}}} (5G-Adv)} & \CNnum{2025-2026} & مطالعه \lr{\mbox{ISAC}}، \lr{\mbox{NTN}} پیشرفته، بهبودهای مکان‌یابی، مورد کار \lr{AI/\allowbreak{}RAN} \\
+\lr{\mbox{\textbf{\lr{\mbox{R20}}}}} (\lr{\mbox{6G}} اولیه؟) & \CNnum{2027-2028} & مشخصات \lr{\mbox{ISAC}}، مشخصات \lr{\mbox{RIS}}، مطالعات بدون سلول، مطالعات \lr{\mbox{Sub-THz}} \\
+\lr{\mbox{\textbf{\lr{\mbox{R21}}} (6G)}} & \CNnum{2029-2030} & \lr{\mbox{XL-MIMO}}، \lr{\mbox{Sub-THz}}، مطالعه معنایی، بومی-\lr{\mbox{AI}} کامل، دوقلوی دیجیتال \\
+\lr{\textbf{\lr{\mbox{R22}}} (6G+)} & \CNnum{2031-2032} & ارتباط معنایی، \lr{\mbox{THz}} پیشرفته، شبکه‌های خودران \\
+\end{longtable}
+}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{خلاصه: تغییرات پارادایم \lr{\mbox{5G}} در برابر \lr{\mbox{6G}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{5G}}} & \CNth{\lr{\mbox{6G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نقش \lr{\mbox{AI}} & افزودنی بهینه‌سازی & اصل طراحی بومی \\
+طیف & زیر-\lr{6 + mmWave (FR1+FR2)} & + \lr{\mbox{Sub-THz}} (\lr{\mbox{FR3}}؟) \\
+معماری & مبتنی بر سلول & بدون سلول + \lr{\mbox{NTN}} \\
+پوشش & زمینی & زمینی + فضا + هوایی \\
+سنجش & پشتیبانی نمی‌شود & یکپارچه \lr{\mbox{(ISAC)}} \\
+مکان‌یابی & دقت حدود \lr{\mbox{1m}} & دقت حدود \lr{\mbox{1~cm}} \\
+کنترل محیط & غیرفعال (تطبیق با کانال) & فعال (\lr{\mbox{RIS}} کانال را شکل می‌دهد) \\
+هدف ارتباط & انتقال بیت به‌طور قابل اعتماد & انتقال معنا به‌طور کارآمد \\
+مدیریت شبکه & پیکربندی‌شده توسط انسان & خودران (دوقلوی دیجیتال + \lr{\mbox{AI}}) \\
+مقیاس آنتن & \CNnum{64-256} عنصر & بیش از \CNnum{1000-10000} عنصر \\
+نرخ اوج & \lr{\mbox{20~Gbps}} & بیش از \lr{\mbox{200~Gbps}} \\
+تأخیر & \lr{\mbox{1~ms}} & \lr{\mbox{0.1~ms}} \\
+\end{longtable}
+}
+
+\CNboxsection{نکات کلیدی}
+
+\begin{CNbox}[unbreakable]{sum}{نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{همه «فناوری‌های \lr{\mbox{6G}}» برابر نیستند} \lr{—} \lr{\mbox{NTN}} از قبل استانداردشده است، در حالی که ارتباط معنایی حدسی باقی می‌ماند. همیشه سطح بلوغ را بررسی کنید.
+\item
+  \textbf{\lr{\mbox{6G}} تحولی و انقلابی است} \lr{—} برخی ویژگی‌ها (\lr{\mbox{AI-RAN}}، \lr{\mbox{ISAC}}، \lr{\mbox{RIS}}) از \lr{5G-Advanced} تحول می‌یابند. برخی دیگر (معنایی، \lr{\mbox{THz}}، بدون سلول) تغییرات پارادایم را نمایندگی می‌کنند.
+\item
+  \textbf{\lr{\mbox{3GPP}} استانداردسازی را هدایت می‌کند} \lr{—} فناوری‌ها باید عبور کنند: پژوهش \ensuremath{\leftarrow} مورد مطالعه \ensuremath{\leftarrow} مورد کار \ensuremath{\leftarrow} مشخصات فنی. این فرآیند \CNnum{3-5} سال در هر فناوری طول می‌کشد.
+\item
+  \textbf{زمان‌بندی: مشخصات \lr{\mbox{6G}} حدود \CNnum{2028-2030} انتظار می‌رود}، با اولین استقرارها حدود \CNnum{2030-2032.}
+\item
+  \textbf{چارچوب \lr{\mbox{IMT-2030}}} اهداف را تعیین می‌کند اما مشخصات واقعی ممکن است با چشم‌اندازهای اولیه متفاوت باشد (همان‌طور که با \lr{IMT-2020/\allowbreak{}5G} رخ داد).
+\item
+  \textbf{قابلیت اقتصادی} در نهایت پذیرش را تعیین می‌کند \lr{—} راه‌حل‌های از نظر فنی برتر ممکن است به جایگزین‌های عملی «به‌قدر کافی خوب» ببازند.
+\end{enumerate}
+
+\end{CNbox}
+
+\Needspace{14\baselineskip}
+
+\CNsection{}{مراجع و مطالعه بیشتر}
+
+\CNchained\CNsubsection{}{اسناد \lr{\mbox{3GPP}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{TR 38.843: Study on AI/\allowbreak{}ML for NR air interface (R18)}
+\item
+  \lr{TR 38.857: Study on NR network-controlled repeaters (R18)}
+\item
+  \lr{TR 38.811: Study on NR to support NTN (R15)}
+\item
+  \lr{TR 38.821: Solutions for NR to support NTN (R16)}
+\item
+  \lr{TS 38.305: Stage 2 functional specification for positioning (R16+)}
+\end{itemize}
+
+\CNsubsection{}{\lr{\mbox{ITU-R}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{IMT-2030 Framework Recommendation (ITU-R M.2160)}
+\item
+  \lr{Report ITU-R M.2516: Future technology trends for IMT systems toward 2030+}
+\end{itemize}
+
+\CNsubsection{}{مقالات پژوهشی کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{Björnson et al., ``Scalable Cell-Free Massive MIMO Systems,'' IEEE Trans. Commun., 2020}
+\item
+  \lr{Di Renzo et al., ``Smart Radio Environments Empowered by RIS,'' JSAC, 2020}
+\item
+  \lr{Rappaport et al., ``Wireless Communications and Applications Above 100~GHz,'' IEEE Access, 2019}
+\item
+  \lr{Qin et al., ``Semantic Communications: Principles and Challenges,'' arXiv, 2021}
+\item
+  \lr{Liu et al., ``Integrated Sensing and Communications,'' IEEE JSAC, 2022}
+\item
+  \lr{Amiri et al., ``Extremely Large MIMO,'' IEEE Commun. Mag., 2024}
+\end{itemize}
+
+\CNsubsection{}{نقشه‌های راه صنعت}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{Next G Alliance (ATIS): 6G Roadmap}
+\item
+  \lr{Hexa-X /\allowbreak{} Hexa-X-II (EU 6G Flagship Project)}
+\item
+  \lr{Samsung 6G Vision (2020, updated 2023)}
+\item
+  \lr{Nokia Bell Labs 6G Vision}
+\item
+  \lr{NGMN Alliance: 6G Drivers and Vision}
+\end{itemize}
+
+\emph{ماژول 26 \lr{—} آخرین به‌روزرسانی: اوت 2026}\CNbr{}\emph{یادداشت: این یک سند زنده است. ارزیابی‌های بلوغ فناوری با پیشرفت پژوهش و کار \lr{\mbox{3GPP}} تغییر خواهند کرد.}

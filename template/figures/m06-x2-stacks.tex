@@ -1,0 +1,7 @@
+% Module 6 — X2 protocol stacks (control and user plane)
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle] at (0,0.75) {\CNL{Control plane (X2-C)}{صفحه کنترل (\lr{X2-C})}};
+\node[CNtitle] at (5,0.75) {\CNL{User plane (X2-U)}{صفحه کاربر (\lr{X2-U})}};
+\CNstack{c}{0}{0}{2.2cm}{X2AP/CNcpL, SCTP/{}, IP/{}, {L2/L1}/CNphyL}
+\CNstack{u}{5}{0}{2.2cm}{GTP-U/CNupL, UDP/{}, IP/{}, {L2/L1}/CNphyL}
+\end{tikzpicture}

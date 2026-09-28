@@ -1,0 +1,92 @@
+% ============================================================
+%  AdvancedCommNetworks — diagram vocabulary shared by all figures
+%  (loaded once by acn-style.tex; figures are always typeset LTR)
+%
+%  nodes:  CNue  device        CNran  radio access    CNcp  control-plane NF
+%          CNup  user-plane NF CNdb   database/AAA    CNext external network
+%          CNbox neutral box   CNgroup subgraph frame  CNlayer protocol layer
+%  links:  CNlink generic      CNsigl signalling (orange, dashed)
+%          CNdata user data (cyan, solid)               CNelab edge label
+%  sequence diagrams: CNactor, CNlife, CNmsg, CNret, CNnote, CNframe
+% ============================================================
+\tikzset{
+  CNnohyph/.style={execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+  CNfig/.style={font=\sffamily\small, >={Stealth[length=5.5pt, width=4.2pt]},
+    line cap=round, line join=round},
+  CNnodebase/.style={draw, rounded corners=2.2pt, line width=0.75pt, align=center,
+    inner xsep=5pt, inner ysep=4pt, minimum height=0.95cm, font=\sffamily\small,
+    text=CNink, CNnohyph},
+  CNbox/.style={CNnodebase, draw=CNinkL!70, fill=white},
+  CNue/.style={CNnodebase, draw=CNink, fill=CNpaper},
+  CNran/.style={CNnodebase, draw=CNcyan, fill=CNcyan!9},
+  CNcp/.style={CNnodebase, draw=CNsig, fill=CNsig!8},
+  CNup/.style={CNnodebase, draw=CNcyanD, fill=CNcyan!18},
+  CNdb/.style={CNnodebase, draw=CNviolet, fill=CNviolet!9},
+  CNext/.style={CNnodebase, draw=CNmuted, fill=white, dashed},
+  CNhl/.style={CNnodebase, draw=CNamber!90!black, fill=CNamber!18},
+  CNok/.style={CNnodebase, draw=CNgreen, fill=CNgreen!10},
+  CNbad/.style={CNnodebase, draw=CNred, fill=CNred!8},
+  CNdark/.style={CNnodebase, draw=CNink, fill=CNink, text=white, font=\sffamily\small\bfseries},
+  CNlayer/.style={draw=CNinkL!70, fill=white, line width=0.7pt, minimum height=0.72cm,
+    font=\sffamily\small, text=CNink, align=center, CNnohyph},
+  CNgroup/.style={draw=CNline, line width=0.8pt, rounded corners=4pt, fill=CNpaper,
+    inner sep=9pt},
+  CNgrouplabel/.style={font=\sffamily\scriptsize\bfseries, text=CNmuted, inner sep=2pt},
+  CNlink/.style={draw=CNinkL, line width=0.8pt},
+  CNsigl/.style={draw=CNsig, line width=0.9pt, dash pattern=on 3.2pt off 2pt},
+  CNdata/.style={draw=CNcyan, line width=1.4pt},
+  CNelab/.style={font=\sffamily\scriptsize, text=CNinkL, fill=white, inner sep=1.4pt,
+    align=center, CNnohyph},
+  CNnote/.style={draw=CNamber!80!black, fill=CNamber!14, line width=0.6pt,
+    font=\sffamily\scriptsize, text=CNink, align=center, inner sep=3pt, CNnohyph},
+  CNtiny/.style={font=\sffamily\scriptsize, text=CNinkL, align=center},
+  CNtitle/.style={font=\sffamily\small\bfseries, text=CNink, align=center},
+  % sequence diagrams
+  CNactor/.style={draw=CNink, fill=CNink, text=white, rounded corners=2pt,
+    font=\sffamily\small\bfseries, minimum height=0.8cm, inner xsep=5pt, align=center},
+  CNlife/.style={draw=CNline, line width=0.9pt, dash pattern=on 4pt off 2.5pt},
+  CNmsg/.style={draw=CNink, line width=0.75pt, ->},
+  CNret/.style={draw=CNinkL, line width=0.75pt, dash pattern=on 3pt off 2pt, ->},
+  CNmlab/.style={font=\sffamily\scriptsize, text=CNink, inner sep=1.5pt, align=center, CNnohyph},
+  CNframe/.style={draw=CNcyan!70, line width=0.7pt, rounded corners=1.5pt},
+  CNframetag/.style={fill=CNcyan!70, text=white, font=\sffamily\scriptsize\bfseries,
+    inner sep=2pt},
+  CNact/.style={fill=CNsig!12, draw=CNsig!60, line width=0.5pt},
+}
+% plot style for signal/time charts
+\pgfplotsset{CNplot/.style={
+  axis lines=left, axis line style={CNinkL, -{Stealth[length=5pt]}},
+  tick style={CNinkL}, tick label style={font=\sffamily\scriptsize, text=CNink},
+  label style={font=\sffamily\small, text=CNink},
+  every axis x label/.style={at={(ticklabel* cs:1.0)}, anchor=west, xshift=3pt},
+  every axis y label/.style={at={(ticklabel* cs:1.0)}, anchor=south, yshift=3pt},
+  grid style={CNline!60}, enlargelimits=false, clip=false,
+  legend style={font=\sffamily\scriptsize, draw=CNline, fill=white},
+  every axis plot/.append style={line width=1.2pt}}}
+% a simple mobile-phone and a radio-mast glyph for diagrams
+\newcommand{\CNphone}[1][CNink]{\tikz[baseline=0.2em]{\draw[#1, line width=0.8pt, rounded corners=1pt] (0,0) rectangle (0.42em,0.78em);
+  \fill[#1] (0.21em,0.11em) circle (0.05em);}}
+\newcommand{\CNmast}[1][CNink]{\tikz[baseline=0em]{\draw[#1, line width=0.8pt] (0,0) -- (0.3em,0.95em) -- (0.6em,0)
+  (0.1em,0.3em) -- (0.5em,0.3em); \draw[#1, line width=0.6pt] (0.05em,1.05em) arc (160:20:0.27em);}}
+% protocol stack: \CNstack{prefix}{x}{y of top layer}{width}{Layer/style, Layer/style, …}
+% defines nodes <prefix>-1 (top) … <prefix>-n; styles: CNcpL (signalling), CNupL (user data)
+\tikzset{CNcpL/.style={fill=CNsig!9}, CNupL/.style={fill=CNcyan!14}, CNphyL/.style={fill=CNpaper}, CNsecL/.style={fill=CNamber!14}}
+\newcommand{\CNstack}[5]{%
+  \foreach \CNlab/\CNst [count=\CNi] in {#5}{%
+    \node[CNlayer, \CNst, minimum width=#4, minimum height=0.66cm, inner ysep=1pt]
+      (#1-\CNi) at (#2,{#3-(\CNi-1)*0.66}) {\CNlab};}}
+% packet header bit layout (32 bits per row): \CNbitruler, then
+% \CNfield{row}{first bit}{number of bits}{label}{fill}
+\def\CNbu{0.46}
+\newcommand{\CNbitruler}{%
+  \foreach \CNb in {0,...,31}{\node[font=\sffamily\tiny, text=CNmuted, inner sep=1pt] at ({(\CNb+0.5)*\CNbu},0.22) {\CNb};}}
+\newcommand{\CNfield}[5]{%
+  \node[draw=CNinkL!75, fill=#5, line width=0.6pt, minimum height=0.62cm, minimum width={#3*\CNbu cm},
+        anchor=north west, inner sep=1pt, font=\sffamily\scriptsize, align=center] at ({#2*\CNbu},{-#1*0.62}) {#4};}
+% packet on the wire: \CNpacket{y}{label/width(cm)/fill, …} — a strip of header fields from x = 0
+\newcommand{\CNpacket}[2]{%
+  \def\CNpx{0}%
+  \foreach \CNl/\CNw/\CNf in {#2}{%
+    \node[draw=CNinkL!75, fill=\CNf, line width=0.6pt, minimum height=0.9cm, minimum width=\CNw cm,
+          anchor=west, inner sep=1.5pt, font=\sffamily\scriptsize, align=center] at (\CNpx,#1) {\CNl};
+    \pgfmathsetmacro{\CNpnext}{\CNpx+\CNw}\xdef\CNpx{\CNpnext}}}

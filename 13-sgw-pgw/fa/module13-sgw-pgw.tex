@@ -1,0 +1,21 @@
+% !TEX program = xelatex
+% Advanced Communication Networks — Fall 2026-2027 (Persian)
+% Instructor: Amin Azari — compile with XeLaTeX (or tectonic).
+\documentclass[11pt]{article}
+\def\CNroot{../../template}
+\input{\CNroot/acn-fa}
+\CNsetmodule{13}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده) و \lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}{S-GW (Serving Gateway) and P-GW (PDN Gateway)}
+\begin{document}
+\CNcoverpage{ماژول ۱۳}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده) و \lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}{S-GW (Serving Gateway) and P-GW (PDN Gateway)}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{چرا \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} جدا هستند؟}
+\CNtocitem{2}{2}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده)}
+\CNtocitem{3}{3}{\lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}
+\CNtocitem{4}{4}{پروتکل \lr{\mbox{GTP}}}
+\CNtocitem{5}{5}{ردیابی مسیر بسته (سرتاسری با کپسوله‌سازی)}
+\CNtocitem{6}{6}{\lr{\mbox{CUPS}}: جداسازی صفحه کنترل و صفحه کاربر}
+\CNtocitem{7}{7}{تحول: \lr{S-GW + P-GW \ensuremath{\to} UPF (5G)}}
+\CNtocitem{8}{}{خلاصه}
+\end{CNminitoc}
+\input{content}
+\end{document}

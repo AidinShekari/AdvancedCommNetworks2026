@@ -1,0 +1,761 @@
+% !TEX program = xelatex
+% Advanced Communication Networks — Fall 2026-2027 (English)
+% Instructor: Amin Azari — compile with XeLaTeX (or tectonic).
+\documentclass[11pt]{article}
+\def\CNroot{../../template}
+\input{\CNroot/acn-en}
+\begin{document}
+\CNcoverpage{Complete Lecture Notes}{Modules 1-26}{جزوه کامل درس - ماژول‌های ۱ تا ۲۶}
+\CNsetmodule{}{\CNlangContents}{}
+\begin{CNbooktoc}
+\CNtocmodule{CNmod:Description}{}{Course Description}
+\CNtocitemk{Description}{1}{}{Introduction}
+\CNtocitemk{Description}{2}{}{Structure and Content}
+\CNtocitemk{Description}{3}{}{Assessment and Practical Work}
+\CNtocitemk{Description}{4}{}{Main References}
+\CNtocmodule{CNmod:Syllabus}{}{Course Syllabus}
+\CNtocitemk{Syllabus}{1}{}{Course Information}
+\CNtocitemk{Syllabus}{2}{}{Course Objectives}
+\CNtocitemk{Syllabus}{3}{}{Module List (26 Modules)}
+\CNtocitemk{Syllabus}{4}{}{Grading Breakdown}
+\CNtocitemk{Syllabus}{5}{}{Recommended Textbooks}
+\CNtocitemk{Syllabus}{6}{}{Week-by-Week Schedule}
+\CNtocitemk{Syllabus}{7}{}{Lab Assignments}
+\CNtocitemk{Syllabus}{8}{}{Project}
+\CNtocitemk{Syllabus}{9}{}{Academic Integrity}
+\CNtocmodule{CNmod:Prereq}{}{Prerequisites Review}
+\CNtocitemk{Prereq}{1}{1}{OSI Model Review (Telecom Focus)}
+\CNtocitemk{Prereq}{2}{2}{Basic RF Concepts}
+\CNtocitemk{Prereq}{3}{3}{Digital Communications Basics}
+\CNtocitemk{Prereq}{4}{4}{IP Networking Fundamentals}
+\CNtocitemk{Prereq}{5}{5}{Basic Probability}
+\CNtocitemk{Prereq}{6}{6}{Decibel Math}
+\CNtocitemk{Prereq}{7}{}{Summary Checklist}
+\CNtocmodule{CNmod:1}{1}{GSM, GPRS, and EDGE}
+\CNtocitemk{1}{1}{1}{GSM Architecture}
+\CNtocitemk{1}{2}{2}{GSM Network Elements — Detailed Explanation}
+\CNtocitemk{1}{3}{3}{GSM Interfaces}
+\CNtocitemk{1}{4}{4}{GSM Mobility \& Location Management}
+\CNtocitemk{1}{5}{5}{GSM Authentication \& Security}
+\CNtocitemk{1}{6}{6}{WHY GPRS Was Needed}
+\CNtocitemk{1}{7}{7}{GPRS Architecture}
+\CNtocitemk{1}{8}{8}{PDP Context}
+\CNtocitemk{1}{9}{9}{GPRS Mobility Management}
+\CNtocitemk{1}{10}{10}{EDGE — Enhanced Data Rates for GSM Evolution}
+\CNtocitemk{1}{11}{11}{Evolution Path: GSM \ensuremath{\to} GPRS \ensuremath{\to} EDGE \ensuremath{\to} 3G}
+\CNtocitemk{1}{12}{}{Summary Table}
+\CNtocitemk{1}{13}{}{Review Questions}
+\CNtocitemk{1}{14}{}{References}
+\CNtocmodule{CNmod:2}{2}{2G Circuit Switching}
+\CNtocitemk{2}{1}{1}{Circuit Switching Fundamentals}
+\CNtocitemk{2}{2}{2}{SS7 Signaling Concepts}
+\CNtocitemk{2}{3}{3}{Call Setup Process}
+\CNtocitemk{2}{4}{4}{Call Routing}
+\CNtocitemk{2}{5}{5}{Location Update Procedure}
+\CNtocitemk{2}{6}{6}{Authentication Procedure}
+\CNtocitemk{2}{7}{7}{Roaming}
+\CNtocitemk{2}{8}{8}{Call Release}
+\CNtocitemk{2}{9}{9}{Why Circuit Switching?}
+\CNtocitemk{2}{10}{}{Key Terms Summary}
+\CNtocmodule{CNmod:3}{3}{2G/\allowbreak{}3G Core Networks}
+\CNtocitemk{3}{1}{3.1}{Evolution from 2G to 3G — The Driving Forces}
+\CNtocitemk{3}{2}{3.2}{UMTS Architecture Overview}
+\CNtocitemk{3}{3}{3.3}{UTRAN: NodeB and RNC}
+\CNtocitemk{3}{4}{3.4}{3G Core Network: CS Domain + PS Domain}
+\CNtocitemk{3}{5}{3.5}{The Iu Interface}
+\CNtocitemk{3}{6}{3.6}{Release 99 vs Release 5+ (HSPA Evolution)}
+\CNtocitemk{3}{7}{3.7}{IMS (IP Multimedia Subsystem) — Introduction}
+\CNtocitemk{3}{8}{3.8}{Major Comparison Table: Mobile Network Generations}
+\CNtocitemk{3}{9}{3.9}{The CS/\allowbreak{}PS Split — And Why LTE Killed It}
+\CNtocitemk{3}{10}{3.10}{Summary: Key Takeaways}
+\CNtocitemk{3}{11}{}{Review Questions}
+\CNtocmodule{CNmod:4}{4}{Mobility and Handover}
+\CNtocitemk{4}{1}{1}{Why Mobility Management Is Needed}
+\CNtocitemk{4}{2}{2}{Location Management: LA vs RA vs TA}
+\CNtocitemk{4}{3}{3}{Cell Reselection (Idle Mode Mobility)}
+\CNtocitemk{4}{4}{4}{Handover Types}
+\CNtocitemk{4}{5}{5}{Handover Decision Process}
+\CNtocitemk{4}{6}{6}{Handover Procedure — LTE X2 Handover}
+\CNtocitemk{4}{7}{7}{Handover Failures}
+\CNtocitemk{4}{8}{8}{Evolution of Handover: 2G \ensuremath{\to} 3G \ensuremath{\to} LTE \ensuremath{\to} 5G}
+\CNtocitemk{4}{9}{9}{Engineering Examples with Typical Parameter Values}
+\CNtocitemk{4}{10}{10}{Summary Diagrams}
+\CNtocitemk{4}{11}{}{Key Formulas Summary}
+\CNtocitemk{4}{12}{}{Review Questions}
+\CNtocmodule{CNmod:5}{5}{4G LTE Architecture}
+\CNtocitemk{5}{1}{5.1}{Why LTE Was Developed}
+\CNtocitemk{5}{2}{5.2}{LTE Design Principles}
+\CNtocitemk{5}{3}{5.3}{LTE Architecture Overview}
+\CNtocitemk{5}{4}{5.4}{Network Elements — Detailed}
+\CNtocitemk{5}{5}{5.5}{LTE Interfaces — Reference Points}
+\CNtocitemk{5}{6}{5.6}{IMS Overview (IP Multimedia Subsystem)}
+\CNtocitemk{5}{7}{5.7}{Control Plane vs User Plane Separation (CUPS)}
+\CNtocitemk{5}{8}{5.8}{Key Differences from 3G}
+\CNtocitemk{5}{9}{5.9}{Control Plane vs User Plane Paths}
+\CNtocitemk{5}{10}{5.10}{Interface Summary Table}
+\CNtocitemk{5}{11}{}{Key Takeaways}
+\CNtocitemk{5}{12}{}{References}
+\CNtocmodule{CNmod:6}{6}{E-UTRAN — LTE Radio Access Network}
+\CNtocitemk{6}{1}{6.1}{E-UTRAN Architecture}
+\CNtocitemk{6}{2}{6.2}{eNodeB Functions}
+\CNtocitemk{6}{3}{6.3}{LTE Protocol Stack}
+\CNtocitemk{6}{4}{6.4}{Protocol Layers in Detail}
+\CNtocitemk{6}{5}{6.5}{LTE Channel Structure}
+\CNtocitemk{6}{6}{6.6}{S1 Interface}
+\CNtocitemk{6}{7}{6.7}{X2 Interface}
+\CNtocitemk{6}{8}{6.8}{RRC States and Transitions}
+\CNtocitemk{6}{9}{}{Summary}
+\CNtocmodule{CNmod:7}{7}{LTE Scheduling}
+\CNtocitemk{7}{1}{1}{Why Scheduling Matters}
+\CNtocitemk{7}{2}{2}{The LTE Resource Grid}
+\CNtocitemk{7}{3}{3}{Scheduling Granularity}
+\CNtocitemk{7}{4}{4}{Downlink Scheduling}
+\CNtocitemk{7}{5}{5}{Uplink Scheduling}
+\CNtocitemk{7}{6}{6}{Channel Quality Indicator (CQI)}
+\CNtocitemk{7}{7}{7}{Link Adaptation}
+\CNtocitemk{7}{8}{8}{HARQ (Hybrid Automatic Repeat Request)}
+\CNtocitemk{7}{9}{9}{Scheduling Algorithms}
+\CNtocitemk{7}{10}{10}{Engineering Trade-offs}
+\CNtocitemk{7}{11}{11}{Numerical Example}
+\CNtocitemk{7}{12}{}{Key Takeaways}
+\CNtocitemk{7}{13}{}{References}
+\CNtocmodule{CNmod:8}{8}{Random Access Channel (RACH)}
+\CNtocitemk{8}{1}{8.1}{Why Random Access is Needed}
+\CNtocitemk{8}{2}{8.2}{PRACH (Physical Random Access Channel)}
+\CNtocitemk{8}{3}{8.3}{Preamble Sequences}
+\CNtocitemk{8}{4}{8.4}{Contention-Based Random Access (4-Step CBRA)}
+\CNtocitemk{8}{5}{8.5}{Contention-Free Random Access (CFRA)}
+\CNtocitemk{8}{6}{8.6}{Timing Advance (TA)}
+\CNtocitemk{8}{7}{8.7}{Collisions and Backoff}
+\CNtocitemk{8}{8}{8.8}{RACH Overload}
+\CNtocitemk{8}{9}{8.9}{5G NR Random Access}
+\CNtocitemk{8}{10}{8.10}{Summary and Key Equations}
+\CNtocitemk{8}{11}{}{Review Questions}
+\CNtocitemk{8}{12}{}{References}
+\CNtocmodule{CNmod:9}{9}{Evolved Packet Core (EPC)}
+\CNtocitemk{9}{1}{9.1}{Why EPC Was Designed}
+\CNtocitemk{9}{2}{9.2}{EPC Architecture Overview}
+\CNtocitemk{9}{3}{9.3}{EPC Network Functions}
+\CNtocitemk{9}{4}{9.4}{EPC Bearers}
+\CNtocitemk{9}{5}{9.5}{Authentication in EPC}
+\CNtocitemk{9}{6}{9.6}{Session Management}
+\CNtocitemk{9}{7}{9.7}{Mobility Management}
+\CNtocitemk{9}{8}{9.8}{Failure Scenarios}
+\CNtocitemk{9}{9}{9.9}{Summary}
+\CNtocmodule{CNmod:10}{10}{Diameter Protocol}
+\CNtocitemk{10}{1}{1}{Why Diameter Was Introduced}
+\CNtocitemk{10}{2}{2}{Diameter vs RADIUS Comparison}
+\CNtocitemk{10}{3}{3}{Diameter Architecture}
+\CNtocitemk{10}{4}{4}{Diameter Message Structure}
+\CNtocitemk{10}{5}{5}{Diameter Commands}
+\CNtocitemk{10}{6}{6}{Important Diameter Applications in LTE}
+\CNtocitemk{10}{7}{7}{Diameter in LTE Authentication (S6a Deep Dive)}
+\CNtocitemk{10}{8}{}{Gx Policy Flow (CCR-I/\allowbreak{}CCA-I at Session Start)}
+\CNtocitemk{10}{9}{8}{Diameter vs HTTP/\allowbreak{}2 in 5G}
+\CNtocitemk{10}{10}{9}{Diameter = Control Plane Only}
+\CNtocitemk{10}{11}{}{Summary}
+\CNtocmodule{CNmod:11}{11}{Home Subscriber Server (HSS)}
+\CNtocitemk{11}{1}{1}{Why a Centralized Subscriber Database?}
+\CNtocitemk{11}{2}{2}{HSS Role in LTE/\allowbreak{}EPC}
+\CNtocitemk{11}{3}{3}{HSS Data Model}
+\CNtocitemk{11}{4}{4}{Authentication Vector Generation}
+\CNtocitemk{11}{5}{5}{HSS Interaction with MME (S6a /\allowbreak{} Diameter)}
+\CNtocitemk{11}{6}{6}{HSS Interaction with Other Network Elements}
+\CNtocitemk{11}{7}{7}{Authentication Scenario (Step-by-Step)}
+\CNtocitemk{11}{8}{8}{Evolution to 5G: HSS Decomposition}
+\CNtocitemk{11}{9}{}{Summary}
+\CNtocitemk{11}{10}{}{References}
+\CNtocmodule{CNmod:12}{12}{Mobility Management Entity (MME)}
+\CNtocitemk{12}{1}{1}{Why MME Exists}
+\CNtocitemk{12}{2}{2}{MME Functions}
+\CNtocitemk{12}{3}{3}{NAS Protocol Stack}
+\CNtocitemk{12}{4}{4}{Detailed Procedures}
+\CNtocitemk{12}{5}{5}{Bearer Management}
+\CNtocitemk{12}{6}{6}{MME Selection}
+\CNtocitemk{12}{7}{7}{S1-Flex and MME Pooling}
+\CNtocitemk{12}{8}{8}{Evolution: MME \ensuremath{\to} AMF (5G)}
+\CNtocmodule{CNmod:13}{13}{S-GW (Serving Gateway) and P-GW (PDN Gateway)}
+\CNtocitemk{13}{1}{1}{Why Separate S-GW and P-GW?}
+\CNtocitemk{13}{2}{2}{S-GW (Serving Gateway)}
+\CNtocitemk{13}{3}{3}{P-GW (PDN Gateway)}
+\CNtocitemk{13}{4}{4}{GTP Protocol}
+\CNtocitemk{13}{5}{5}{Packet Path Trace (End-to-End with Encapsulation)}
+\CNtocitemk{13}{6}{6}{CUPS: Control and User Plane Separation}
+\CNtocitemk{13}{7}{7}{Evolution: S-GW + P-GW \ensuremath{\to} UPF (5G)}
+\CNtocitemk{13}{8}{}{Summary}
+\CNtocmodule{CNmod:14}{14}{5G Networks Introduction}
+\CNtocitemk{14}{1}{1}{Why 5G? — Limitations of LTE/\allowbreak{}4G}
+\CNtocitemk{14}{2}{2}{5G Requirements — ITU IMT-2020 Targets}
+\CNtocitemk{14}{3}{3}{Three Pillars — 5G Use Cases}
+\CNtocitemk{14}{4}{4}{5G NR (New Radio) — Physical Layer}
+\CNtocitemk{14}{5}{5}{5G NSA vs SA — Deployment Strategies}
+\CNtocitemk{14}{6}{6}{5G Architecture Overview}
+\CNtocitemk{14}{7}{7}{gNB Architecture — CU/\allowbreak{}DU Split}
+\CNtocitemk{14}{8}{8}{Timeline — 3GPP Releases}
+\CNtocitemk{14}{9}{}{Summary — Key Takeaways}
+\CNtocitemk{14}{10}{}{References}
+\CNtocmodule{CNmod:15}{15}{Software Defined Networking (SDN)}
+\CNtocitemk{15}{1}{1}{Why SDN?}
+\CNtocitemk{15}{2}{2}{Traditional vs SDN Architecture}
+\CNtocitemk{15}{3}{3}{SDN Architecture Layers}
+\CNtocitemk{15}{4}{4}{SDN Controller Functions}
+\CNtocitemk{15}{5}{5}{Southbound Interfaces}
+\CNtocitemk{15}{6}{6}{Northbound Interfaces}
+\CNtocitemk{15}{7}{7}{OpenFlow Basics}
+\CNtocitemk{15}{8}{8}{SDN in Telecom}
+\CNtocitemk{15}{9}{9}{Benefits of SDN}
+\CNtocitemk{15}{10}{10}{Challenges of SDN}
+\CNtocitemk{15}{11}{}{Key Takeaways}
+\CNtocmodule{CNmod:16}{16}{Network Function Virtualization (NFV)}
+\CNtocitemk{16}{1}{1}{Why NFV?}
+\CNtocitemk{16}{2}{2}{Traditional vs NFV Comparison}
+\CNtocitemk{16}{3}{3}{ETSI NFV Architecture}
+\CNtocitemk{16}{4}{4}{NFV Infrastructure (NFVI)}
+\CNtocitemk{16}{5}{5}{VNF vs CNF}
+\CNtocitemk{16}{6}{6}{MANO (Management and Orchestration)}
+\CNtocitemk{16}{7}{7}{NFV in Telecom (Real Examples)}
+\CNtocitemk{16}{8}{8}{Evolution: Physical \ensuremath{\to} Virtual \ensuremath{\to} Cloud-Native}
+\CNtocitemk{16}{9}{9}{Benefits of NFV}
+\CNtocitemk{16}{10}{10}{Challenges of NFV}
+\CNtocitemk{16}{11}{}{Key Takeaways}
+\CNtocmodule{CNmod:17}{17}{3GPP Standardization for Advanced Communication Networks}
+\CNtocitemk{17}{1}{1}{What is 3GPP?}
+\CNtocitemk{17}{2}{2}{3GPP Organizational Structure}
+\CNtocitemk{17}{3}{3}{Specification Types}
+\CNtocitemk{17}{4}{4}{Release System}
+\CNtocitemk{17}{5}{5}{How to Navigate 3GPP Specifications}
+\CNtocitemk{17}{6}{6}{Study Items vs Work Items}
+\CNtocitemk{17}{7}{7}{Practical Guide: Referencing 3GPP Specs in Academic Work}
+\CNtocitemk{17}{8}{8}{Important Specification Series Table}
+\CNtocitemk{17}{9}{}{Summary}
+\CNtocmodule{CNmod:18}{18}{5G Service-Based Architecture (SBA)}
+\CNtocitemk{18}{1}{1}{Why 5G Moved Away from EPC Point-to-Point Interfaces}
+\CNtocitemk{18}{2}{2}{SBA Design Principles}
+\CNtocitemk{18}{3}{3}{5G Core Network Functions}
+\CNtocitemk{18}{4}{4}{NRF — The Key Enabler of SBA}
+\CNtocitemk{18}{5}{5}{Service Discovery and Communication Flow}
+\CNtocitemk{18}{6}{6}{SBI Protocol Stack}
+\CNtocitemk{18}{7}{7}{Comparison: EPC Interfaces vs 5G SBA}
+\CNtocitemk{18}{8}{}{Summary}
+\CNtocitemk{18}{9}{}{Review Questions}
+\CNtocitemk{18}{10}{}{References}
+\CNtocmodule{CNmod:19}{19}{5G Core Architecture}
+\CNtocitemk{19}{1}{1}{5G Core Overview}
+\CNtocitemk{19}{2}{2}{Reference Architecture}
+\CNtocitemk{19}{3}{3}{Network Functions in Detail}
+\CNtocitemk{19}{4}{4}{Control Plane vs User Plane in 5G Core}
+\CNtocitemk{19}{5}{5}{Major Comparison: 4G EPC vs 5G Core}
+\CNtocitemk{19}{6}{6}{Reference Points}
+\CNtocitemk{19}{7}{7}{Deployment Options}
+\CNtocitemk{19}{8}{}{Summary}
+\CNtocmodule{CNmod:20}{20}{5G Procedures}
+\CNtocitemk{20}{1}{1}{Registration (Initial Registration)}
+\CNtocitemk{20}{2}{2}{Authentication (5G-AKA)}
+\CNtocitemk{20}{3}{3}{Security Establishment}
+\CNtocitemk{20}{4}{4}{PDU Session Establishment}
+\CNtocitemk{20}{5}{5}{PDU Session Release}
+\CNtocitemk{20}{6}{6}{Service Request}
+\CNtocitemk{20}{7}{7}{Paging}
+\CNtocitemk{20}{8}{8}{Xn Handover}
+\CNtocitemk{20}{9}{9}{N2 Handover (Inter-AMF)}
+\CNtocitemk{20}{10}{}{Summary: Procedure Comparison Table}
+\CNtocitemk{20}{11}{}{Key References}
+\CNtocmodule{CNmod:21}{21}{Network Slicing}
+\CNtocitemk{21}{1}{1}{Why Network Slicing?}
+\CNtocitemk{21}{2}{2}{Network Slicing Concept}
+\CNtocitemk{21}{3}{3}{Slice Identification}
+\CNtocitemk{21}{4}{4}{Slice Selection (NSSF Role)}
+\CNtocitemk{21}{5}{5}{Slice Architecture}
+\CNtocitemk{21}{6}{6}{Slice Isolation}
+\CNtocitemk{21}{7}{7}{Slice Lifecycle Management}
+\CNtocitemk{21}{8}{8}{Slice Use Cases}
+\CNtocitemk{21}{9}{9}{Slicing vs. QoS vs. DNN}
+\CNtocitemk{21}{10}{10}{RAN Slicing}
+\CNtocitemk{21}{11}{}{Summary}
+\CNtocitemk{21}{12}{}{Key Takeaways}
+\CNtocmodule{CNmod:22}{22}{Quality of Service (QoS)}
+\CNtocitemk{22}{1}{1}{Why QoS?}
+\CNtocitemk{22}{2}{2}{QoS Evolution Across Generations}
+\CNtocitemk{22}{3}{3}{LTE Bearer-Based QoS}
+\CNtocitemk{22}{4}{4}{5G Flow-Based QoS}
+\CNtocitemk{22}{5}{5}{QoS Mapping and Enforcement}
+\CNtocitemk{22}{6}{6}{Bearer vs Flow Comparison}
+\CNtocitemk{22}{7}{7}{GBR vs Non-GBR vs Delay-Critical GBR}
+\CNtocitemk{22}{8}{8}{AMBR (Aggregate Maximum Bit Rate)}
+\CNtocitemk{22}{9}{9}{QoS Enforcement Architecture}
+\CNtocitemk{22}{10}{}{Summary: Key Takeaways}
+\CNtocitemk{22}{11}{}{QCI vs 5QI Quick Reference}
+\CNtocmodule{CNmod:23}{23}{User Plane}
+\CNtocitemk{23}{1}{1}{User Plane Concept}
+\CNtocitemk{23}{2}{2}{GTP-U Protocol (GPRS Tunneling Protocol — User Plane)}
+\CNtocitemk{23}{3}{3}{User Plane in LTE (4G)}
+\CNtocitemk{23}{4}{4}{User Plane in 5G}
+\CNtocitemk{23}{5}{5}{UPF Functions (3GPP TS 23.501)}
+\CNtocitemk{23}{6}{6}{Packet Trace Example: Downlink Data}
+\CNtocitemk{23}{7}{7}{User Plane Optimization}
+\CNtocitemk{23}{8}{}{Complete 5G User Plane Path Diagram}
+\CNtocitemk{23}{9}{}{Summary Table: User Plane Across Generations}
+\CNtocitemk{23}{10}{}{Key Takeaways}
+\CNtocmodule{CNmod:24}{24}{Control Plane}
+\CNtocitemk{24}{1}{1}{Control Plane Concept}
+\CNtocitemk{24}{2}{2}{Control Plane Protocols — MAJOR Reference Table}
+\CNtocitemk{24}{3}{3}{NAS (Non-Access Stratum)}
+\CNtocitemk{24}{4}{4}{RRC (Radio Resource Control)}
+\CNtocitemk{24}{5}{5}{NGAP (NG Application Protocol) — TS 38.413}
+\CNtocitemk{24}{6}{6}{GTP-C (GTP Control Plane)}
+\CNtocitemk{24}{7}{7}{HTTP/\allowbreak{}2 SBI (Service-Based Interface)}
+\CNtocitemk{24}{8}{8}{Signaling Protocol Evolution: SS7 \ensuremath{\to} Diameter \ensuremath{\to} HTTP/\allowbreak{}2}
+\CNtocitemk{24}{9}{}{Complete Control Plane Architecture Diagram (5G)}
+\CNtocitemk{24}{10}{}{Summary: Control Plane vs. User Plane}
+\CNtocitemk{24}{11}{}{Key Takeaways}
+\CNtocmodule{CNmod:25}{25}{Network Evolution — Grand Synthesis}
+\CNtocitemk{25}{1}{1}{Introduction}
+\CNtocitemk{25}{2}{2}{Master Comparison Table}
+\CNtocitemk{25}{3}{3}{Generation-by-Generation Analysis}
+\CNtocitemk{25}{4}{4}{Timeline Diagram}
+\CNtocitemk{25}{5}{5}{Architecture Evolution Diagram}
+\CNtocitemk{25}{6}{6}{Data Rate Evolution Graph (Exponential Growth)}
+\CNtocitemk{25}{7}{7}{Key Lessons Learned from Each Transition}
+\CNtocitemk{25}{8}{8}{Summary of Evolutionary Patterns}
+\CNtocitemk{25}{9}{9}{Exam Preparation Quick Reference}
+\CNtocitemk{25}{10}{10}{Conclusion}
+\CNtocmodule{CNmod:26}{26}{Future 6G Technologies for Advanced Communication Networks}
+\CNtocitemk{26}{1}{}{\CNwarn{} IMPORTANT DISCLAIMER}
+\CNtocitemk{26}{2}{}{Overview: The Road to 6G}
+\CNtocitemk{26}{3}{1}{AI-Native Networks /\allowbreak{} AI-RAN}
+\CNtocitemk{26}{4}{2}{Extremely Large MIMO (XL-MIMO)}
+\CNtocitemk{26}{5}{3}{Cell-Free Massive MIMO}
+\CNtocitemk{26}{6}{4}{Integrated Sensing and Communication (ISAC /\allowbreak{} JCS)}
+\CNtocitemk{26}{7}{5}{Reconfigurable Intelligent Surfaces (RIS)}
+\CNtocitemk{26}{8}{6}{Sub-THz /\allowbreak{} THz Communications}
+\CNtocitemk{26}{9}{7}{Non-Terrestrial Networks (NTN)}
+\CNtocitemk{26}{10}{8}{Semantic Communications}
+\CNtocitemk{26}{11}{9}{Digital Twins for Networks}
+\CNtocitemk{26}{12}{10}{Advanced Positioning (cm-Level)}
+\CNtocitemk{26}{13}{}{Technology Maturity Matrix}
+\CNtocitemk{26}{14}{}{Projected Timeline: 3GPP Releases and 6G Technologies}
+\CNtocitemk{26}{15}{}{Summary: 5G vs 6G Paradigm Shifts}
+\CNtocitemk{26}{16}{}{Key Takeaways}
+\CNtocitemk{26}{17}{}{References and Further Reading}
+\end{CNbooktoc}
+\clearpage
+\clearpage\CNsetmodule{}{Course Description}{}\gdef\CNmodkey{Description}
+\phantomsection\label{CNmod:Description}
+\input{../../00-course-description/en/content}
+\clearpage\CNsetmodule{}{Course Syllabus}{}\gdef\CNmodkey{Syllabus}
+\phantomsection\label{CNmod:Syllabus}
+\input{../../00-syllabus/en/content}
+\clearpage\CNsetmodule{}{Prerequisites Review}{}\gdef\CNmodkey{Prereq}
+\phantomsection\label{CNmod:Prereq}
+\input{../../00-prerequisites/en/content}
+\CNmoduleopener{1}{GSM, GPRS, and EDGE}{\lr{\mbox{GSM}}، \lr{\mbox{GPRS}} و \lr{\mbox{EDGE}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{GSM Architecture}
+\CNtocitem{2}{2}{GSM Network Elements — Detailed Explanation}
+\CNtocitem{3}{3}{GSM Interfaces}
+\CNtocitem{4}{4}{GSM Mobility \& Location Management}
+\CNtocitem{5}{5}{GSM Authentication \& Security}
+\CNtocitem{6}{6}{WHY GPRS Was Needed}
+\CNtocitem{7}{7}{GPRS Architecture}
+\CNtocitem{8}{8}{PDP Context}
+\CNtocitem{9}{9}{GPRS Mobility Management}
+\CNtocitem{10}{10}{EDGE — Enhanced Data Rates for GSM Evolution}
+\CNtocitem{11}{11}{Evolution Path: GSM \ensuremath{\to} GPRS \ensuremath{\to} EDGE \ensuremath{\to} 3G}
+\CNtocitem{12}{}{Summary Table}
+\CNtocitem{13}{}{Review Questions}
+\CNtocitem{14}{}{References}
+\end{CNminitoc}
+\clearpage
+\input{../../01-gsm-gprs-edge/en/content}
+\CNmoduleopener{2}{2G Circuit Switching}{سوییچینگ مداری \lr{\mbox{2G}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Circuit Switching Fundamentals}
+\CNtocitem{2}{2}{SS7 Signaling Concepts}
+\CNtocitem{3}{3}{Call Setup Process}
+\CNtocitem{4}{4}{Call Routing}
+\CNtocitem{5}{5}{Location Update Procedure}
+\CNtocitem{6}{6}{Authentication Procedure}
+\CNtocitem{7}{7}{Roaming}
+\CNtocitem{8}{8}{Call Release}
+\CNtocitem{9}{9}{Why Circuit Switching?}
+\CNtocitem{10}{}{Key Terms Summary}
+\end{CNminitoc}
+\clearpage
+\input{../../02-circuit-switching/en/content}
+\CNmoduleopener{3}{2G/\allowbreak{}3G Core Networks}{شبکه‌های هسته \lr{2G/\allowbreak{}3G}}
+\begin{CNminitoc}
+\CNtocitem{1}{3.1}{Evolution from 2G to 3G — The Driving Forces}
+\CNtocitem{2}{3.2}{UMTS Architecture Overview}
+\CNtocitem{3}{3.3}{UTRAN: NodeB and RNC}
+\CNtocitem{4}{3.4}{3G Core Network: CS Domain + PS Domain}
+\CNtocitem{5}{3.5}{The Iu Interface}
+\CNtocitem{6}{3.6}{Release 99 vs Release 5+ (HSPA Evolution)}
+\CNtocitem{7}{3.7}{IMS (IP Multimedia Subsystem) — Introduction}
+\CNtocitem{8}{3.8}{Major Comparison Table: Mobile Network Generations}
+\CNtocitem{9}{3.9}{The CS/\allowbreak{}PS Split — And Why LTE Killed It}
+\CNtocitem{10}{3.10}{Summary: Key Takeaways}
+\CNtocitem{11}{}{Review Questions}
+\end{CNminitoc}
+\clearpage
+\input{../../03-2g-3g-core/en/content}
+\CNmoduleopener{4}{Mobility and Handover}{تحرک و تحویل}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why Mobility Management Is Needed}
+\CNtocitem{2}{2}{Location Management: LA vs RA vs TA}
+\CNtocitem{3}{3}{Cell Reselection (Idle Mode Mobility)}
+\CNtocitem{4}{4}{Handover Types}
+\CNtocitem{5}{5}{Handover Decision Process}
+\CNtocitem{6}{6}{Handover Procedure — LTE X2 Handover}
+\CNtocitem{7}{7}{Handover Failures}
+\CNtocitem{8}{8}{Evolution of Handover: 2G \ensuremath{\to} 3G \ensuremath{\to} LTE \ensuremath{\to} 5G}
+\CNtocitem{9}{9}{Engineering Examples with Typical Parameter Values}
+\CNtocitem{10}{10}{Summary Diagrams}
+\CNtocitem{11}{}{Key Formulas Summary}
+\CNtocitem{12}{}{Review Questions}
+\end{CNminitoc}
+\clearpage
+\input{../../04-mobility-handover/en/content}
+\CNmoduleopener{5}{4G LTE Architecture}{معماری \lr{\mbox{4G LTE}}}
+\begin{CNminitoc}
+\CNtocitem{1}{5.1}{Why LTE Was Developed}
+\CNtocitem{2}{5.2}{LTE Design Principles}
+\CNtocitem{3}{5.3}{LTE Architecture Overview}
+\CNtocitem{4}{5.4}{Network Elements — Detailed}
+\CNtocitem{5}{5.5}{LTE Interfaces — Reference Points}
+\CNtocitem{6}{5.6}{IMS Overview (IP Multimedia Subsystem)}
+\CNtocitem{7}{5.7}{Control Plane vs User Plane Separation (CUPS)}
+\CNtocitem{8}{5.8}{Key Differences from 3G}
+\CNtocitem{9}{5.9}{Control Plane vs User Plane Paths}
+\CNtocitem{10}{5.10}{Interface Summary Table}
+\CNtocitem{11}{}{Key Takeaways}
+\CNtocitem{12}{}{References}
+\end{CNminitoc}
+\clearpage
+\input{../../05-4g-lte/en/content}
+\CNmoduleopener{6}{E-UTRAN — LTE Radio Access Network}{\lr{\mbox{E-UTRAN}} \lr{—} شبکه دسترسی رادیویی \lr{\mbox{LTE}}}
+\begin{CNminitoc}
+\CNtocitem{1}{6.1}{E-UTRAN Architecture}
+\CNtocitem{2}{6.2}{eNodeB Functions}
+\CNtocitem{3}{6.3}{LTE Protocol Stack}
+\CNtocitem{4}{6.4}{Protocol Layers in Detail}
+\CNtocitem{5}{6.5}{LTE Channel Structure}
+\CNtocitem{6}{6.6}{S1 Interface}
+\CNtocitem{7}{6.7}{X2 Interface}
+\CNtocitem{8}{6.8}{RRC States and Transitions}
+\CNtocitem{9}{}{Summary}
+\end{CNminitoc}
+\clearpage
+\input{../../06-eutran/en/content}
+\CNmoduleopener{7}{LTE Scheduling}{زمان‌بندی \lr{\mbox{LTE}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why Scheduling Matters}
+\CNtocitem{2}{2}{The LTE Resource Grid}
+\CNtocitem{3}{3}{Scheduling Granularity}
+\CNtocitem{4}{4}{Downlink Scheduling}
+\CNtocitem{5}{5}{Uplink Scheduling}
+\CNtocitem{6}{6}{Channel Quality Indicator (CQI)}
+\CNtocitem{7}{7}{Link Adaptation}
+\CNtocitem{8}{8}{HARQ (Hybrid Automatic Repeat Request)}
+\CNtocitem{9}{9}{Scheduling Algorithms}
+\CNtocitem{10}{10}{Engineering Trade-offs}
+\CNtocitem{11}{11}{Numerical Example}
+\CNtocitem{12}{}{Key Takeaways}
+\CNtocitem{13}{}{References}
+\end{CNminitoc}
+\clearpage
+\input{../../07-lte-scheduling/en/content}
+\CNmoduleopener{8}{Random Access Channel (RACH)}{کانال دسترسی تصادفی \lr{\mbox{(RACH)}}}
+\begin{CNminitoc}
+\CNtocitem{1}{8.1}{Why Random Access is Needed}
+\CNtocitem{2}{8.2}{PRACH (Physical Random Access Channel)}
+\CNtocitem{3}{8.3}{Preamble Sequences}
+\CNtocitem{4}{8.4}{Contention-Based Random Access (4-Step CBRA)}
+\CNtocitem{5}{8.5}{Contention-Free Random Access (CFRA)}
+\CNtocitem{6}{8.6}{Timing Advance (TA)}
+\CNtocitem{7}{8.7}{Collisions and Backoff}
+\CNtocitem{8}{8.8}{RACH Overload}
+\CNtocitem{9}{8.9}{5G NR Random Access}
+\CNtocitem{10}{8.10}{Summary and Key Equations}
+\CNtocitem{11}{}{Review Questions}
+\CNtocitem{12}{}{References}
+\end{CNminitoc}
+\clearpage
+\input{../../08-random-access/en/content}
+\CNmoduleopener{9}{Evolved Packet Core (EPC)}{هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}}}
+\begin{CNminitoc}
+\CNtocitem{1}{9.1}{Why EPC Was Designed}
+\CNtocitem{2}{9.2}{EPC Architecture Overview}
+\CNtocitem{3}{9.3}{EPC Network Functions}
+\CNtocitem{4}{9.4}{EPC Bearers}
+\CNtocitem{5}{9.5}{Authentication in EPC}
+\CNtocitem{6}{9.6}{Session Management}
+\CNtocitem{7}{9.7}{Mobility Management}
+\CNtocitem{8}{9.8}{Failure Scenarios}
+\CNtocitem{9}{9.9}{Summary}
+\end{CNminitoc}
+\clearpage
+\input{../../09-epc/en/content}
+\CNmoduleopener{10}{Diameter Protocol}{پروتکل \lr{\mbox{Diameter}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why Diameter Was Introduced}
+\CNtocitem{2}{2}{Diameter vs RADIUS Comparison}
+\CNtocitem{3}{3}{Diameter Architecture}
+\CNtocitem{4}{4}{Diameter Message Structure}
+\CNtocitem{5}{5}{Diameter Commands}
+\CNtocitem{6}{6}{Important Diameter Applications in LTE}
+\CNtocitem{7}{7}{Diameter in LTE Authentication (S6a Deep Dive)}
+\CNtocitem{8}{}{Gx Policy Flow (CCR-I/\allowbreak{}CCA-I at Session Start)}
+\CNtocitem{9}{8}{Diameter vs HTTP/\allowbreak{}2 in 5G}
+\CNtocitem{10}{9}{Diameter = Control Plane Only}
+\CNtocitem{11}{}{Summary}
+\end{CNminitoc}
+\clearpage
+\input{../../10-diameter/en/content}
+\CNmoduleopener{11}{Home Subscriber Server (HSS)}{سرور مشترک خانگی \lr{\mbox{(HSS)}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why a Centralized Subscriber Database?}
+\CNtocitem{2}{2}{HSS Role in LTE/\allowbreak{}EPC}
+\CNtocitem{3}{3}{HSS Data Model}
+\CNtocitem{4}{4}{Authentication Vector Generation}
+\CNtocitem{5}{5}{HSS Interaction with MME (S6a /\allowbreak{} Diameter)}
+\CNtocitem{6}{6}{HSS Interaction with Other Network Elements}
+\CNtocitem{7}{7}{Authentication Scenario (Step-by-Step)}
+\CNtocitem{8}{8}{Evolution to 5G: HSS Decomposition}
+\CNtocitem{9}{}{Summary}
+\CNtocitem{10}{}{References}
+\end{CNminitoc}
+\clearpage
+\input{../../11-hss/en/content}
+\CNmoduleopener{12}{Mobility Management Entity (MME)}{موجودیت مدیریت تحرک \lr{\mbox{(MME)}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why MME Exists}
+\CNtocitem{2}{2}{MME Functions}
+\CNtocitem{3}{3}{NAS Protocol Stack}
+\CNtocitem{4}{4}{Detailed Procedures}
+\CNtocitem{5}{5}{Bearer Management}
+\CNtocitem{6}{6}{MME Selection}
+\CNtocitem{7}{7}{S1-Flex and MME Pooling}
+\CNtocitem{8}{8}{Evolution: MME \ensuremath{\to} AMF (5G)}
+\end{CNminitoc}
+\clearpage
+\input{../../12-mme/en/content}
+\CNmoduleopener{13}{S-GW (Serving Gateway) and P-GW (PDN Gateway)}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده) و \lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why Separate S-GW and P-GW?}
+\CNtocitem{2}{2}{S-GW (Serving Gateway)}
+\CNtocitem{3}{3}{P-GW (PDN Gateway)}
+\CNtocitem{4}{4}{GTP Protocol}
+\CNtocitem{5}{5}{Packet Path Trace (End-to-End with Encapsulation)}
+\CNtocitem{6}{6}{CUPS: Control and User Plane Separation}
+\CNtocitem{7}{7}{Evolution: S-GW + P-GW \ensuremath{\to} UPF (5G)}
+\CNtocitem{8}{}{Summary}
+\end{CNminitoc}
+\clearpage
+\input{../../13-sgw-pgw/en/content}
+\CNmoduleopener{14}{5G Networks Introduction}{مقدمه‌ای بر شبکه‌های \lr{\mbox{5G}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why 5G? — Limitations of LTE/\allowbreak{}4G}
+\CNtocitem{2}{2}{5G Requirements — ITU IMT-2020 Targets}
+\CNtocitem{3}{3}{Three Pillars — 5G Use Cases}
+\CNtocitem{4}{4}{5G NR (New Radio) — Physical Layer}
+\CNtocitem{5}{5}{5G NSA vs SA — Deployment Strategies}
+\CNtocitem{6}{6}{5G Architecture Overview}
+\CNtocitem{7}{7}{gNB Architecture — CU/\allowbreak{}DU Split}
+\CNtocitem{8}{8}{Timeline — 3GPP Releases}
+\CNtocitem{9}{}{Summary — Key Takeaways}
+\CNtocitem{10}{}{References}
+\end{CNminitoc}
+\clearpage
+\input{../../14-5g-networks/en/content}
+\CNmoduleopener{15}{Software Defined Networking (SDN)}{شبکه‌سازی نرم‌افزارمحور \lr{\mbox{(SDN)}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why SDN?}
+\CNtocitem{2}{2}{Traditional vs SDN Architecture}
+\CNtocitem{3}{3}{SDN Architecture Layers}
+\CNtocitem{4}{4}{SDN Controller Functions}
+\CNtocitem{5}{5}{Southbound Interfaces}
+\CNtocitem{6}{6}{Northbound Interfaces}
+\CNtocitem{7}{7}{OpenFlow Basics}
+\CNtocitem{8}{8}{SDN in Telecom}
+\CNtocitem{9}{9}{Benefits of SDN}
+\CNtocitem{10}{10}{Challenges of SDN}
+\CNtocitem{11}{}{Key Takeaways}
+\end{CNminitoc}
+\clearpage
+\input{../../15-sdn/en/content}
+\CNmoduleopener{16}{Network Function Virtualization (NFV)}{مجازی‌سازی توابع شبکه \lr{\mbox{(NFV)}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why NFV?}
+\CNtocitem{2}{2}{Traditional vs NFV Comparison}
+\CNtocitem{3}{3}{ETSI NFV Architecture}
+\CNtocitem{4}{4}{NFV Infrastructure (NFVI)}
+\CNtocitem{5}{5}{VNF vs CNF}
+\CNtocitem{6}{6}{MANO (Management and Orchestration)}
+\CNtocitem{7}{7}{NFV in Telecom (Real Examples)}
+\CNtocitem{8}{8}{Evolution: Physical \ensuremath{\to} Virtual \ensuremath{\to} Cloud-Native}
+\CNtocitem{9}{9}{Benefits of NFV}
+\CNtocitem{10}{10}{Challenges of NFV}
+\CNtocitem{11}{}{Key Takeaways}
+\end{CNminitoc}
+\clearpage
+\input{../../16-nfv/en/content}
+\CNmoduleopener{17}{3GPP Standardization for Advanced Communication Networks}{استانداردسازی \lr{\mbox{3GPP}} برای شبکه‌های ارتباطی پیشرفته}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{What is 3GPP?}
+\CNtocitem{2}{2}{3GPP Organizational Structure}
+\CNtocitem{3}{3}{Specification Types}
+\CNtocitem{4}{4}{Release System}
+\CNtocitem{5}{5}{How to Navigate 3GPP Specifications}
+\CNtocitem{6}{6}{Study Items vs Work Items}
+\CNtocitem{7}{7}{Practical Guide: Referencing 3GPP Specs in Academic Work}
+\CNtocitem{8}{8}{Important Specification Series Table}
+\CNtocitem{9}{}{Summary}
+\end{CNminitoc}
+\clearpage
+\input{../../17-3gpp/en/content}
+\CNmoduleopener{18}{5G Service-Based Architecture (SBA)}{معماری خدمات‌محور \lr{\mbox{5G (SBA)}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why 5G Moved Away from EPC Point-to-Point Interfaces}
+\CNtocitem{2}{2}{SBA Design Principles}
+\CNtocitem{3}{3}{5G Core Network Functions}
+\CNtocitem{4}{4}{NRF — The Key Enabler of SBA}
+\CNtocitem{5}{5}{Service Discovery and Communication Flow}
+\CNtocitem{6}{6}{SBI Protocol Stack}
+\CNtocitem{7}{7}{Comparison: EPC Interfaces vs 5G SBA}
+\CNtocitem{8}{}{Summary}
+\CNtocitem{9}{}{Review Questions}
+\CNtocitem{10}{}{References}
+\end{CNminitoc}
+\clearpage
+\input{../../18-sba/en/content}
+\CNmoduleopener{19}{5G Core Architecture}{معماری هسته \lr{\mbox{5G}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{5G Core Overview}
+\CNtocitem{2}{2}{Reference Architecture}
+\CNtocitem{3}{3}{Network Functions in Detail}
+\CNtocitem{4}{4}{Control Plane vs User Plane in 5G Core}
+\CNtocitem{5}{5}{Major Comparison: 4G EPC vs 5G Core}
+\CNtocitem{6}{6}{Reference Points}
+\CNtocitem{7}{7}{Deployment Options}
+\CNtocitem{8}{}{Summary}
+\end{CNminitoc}
+\clearpage
+\input{../../19-5g-core/en/content}
+\CNmoduleopener{20}{5G Procedures}{رویه‌های \lr{\mbox{5G}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Registration (Initial Registration)}
+\CNtocitem{2}{2}{Authentication (5G-AKA)}
+\CNtocitem{3}{3}{Security Establishment}
+\CNtocitem{4}{4}{PDU Session Establishment}
+\CNtocitem{5}{5}{PDU Session Release}
+\CNtocitem{6}{6}{Service Request}
+\CNtocitem{7}{7}{Paging}
+\CNtocitem{8}{8}{Xn Handover}
+\CNtocitem{9}{9}{N2 Handover (Inter-AMF)}
+\CNtocitem{10}{}{Summary: Procedure Comparison Table}
+\CNtocitem{11}{}{Key References}
+\end{CNminitoc}
+\clearpage
+\input{../../20-5g-procedures/en/content}
+\CNmoduleopener{21}{Network Slicing}{شبکه‌بندی}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why Network Slicing?}
+\CNtocitem{2}{2}{Network Slicing Concept}
+\CNtocitem{3}{3}{Slice Identification}
+\CNtocitem{4}{4}{Slice Selection (NSSF Role)}
+\CNtocitem{5}{5}{Slice Architecture}
+\CNtocitem{6}{6}{Slice Isolation}
+\CNtocitem{7}{7}{Slice Lifecycle Management}
+\CNtocitem{8}{8}{Slice Use Cases}
+\CNtocitem{9}{9}{Slicing vs. QoS vs. DNN}
+\CNtocitem{10}{10}{RAN Slicing}
+\CNtocitem{11}{}{Summary}
+\CNtocitem{12}{}{Key Takeaways}
+\end{CNminitoc}
+\clearpage
+\input{../../21-network-slicing/en/content}
+\CNmoduleopener{22}{Quality of Service (QoS)}{کیفیت خدمات \lr{\mbox{(QoS)}}}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Why QoS?}
+\CNtocitem{2}{2}{QoS Evolution Across Generations}
+\CNtocitem{3}{3}{LTE Bearer-Based QoS}
+\CNtocitem{4}{4}{5G Flow-Based QoS}
+\CNtocitem{5}{5}{QoS Mapping and Enforcement}
+\CNtocitem{6}{6}{Bearer vs Flow Comparison}
+\CNtocitem{7}{7}{GBR vs Non-GBR vs Delay-Critical GBR}
+\CNtocitem{8}{8}{AMBR (Aggregate Maximum Bit Rate)}
+\CNtocitem{9}{9}{QoS Enforcement Architecture}
+\CNtocitem{10}{}{Summary: Key Takeaways}
+\CNtocitem{11}{}{QCI vs 5QI Quick Reference}
+\end{CNminitoc}
+\clearpage
+\input{../../22-qos/en/content}
+\CNmoduleopener{23}{User Plane}{صفحه کاربر}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{User Plane Concept}
+\CNtocitem{2}{2}{GTP-U Protocol (GPRS Tunneling Protocol — User Plane)}
+\CNtocitem{3}{3}{User Plane in LTE (4G)}
+\CNtocitem{4}{4}{User Plane in 5G}
+\CNtocitem{5}{5}{UPF Functions (3GPP TS 23.501)}
+\CNtocitem{6}{6}{Packet Trace Example: Downlink Data}
+\CNtocitem{7}{7}{User Plane Optimization}
+\CNtocitem{8}{}{Complete 5G User Plane Path Diagram}
+\CNtocitem{9}{}{Summary Table: User Plane Across Generations}
+\CNtocitem{10}{}{Key Takeaways}
+\end{CNminitoc}
+\clearpage
+\input{../../23-user-plane/en/content}
+\CNmoduleopener{24}{Control Plane}{صفحه کنترل}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Control Plane Concept}
+\CNtocitem{2}{2}{Control Plane Protocols — MAJOR Reference Table}
+\CNtocitem{3}{3}{NAS (Non-Access Stratum)}
+\CNtocitem{4}{4}{RRC (Radio Resource Control)}
+\CNtocitem{5}{5}{NGAP (NG Application Protocol) — TS 38.413}
+\CNtocitem{6}{6}{GTP-C (GTP Control Plane)}
+\CNtocitem{7}{7}{HTTP/\allowbreak{}2 SBI (Service-Based Interface)}
+\CNtocitem{8}{8}{Signaling Protocol Evolution: SS7 \ensuremath{\to} Diameter \ensuremath{\to} HTTP/\allowbreak{}2}
+\CNtocitem{9}{}{Complete Control Plane Architecture Diagram (5G)}
+\CNtocitem{10}{}{Summary: Control Plane vs. User Plane}
+\CNtocitem{11}{}{Key Takeaways}
+\end{CNminitoc}
+\clearpage
+\input{../../24-control-plane/en/content}
+\CNmoduleopener{25}{Network Evolution — Grand Synthesis}{تحول شبکه \lr{—} ترکیب جامع}
+\begin{CNminitoc}
+\CNtocitem{1}{1}{Introduction}
+\CNtocitem{2}{2}{Master Comparison Table}
+\CNtocitem{3}{3}{Generation-by-Generation Analysis}
+\CNtocitem{4}{4}{Timeline Diagram}
+\CNtocitem{5}{5}{Architecture Evolution Diagram}
+\CNtocitem{6}{6}{Data Rate Evolution Graph (Exponential Growth)}
+\CNtocitem{7}{7}{Key Lessons Learned from Each Transition}
+\CNtocitem{8}{8}{Summary of Evolutionary Patterns}
+\CNtocitem{9}{9}{Exam Preparation Quick Reference}
+\CNtocitem{10}{10}{Conclusion}
+\end{CNminitoc}
+\clearpage
+\input{../../25-network-evolution/en/content}
+\CNmoduleopener{26}{Future 6G Technologies for Advanced Communication Networks}{فناوری‌های آینده \lr{\mbox{6G}} برای شبکه‌های ارتباطی پیشرفته}
+\begin{CNminitoc}
+\CNtocitem{1}{}{\CNwarn{} IMPORTANT DISCLAIMER}
+\CNtocitem{2}{}{Overview: The Road to 6G}
+\CNtocitem{3}{1}{AI-Native Networks /\allowbreak{} AI-RAN}
+\CNtocitem{4}{2}{Extremely Large MIMO (XL-MIMO)}
+\CNtocitem{5}{3}{Cell-Free Massive MIMO}
+\CNtocitem{6}{4}{Integrated Sensing and Communication (ISAC /\allowbreak{} JCS)}
+\CNtocitem{7}{5}{Reconfigurable Intelligent Surfaces (RIS)}
+\CNtocitem{8}{6}{Sub-THz /\allowbreak{} THz Communications}
+\CNtocitem{9}{7}{Non-Terrestrial Networks (NTN)}
+\CNtocitem{10}{8}{Semantic Communications}
+\CNtocitem{11}{9}{Digital Twins for Networks}
+\CNtocitem{12}{10}{Advanced Positioning (cm-Level)}
+\CNtocitem{13}{}{Technology Maturity Matrix}
+\CNtocitem{14}{}{Projected Timeline: 3GPP Releases and 6G Technologies}
+\CNtocitem{15}{}{Summary: 5G vs 6G Paradigm Shifts}
+\CNtocitem{16}{}{Key Takeaways}
+\CNtocitem{17}{}{References and Further Reading}
+\end{CNminitoc}
+\clearpage
+\input{../../26-future-6g/en/content}
+\end{document}

@@ -1,0 +1,725 @@
+\Needspace{14\baselineskip}
+
+\CNsection{1}{مبانی سوییچینگ مداری}
+
+\CNchained\CNsubsection{}{مفهوم: مسیر اختصاصی}
+
+در سوییچینگ مداری، یک \textbf{مسیر ارتباطی اختصاصی} بین دو نقطه انتهایی برای کل مدت تماس برقرار می‌شود. این مسیر به‌صورت انحصاری رزرو می‌شود \lr{—} هیچ کاربر دیگری نمی‌تواند تا زمان آزادسازی تماس از آن منابع استفاده کند.
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{چگونه در \lr{\mbox{GSM}} کار می‌کند}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{اقدام} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & تماس‌گیرنده تماسی را آغاز می‌کند \\
+2 & شبکه یک شکاف زمانی اختصاصی روی واسط رادیویی تخصیص می‌دهد \lr{\mbox{(TDMA)}} \\
+3 & یک مسیر ثابت از طریق \lr{BTS \ensuremath{\leftarrow} BSC \ensuremath{\leftarrow} MSC} \ensuremath{\leftarrow} ترانک تا مقصد رزرو می‌شود \\
+4 & منابع برای کل مدت تماس تخصیص‌یافته باقی می‌مانند \\
+5 & با قطع تماس، تمام منابع آزاد می‌شوند \\
+\end{longtable}
+}
+
+\CNsubsection{}{رزرو منابع}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{واسط رادیویی}: یک شکاف زمانی \lr{\mbox{TDMA}} اختصاصی (یکی از 8 شکاف در هر فرکانس حامل) تخصیص می‌یابد
+\item
+  \textbf{واسط \lr{\mbox{Abis}}} \lr{(BTS\ensuremath{\leftrightarrow}BSC)}: یک کانال \lr{\mbox{16~kbps}} یا \lr{\mbox{64~kbps}} روی لینک‌های \lr{E1/\allowbreak{}T1}
+\item
+  \textbf{واسط \lr{\mbox{A}}} \lr{(BSC\ensuremath{\leftrightarrow}MSC)}: یک شکاف زمانی \lr{\mbox{64~kbps}} روی لینک‌های \lr{E1/\allowbreak{}T1}
+\item
+  \textbf{ترانک} (\lr{\mbox{MSC\ensuremath{\leftrightarrow}PSTN}}/\allowbreak{}سایر \lr{\mbox{MSC}}): یک مدار \lr{\mbox{64~kbps}} روی لینک‌های \lr{\mbox{PCM}}
+\end{itemize}
+
+\CNsubsection{}{ویژگی‌های کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{اتصال‌گرا}: مسیر پیش از جریان داده برقرار می‌شود
+\item
+  \textbf{پهنای باند تضمین‌شده}: \lr{\mbox{64~kbps}} ثابت در هر جهت پس از اتصال
+\item
+  \textbf{تأخیر ثابت}: تأخیر قابل پیش‌بینی (هدف حدود \lr{\mbox{150ms}} سرتاسری)
+\item
+  \textbf{ناکارآمد برای داده انفجاری}: منابع در دوره‌های سکوت هدر می‌روند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{مفاهیم سیگنالینگ \lr{\mbox{SS7}}}
+
+\CNchained\CNsubsection{}{\lr{\mbox{SS7}} چیست؟}
+
+\textbf{سیستم سیگنالینگ \lr{\mbox{7 (SS7)}}} پشته پروتکل سیگنالینگ خارج از باند است که توسط شبکه‌های مخابراتی برای موارد زیر استفاده می‌شود:
+
+\begin{itemize}
+\tightlist
+\item
+  برقراری و آزادسازی تماس‌ها
+\item
+  مدیریت پایگاه‌های داده مشترکین
+\item
+  فعال‌سازی رومینگ و تحویل‌ها
+\item
+  ارایه خدمات تکمیلی (انتقال تماس، \lr{\mbox{SMS}} و غیره)
+\end{itemize}
+
+سیگنالینگ \lr{\mbox{SS7}} از مسیر صدا \textbf{جدا} است \lr{—} به این \textbf{سیگنالینگ کانال مشترک \lr{\mbox{(CCS)}}} گفته می‌شود.
+
+\CNkeepfig{m02-ss7-stack}{3}
+
+\CNsubsection{}{پشته پروتکل \lr{\mbox{SS7}} (ساده‌شده)}
+
+\CNfigure{m02-ss7-stack}{پشته پروتکل \lr{\mbox{SS7}} (ساده‌شده)}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{پروتکل‌های کلیدی}
+
+\CNchained\CNsubsubsection{\lr{\mbox{ISUP}} (بخش کاربر \lr{\mbox{ISDN}})}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{هدف}: برقراری، مدیریت و آزادسازی تماس بین مراکز تلفن (\lr{\mbox{MSC}}ها)
+\item
+  \textbf{پیام‌ها}: \lr{\mbox{IAM}} (پیام آدرس اولیه)، \lr{\mbox{ACM}} (آدرس کامل)، \lr{\mbox{ANM}} (پاسخ)، \lr{\mbox{REL}} (آزادسازی)، \lr{\mbox{RLC}} (آزادسازی کامل)
+\item
+  \textbf{مورد استفاده برای}: برقراری مدار صوتی بین سوییچ‌ها
+\end{itemize}
+
+\CNsubsubsection{\lr{\mbox{MAP}} (بخش کاربرد موبایل)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{هدف}: ارتباط بین عناصر شبکه \lr{\mbox{GSM}} (\lr{\mbox{MSC}}، \lr{\mbox{HLR}}، \lr{\mbox{VLR}}، \lr{\mbox{AuC}})
+\item
+  \textbf{عملیات}: به‌روزرسانی مکان، بازیابی داده احراز هویت، پرس‌وجوهای اطلاعات مشترک، مسیریابی \lr{\mbox{SMS}}
+\item
+  \textbf{مورد استفاده برای}: مدیریت تحرک، رومینگ، تبادل داده مشترک
+\end{itemize}
+
+\CNsubsubsection{\lr{\mbox{TCAP}} (بخش کاربرد قابلیت‌های تراکنش)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{هدف}: فراهم‌کردن چارچوبی برای \lr{\mbox{MAP}} و سایر کاربردها جهت تبادل داده ساخت‌یافته
+\item
+  \textbf{مدل}: تراکنش‌های درخواست-پاسخ (\lr{\mbox{invoke}}، \lr{\mbox{result}}، \lr{\mbox{error}})
+\item
+  \textbf{مورد استفاده برای}: حمل عملیات \lr{\mbox{MAP}} روی شبکه \lr{\mbox{SS7}}
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{نقاط سیگنالینگ}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنصر} & \CNth{نقش} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{SSP}}}}} (نقطه سوییچینگ خدمات) & \lr{MSC/\allowbreak{}GMSC} \lr{—} سیگنالینگ را ایجاد/\allowbreak{}پایان می‌دهد \\
+\lr{\mbox{\textbf{\lr{\mbox{STP}}}}} (نقطه انتقال سیگنال) & پیام‌های سیگنالینگ را بین \lr{\mbox{SSP}}ها مسیریابی می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{SCP}}}}} (نقطه کنترل خدمات) & گره‌های پایگاه داده (\lr{\mbox{HLR}}، \lr{\mbox{AuC}}) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{فرآیند برقراری تماس}
+
+\CNchained\CNsubsection{3.1}{تماس با مبدأ موبایل \lr{\mbox{(MOC)}}}
+
+تماس با مبدأ موبایل توسط مشترک موبایل آغاز می‌شود.
+
+\CNsubsubsection{توالی رویدادها}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\lr{\mbox{UE}} شماره را می‌گیرد} \ensuremath{\leftarrow} پیام \lr{CHANNEL REQUEST} را روی \lr{\mbox{RACH}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{BTS}}}}} آن را به \lr{\mbox{BSC}} ارسال می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{BSC}}}}} یک کانال اختصاصی \lr{\mbox{(SDCCH)}} تخصیص می‌دهد \ensuremath{\leftarrow} \lr{IMMEDIATE ASSIGNMENT}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}} پیام \lr{CM SERVICE REQUEST} را (نوع خدمت = \lr{\mbox{MOC}}) از طریق \lr{\mbox{BSC}} به \lr{\mbox{MSC}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} مشترک را احراز هویت می‌کند (به بخش 6 مراجعه کنید)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} رمزگذاری را فعال می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}} پیام \lr{\mbox{SETUP}} را با شماره طرف مقابل می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} پیام \lr{CALL PROCEEDING} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} ارقام را تحلیل می‌کند، مسیریابی را تعیین می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} پیام \lr{IAM (ISUP)} را به‌سمت \lr{GMSC/\allowbreak{}PSTN} می‌فرستد
+\item
+  \lr{\textbf{\lr{GMSC/\allowbreak{}PSTN}}} پیام \lr{\mbox{ACM}} (آدرس کامل) را بازمی‌گرداند \ensuremath{\leftarrow} زنگ برگشتی
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} پیام \lr{\mbox{ALERTING}} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \textbf{طرف مقابل پاسخ می‌دهد} \ensuremath{\leftarrow} \lr{\mbox{ANM}} (پیام پاسخ) بازگردانده می‌شود
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} پیام \lr{\mbox{CONNECT}} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{BSC}}}}} یک \lr{\mbox{TCH}} (کانال ترافیک) برای صدا تخصیص می‌دهد
+\item
+  \textbf{مسیر صدا برقرار می‌شود} \lr{—} گفتگو آغاز می‌شود
+\end{enumerate}
+
+\CNkeepfig{m02-moc-1}{2}
+
+\CNsubsubsection{نمودار توالی \lr{\mbox{MOC}}}
+
+\CNfigure{m02-moc-1}{برقراری تماس مبدأ موبایل \lr{\mbox{(MOC)}}\CNpart{1}{2}}
+
+\CNfigure{m02-moc-2}{برقراری تماس مبدأ موبایل \lr{\mbox{(MOC)}}\CNpart{2}{2}}
+
+\CNsubsection{3.2}{تماس با مقصد موبایل \lr{\mbox{(MTC)}}}
+
+تماس با مقصد موبایل تماسی است که برای یک مشترک موبایل می‌رسد.
+
+\CNsubsubsection{توالی رویدادها}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\lr{\mbox{PSTN}}/\allowbreak{}طرف تماس‌گیرنده} پیام \lr{\mbox{IAM}} را با \lr{\mbox{MSISDN}} مقصد به \lr{\mbox{GMSC}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{GMSC}}}}} از \lr{\mbox{HLR}} پرس‌وجو می‌کند: «این مشترک کجاست؟» \lr{(MAP: Send Routing Info)}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{HLR}}}}} مقدار \lr{\mbox{MSRN}} (شماره رومینگ ایستگاه موبایل) را که به \lr{\mbox{MSC}} خدمات‌دهنده اشاره دارد بازمی‌گرداند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{GMSC}}}}} تماس را با استفاده از \lr{MSRN (IAM)} به \lr{\mbox{MSC}} خدمات‌دهنده مسیریابی می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} از \lr{\mbox{VLR}} وضعیت مشترک و ناحیه مکانی را پرس‌وجو می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}} UE}} را در ناحیه مکانی صفحه‌بندی می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}} به صفحه‌بندی روی \lr{\mbox{RACH}} پاسخ می‌دهد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{BSC}}}}} کانال \lr{\mbox{SDCCH}} را تخصیص می‌دهد \ensuremath{\leftarrow} احراز هویت و رمزگذاری
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} پیام \lr{\mbox{SETUP}} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}} پیام \lr{CALL CONFIRMED} را می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}} به کاربر هشدار می‌دهد (آهنگ زنگ)
+\item
+  \textbf{کاربر پاسخ می‌دهد} \ensuremath{\leftarrow} \lr{\mbox{UE}} پیام \lr{\mbox{CONNECT}} را می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} پیام \lr{\mbox{ANM}} را به‌سمت \lr{GMSC/\allowbreak{}PSTN} بازمی‌گرداند
+\item
+  \textbf{کانال ترافیک تخصیص می‌یابد} \lr{—} مسیر صدا فعال است
+\end{enumerate}
+
+\CNkeepfig{m02-mtc-1}{2}
+
+\CNsubsubsection{نمودار توالی \lr{\mbox{MTC}}}
+
+\CNfigure{m02-mtc-1}{برقراری تماس مقصد موبایل \lr{\mbox{(MTC)}}\CNpart{1}{2}}
+
+\CNfigure{m02-mtc-2}{برقراری تماس مقصد موبایل \lr{\mbox{(MTC)}}\CNpart{2}{2}}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{مسیریابی تماس}
+
+\CNchained\CNsubsection{}{چگونه \lr{MSC/\allowbreak{}GMSC} تماس‌ها را با استفاده از \lr{\mbox{HLR}} مسیریابی می‌کند}
+
+\lr{\mbox{HLR}} \textbf{پایگاه داده اصلی} تمام مشترکین است. می‌داند که در حال حاضر کدام \lr{MSC/\allowbreak{}VLR} به هر مشترک خدمات می‌دهد.
+
+\CNsubsection{}{مسیریابی یک تماس با مقصد موبایل}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Step 1: PSTN delivers call to GMSC (based on MSISDN number plan)
+Step 2: GMSC sends MAP "Send Routing Information" to HLR
+Step 3: HLR identifies the serving MSC/VLR for that subscriber
+Step 4: HLR asks serving VLR to allocate an MSRN (temporary routing number)
+Step 5: VLR returns MSRN to HLR
+Step 6: HLR returns MSRN to GMSC
+Step 7: GMSC uses MSRN to route the ISUP IAM to the correct MSC
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNsubsection{}{\lr{\mbox{MSRN}} (شماره رومینگ ایستگاه موبایل)}
+
+\begin{itemize}
+\tightlist
+\item
+  شماره موقت در قالب \lr{\mbox{E.164}}
+\item
+  مانند یک شماره تلفن عادی در طرح شماره‌گذاری شبکه خدمات‌دهنده به نظر می‌رسد
+\item
+  به \lr{\mbox{GMSC}} امکان می‌دهد تماس را با استفاده از \lr{\mbox{ISUP}} استاندارد و بدون اطلاع از جزییات داخلی \lr{\mbox{GSM}} مسیریابی کند
+\item
+  به‌ازای هر تماس تخصیص می‌یابد و پس از مسیریابی آزاد می‌شود
+\end{itemize}
+
+\CNsubsection{}{مسیریابی یک تماس با مبدأ موبایل}
+
+برای \lr{\mbox{MOC}}، مسیریابی ساده‌تر است:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{MSC}} ارقام گرفته‌شده را از \lr{\mbox{UE}} دریافت می‌کند
+\item
+  \lr{\mbox{MSC}} تحلیل ارقام را انجام می‌دهد (طرح شماره‌گذاری، پیشوندها، خدمات تکمیلی)
+\item
+  \lr{\mbox{MSC}} تماس را از طریق \lr{\mbox{ISUP}} به‌سمت ترانک/\allowbreak{}دروازه \lr{GMSC/\allowbreak{}PSTN} مناسب مسیریابی می‌کند
+\item
+  اگر تماس به موبایل دیگری در همان شبکه باشد \ensuremath{\leftarrow} \lr{\mbox{MSC}} ممکن است از \lr{\mbox{HLR}} برای \lr{\mbox{MSRN}} پرس‌وجو کند
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{رویه به‌روزرسانی مکان}
+
+\CNchained\CNsubsection{}{چرا به‌روزرسانی‌های مکان لازم هستند}
+
+شبکه باید بداند \textbf{مشترک کجاست} تا تماس‌ها و پیام‌ها را تحویل دهد. بدون ردیابی مکان:
+
+\begin{itemize}
+\tightlist
+\item
+  شبکه باید هر سلول در کل کشور را صفحه‌بندی کند
+\item
+  این کار ظرفیت کانال صفحه‌بندی را اشباع می‌کرد
+\item
+  زمان برقراری تماس غیرقابل قبول می‌شد
+\end{itemize}
+
+به‌روزرسانی‌های مکان به شبکه امکان می‌دهند \textbf{صفحه‌بندی را به یک ناحیه مکانی مشخص} (گروهی از سلول‌ها) محدود کند.
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{انواع به‌روزرسانی‌های مکان}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{محرک} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\textbf{\lr{IMSI Attach}}} & گوشی روشن می‌شود \lr{—} به شبکه اطلاع می‌دهد که مشترک قابل دسترسی است \\
+\textbf{\lr{\mbox{LU}} عادی} & \lr{\mbox{UE}} به ناحیه مکانی جدیدی می‌رود (\lr{\mbox{LAI}} جدید روی \lr{\mbox{BCCH}} را تشخیص می‌دهد) \\
+\textbf{\lr{\mbox{LU}} دوره‌ای} & به‌روزرسانی مبتنی بر تایمر برای تأیید اینکه \lr{\mbox{UE}} هنوز قابل دسترسی است \\
+\lr{\textbf{\lr{IMSI Detach}}} & گوشی به‌صورت صحیح خاموش می‌شود \lr{—} به شبکه اطلاع می‌دهد \\
+\end{longtable}
+}
+
+\CNkeepfig{m02-location-update}{3}
+
+\CNsubsection{}{نمودار توالی به‌روزرسانی مکان}
+
+\CNfigure{m02-location-update}{به‌روزرسانی مکان همراه با تغییر \lr{MSC/\allowbreak{}VLR}}
+
+\CNsubsection{}{\lr{IMSI Attach}}
+
+وقتی گوشی روشن می‌شود:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE}} کانال \lr{\mbox{BCCH}} را می‌خواند تا \lr{\mbox{LAI}} و اطلاعات شبکه را به دست آورد
+\item
+  \lr{\mbox{UE}} پیام \lr{LOCATION UPDATING REQUEST} را با پرچم \lr{\mbox{attach}} می‌فرستد
+\item
+  همان رویه \lr{\mbox{LU}} عادی دنبال می‌شود
+\item
+  \lr{\mbox{VLR}} مشترک را به‌عنوان «متصل» (قابل دسترسی) علامت‌گذاری می‌کند
+\end{enumerate}
+
+\CNsubsection{}{به‌روزرسانی مکان دوره‌ای}
+
+\begin{itemize}
+\tightlist
+\item
+  شبکه یک مقدار تایمر \lr{\mbox{(T3212)}} را روی \lr{\mbox{BCCH}} پخش می‌کند
+\item
+  \lr{\mbox{UE}} باید پیش از انقضای تایمر یک \lr{\mbox{LU}} بفرستد، حتی اگر جابه‌جا نشده باشد
+\item
+  اگر تایمر بدون \lr{\mbox{LU}} منقضی شود، \lr{\mbox{VLR}} مشترک را «به‌صورت ضمنی جدا شده» علامت‌گذاری می‌کند
+\item
+  هدف: تشخیص گوشی‌هایی که بدون \lr{IMSI Detach} خاموش شده‌اند (باتری تمام شده و غیره)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{رویه احراز هویت}
+
+\CNchained\CNsubsection{}{هدف}
+
+احراز هویت تضمین می‌کند که مشترک همان کسی است که ادعا می‌کند، و از موارد زیر جلوگیری می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  دسترسی غیرمجاز به شبکه
+\item
+  کلاهبرداری با \lr{\mbox{SIM}} کلون‌شده
+\item
+  شنود (در ترکیب با رمزگذاری)
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{سه‌گانه احراز هویت}
+
+\lr{\mbox{AuC}} (مرکز احراز هویت، هم‌مکان با \lr{\mbox{HLR}}) \textbf{سه‌گانه‌های احراز هویت} را تولید می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنصر} & \CNth{اندازه} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{RAND}}}}} & 128 بیت & چالش تصادفی فرستاده‌شده به \lr{\mbox{UE}} \\
+\lr{\mbox{\textbf{\lr{\mbox{SRES}}}}} & 32 بیت & پاسخ مورد انتظار (محاسبه‌شده از \lr{RAND + Ki}) \\
+\lr{\mbox{\textbf{\lr{\mbox{Kc}}}}} & 64 بیت & کلید رمز برای رمزنگاری واسط رادیویی \\
+\end{longtable}
+}
+
+\CNkeepfig{m02-triplets}{3}
+
+\CNsubsection{}{چگونه سه‌گانه‌ها تولید می‌شوند}
+
+\CNfigure{m02-triplets}{تولید یک سه‌تایی احراز هویت (\lr{\mbox{RAND}}، \lr{\mbox{SRES}}، \lr{\mbox{Kc}})}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Ki}}}}} هرگز از کارت \lr{\mbox{SIM}} یا \lr{\mbox{AuC}} خارج نمی‌شود
+\item
+  همان محاسبه به‌صورت مستقل در هر دو طرف انجام می‌شود
+\item
+  اگر \lr{\mbox{SRES}} از \lr{\mbox{UE}} با \lr{\mbox{SRES}} از سه‌گانه مطابقت داشته باشد \ensuremath{\leftarrow} مشترک احراز هویت شده است
+\end{itemize}
+
+\CNkeepfig{m02-authentication}{3}
+
+\CNsubsection{}{نمودار توالی احراز هویت}
+
+\CNfigure{m02-authentication}{احراز هویت و رمزگذاری در \lr{\mbox{GSM}}}
+
+\CNsubsection{}{نکات کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{VLR}} \textbf{چندین سه‌گانه} ذخیره می‌کند (معمولاً 5) تا از پرس‌وجو از \lr{\mbox{HLR}} برای هر تراکنش اجتناب کند
+\item
+  احراز هویت در موارد زیر انجام می‌شود: برقراری تماس، به‌روزرسانی مکان، \lr{\mbox{SMS}}، فعال‌سازی خدمات تکمیلی
+\item
+  احراز هویت \lr{\mbox{GSM}} \textbf{یک‌طرفه} است \lr{—} شبکه \lr{\mbox{UE}} را احراز هویت می‌کند، اما \lr{\mbox{UE}} شبکه را احراز هویت نمی‌کند (آسیب‌پذیری که در \lr{3G/\allowbreak{}UMTS} برطرف شد)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{7}{رومینگ}
+
+\CNchained\CNsubsection{}{مفاهیم}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6667}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{اصطلاح} & \CNth{تعریف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{HPLMN}}}}} & \lr{\mbox{PLMN}} خانگی \lr{—} شبکه‌ای که مشترک اشتراک خود را در آن دارد \\
+\lr{\mbox{\textbf{\lr{\mbox{VPLMN}}}}} & \lr{\mbox{PLMN}} بازدیدشده \lr{—} شبکه خارجی که مشترک در حین رومینگ از آن استفاده می‌کند \\
+\textbf{توافق رومینگ} & توافق تجاری + فنی بین دو اپراتور \\
+\lr{\textbf{\lr{GRX/\allowbreak{}IPX}}} & شبکه اتصال‌دهنده برای سیگنالینگ بین \lr{\mbox{PLMN}}ها \\
+\end{longtable}
+}
+
+\CNsubsection{}{رومینگ چگونه کار می‌کند}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\lr{\mbox{UE}} در کشور خارجی روشن می‌شود} \ensuremath{\leftarrow} \lr{\mbox{VPLMN}} را انتخاب می‌کند (بر اساس فهرست \lr{\mbox{PLMN}} ترجیحی \lr{\mbox{SIM}})
+\item
+  \textbf{\lr{\mbox{UE}} به‌روزرسانی مکان را انجام می‌دهد} به \lr{MSC/\allowbreak{}VLR} مربوط به \lr{\mbox{VPLMN}}
+\item
+  \textbf{\lr{\mbox{VLR}} مربوط به \lr{\mbox{VPLMN}}} با \textbf{\lr{\mbox{HLR}} مربوط به \lr{\mbox{HPLMN}}} از طریق \lr{SS7/\allowbreak{}MAP} (از طریق لینک‌های سیگنالینگ بین‌المللی) تماس می‌گیرد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{HLR}}}}} مشترک را احراز هویت می‌کند (سه‌گانه‌ها را به \lr{\mbox{VPLMN}} می‌فرستد)
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{HLR}}}}} پروفایل مشترک را به \lr{\mbox{VLR}} مربوط به \lr{\mbox{VPLMN}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{HLR}}}}} آدرس \lr{\mbox{VLR}} مربوط به \lr{\mbox{VPLMN}} را به‌عنوان مکان فعلی مشترک ثبت می‌کند
+\item
+  \textbf{مشترک اکنون می‌تواند از طریق \lr{\mbox{VPLMN}} تماس بگیرد/\allowbreak{}دریافت کند}
+\end{enumerate}
+
+\CNkeepfig{m02-roaming}{3}
+
+\CNsubsection{}{مسیر سیگنالینگ برای رومینگ}
+
+\CNfigure{m02-roaming}{مسیر سیگنالینگ رومینگ: از \lr{MSC/\allowbreak{}VLR} میزبان تا \lr{HLR/\allowbreak{}AuC} خانگی روی \lr{SS7/\allowbreak{}MAP}}
+
+\CNsubsection{}{تماس ورودی به یک مشترک در حال رومینگ}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  تماس به \lr{\mbox{GMSC}} مربوط به \lr{\mbox{HPLMN}} می‌رسد
+\item
+  \lr{\mbox{GMSC}} از \lr{\mbox{HLR}} پرس‌وجو می‌کند \ensuremath{\leftarrow} می‌فهمد که مشترک در \lr{\mbox{VPLMN}} است
+\item
+  \lr{\mbox{HLR}} از \lr{\mbox{VLR}} مربوط به \lr{\mbox{VPLMN}} درخواست \lr{\mbox{MSRN}} می‌کند
+\item
+  \lr{\mbox{VLR}} مربوط به \lr{\mbox{VPLMN}} مقدار \lr{\mbox{MSRN}} را بازمی‌گرداند
+\item
+  \lr{\mbox{HLR}} مقدار \lr{\mbox{MSRN}} را به \lr{\mbox{GMSC}} می‌دهد
+\item
+  \lr{\mbox{GMSC}} تماس را با استفاده از \lr{\mbox{MSRN}} (از طریق ترانک‌های بین‌المللی) به \lr{\mbox{MSC}} مربوط به \lr{\mbox{VPLMN}} مسیریابی می‌کند
+\item
+  \lr{\mbox{MSC}} مربوط به \lr{\mbox{VPLMN}} مشترک را صفحه‌بندی و متصل می‌کند
+\end{enumerate}
+
+\CNsubsection{}{تماس خروجی از یک مشترک در حال رومینگ}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE}} تماسی را در \lr{\mbox{VPLMN}} آغاز می‌کند
+\item
+  \lr{\mbox{MSC}} مربوط به \lr{\mbox{VPLMN}} تماس را به‌صورت محلی مدیریت می‌کند
+\item
+  تماس از \lr{\mbox{VPLMN}} به مقصد مسیریابی می‌شود (ممکن است از \lr{\mbox{HPLMN}} عبور کند یا مستقیم برود)
+\item
+  پروتکل \lr{CAMEL/\allowbreak{}CAP} ممکن است برای کنترل پیش‌پرداخت از \lr{\mbox{HPLMN}} استفاده شود
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{آزادسازی تماس}
+
+\CNchained\CNsubsection{}{آزادسازی عادی تماس (با شروع موبایل)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}} پیام \lr{\mbox{DISCONNECT}} را به \lr{\mbox{MSC}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} پیام \lr{\mbox{REL}} (آزادسازی) را از طریق \lr{\mbox{ISUP}} به‌سمت انتهای دور می‌فرستد
+\item
+  \textbf{انتهای دور} با \lr{\mbox{RLC}} (آزادسازی کامل) پاسخ می‌دهد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{MSC}}}}} پیام \lr{\mbox{RELEASE}} را به \lr{\mbox{UE}} می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{UE}}}}} پیام \lr{RELEASE COMPLETE} را می‌فرستد
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{BSC}}}}} کانال \lr{\mbox{TCH}} (کانال ترافیک) را آزاد می‌کند
+\item
+  \textbf{تمام منابع آزاد می‌شوند}: شکاف‌های زمانی، ترانک‌ها، ارجاعات مدار
+\end{enumerate}
+
+\CNsubsection{}{آزادسازی با شروع شبکه}
+
+می‌تواند توسط موارد زیر فعال شود:
+
+\begin{itemize}
+\tightlist
+\item
+  قطع تماس از انتهای دور
+\item
+  شکست لینک رادیویی (\lr{\mbox{UE}} خارج از پوشش)
+\item
+  انقضای تایمر \lr{BSC/\allowbreak{}MSC}
+\item
+  قطع اداری
+\end{itemize}
+
+\CNkeepfig{m02-isup-release}{3}
+
+\CNsubsection{}{پیام‌های آزادسازی \lr{\mbox{ISUP}}}
+
+\CNfigure{m02-isup-release}{آزادسازی تماس در \lr{\mbox{ISUP}}}
+
+\Needspace{16\baselineskip}
+
+\CNsection{9}{چرا سوییچینگ مداری؟}
+
+\CNchained\CNsubsection{}{چرا سوییچینگ مداری برای صدا استفاده می‌شد}
+
+\CNchained\CNsubsubsection{نیازمندی‌های صدا}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{نرخ بیت ثابت}: \lr{\mbox{13~kbps}} (نرخ کامل) یا \lr{\mbox{6.5~kbps}} (نرخ نصف) \lr{—} جریان پیوسته
+\item
+  \textbf{تأخیر کم و قابل پیش‌بینی}: کمتر از \lr{\mbox{150ms}} یک‌طرفه برای کیفیت گفتگوی قابل قبول
+\item
+  \textbf{عدم تحمل جیتر}: گوش انسان به تأخیر متغیر بسیار حساس است
+\item
+  \textbf{ترافیک متقارن}: هر دو طرف تقریباً به یک اندازه صحبت می‌کنند
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{چرا سوییچینگ مداری برای صدا مناسب است}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نیازمندی} & \CNth{چگونه \lr{\mbox{CS}} آن را برآورده می‌کند} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+تأخیر کم & مسیر اختصاصی = بدون تأخیر صف \\
+بدون جیتر & تخصیص شکاف زمانی ثابت = تأخیر ثابت \\
+پهنای باند تضمین‌شده & منابع رزروشده = بدون افت ناشی از ازدحام \\
+پردازش ساده & پس از برقراری مسیر، سوییچینگ بی‌اهمیت است \\
+بلادرنگ & بدون تأخیر ذخیره-و-ارسال \\
+\end{longtable}
+}
+
+\CNsubsubsection{زمینه تاریخی (دهه \CNnum{1980-90)}}
+
+\begin{itemize}
+\tightlist
+\item
+  توان پردازشی گران بود \lr{—} سوییچینگ ساده ترجیح داده می‌شد
+\item
+  حافظه گران بود \lr{—} بدون بافرینگ/\allowbreak{}بسته‌بندی‌سازی
+\item
+  \lr{\mbox{PSTN}} موجود سوییچینگ مداری بود \lr{—} یکپارچگی طبیعی
+\item
+  صدا \textbf{تنها} خدمت مورد انتظار از تلفن‌های موبایل بود
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{چرا سوییچینگ مداری به یک محدودیت تبدیل شد}
+
+\CNchained\CNsubsubsection{مشکل با داده}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مسیله} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هدر رفتن منابع} & یک مدار \lr{\mbox{64~kbps}} حتی در سکوت نگه داشته می‌شود \CNnum{(50-60\%} یک تماس صوتی) \\
+\textbf{بدون مالتی‌پلکسینگ آماری} & نمی‌توان منابع را به‌صورت پویا بین چندین کاربر به اشتراک گذاشت \\
+\textbf{پهنای باند ثابت} & حتی وقتی شبکه بیکار است نمی‌توان بالاتر از \lr{\mbox{64~kbps}} انفجار داشت \\
+\textbf{تأخیر برقراری تماس} & \CNnum{3-7} ثانیه برای برقراری یک مدار \lr{—} غیرقابل قبول برای وب‌گردی \\
+\textbf{صورت‌حساب دقیقه‌ای} & ناکارآمد برای بررسی ایمیل (30 ثانیه داده، صورتحساب 1 دقیقه) \\
+\textbf{مقیاس‌پذیری} & هر نشست داده یک مدار صوتی کامل مصرف می‌کند \\
+\end{longtable}
+}
+
+\CNkeepfig{m02-traffic-patterns}{2}
+
+\CNsubsubsection{ویژگی‌های ترافیک داده در برابر صدا}
+
+\CNfigure{m02-traffic-patterns}{اشغال یک مدار رزروشده: صدای پیوسته در برابر داده انفجاری}
+
+سوییچینگ مداری \textbf{نمی‌تواند به‌طور کارآمد ترافیک انفجاری را مدیریت کند} زیرا منابع رزرو می‌شوند اما بیشتر مواقع بلااستفاده می‌مانند.
+
+\CNkeepfig{m02-evolution}{2}
+
+\CNsubsubsection{مسیر تحول}
+
+\CNfigure{m02-evolution}{از سوییچینگ مداری تا شبکه‌های کاملاً بسته‌ای}
+
+\CNsubsection{}{خلاصه}
+
+سوییچینگ مداری در دهه 1990 \textbf{انتخاب درست} برای صدا بود \lr{—} این فناوری با توان موجود در آن زمان، تضمین‌های کیفی مورد نیاز ارتباط صوتی را فراهم می‌کرد. اما با تغییر کاربرد موبایل از صرفاً صدا به خدمات داده‌محور، ناکارآمدی نگه‌داشتن مدارهای اختصاصی برای ترافیک داده انفجاری و نامتقارن، سوییچینگ بسته‌ای را به جانشین اجتناب‌ناپذیر تبدیل کرد.
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{خلاصه اصطلاحات کلیدی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6667}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{اصطلاح} & \CNth{تعریف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{MOC}}}}} & تماس با مبدأ موبایل \\
+\lr{\mbox{\textbf{\lr{\mbox{MTC}}}}} & تماس با مقصد موبایل \\
+\lr{\mbox{\textbf{\lr{\mbox{MSRN}}}}} & شماره رومینگ ایستگاه موبایل \lr{—} شماره موقت برای مسیریابی تماس \\
+\lr{\mbox{\textbf{\lr{\mbox{IAM}}}}} & پیام آدرس اولیه \lr{—} پیام \lr{\mbox{ISUP}} برای آغاز یک تماس \\
+\lr{\mbox{\textbf{\lr{\mbox{ACM}}}}} & پیام آدرس کامل \lr{—} طرف مقابل در حال هشدار است \\
+\lr{\mbox{\textbf{\lr{\mbox{ANM}}}}} & پیام پاسخ \lr{—} طرف مقابل پاسخ داده است \\
+\lr{\textbf{\lr{REL/\allowbreak{}RLC}}} & آزادسازی /\allowbreak{} آزادسازی کامل \lr{—} آزادسازی تماس \\
+\lr{\mbox{\textbf{\lr{\mbox{LAI}}}}} & هویت ناحیه مکانی \lr{—} یک گروه از سلول‌ها را شناسایی می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{TMSI}}}}} & هویت موقت مشترک موبایل \lr{—} محافظت از حریم خصوصی \\
+\lr{\mbox{\textbf{\lr{\mbox{Ki}}}}} & کلید مخفی مشترک بین \lr{\mbox{SIM}} و \lr{\mbox{AuC}} \\
+\lr{\mbox{\textbf{\lr{\mbox{SRES}}}}} & پاسخ امضاشده \lr{—} اثبات احراز هویت \\
+\lr{\mbox{\textbf{\lr{\mbox{Kc}}}}} & کلید رمز مشتق‌شده در حین احراز هویت \\
+\lr{\mbox{\textbf{\lr{\mbox{VPLMN}}}}} & \lr{\mbox{PLMN}} بازدیدشده \lr{—} شبکه خارجی در حین رومینگ \\
+\lr{\mbox{\textbf{\lr{\mbox{HPLMN}}}}} & \lr{\mbox{PLMN}} خانگی \lr{—} شبکه خانگی مشترک \\
+\end{longtable}
+}
+
+\emph{ماژول بعدی: {ماژول \lr{\mbox{3 — GPRS}} و سوییچینگ بسته‌ای}}

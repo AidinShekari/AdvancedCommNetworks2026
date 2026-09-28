@@ -1,0 +1,702 @@
+\Needspace{19\baselineskip}
+
+\CNsection{1}{چرا یک پایگاه داده مرکزی مشترکین؟}
+
+در هر شبکه موبایل، هزاران تا میلیون‌ها مشترک به‌طور همزمان متصل می‌شوند، جابه‌جا می‌شوند و خدمات مصرف می‌کنند. یک پایگاه داده مرکزی مشترکین برای موارد زیر ضروری است:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5263}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4737}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{احراز هویت} & تأیید هویت مشترک پیش از اعطای دسترسی به شبکه \\
+\textbf{مجوزدهی} & تعیین اینکه مشترک مجاز به استفاده از کدام خدمات/\allowbreak{}منابع است \\
+\textbf{ردیابی مکان} & دانستن اینکه در حال حاضر کدام عنصر شبکه به هر مشترک خدمات می‌دهد \\
+\textbf{مدیریت اشتراک} & ذخیره و اجرای طرح‌های خدمات، پروفایل‌های \lr{\mbox{QoS}} و محدودیت‌ها \\
+\end{longtable}
+}
+
+بدون یک پایگاه داده مرکزی:
+
+\begin{itemize}
+\tightlist
+\item
+  هر دستگاهی می‌توانست خود را جای مشترک جا بزند
+\item
+  شبکه نمی‌تواند تماس/\allowbreak{}داده ورودی را به مکان صحیح مسیریابی کند
+\item
+  تمایز خدمات (طرح‌های ممتاز در برابر پایه) غیرممکن می‌شد
+\item
+  رومینگ بین شبکه‌ها کار نمی‌کرد
+\end{itemize}
+
+\textbf{\lr{\mbox{HSS}} (سرور مشترک خانگی)} تحول \lr{\mbox{HLR}} (ثبت‌کننده مکان خانگی) نسل \lr{2G/\allowbreak{}3G} است که برای شبکه‌های تمام-\lr{IP LTE/\allowbreak{}EPC} با استفاده از پروتکل \lr{\mbox{Diameter}} به‌جای \lr{SS7/\allowbreak{}MAP} بازطراحی شده است.
+
+\CNkeepfig{m11-hss-contents}{7}
+
+\CNsection{2}{نقش \lr{\mbox{HSS}} در \lr{LTE/\allowbreak{}EPC}}
+
+\lr{\mbox{HSS}} \textbf{پایگاه داده اصلی} برای تمام داده‌های مشترک و اشتراک در هسته بسته تکامل‌یافته \lr{\mbox{(EPC)}} است:
+
+\CNfigure{m11-hss-contents}{آنچه \lr{\mbox{HSS}} ذخیره می‌کند}
+
+\CNsubsection{}{مسیولیت‌های کلیدی:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{ذخیره هویت دایمی مشترک \lr{\mbox{(IMSI)}}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    هویت بین‌المللی مشترک موبایل \lr{—} شناسه 15 رقمی یکتا در سطح جهانی
+  \item
+    قالب: \lr{\mbox{MCC}} (3 رقم) + \lr{\mbox{MNC}} (\CNnum{2-3} رقم) + \lr{\mbox{MSIN}} (\CNnum{9-10} رقم)
+  \end{itemize}
+\item
+  \textbf{ذخیره اعتبارنامه‌های احراز هویت \lr{\mbox{(K, OPc)}}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{\textbf{\lr{\mbox{K}}}}}: کلید مخفی دایمی 128 بیتی (فقط بین \lr{\mbox{USIM}} و \lr{\mbox{HSS}} مشترک)
+  \item
+    \lr{\mbox{\textbf{\lr{\mbox{OPc}}}}}: ثابت مختص اپراتور مشتق‌شده از \lr{\mbox{OP}} (کلید اپراتور) و \lr{\mbox{K}}
+  \item
+    هرگز روی هوا منتقل نمی‌شود \lr{—} برای تولید اعتبارنامه‌های موقت استفاده می‌شود
+  \end{itemize}
+\item
+  \textbf{ذخیره پروفایل‌های اشتراک (\lr{\mbox{APN}}، \lr{\mbox{QoS}}، خدمات مجاز)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    مشترک می‌تواند به کدام \lr{\mbox{APN}}ها متصل شود
+  \item
+    حداکثر نرخ بیت \lr{\mbox{(AMBR)}} برای پیوند بالاسو/\allowbreak{}پایین‌سو
+  \item
+    شناسه‌های کلاس کیفیت خدمات \lr{\mbox{(QCI)}}
+  \item
+    خدمات مجاز و محدودیت‌ها
+  \end{itemize}
+\item
+  \textbf{ردیابی مکان \lr{\mbox{UE}} (\lr{\mbox{MME}} خدمات‌دهنده)}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ثبت می‌کند که در حال حاضر کدام \lr{\mbox{MME}} به \lr{\mbox{UE}} خدمات می‌دهد
+  \item
+    مسیریابی خدمات ورودی (\lr{\mbox{MT-SMS}}، صفحه‌بندی) را ممکن می‌سازد
+  \item
+    هر بار که \lr{\mbox{UE}} به‌روزرسانی ناحیه ردیابی \lr{\mbox{(TAU)}} یا اتصال انجام می‌دهد به‌روزرسانی می‌شود
+  \end{itemize}
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m11-hss-data-model}{8}
+
+\CNsection{3}{مدل داده \lr{\mbox{HSS}}}
+
+\CNchained\CNsubsection{}{نمودار مدل داده \lr{\mbox{HSS}}}
+
+\CNfigure{m11-hss-data-model}{مدل داده \lr{\mbox{HSS}}: هویت، احراز هویت، اشتراک، مکان و محدودیت‌ها}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{فیلدهای داده تفصیلی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2564}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1795}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2308}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{دسته} & \CNth{فیلد} & \CNth{توضیح} & \CNth{مثال} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هویت} & \lr{\mbox{IMSI}} & شناسه یکتای مشترک & 234150999999999 \\
+\textbf{هویت} & \lr{\mbox{MSISDN}} & شماره تلفن \lr{\mbox{(E.164)}} & \lr{\mbox{+447700900000}} \\
+\textbf{احراز هویت} & \lr{\mbox{K}} & کلید مخفی دایمی 128 بیتی & \lr{0x465B5CE8…(hex)} \\
+\textbf{احراز هویت} & \lr{\mbox{OPc}} & ثابت واریانت اپراتور & \lr{0xE8ED289D…(hex)} \\
+\textbf{احراز هویت} & \lr{\mbox{SQN}} & شماره ترتیب (ضد-بازپخش) & 000000000021 \\
+\textbf{احراز هویت} & \lr{\mbox{AMF}} & فیلد مدیریت احراز هویت & \lr{\mbox{0x8000}} \\
+\textbf{اشتراک} & \lr{\mbox{APN}} پیش‌فرض & اتصال داده اصلی & \lr{\mbox{``internet''}} \\
+\textbf{اشتراک} & فهرست \lr{\mbox{APN}} & تمام \lr{\mbox{APN}}های مجاز & \lr{\mbox{internet}}، \lr{\mbox{ims}}، \lr{\mbox{mms}} \\
+\textbf{اشتراک} & \lr{\mbox{UE-AMBR}} & حداکثر نرخ بیت تجمیعی & \lr{\mbox{DL:150M}}، \lr{\mbox{UL:50M}} \\
+\textbf{اشتراک} & \lr{\mbox{APN-AMBR}} & حداکثر نرخ بیت در هر \lr{\mbox{APN}} & \lr{\mbox{DL:100M}}، \lr{\mbox{UL:40M}} \\
+\textbf{اشتراک} & \lr{\mbox{QCI}} & شناسه کلاس \lr{\mbox{QoS}} & 9 (بهترین تلاش) \\
+\textbf{اشتراک} & \lr{\mbox{ARP}} & اولویت تخصیص/\allowbreak{}نگهداری & سطح 8، \lr{\mbox{PCI}}=بله، \lr{\mbox{PVI}}=خیر \\
+\textbf{مکان} & هویت \lr{\mbox{MME}} & نام میزبان/\allowbreak{}آدرس \lr{\mbox{MME}} خدمات‌دهنده & \lr{mme01.\allowbreak{}epc.\allowbreak{}mnc015.\allowbreak{}mcc234} \\
+\textbf{مکان} & \lr{Realm MME} & \lr{realm Diameter} مربوط به \lr{\mbox{MME}} & \lr{epc.\allowbreak{}mnc015.\allowbreak{}mcc234.3gppnetwork.\allowbreak{}org} \\
+\textbf{مکان} & پرچم پاک‌سازی & \lr{\mbox{UE}} جدا شده/\allowbreak{}غیرقابل دسترس & \lr{true/\allowbreak{}false} \\
+\textbf{محدودیت‌ها} & \lr{\mbox{ODB}} & ممنوعیت تعیین‌شده توسط اپراتور & ممنوعیت تماس‌های بین‌المللی خروجی \\
+\textbf{محدودیت‌ها} & رومینگ & \lr{\mbox{PLMN}}های مجاز/\allowbreak{}ممنوع & فقط خانگی /\allowbreak{} رومینگ اتحادیه اروپا \\
+\textbf{محدودیت‌ها} & محدودیت \lr{\mbox{RAT}} & فناوری‌های دسترسی مجاز & \lr{\mbox{E-UTRAN}}، \lr{\mbox{UTRAN}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{24\baselineskip}
+
+\CNsection{4}{تولید بردار احراز هویت}
+
+\CNchained\CNsubsection{}{\lr{\mbox{EPS-AKA}} (سیستم بسته تکامل‌یافته - احراز هویت و توافق کلید)}
+
+\lr{\mbox{HSS}} \textbf{بردارهای احراز هویت \lr{\mbox{(AV)}}} را تولید می‌کند که احراز هویت متقابل بین \lr{\mbox{UE}} و شبکه را بدون ارسال کلید دایمی \lr{\mbox{K}} ممکن می‌سازد.
+
+هر بردار احراز هویت شامل موارد زیر است:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4231}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3462}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مؤلفه} & \CNth{اندازه} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{RAND}}}}} & 128 بیت & چالش تصادفی (تولیدشده تازه توسط \lr{\mbox{HSS}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{AUTN}}}}} & 128 بیت & نشانه احراز هویت (هویت شبکه را به \lr{\mbox{UE}} اثبات می‌کند) \\
+\lr{\mbox{\textbf{\lr{\mbox{XRES}}}}} & \CNnum{32-128} بیت & پاسخ مورد انتظار (آنچه \lr{\mbox{UE}} باید پاسخ دهد) \\
+\lr{\mbox{\textbf{\lr{\mbox{\ensuremath{K_{\mathrm{ASME}}}}}}}} & 256 بیت & کلید پایه برای مشتق‌سازی تمام کلیدهای نشست \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{مجموعه الگوریتم \lr{\mbox{Milenage}}}
+
+مجموعه الگوریتم \lr{\mbox{\textbf{\lr{\mbox{Milenage}}}}} جعبه‌ابزار رمزنگاری استاندارد است \lr{(3GPP TS 35.205-208)}:
+
+\textbf{ورودی‌ها:} \lr{\mbox{K}} (۱۲۸ بیتی)، \lr{\mbox{RAND}} (۱۲۸ بیتی)، \lr{\mbox{SQN}} (۴۸ بیتی)، \lr{\mbox{AMF}} (۱۶ بیتی)، \lr{\mbox{OPc}} (۱۲۸ بیتی)
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{تابع \lr{\mbox{Milenage}}} & \CNth{خروجی} & \CNth{کاربرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{f1(K, RAND, SQN, AMF)} & \lr{\mbox{MAC-A}} & احراز هویت شبکه \\
+\lr{f1*(K, RAND, SQN, AMF)} & \lr{\mbox{MAC-S}} & همگام‌سازی مجدد \\
+\lr{f2(K, RAND)} & \lr{RES /\allowbreak{} XRES} & پاسخ \\
+\lr{f3(K, RAND)} & \lr{\mbox{CK}} & کلید رمز \\
+\lr{f4(K, RAND)} & \lr{\mbox{IK}} & کلید یکپارچگی \\
+\lr{f5(K, RAND)} & \lr{\mbox{AK}} & کلید گمنامی \\
+\lr{f5*(K, RAND)} & \lr{\mbox{AK}} & کلید گمنامی برای همگام‌سازی مجدد \\
+\end{longtable}
+}
+
+\textbf{فرآیند مشتق‌سازی بردار:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{HSS}} یک \lr{\mbox{\textbf{\lr{\mbox{RAND}}}}} تصادفی 128 بیتی تولید می‌کند
+\item
+  \lr{\mbox{HSS}} مقدار \lr{\mbox{\textbf{\lr{\mbox{SQN}}}}} (شماره ترتیب) را افزایش می‌دهد
+\item
+  محاسبه: \lr{\CNcode{MAC-A =}\allowbreak{}\CNcode{ f1(K, RAND, SQN, AMF)}}
+\item
+  محاسبه: \lr{\CNcode{XRES = f2(K, RAND)}}
+\item
+  محاسبه: \lr{\CNcode{CK = f3(K, RAND)}}
+\item
+  محاسبه: \lr{\CNcode{IK = f4(K, RAND)}}
+\item
+  محاسبه: \lr{\CNcode{AK = f5(K, RAND)}}
+\item
+  ساخت: \lr{\CNcode{AUTN =}\allowbreak{}\CNcode{ (SQN ⊕ AK) \textbar{}\textbar{} AMF \textbar{}\textbar{} MAC-A}}
+\item
+  مشتق‌سازی: \lr{\CNcode{KASME =}\allowbreak{}\CNcode{ KDF(CK, IK, SN-ID, SQN ⊕ AK)}}
+\end{enumerate}
+
+\CNsubsection{}{مدیریت \lr{\mbox{SQN}} (محافظت از بازپخش)}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{SQN}}}}} یک شمارنده 48 بیتی است که به‌طور مستقل توسط \lr{\mbox{HSS}} و \lr{\mbox{USIM}} نگهداری می‌شود
+\item
+  از بازپخش بردارهای احراز هویت قدیمی جلوگیری می‌کند
+\item
+  \lr{\mbox{UE}} تأیید می‌کند: \lr{\mbox{SQN}} دریافتی \lr{\textgreater{}} آخرین \lr{\mbox{SQN}} پذیرفته‌شده (در یک پنجره)
+\item
+  اگر \lr{\mbox{SQN}} خارج از محدوده باشد \ensuremath{\leftarrow} \lr{\mbox{UE}} یک \lr{\mbox{\textbf{\lr{\mbox{AUTS}}}}} (نشانه همگام‌سازی مجدد) می‌فرستد
+\item
+  \lr{\mbox{HSS}} از \lr{\mbox{f1*}} و \lr{\mbox{f5*}} برای همگام‌سازی مجدد \lr{\mbox{SQN}} خود با \lr{\mbox{USIM}} استفاده می‌کند
+\end{itemize}
+
+\CNsubsection{}{تحویل بردار به \lr{\mbox{MME}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{HSS}} معمولاً \textbf{چندین بردار} (دسته) در هر درخواست تولید می‌کند
+\item
+  \lr{\mbox{MME}} بردارهای استفاده‌نشده را برای احراز هویت‌های مجدد بعدی ذخیره می‌کند
+\item
+  بار سیگنالینگ را کاهش می‌دهد (\lr{\mbox{MME}} نیازی به تماس با \lr{\mbox{HSS}} در هر بار ندارد)
+\item
+  اندازه دسته معمول: \CNnum{3-5} بردار در هر درخواست \lr{\mbox{AIR}}
+\end{itemize}
+
+\Needspace{27\baselineskip}
+
+\CNsection{5}{تعامل \lr{\mbox{HSS}} با \lr{MME (S6a /\allowbreak{} Diameter)}}
+
+واسط \lr{\mbox{\textbf{\lr{\mbox{S6a}}}}} از \textbf{پروتکل \lr{\mbox{Diameter}}} \lr{(RFC 6733)} با کاربرد \lr{\mbox{Diameter}} گروه \lr{\mbox{3GPP}} برای \lr{\mbox{EPS}} استفاده می‌کند (شناسه کاربرد: 16777251).
+
+\CNsubsection{}{جریان‌های پیام}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2292}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3542}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2292}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1875}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{درخواست \ensuremath{\leftarrow} پاسخ} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+احراز هویت & \lr{AIR \ensuremath{\to} AIA} & \lr{MME \ensuremath{\to} HSS} & دریافت بردارهای احراز هویت \\
+به‌روزرسانی مکان & \lr{ULR \ensuremath{\to} ULA} & \lr{MME \ensuremath{\to} HSS} & ثبت \lr{\mbox{MME}}، دریافت اشتراک \\
+پاک‌سازی & \lr{PUR \ensuremath{\to} PUA} & \lr{MME \ensuremath{\to} HSS} & \lr{\mbox{UE}} به‌صراحت جدا شده است \\
+لغو مکان & \lr{CLR \ensuremath{\to} CLA} & \lr{HSS \ensuremath{\to} MME} & جداسازی اجباری (مثلاً \lr{\mbox{UE}} جابه‌جا شده) \\
+درج داده اشتراک & \lr{IDR \ensuremath{\to} IDA} & \lr{HSS \ensuremath{\to} MME} & ارسال تغییرات اشتراک \\
+حذف داده اشتراک & \lr{DSR \ensuremath{\to} DSA} & \lr{HSS \ensuremath{\to} MME} & حذف داده اشتراک \\
+اعلان & \lr{NOR \ensuremath{\to} NOA} & \lr{MME \ensuremath{\to} HSS} & اطلاع‌دادن اطلاعات پایانه \\
+\end{longtable}
+}
+
+\CNkeepfig{m11-attach-s6a}{3}
+
+\CNsubsection{}{رویه اتصال \lr{(AIR/\allowbreak{}AIA + ULR/\allowbreak{}ULA)}}
+
+\CNfigure{m11-attach-s6a}{تبادل \lr{\mbox{S6a}} بین \lr{\mbox{MME}} و \lr{\mbox{HSS}} در هنگام اتصال}
+
+\lr{\textbf{\lr{AIR (Authentication-Information-Request):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{IMSI}} مشترک
+\item
+  شناسه \lr{\mbox{PLMN}} بازدیدشده
+\item
+  تعداد بردارهای درخواستی
+\item
+  اطلاعات همگام‌سازی مجدد (\lr{\mbox{AUTS}}، در صورت عدم تطابق \lr{\mbox{SQN}})
+\end{itemize}
+
+\lr{\textbf{\lr{AIA (Authentication-Information-Answer):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  یک یا چند بردار احراز هویت \lr{\mbox{EPS}} (\lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{XRES}}، \lr{\mbox{\ensuremath{K_{\mathrm{ASME}}}}})
+\item
+  کد نتیجه (موفقیت/\allowbreak{}شکست)
+\end{itemize}
+
+\lr{\textbf{\lr{ULR (Update-Location-Request):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{IMSI}}
+\item
+  هویت \lr{\mbox{MME}} (نام میزبان + \lr{\mbox{realm}})
+\item
+  نوع \lr{\mbox{RAT}}
+\item
+  پرچم‌های \lr{\mbox{ULR}} (اتصال اولیه و غیره)
+\end{itemize}
+
+\lr{\textbf{\lr{ULA (Update-Location-Answer):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  داده اشتراک (تمام \lr{\mbox{APN}}ها، \lr{\mbox{AMBR}}، پروفایل‌های \lr{\mbox{QoS}})
+\item
+  کد نتیجه
+\item
+  جداسازی \lr{\mbox{APN}} پیش‌فرض از \lr{\mbox{APN}}های اضافی
+\end{itemize}
+
+\CNsubsection{}{جداسازی /\allowbreak{} پاک‌سازی (\lr{PUR/\allowbreak{}PUA} یا \lr{CLR/\allowbreak{}CLA})}
+
+\textbf{جداسازی صریح (با شروع \lr{\mbox{UE}}):}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{MME}} یک \lr{\mbox{\textbf{\lr{\mbox{PUR}}}}} می‌فرستد \ensuremath{\leftarrow} \lr{\mbox{HSS}} مشترک را «متصل‌نشده» علامت‌گذاری می‌کند
+\item
+  \lr{\mbox{HSS}} با \lr{\mbox{\textbf{\lr{\mbox{PUA}}}}} پاسخ می‌دهد
+\end{itemize}
+
+\textbf{لغو با شروع شبکه (\lr{\mbox{HSS}} ارسال می‌کند):}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{HSS}} یک \lr{\mbox{\textbf{\lr{\mbox{CLR}}}}} به \lr{\mbox{MME}} قدیمی می‌فرستد (مثلاً \lr{\mbox{UE}} در \lr{\mbox{MME}} جدید ثبت‌نام کرده است)
+\item
+  \lr{\mbox{MME}} قدیمی زمینه \lr{\mbox{UE}} را حذف می‌کند، با \lr{\mbox{\textbf{\lr{\mbox{CLA}}}}} پاسخ می‌دهد
+\item
+  دلایل \lr{\mbox{CLR}}: \lr{\mbox{UE}} جابه‌جا شده، اشتراک لغو شده، سیاست اپراتور
+\end{itemize}
+
+\CNsubsection{}{اصلاح اشتراک \lr{(IDR/\allowbreak{}IDA)}}
+
+وقتی اپراتور یک اشتراک را اصلاح می‌کند (مثلاً مشتری طرح خود را ارتقا می‌دهد):
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{HSS}} یک \lr{\textbf{\lr{\mbox{IDR}}} (Insert-Subscriber-Data-Request)} به \lr{\mbox{MME}} خدمات‌دهنده می‌فرستد
+\item
+  \lr{\mbox{MME}} نسخه محلی داده اشتراک را به‌روزرسانی می‌کند
+\item
+  \lr{\mbox{MME}} با \lr{\mbox{\textbf{\lr{\mbox{IDA}}}}} پاسخ می‌دهد
+\item
+  تغییرات بلافاصله اعمال می‌شوند (نیازی به اتصال مجدد نیست)
+\end{itemize}
+
+\CNkeepfig{m11-hss-interfaces}{5}
+
+\CNsection{6}{تعامل \lr{\mbox{HSS}} با سایر عناصر شبکه}
+
+\CNfigure{m11-hss-interfaces}{واسط‌های \lr{\mbox{Diameter}} در \lr{\mbox{HSS}}}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{جزییات واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2558}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3023}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2326}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2093}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{موجودیت همتا} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{S6a}}}}} & \lr{\mbox{MME}} & \lr{\mbox{Diameter}} & احراز هویت \lr{\mbox{EPS}}، مکان، اشتراک \\
+\lr{\mbox{\textbf{\lr{\mbox{S6d}}}}} & \lr{\mbox{SGSN}} & \lr{\mbox{Diameter}} & هم‌کنش‌گری \lr{2G/\allowbreak{}3G} (همان توابع \lr{\mbox{S6a}} برای \lr{GERAN/\allowbreak{}UTRAN}) \\
+\lr{\mbox{\textbf{\lr{\mbox{Cx}}}}} & \lr{I-CSCF /\allowbreak{} S-CSCF} & \lr{\mbox{Diameter}} & ثبت‌نام \lr{\mbox{IMS}}، مجوزدهی کاربر \\
+\lr{\mbox{\textbf{\lr{\mbox{Dx}}}}} & \lr{\mbox{I-CSCF}} & \lr{\mbox{Diameter}} & پرس‌وجوی مکان \lr{\mbox{IMS}} (یافتن \lr{\mbox{S-CSCF}} برای کاربر) \\
+\lr{\mbox{\textbf{\lr{\mbox{Sh}}}}} & سرور کاربردی & \lr{\mbox{Diameter}} & خواندن/\allowbreak{}نوشتن داده کاربر برای خدمات \\
+\lr{\mbox{\textbf{\lr{\mbox{S13}}}}} & \lr{\mbox{EIR}} & \lr{\mbox{Diameter}} & بررسی هویت تجهیزات (تأیید \lr{\mbox{IMEI}}) \\
+\end{longtable}
+}
+
+\CNsubsection{}{\lr{\mbox{S6d}} (\lr{\mbox{SGSN}} \lr{—} هم‌کنش‌گری \lr{2G/\allowbreak{}3G})}
+
+\begin{itemize}
+\tightlist
+\item
+  همان مجموعه پیام \lr{\mbox{S6a}} اما تطبیق‌یافته برای دسترسی \lr{GERAN/\allowbreak{}UTRAN}
+\item
+  زمانی استفاده می‌شود که \lr{\mbox{UE}} از طریق رادیو \lr{2G/\allowbreak{}3G} متصل است
+\item
+  تحویل بی‌وقفه بین \lr{\mbox{4G}} و \lr{2G/\allowbreak{}3G} را ممکن می‌سازد \lr{\mbox{(IRAT)}}
+\end{itemize}
+
+\CNsubsection{}{\lr{Cx/\allowbreak{}Dx (IMS — VoLTE)}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Cx}}}}}: ثبت‌نام/\allowbreak{}لغو ثبت‌نام کاربران \lr{\mbox{IMS}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{UAR/\allowbreak{}UAA}: مجوزدهی کاربر (در حین \lr{\mbox{REGISTER}})
+  \item
+    \lr{SAR/\allowbreak{}SAA}: تخصیص سرور (تخصیص \lr{\mbox{S-CSCF}})
+  \item
+    \lr{MAR/\allowbreak{}MAA}: احراز هویت چندرسانه‌ای (دریافت بردارهای احراز هویت \lr{\mbox{IMS}})
+  \item
+    \lr{LIR/\allowbreak{}LIA}: اطلاعات مکان (یافتن \lr{\mbox{S-CSCF}} تخصیص‌یافته)
+  \end{itemize}
+\item
+  برای برقراری تماس \lr{\mbox{VoLTE}} و ثبت‌نام \lr{\mbox{IMS}} استفاده می‌شود
+\end{itemize}
+
+\CNsubsection{}{\lr{\mbox{Sh}} (سرورهای کاربردی)}
+
+\begin{itemize}
+\tightlist
+\item
+  به \lr{\mbox{AS}} امکان می‌دهد داده‌های مختص کاربر را بخواند/\allowbreak{}به‌روزرسانی کند
+\item
+  برای خدمات تکمیلی، حضور، پیام‌رسانی استفاده می‌شود
+\item
+  از اشتراک‌ها برای اعلان‌ها در تغییرات داده پشتیبانی می‌کند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m11-eps-aka-1}{8}
+
+\CNsection{7}{سناریوی احراز هویت (گام-به-گام)}
+
+\CNchained\CNsubsection{}{جریان کامل احراز هویت \lr{\mbox{EPS-AKA}}}
+
+\CNfigure{m11-eps-aka-1}{جریان کامل احراز هویت \lr{\mbox{EPS-AKA}} به همراه محاسبات کلیدها\CNpart{1}{2}}
+
+\CNfigure{m11-eps-aka-2}{جریان کامل احراز هویت \lr{\mbox{EPS-AKA}} به همراه محاسبات کلیدها\CNpart{2}{2}}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{توضیح گام-به-گام}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2609}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3478}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3913}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{اقدام} & \CNth{جزییات} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{UE}} درخواست اتصال می‌فرستد & شامل \lr{\mbox{IMSI}} (بار اول) یا \lr{\mbox{GUTI}} قدیمی (بارهای بعدی) \\
+2 & \lr{\mbox{MME}} بردار درخواست می‌کند & \lr{\mbox{AIR}} با \lr{\mbox{IMSI}} مشترک به \lr{\mbox{HSS}} فرستاده می‌شود \\
+3 & \lr{\mbox{HSS}} بردار تولید می‌کند & از \lr{K + OPc + RAND + SQN} از طریق \lr{\mbox{Milenage}} استفاده می‌کند \\
+4 & \lr{\mbox{HSS}} بردارها را بازمی‌گرداند & \lr{\mbox{AIA}} شامل \lr{\mbox{RAND}}، \lr{\mbox{AUTN}}، \lr{\mbox{XRES}}، \lr{\mbox{\ensuremath{K_{\mathrm{ASME}}}}} (دسته \CNnum{3-5)} \\
+5 & \lr{\mbox{MME}} به \lr{\mbox{UE}} چالش می‌دهد & \lr{RAND + AUTN} را در \lr{NAS Authentication Request} به \lr{\mbox{UE}} می‌فرستد \\
+6 & \lr{\mbox{UE}} شبکه را تأیید می‌کند & \lr{\mbox{MAC}} در \lr{\mbox{AUTN}} را با \lr{\mbox{K}} خود بررسی می‌کند \ensuremath{\leftarrow} \textbf{احراز هویت متقابل} \\
+7 & \lr{\mbox{UE}} مقدار \lr{\mbox{RES}} را محاسبه می‌کند & پاسخ را به \lr{\mbox{MME}} بازمی‌گرداند \\
+8 & \lr{\mbox{MME UE}} را تأیید می‌کند & \lr{\mbox{RES}} را با \lr{\mbox{XRES}} از \lr{\mbox{HSS}} مقایسه می‌کند \\
+9 & به‌روزرسانی مکان & \lr{\mbox{MME}} خود را به‌عنوان \lr{\mbox{MME}} خدمات‌دهنده در \lr{\mbox{HSS}} ثبت می‌کند \\
+10 & برقراری نشست & کلیدها مشتق می‌شوند، حامل‌ها برقرار می‌شوند \\
+\end{longtable}
+}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{سناریوهای شکست احراز هویت}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3704}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2593}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3704}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{سناریو} & \CNth{علت} & \CNth{بازیابی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+شکست \lr{\mbox{MAC}} در \lr{\mbox{UE}} & شبکه \lr{\mbox{K}} صحیح را نمی‌داند & \lr{\mbox{UE}} یک \lr{Auth Failure} می‌فرستد (علت: شکست \lr{\mbox{MAC}}) \\
+\lr{\mbox{SQN}} خارج از محدوده & \lr{\mbox{SQN}} از همگام‌سازی خارج شده & \lr{\mbox{UE}} یک \lr{Auth Failure + AUTS} برای همگام‌سازی مجدد می‌فرستد \\
+عدم تطابق \lr{\mbox{XRES}} در \lr{\mbox{MME}} & \lr{\mbox{UE K}} صحیح را نمی‌داند & \lr{\mbox{MME}} اتصال را رد می‌کند، ممکن است \lr{Auth Reject} بفرستد \\
+اتمام زمان & شبکه/\allowbreak{}\lr{\mbox{UE}} غیرقابل دسترس & تلاش مجدد با عقب‌نشینی \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m11-hss-decomposition}{10}
+
+\CNsection{8}{تحول به \lr{\mbox{5G}}: تجزیه \lr{\mbox{HSS}}}
+
+\CNchained\CNsubsection{}{مقایسه معماری}
+
+در \lr{\mbox{5G}} (نسخه \lr{\mbox{15}}+ گروه \lr{\mbox{3GPP}})، \lr{\mbox{HSS}} یکپارچه به توابع شبکه تخصصی تجزیه می‌شود:
+
+\CNfigure{m11-hss-decomposition}{\lr{\mbox{HSS}} در \lr{\mbox{5G}} به \lr{\mbox{AUSF}}، \lr{\mbox{UDM}} و \lr{\mbox{UDR}} تفکیک می‌شود}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{مقایسه تفصیلی: \lr{\mbox{HSS (4G)}} در برابر \lr{UDM + AUSF + UDR (5G)}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1905}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2381}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5714}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{HSS (4G)}}} & \CNth{\lr{UDM + AUSF + UDR (5G)}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{معماری} & یکپارچه & تجزیه‌شده، میکروسرویس‌ها \\
+\textbf{پروتکل} & \lr{Diameter (S6a)} & \lr{HTTP/\allowbreak{}2 + JSON (SBI)} \\
+\textbf{عملکرد احراز هویت} & تعبیه‌شده در \lr{\mbox{HSS}} & \lr{\mbox{AUSF}} جداگانه (تابع سرور احراز هویت) \\
+\textbf{مدیریت داده} & تعبیه‌شده در \lr{\mbox{HSS}} & \lr{\mbox{UDM}} جداگانه (مدیریت داده یکپارچه) \\
+\textbf{ذخیره داده} & پایگاه داده داخلی & \lr{\mbox{UDR}} جداگانه (مخزن داده یکپارچه) \\
+\textbf{هویت} & \lr{\mbox{IMSI}} (به‌صورت شفاف ارسال می‌شود) & \lr{SUPI/\allowbreak{}SUCI} (\lr{SUCI = SUPI} رمزنگاری‌شده) \\
+\textbf{حریم خصوصی} & \lr{\mbox{IMSI}} روی هوا افشا می‌شود & \lr{\mbox{SUCI}} هویت را پنهان می‌کند (رمزنگاری \lr{\mbox{ECIES}}) \\
+\textbf{پروتکل احراز هویت} & فقط \lr{\mbox{EPS-AKA}} & \lr{\mbox{5G-AKA}} یا \lr{\mbox{EAP-AKA’}} (قابل توسعه) \\
+\textbf{سلسله‌مراتب کلید} & \lr{\ensuremath{K_{\mathrm{ASME}}} \ensuremath{\leftarrow} \ensuremath{K_{\mathrm{eNB}}} \ensuremath{\leftarrow} …} & \lr{\ensuremath{K_{\mathrm{AUSF}}} \ensuremath{\leftarrow} \ensuremath{K_{\mathrm{SEAF}}} \ensuremath{\leftarrow} \ensuremath{K_{\mathrm{AMF}}} \ensuremath{\leftarrow} \ensuremath{K_{\mathrm{gNB}}} \ensuremath{\leftarrow} …} \\
+\textbf{مقیاس‌پذیری} & مقیاس‌دهی کل \lr{\mbox{HSS}} & مقیاس‌دهی مستقل هر \lr{\mbox{NF}} \\
+\textbf{واسط‌ها} & \lr{\mbox{Diameter}} نقطه-به-نقطه & واسط خدمات‌محور (\lr{\mbox{API}}های \lr{\mbox{REST}}) \\
+\textbf{کشف} & پیکربندی ایستا /\allowbreak{} \lr{\mbox{DNS}} & \lr{\mbox{NRF}} (تابع مخزن شبکه) \\
+\textbf{افزونگی} & فعال/\allowbreak{}آماده & بومی-ابر، \lr{\mbox{NF}}های بدون حالت + \lr{\mbox{UDR}} مشترک \\
+\end{longtable}
+}
+
+\CNsubsection{}{هویت \lr{\mbox{5G}}: \lr{\mbox{SUPI}} و \lr{\mbox{SUCI}}}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+SUPI (Subscription Permanent Identifier)
+  = IMSI (same format as 4G: MCC+MNC+MSIN)
+  (never sent over the air in 5G!)
+
+SUCI (Subscription Concealed Identifier)
+  = Home Network ID + Routing Indicator + Protection Scheme + Encrypted MSIN
+  
+  Encryption: ECIES (Elliptic Curve Integrated Encryption Scheme)
+  - Home network publishes public key
+  - UE encrypts MSIN portion with home network public key
+  - Only home network (UDM) can decrypt → reveals SUPI
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNsubsection{}{روش‌های احراز هویت \lr{\mbox{5G}}}
+
+\lr{\mbox{\textbf{\lr{\mbox{5G-AKA:}}}}}
+
+\begin{itemize}
+\tightlist
+\item
+  نسخه بهبودیافته \lr{\mbox{EPS-AKA}}
+\item
+  تأیید شبکه خانگی را اضافه می‌کند \lr{(HRES\emph{\lr{/\allowbreak{}HXRES}})}
+\item
+  شبکه خدمات‌دهنده به شبکه خانگی اثبات می‌کند که احراز هویت کامل شده است
+\item
+  از حملات \lr{\mbox{MITM}} خاصی که در \lr{\mbox{4G}} ممکن بود جلوگیری می‌کند
+\end{itemize}
+
+\lr{\textbf{\lr{EAP-AKA’:}}}
+
+\begin{itemize}
+\tightlist
+\item
+  واریانت پروتکل احراز هویت قابل توسعه
+\item
+  احراز هویت را به نام شبکه خدمات‌دهنده متصل می‌کند
+\item
+  مناسب‌تر برای دسترسی غیر-\lr{\mbox{3GPP}} (\lr{\mbox{Wi-Fi}}، ثابت)
+\item
+  از \lr{AT\_\allowbreak{}KDF\_\allowbreak{}INPUT} برای اتصال شبکه استفاده می‌کند
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{توابع تجزیه‌شده \lr{\mbox{5G}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2759}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2069}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5172}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{NF}} در \lr{\mbox{5G}}} & \CNth{نقش} & \CNth{معادل در \lr{\mbox{4G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{AUSF}}}}} & رویه‌های احراز هویت را مدیریت می‌کند، کلیدها را تولید می‌کند & عملکرد احراز هویت \lr{\mbox{HSS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{UDM}}}}} & داده اشتراک را مدیریت می‌کند، بردارهای احراز هویت را تولید می‌کند، ثبت‌نام را انجام می‌دهد & مدیریت داده \lr{\mbox{HSS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{UDR}}}}} & تمام داده را ذخیره می‌کند (مشترک، سیاست، کاربرد) & پایگاه داده داخلی \lr{\mbox{HSS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{SIDF}}}}} & \lr{\mbox{SUCI}} را به \lr{\mbox{SUPI}} رمزگشایی می‌کند (بخشی از \lr{\mbox{UDM}}) & \lr{N/\allowbreak{}A} (معادلی در \lr{\mbox{4G}} ندارد) \\
+\end{longtable}
+}
+
+\CNsection{}{خلاصه}
+
+\lr{\mbox{HSS}} لنگر امنیت و هویت شبکه \lr{LTE/\allowbreak{}EPC} است. این سرور:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{از کلیدها محافظت می‌کند} \lr{—} \lr{\mbox{K}} هرگز از \lr{\mbox{HSS}} (و \lr{\mbox{USIM}}) خارج نمی‌شود
+\item
+  \textbf{هویت را اثبات می‌کند} \lr{—} احراز هویت متقابل از طریق \lr{\mbox{EPS-AKA}}
+\item
+  \textbf{دسترسی را کنترل می‌کند} \lr{—} پروفایل‌های اشتراک تعیین می‌کنند کاربران چه کاری می‌توانند انجام دهند
+\item
+  \textbf{مکان را ردیابی می‌کند} \lr{—} می‌داند کدام \lr{\mbox{MME}} به هر مشترک خدمات می‌دهد
+\item
+  \textbf{به‌صورت تدریجی تحول می‌یابد} \lr{—} در \lr{\mbox{5G}} به \lr{UDM/\allowbreak{}AUSF/\allowbreak{}UDR} برای استقرار بومی-ابر تجزیه می‌شود
+\end{enumerate}
+
+درک \lr{\mbox{HSS}} برای موارد زیر حیاتی است:
+
+\begin{itemize}
+\tightlist
+\item
+  تحلیل امنیت شبکه
+\item
+  اشکال‌زدایی شکست‌های احراز هویت
+\item
+  برنامه‌ریزی تأمین مشترکین
+\item
+  درک گذار از هسته \lr{\mbox{4G}} به \lr{\mbox{5G}}
+\end{itemize}
+
+\CNsection{}{مراجع}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{3GPP TS 29.272: S6a/\allowbreak{}S6d Diameter-based interface (MME/\allowbreak{}SGSN–HSS)}
+\item
+  \lr{3GPP TS 33.401: EPS security architecture}
+\item
+  \lr{3GPP TS 35.205-208: Milenage algorithm specification}
+\item
+  \lr{3GPP TS 23.501: 5G System Architecture}
+\item
+  \lr{3GPP TS 33.501: 5G Security Architecture and Procedures}
+\item
+  \lr{3GPP TS 29.509: AUSF Services (5G)}
+\item
+  \lr{3GPP TS 29.503: UDM Services (5G)}
+\end{itemize}

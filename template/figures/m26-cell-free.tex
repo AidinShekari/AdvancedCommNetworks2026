@@ -1,0 +1,10 @@
+% Module 26 — cell-free massive MIMO
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNcp, minimum width=5cm] (cpu) at (4.95,2.4) {CPU (Central Processing Unit)};
+\foreach \i in {0,...,9}{\node[CNran, minimum width=0.9cm, inner xsep=2pt] (ap\i) at ({\i*1.1},0) {AP}; \draw[CNlink] (cpu.south) -- (ap\i.north);}
+\node[CNtiny, anchor=west] at (10.6,0) {$\leftarrow$ \CNL{distributed access points}{نقاط دسترسی توزیع‌شده}};
+\foreach \i in {1,...,5}{\node[CNue, minimum width=0.9cm, inner xsep=2pt] (ue\i) at ({\i*1.65},-2.2) {UE\textsubscript{\i}};
+  \foreach \a in {0,...,9}{\draw[CNcyan, opacity=0.18, line width=0.5pt] (ue\i.north) -- (ap\a.south);}}
+\node[CNtiny, anchor=west] at (10.6,-2.2) {$\leftarrow$ \CNL{all UEs served by ALL APs}{همه \lr{UE}ها توسط همه \lr{AP}ها خدمت می‌گیرند}};
+\node[CNnote, anchor=north, text width=9cm] at (4.95,-2.9) {\CNLP{No cell boundaries! Each UE gets coherent service from nearby APs.}{بدون مرز سلول! هر \lr{UE} از \lr{AP}های نزدیک خدمت همدوس دریافت می‌کند.}};
+\end{tikzpicture}

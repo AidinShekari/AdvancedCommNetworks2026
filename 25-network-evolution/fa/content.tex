@@ -1,0 +1,560 @@
+\CNsection{1}{مقدمه}
+
+این ماژول یک \textbf{ترکیب جامع} از تحول شبکه موبایل از سیستم‌های آنالوگ \lr{\mbox{1G}} تا \lr{\mbox{5G}} و فراتر از آن فراهم می‌کند. این ماژول به‌عنوان یک مرجع اصلی عمل می‌کند که تمام ماژول‌های قبلی را به هم متصل می‌کند و نشان می‌دهد چگونه هر نسل مسایل مشخصی را حل کرد در حالی که چالش‌های جدیدی ایجاد کرد که انگیزه تحول بعدی شد.
+
+تحول یک مسیر روشن را دنبال می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{صدا \ensuremath{\leftarrow} داده \ensuremath{\leftarrow} همه چیز}
+\item
+  \textbf{مدار \ensuremath{\leftarrow} بسته \ensuremath{\leftarrow} تمام-\lr{\mbox{IP}} \ensuremath{\leftarrow} خدمات‌محور}
+\item
+  \textbf{سلسله‌مراتبی \ensuremath{\leftarrow} مسطح \ensuremath{\leftarrow} بومی-ابر}
+\item
+  \textbf{یک‌اندازه-برای-همه \ensuremath{\leftarrow} شبکه‌بندی \ensuremath{\leftarrow} بومی-\lr{\mbox{AI}}}
+\end{itemize}
+
+\Needspace{28\baselineskip}
+
+\CNsection{2}{جدول مقایسه اصلی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{\lr{\mbox{GSM (2G)}}} & \CNth{\lr{GPRS (2.5G)}} & \CNth{\lr{EDGE (2.75G)}} & \CNth{\lr{UMTS (3G)}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{نسخه \lr{\mbox{3GPP}}} & \lr{Rel-96/\allowbreak{}97} & \lr{Rel-97/\allowbreak{}98} & \lr{\mbox{Rel-99}} & \lr{Rel-99/\allowbreak{}4} \\
+\textbf{سال} & 1991 & 2000 & 2003 & 2001 \\
+\textbf{دسترسی رادیویی} & \lr{TDMA/\allowbreak{}FDMA} & \lr{TDMA/\allowbreak{}FDMA} & \lr{TDMA/\allowbreak{}FDMA (8PSK)} & \lr{\mbox{WCDMA}} \\
+\textbf{شبکه هسته} & \lr{NSS (MSC/\allowbreak{}HLR/\allowbreak{}VLR)} & \lr{NSS + SGSN/\allowbreak{}GGSN} & \lr{NSS + SGSN/\allowbreak{}GGSN} & هسته \lr{\mbox{CS + PS}} \\
+\textbf{نوع سوییچینگ} & مدار-گزارشی & \lr{\mbox{CS}} + بسته-گزارشی & \lr{\mbox{CS + PS}} & \lr{\mbox{CS + PS}} \\
+\textbf{حداکثر نرخ \lr{\mbox{DL}}} & \lr{\mbox{9.6~kbps}} & \lr{171.2~kbps} & \lr{473.6~kbps} & \lr{\mbox{2~Mbps}} \\
+\textbf{تأخیر معمول} & \lr{\mbox{500~ms}} & \lr{300-600~ms} & \lr{200-400~ms} & \lr{100-200~ms} \\
+\textbf{سازوکار تحرک} & تحویل (سخت) & انتخاب مجدد سلول + تحویل & انتخاب مجدد سلول + تحویل & تحویل نرم \\
+\textbf{پروتکل سیگنالینگ} & \lr{MAP/\allowbreak{}BSSAP} & \lr{MAP/\allowbreak{}BSSGP} & \lr{MAP/\allowbreak{}BSSGP} & \lr{RANAP/\allowbreak{}MAP} \\
+\textbf{پروتکل صفحه کاربر} & \lr{PCM (64~kbps)} & \lr{LLC/\allowbreak{}SNDCP/\allowbreak{}GTP-U} & \lr{LLC/\allowbreak{}SNDCP/\allowbreak{}GTP-U} & \lr{GTP-U/\allowbreak{}PDCP} \\
+\textbf{پروتکل صفحه کنترل} & \lr{SS7/\allowbreak{}ISUP/\allowbreak{}MAP} & \lr{SS7 + GTP-C} & \lr{SS7 + GTP-C} & \lr{SS7 + GTP-C} \\
+\textbf{نوآوری اصلی} & صدای دیجیتال، رومینگ & داده بسته همیشه-فعال & مدولاسیون بالاتر \lr{\mbox{(8PSK)}} & داده پهن‌باند \lr{\mbox{(5~MHz)}} \\
+\textbf{محدودیت اصلی} & بدون داده، ظرفیت کم & داده کند، \lr{\mbox{TDMA}} مشترک & همچنان محدود به \lr{\mbox{TDMA}} & تأخیر بالا، \lr{\mbox{RNC}} پیچیده \\
+\textbf{مشترکین (تقریبی)} & \lr{1B (2003)} & \lr{1.5B (2005)} & \lr{2B (2006)} & \lr{2B (2007)} \\
+\end{longtable}
+}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{\lr{HSPA (3.5G)}} & \CNth{\lr{\mbox{LTE (4G)}}} & \CNth{\lr{LTE-Advanced (4G+)}} & \CNth{\lr{\mbox{5G NSA}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{نسخه \lr{\mbox{3GPP}}} & \lr{Rel-5/\allowbreak{}6/\allowbreak{}7} & \lr{Rel-8/\allowbreak{}9} & \lr{Rel-10/\allowbreak{}11/\allowbreak{}12} & \lr{\mbox{Rel-15}} \\
+\textbf{سال} & \CNnum{2005-2008} & 2009 & \CNnum{2011-2014} & 2018 \\
+\textbf{دسترسی رادیویی} & \lr{WCDMA + AMC} & \lr{OFDMA/\allowbreak{}SC-FDMA} & \lr{OFDMA + CA + MIMO} & \lr{\mbox{NR + LTE}} \\
+\textbf{شبکه هسته} & هسته \lr{\mbox{CS + PS}} & \lr{EPC (MME/\allowbreak{}SGW/\allowbreak{}PGW)} & \lr{\mbox{EPC}} بهبودیافته & \lr{EPC + NGC} جزیی \\
+\textbf{نوع سوییچینگ} & \lr{CS + PS (HSPA=PS)} & تمام-\lr{\mbox{IP}} (بسته) & تمام-\lr{\mbox{IP}} & تمام-\lr{\mbox{IP}} \\
+\textbf{حداکثر نرخ \lr{\mbox{DL}}} & \lr{42~Mbps (HSPA+)} & \lr{\mbox{300~Mbps}} & \lr{\mbox{3~Gbps}} & \lr{\mbox{2-4~Gbps}} \\
+\textbf{تأخیر معمول} & \lr{50-100~ms} & \lr{\mbox{10-30~ms}} & \lr{\mbox{10-20~ms}} & \lr{\mbox{4-10~ms}} \\
+\textbf{سازوکار تحرک} & تحویل نرم/\allowbreak{}سخت & تحویل \lr{\mbox{X2}} (سخت) & تحویل \lr{X2/\allowbreak{}S1 + CoMP} & اتصال دوگانه \\
+\textbf{پروتکل سیگنالینگ} & \lr{RANAP/\allowbreak{}MAP} & \lr{S1AP/\allowbreak{}GTP-C} & \lr{S1AP/\allowbreak{}GTP-C v2} & \lr{X2AP + S1AP + NG-AP} \\
+\textbf{پروتکل صفحه کاربر} & \lr{GTP-U/\allowbreak{}PDCP/\allowbreak{}MAC} & \lr{GTP-U/\allowbreak{}PDCP/\allowbreak{}RLC} & \lr{GTP-U/\allowbreak{}PDCP/\allowbreak{}RLC} & \lr{\mbox{GTP-U}} (لوله دوگانه) \\
+\textbf{پروتکل صفحه کنترل} & \lr{SS7 + GTP-C} & \lr{Diameter/\allowbreak{}GTP-C} & \lr{Diameter/\allowbreak{}GTP-C} & \lr{GTP-C + NGAP} \\
+\textbf{نوآوری اصلی} & زمان‌بندی سریع، \lr{\mbox{AMC}} & تمام-\lr{\mbox{IP}}، معماری مسطح، \lr{\mbox{OFDM}} & تجمیع حامل، \lr{\mbox{MIMO 8\ensuremath{\times}8}} & رادیو \lr{\mbox{NR}} با لنگر \lr{\mbox{LTE}} \\
+\textbf{محدودیت اصلی} & همچنان صدای \lr{\mbox{CS}}، پیچیده & بدون \lr{\mbox{IoT}} بومی، \lr{\mbox{MIMO}} محدود & قطعه‌بندی طیف & وابسته به هسته \lr{\mbox{4G}} \\
+\textbf{مشترکین (تقریبی)} & \lr{3B (2012)} & \lr{4B (2018)} & \lr{5B (2020)} & \lr{1B (2022)} \\
+\end{longtable}
+}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{\lr{\mbox{5G SA}}} & \CNth{هسته \lr{\mbox{5G (SBA)}}} & \CNth{\lr{\mbox{6G}} (آینده)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{نسخه \lr{\mbox{3GPP}}} & \lr{Rel-15/\allowbreak{}16} & \lr{Rel-15/\allowbreak{}16/\allowbreak{}17} & \lr{\mbox{Rel-20+}} \\
+\textbf{سال} & 2020 & \CNnum{2020-2022} & حدود 2030 \\
+\textbf{دسترسی رادیویی} & \lr{\mbox{NR}} (مستقل) & \lr{\mbox{NR}} & \lr{\mbox{Sub-THz}}، \lr{\mbox{RIS}}، \lr{\mbox{AI}} \\
+\textbf{شبکه هسته} & \lr{5GC (AMF/\allowbreak{}SMF/\allowbreak{}UPF)} & \lr{\mbox{5GC SBA}} (\lr{\mbox{NF}}ها) & هسته \lr{\mbox{6G}} (بومی-\lr{\mbox{AI}}) \\
+\textbf{نوع سوییچینگ} & تمام-\lr{\mbox{IP}} & تمام-\lr{\mbox{IP + SBA}} & تمام-\lr{\mbox{IP}} + رایانش \\
+\textbf{حداکثر نرخ \lr{\mbox{DL}}} & \lr{\mbox{20~Gbps}} & \lr{\mbox{20~Gbps}} & \lr{\mbox{1~Tbps}} \\
+\textbf{تأخیر معمول} & \lr{\mbox{1-4~ms}} & \lr{\mbox{1-4~ms}} & کمتر از \lr{\mbox{0.1~ms}} \\
+\textbf{سازوکار تحرک} & تحویل \lr{\mbox{Xn}} & تحویل \lr{\mbox{Xn}} + تحرک \lr{\mbox{SBI}} & تحویل پیش‌بینانه \lr{\mbox{AI}} \\
+\textbf{پروتکل سیگنالینگ} & \lr{\mbox{NGAP}} & \lr{HTTP/\allowbreak{}2 + SBI} & سیگنالینگ بومی-\lr{\mbox{AI}} \\
+\textbf{پروتکل صفحه کاربر} & \lr{GTP-U/\allowbreak{}SDAP} & \lr{GTP-U/\allowbreak{}SDAP} & ارتباطات معنایی \\
+\textbf{پروتکل صفحه کنترل} & \lr{NGAP/\allowbreak{}NAS 5G} & \lr{SBI (HTTP/\allowbreak{}2)} & مبتنی بر قصد \\
+\textbf{نوآوری اصلی} & \lr{\mbox{5G}} مستقل، شبکه‌بندی & معماری خدمات‌محور & بومی-\lr{\mbox{AI}}، سنجش \\
+\textbf{محدودیت اصلی} & شکاف‌های پوشش \lr{\mbox{(mmWave)}} & پیچیدگی، انرژی & استانداردهای تعریف‌نشده \\
+\textbf{مشترکین (تقریبی)} & \lr{500M (2023)} & بیش از \lr{1B (2024)} & \lr{\mbox{TBD}} (حدود \lr{\mbox{2030}}+) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{تحلیل نسل-به-نسل}
+
+\CNchained\CNsubsection{3.1}{\lr{\mbox{GSM (2G)}} \lr{—} انقلاب صدای دیجیتال (1991)}
+
+\textbf{مسیله حل‌شده:} \lr{\mbox{GSM}} سیستم‌های آنالوگ \lr{\mbox{1G}} (\lr{\mbox{AMPS}}، \lr{\mbox{TACS}}) را با انتقال دیجیتال جایگزین کرد و رمزنگاری، رومینگ بین‌المللی از طریق کارت‌های \lr{\mbox{SIM}} و استفاده کارآمد از طیف از طریق \lr{\mbox{TDMA}} را فراهم کرد. برای اولین بار، یک مشترک می‌توانست در سراسر اروپا سفر کند و با همان تلفن و شماره تماس بگیرد. پروتکل \lr{\mbox{GSM MAP}} مدیریت تحرک جهانی را ممکن ساخت و معماری سلسله‌مراتبی \lr{NSS (MSC/\allowbreak{}VLR/\allowbreak{}HLR/\allowbreak{}AuC)} به الگویی برای شبکه‌های موبایل تبدیل شد.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} \lr{\mbox{GSM}} اساساً مدار-گزارشی بود \lr{—} یک شکاف زمانی اختصاصی برای کل مدت تماس بدون توجه به جریان واقعی داده تخصیص می‌یافت. خدمات داده \lr{\mbox{(CSD)}} به \lr{\mbox{9.6~kbps}} محدود بود و دسترسی به اینترنت را غیرعملی می‌کرد. با انفجار اینترنت در اواخر دهه 1990، اپراتورها به داده بسته-گزارشی بدون جایگزینی کل زیرساخت \lr{\mbox{GSM}} خود نیاز داشتند.
+
+\CNsubsection{3.2}{\lr{GPRS (2.5G)} \lr{—} لایه داده بسته (2000)}
+
+\textbf{مسیله حل‌شده:} \lr{\mbox{GPRS}} بسته-گزارشی را به‌عنوان یک \textbf{لایه رویی} بر رادیو و شبکه هسته موجود \lr{\mbox{GSM}} معرفی کرد. با افزودن گره‌های \lr{\mbox{SGSN}} و \lr{\mbox{GGSN}}، اپراتورها می‌توانستند اتصال اینترنت «همیشه-فعال» ارایه دهند که در آن کاربران منابع رادیویی را به اشتراک می‌گذاشتند و بر اساس حجم داده به‌جای زمان اتصال صورت‌حساب می‌شدند. \lr{\mbox{GPRS}} مفهوم زمینه \lr{\mbox{PDP}}، آدرس‌دهی \lr{\mbox{IP}} برای دستگاه‌های موبایل و تونل‌سازی \lr{\mbox{GTP}} را معرفی کرد \lr{—} مفاهیمی که تا \lr{\mbox{5G}} باقی مانده‌اند.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} \lr{\mbox{GPRS}} از واسط رادیویی \lr{\mbox{TDMA}} در \lr{\mbox{GSM}} استفاده مجدد کرد و شکاف‌های زمانی را به اشتراک می‌گذاشت که همچنان عمدتاً برای صدا تخصیص می‌یافتند. اوج نظری \lr{171.2~kbps} به‌ندرت به دست می‌آمد (معمول: \lr{30-50~kbps}). تأخیر به دلیل ساختار فریم \lr{\mbox{TDMA}} بالا می‌ماند \lr{(300-600~ms)}. واسط رادیویی گلوگاه بود \lr{—} بدون تغییر فناوری واسط رادیویی نمی‌شد آن را رفع کرد.
+
+\CNsubsection{3.3}{\lr{EDGE (2.75G)} \lr{—} داده بهبودیافته روی \lr{GSM (2003)}}
+
+\textbf{مسیله حل‌شده:} \lr{\mbox{EDGE}} مدولاسیون \lr{\mbox{8PSK}} را معرفی کرد (در برابر \lr{\mbox{GMSK}} در \lr{GSM/\allowbreak{}GPRS}) و بیت در هر نماد را از 1 به 3 سه برابر کرد. با مدولاسیون و کدگذاری تطبیقی (9 طرح \lr{\mbox{MCS}})، \lr{\mbox{EDGE}} می‌توانست تا اوج نظری \lr{473.6~kbps} ارایه دهد. این یک ارتقای صرفاً نرم‌افزاری/\allowbreak{}فرستنده-گیرنده بود که نیازی به زیرساخت جدید نداشت و به اپراتورها افزایش ظرفیت مقرون‌به‌صرفه می‌داد در حالی که استقرارهای \lr{\mbox{3G}} خود را برنامه‌ریزی می‌کردند.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} \lr{\mbox{EDGE}} همچنان به پهنای باند حامل \lr{\mbox{200~kHz}} در \lr{\mbox{GSM}} و ساختار \lr{\mbox{TDMA}} محدود بود. سرعت‌های دنیای واقعی \lr{100-200~kbps} نمی‌توانست از پخش جریانی ویدیو یا کاربردهای وب غنی پشتیبانی کند. محدودیت بنیادی واسط رادیویی باریک-باند بود \lr{—} دستیابی به پهن‌باند موبایل واقعی نیازمند فناوری رادیویی پهن‌باند کاملاً جدید بود.
+
+\CNsubsection{3.4}{\lr{UMTS (3G)} \lr{—} پهن‌باند موبایل (2001)}
+
+\textbf{مسیله حل‌شده:} \lr{\mbox{UMTS}} فناوری \lr{\mbox{WCDMA}} را با حامل‌های \lr{\mbox{5~MHz}} معرفی کرد و نرخ داده اوج تا \lr{\mbox{2~Mbps}} فراهم کرد. رویکرد طیف-گسترده کارایی طیفی بهتر، تحویل نرم برای عملکرد بهبودیافته لبه سلول و پشتیبانی بومی از صدا و داده همزمان ارایه می‌کرد. معماری \lr{UTRAN (Node B + RNC)} مدیریت منابع رادیویی متمرکز فراهم می‌کرد و هسته ترکیبی \lr{\mbox{CS+PS}} هم از صدای مدار-گزارشی و هم داده بسته پشتیبانی می‌کرد.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} \lr{\mbox{RNC}} یک گلوگاه و نقطه شکست واحد بود. تأخیر به دلیل پشته پروتکل پیچیده بالا می‌ماند (رفت-و-برگشت \lr{100-200~ms}). رویکرد کانال اختصاصی برای ترافیک داده انفجاری ناکارآمد بود. صدا همچنان از سوییچینگ مدار استفاده می‌کرد و پیچیدگی دو-دامنه‌ای را حفظ می‌نمود. ضریب گسترش ثابت، تطبیق با شرایط متغیر کانال را محدود می‌کرد.
+
+\CNsubsection{3.5}{\lr{HSPA (3.5G)} \lr{—} دسترسی بسته پرسرعت \CNnum{(2005-2008)}}
+
+\textbf{مسیله حل‌شده:} \lr{HSPA (HSDPA + HSUPA)} کانال‌های مشترک، زمان‌بندی سریع در \lr{Node B (TTI 2ms)}، مدولاسیون و کدگذاری تطبیقی \lr{\mbox{(AMC)}} و \lr{\mbox{HARQ}} را معرفی کرد \lr{—} هوش را از \lr{\mbox{RNC}} به ایستگاه پایه منتقل کرد. \lr{\mbox{HSDPA}} تا \lr{14.4~Mbps (Rel-5)} ارایه داد و بعدها \lr{\mbox{HSPA}}+ با \lr{\mbox{64-QAM}} و \lr{\mbox{MIMO}} به \lr{\mbox{42~Mbps}} رسید. این پخش جریانی ویدیوی موبایل و فروشگاه‌های اپلیکیشن را عملی ساخت و عصر گوشی هوشمند را آغاز کرد.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} \lr{\mbox{HSPA}} همچنان بر حامل \lr{\mbox{5~MHz}} در \lr{\mbox{WCDMA}} ساخته شده بود و نرخ اوج را محدود می‌کرد. صدا مدار-گزارشی باقی ماند (به‌جز آزمایش‌های \lr{\mbox{VoIP}}). \lr{\mbox{RNC}} همچنان وجود داشت و تأخیر و هزینه اضافه می‌کرد. معماری نمی‌توانست به‌طور کارآمد مقیاس یابد \lr{—} هر \lr{\mbox{RNC}} صدها \lr{\mbox{Node B}} را مدیریت می‌کرد و چالش‌های برنامه‌ریزی ظرفیت ایجاد می‌نمود. اپراتورها به یک طراحی از پایه نیاز داشتند.
+
+\CNsubsection{3.6}{\lr{\mbox{LTE (4G)}} \lr{—} معماری مسطح تمام-\lr{IP (2009)}}
+
+\textbf{مسیله حل‌شده:} \lr{\mbox{LTE}} یک شکست انقلابی ایجاد کرد: تمام-\lr{\mbox{IP}} از روز اول (بدون سوییچینگ مدار)، \lr{\mbox{OFDMA}} برای پیوند پایین‌سو (حذف مسایل تداخل بین-سلولی)، معماری مسطح (حذف \lr{\mbox{RNC}}، \lr{\mbox{eNodeB}} مستقیماً به \lr{\mbox{EPC}} متصل می‌شود) و هسته بسته تکامل‌یافته (جداسازی \lr{MME/\allowbreak{}S-GW/\allowbreak{}P-GW}). با پهنای باند \lr{\mbox{20~MHz}} و \lr{\mbox{MIMO 2\ensuremath{\times}2}}، \lr{\mbox{LTE}} اوج \lr{150-300~Mbps} ارایه داد. \lr{\mbox{VoLTE}} جایگزین صدای مدار-گزارشی شد. واسط \lr{\mbox{X2}} تحویل‌های مستقیم بین-\lr{\mbox{eNodeB}} بدون دخالت هسته را ممکن ساخت.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} \lr{\mbox{LTE}} فاقد پشتیبانی بومی برای \lr{\mbox{IoT}} انبوه بود (\lr{\mbox{NB-IoT}} بعدها در \lr{\mbox{Rel-13}} آمد)، نمی‌توانست تأخیر زیر-میلی‌ثانیه برای کاربردهای صنعتی دست یابد، \lr{\mbox{MIMO}} محدود داشت (حداکثر 8 لایه) و واسط‌های نقطه-به-نقطه مبتنی بر \lr{\mbox{GTP}} در \lr{\mbox{EPC}} نمی‌توانستند برای عصر بومی-ابر مقیاس یابند. شبکه‌بندی با گره‌های یکپارچه \lr{\mbox{EPC}} ممکن نبود.
+
+\CNsubsection{3.7}{\lr{LTE-Advanced (4G+)} \lr{—} عصر تجمیع حامل \CNnum{(2011-2014)}}
+
+\textbf{مسیله حل‌شده:} \lr{LTE-Advanced} تجمیع حامل (ترکیب تا \lr{5\ensuremath{\times}20~MHz = 100 MHz})، \lr{\mbox{MIMO 8\ensuremath{\times}8}} (8 لایه \lr{\mbox{DL}})، هماهنگی بهبودیافته تداخل بین-سلولی \lr{(eICIC/\allowbreak{}FeICIC)}، گره‌های رله و چند-نقطه هماهنگ \lr{\mbox{(CoMP)}} را معرفی کرد. نرخ‌های اوج به \lr{3~Gbps (Rel-12)} رسید. شبکه‌های ناهمگون \lr{\mbox{(HetNet)}} با سلول‌های کوچک ظرفیت در نواحی متراکم را برطرف کردند. \lr{\mbox{LAA}} (دسترسی کمکی مجاز) طیف غیرمجاز را اضافه کرد.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} \lr{\mbox{LTE-A}} یک تحول بود، نه انقلاب \lr{—} نمی‌توانست ساختار فریم را برای تأخیر فوق‌العاده کم به‌طور بنیادی تغییر دهد، نمی‌توانست از طیف \lr{\mbox{mmWave}} استفاده کند و \lr{\mbox{EPC}} یکپارچه باقی ماند. پشتیبانی از صنایع متنوع (خودروسازی، صنعت، بهداشت) با یک پیکربندی شبکه غیرممکن بود. صنعت به یک رادیو جدید \textbf{و} یک هسته جدید نیاز داشت.
+
+\CNsubsection{3.8}{\lr{\mbox{5G NSA}} \lr{—} غیرمستقل (2018)}
+
+\textbf{مسیله حل‌شده:} \lr{\mbox{5G NSA}} (گزینه \lr{3/\allowbreak{}3a/\allowbreak{}3x}) فناوری \lr{\mbox{NR}} (رادیو جدید) را با استفاده از هسته \lr{\mbox{LTE}} موجود \lr{\mbox{(EPC)}} به‌عنوان لنگر مستقر کرد. این به اپراتورها اجازه داد خدمات \lr{\mbox{5G}} را سریع بدون ساخت یک شبکه هسته کاملاً جدید راه‌اندازی کنند. اتصال دوگانه \lr{\mbox{(EN-DC)}} حامل‌های \lr{\mbox{LTE}} و \lr{\mbox{NR}} را ترکیب کرد و توان عملیاتی چند-\lr{\mbox{Gbps}} با استفاده از \lr{\mbox{mmWave}} و طیف \lr{\mbox{NR}} زیر-\lr{\mbox{6~GHz}} ارایه داد در حالی که \lr{\mbox{LTE}} را برای صفحه کنترل و صدا \lr{\mbox{(VoLTE)}} حفظ می‌کرد.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} \lr{\mbox{5G NSA}} نمی‌توانست وعده کامل \lr{\mbox{5G}} را محقق کند: بدون شبکه‌بندی (\lr{\mbox{EPC}} از آن پشتیبانی نمی‌کند)، بدون کم-تأخیر فوق‌قابل اعتماد (\lr{\mbox{URLLC}} نیازمند \lr{\mbox{5GC}} است)، بدون معماری خدمات‌محور و لنگر \lr{\mbox{LTE}} تأخیر اضافه می‌کرد. این «رادیو \lr{\mbox{5G}} با مغز \lr{\mbox{4G}}» بود \lr{—} یک سنگ پله ضروری، نه مقصد.
+
+\CNsubsection{3.9}{\lr{\mbox{5G SA}} \lr{—} مستقل (2020)}
+
+\textbf{مسیله حل‌شده:} \lr{\mbox{5G SA}} فناوری \lr{\mbox{NR}} را با هسته \lr{\mbox{5G (5GC)}} مستقر کرد و وابستگی به \lr{\mbox{LTE}} را حذف نمود. این شبکه‌بندی (شبکه‌های مجازی جدا برای هر مورد استفاده)، \lr{\mbox{URLLC}} با تأخیر \lr{\mbox{1ms}}، پشتیبانی بومی از \lr{\mbox{IoT}} انبوه \lr{\mbox{(mMTC)}}، یکپارچگی رایانش لبه \lr{\mbox{(MEC)}} و معماری خدمات‌محور را ممکن ساخت. جداسازی \lr{AMF/\allowbreak{}SMF/\allowbreak{}UPF} مقیاس‌پذیری مستقل را ممکن ساخت و \lr{\mbox{SBI}} (\lr{HTTP/\allowbreak{}2}، \lr{\mbox{JSON}}) استقرارهای بومی-ابر را ممکن کرد.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} پوشش \lr{\mbox{mmWave}} محدود باقی می‌ماند (برد کوتاه، حساس به انسداد)، مصرف انرژی به‌طور قابل توجهی بالاتر از \lr{\mbox{4G}} است، پیچیدگی مدیریت برش‌های شبکه در بین اپراتورها حل‌نشده است و تأخیر قطعی واقعی برای خودکارسازی صنعتی نیازمند بهبودهای بیشتر است. مهاجرت از \lr{\mbox{NSA}} به \lr{\mbox{SA}} نیازمند سرمایه‌گذاری قابل توجه با \lr{\mbox{ROI}} کوتاه‌مدت نامطمین است.
+
+\CNsubsection{3.10}{هسته \lr{\mbox{5G}} \lr{—} معماری خدمات‌محور \CNnum{(2020-2022)}}
+
+\textbf{مسیله حل‌شده:} هسته \lr{\mbox{5G}} واسط‌های نقطه-به-نقطه را با یک معماری خدمات‌محور جایگزین کرد که در آن توابع شبکه \lr{\mbox{(NF)}} خدمات را از طریق \lr{\mbox{API}}های \lr{RESTful (HTTP/\allowbreak{}2)} ارایه می‌دهند. \lr{\mbox{NRF}} کشف خدمات را ممکن می‌سازد، \lr{\mbox{NSSF}} انتخاب برش را مدیریت می‌کند، \lr{\mbox{PCF}} سیاست را فراهم می‌کند و \lr{\mbox{UDM}} داده مشترک را یکپارچه می‌سازد. اصول بومی-ابر (میکروسرویس‌ها، طراحی بدون حالت، کانتینری‌سازی) مقیاس‌دهی کشسان، هم‌کنش‌گری چند-سازنده و استقرار سریع ویژگی‌ها را ممکن می‌سازند.
+
+\textbf{آنچه نمی‌توانست انجام دهد:} پیچیدگی \lr{\mbox{SBA}} اپراتورهای کوچک‌تر را به چالش می‌کشد. رومینگ بین-\lr{\mbox{PLMN}} با \lr{SBA (SEPP)} همچنان در حال بلوغ است. کارایی انرژی زیرساخت ابر توزیع‌شده یک نگرانی است. خودکارسازی سرتاسری واقعی (تأمین بدون-لمس) نیازمند یکپارچگی \lr{AI/\allowbreak{}ML} است که همچنان در حال تحول است. معماری برای تحول \lr{\mbox{6G}} آماده است اما نیازمند قابلیت‌های بومی-\lr{\mbox{AI}} است که از پایه ساخته شوند.
+
+\CNsubsection{3.11}{\lr{\mbox{6G}} (آینده) \lr{—} شبکه‌های بومی-\lr{\mbox{AI}} (حدود 2030)}
+
+\textbf{مسیله حل‌شده (مورد انتظار):} \lr{\mbox{6G}} هدف ارایه نرخ اوج \lr{\mbox{1~Tbps}} با استفاده از فرکانس‌های \lr{Sub-THz (100 GHz–3 THz)}، تأخیر زیر-\lr{\mbox{0.1 ms}}، سنجش و ارتباط یکپارچه \lr{\mbox{(ISAC)}}، واسط رادیویی و مدیریت شبکه بومی-\lr{\mbox{AI}}، سطوح هوشمند قابل بازپیکربندی \lr{\mbox{(RIS)}} برای انتشار قابل برنامه‌ریزی، یکپارچگی شبکه‌های غیرزمینی \lr{\mbox{(NTN)}} برای پوشش جهانی و ارتباطات معنایی/\allowbreak{}هدف-محور که معنا را به‌جای بیت منتقل می‌کنند.
+
+\textbf{آنچه نمی‌توانست انجام دهد (چالش‌های پیش‌بینی‌شده):} انتشار \lr{\mbox{Sub-THz}} به‌شدت محدود است (متر تا ده‌ها متر) و نیازمند استقرارهای فوق-متراکم است. کارایی انرژی در این فرکانس‌ها ضعیف است. استانداردسازی پروتکل‌های بومی-\lr{\mbox{AI}} بی‌سابقه است. نگرانی‌های حریم خصوصی با سنجش فراگیر. چارچوب‌های مقرراتی برای تخصیص طیف \lr{\mbox{Sub-THz}} تعریف‌نشده‌اند. قابلیت تجاری برای بسیاری از ویژگی‌های پیشنهادی اثبات‌نشده باقی می‌ماند.
+
+\CNkeepfig{m25-generations-gantt}{5}
+
+\CNsection{4}{نمودار خط زمانی}
+
+\CNfigure{m25-generations-gantt}{نسل‌های شبکه موبایل بر روی محور زمان}
+
+\CNkeepfig{m25-architecture-evolution}{5}
+
+\CNsection{5}{نمودار تحول معماری}
+
+\CNfigure{m25-architecture-evolution}{تحول معماری از \lr{\mbox{GSM}} تا هسته خدمات‌محور \lr{\mbox{5G}}}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{نقشه تحول عناصر معماری}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1579}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1974}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1974}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1974}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عنصر \lr{\mbox{2G}}} & \CNth{معادل در \lr{\mbox{3G}}} & \CNth{معادل در \lr{\mbox{4G}}} & \CNth{معادل در \lr{\mbox{5G}}} & \CNth{الگوی تحول} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{BTS}} & \lr{\mbox{Node B}} & \lr{\mbox{eNodeB}} & \lr{\mbox{gNB}} & هوش بیشتر به لبه رانده شد \\
+\lr{\mbox{BSC}} & \lr{\mbox{RNC}} & \lr{—} (حذف‌شده) & \lr{\mbox{—}} & حذف‌شده (توابع در \lr{eNB/\allowbreak{}gNB}) \\
+\lr{\mbox{MSC}} & \lr{MSC Server} & \lr{\mbox{MME}} & \lr{\mbox{AMF}} & صفحه کنترل از صفحه کاربر جدا شد \\
+\lr{\mbox{HLR}} & \lr{\mbox{HSS}} & \lr{\mbox{HSS}} & \lr{UDM/\allowbreak{}UDR} & مدیریت داده یکپارچه \\
+\lr{\mbox{GMSC}} & \lr{\mbox{GMSC}} & \lr{\mbox{—}} & \lr{\mbox{—}} & حذف‌شده (تمام-\lr{\mbox{IP}}، بدون نیاز به دروازه \lr{\mbox{PSTN}}) \\
+\lr{\mbox{VLR}} & \lr{\mbox{VLR}} & \lr{\mbox{MME}} (یکپارچه) & \lr{\mbox{AMF}} (بدون حالت) & از حالت‌دار به بدون حالت \\
+\lr{\mbox{SGSN}} & \lr{\mbox{SGSN}} & \lr{\mbox{S-GW}} (جزیی) & \lr{\mbox{SMF+UPF}} & به کنترل + صفحه کاربر تقسیم شد \\
+\lr{\mbox{GGSN}} & \lr{\mbox{GGSN}} & \lr{\mbox{P-GW}} & \lr{\mbox{UPF}} & ارسال خالص صفحه کاربر \\
+\lr{\mbox{—}} & \lr{\mbox{—}} & \lr{\mbox{PCRF}} & \lr{\mbox{PCF}} & سیاست و صورت‌حساب \\
+\lr{\mbox{—}} & \lr{\mbox{—}} & \lr{\mbox{—}} & \lr{\mbox{NRF}} & کشف خدمات (جدید در \lr{\mbox{5G}}) \\
+\lr{\mbox{—}} & \lr{\mbox{—}} & \lr{\mbox{—}} & \lr{\mbox{NSSF}} & انتخاب برش (جدید در \lr{\mbox{5G}}) \\
+\end{longtable}
+}
+
+\CNkeepfig{m25-data-rates}{5}
+
+\CNsection{6}{نمودار تحول نرخ داده (رشد نمایی)}
+
+\CNfigure{m25-data-rates}{نرخ داده بیشینه پیوند پایین‌سو در هر نسل (مقیاس لگاریتمی)}
+
+\Needspace{21\baselineskip}
+
+\textbf{الگوی رشد:} حدود ۱۰ برابر در هر ۵ سال (۱۰۰۰ برابر در هر دهه).
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{گام} & \CNth{بهبود} & \CNth{نرخ بیشینه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{GSM \ensuremath{\to} GPRS} & \lr{\mbox{18\ensuremath{\times}}} & \lr{9.6~kbps \ensuremath{\to} 171~kbps} \\
+\lr{GPRS \ensuremath{\to} EDGE} & \lr{\mbox{2.8\ensuremath{\times}}} & \lr{171~kbps \ensuremath{\to} 473~kbps} \\
+\lr{EDGE \ensuremath{\to} UMTS} & \lr{\mbox{4.2\ensuremath{\times}}} & \lr{473~kbps \ensuremath{\to} 2~Mbps} \\
+\lr{UMTS \ensuremath{\to} HSPA} & \lr{\mbox{21\ensuremath{\times}}} & \lr{2~Mbps \ensuremath{\to} 42~Mbps} \\
+\lr{HSPA \ensuremath{\to} LTE} & \lr{\mbox{7\ensuremath{\times}}} & \lr{42~Mbps \ensuremath{\to} 300~Mbps} \\
+\lr{LTE \ensuremath{\to} LTE-A} & \lr{\mbox{10\ensuremath{\times}}} & \lr{300~Mbps \ensuremath{\to} 3~Gbps} \\
+\lr{LTE-A \ensuremath{\to} 5G} & \lr{\mbox{6.7\ensuremath{\times}}} & \lr{3~Gbps \ensuremath{\to} 20~Gbps} \\
+\lr{\mbox{5G \ensuremath{\to} 6G}} & \lr{\mbox{50\ensuremath{\times}}} & \lr{20~Gbps \ensuremath{\to} 1~Tbps} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{23\baselineskip}
+
+\CNsection{7}{درس‌های کلیدی از هر گذار}
+
+\CNchained\CNsubsection{7.1}{\lr{GSM \ensuremath{\to} GPRS}: لایه داده بسته روی مدار}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{درس} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{راهبرد} & نیازی نیست همه چیز را جایگزین کنید \lr{—} قابلیت جدید را به‌عنوان لایه رویی بر زیرساخت موجود اضافه کنید \\
+\textbf{معماری} & \lr{SGSN/\allowbreak{}GGSN} در کنار \lr{\mbox{MSC}} بدون اختلال در سرویس صدا اضافه شد \\
+\textbf{مدیریت ریسک} & استقرار تدریجی: اپراتورها می‌توانستند قابلیت بسته را گره-به-گره اضافه کنند \\
+\textbf{مبادله} & منابع رادیویی مشترک به این معنا بود که نه صدا و نه داده بهینه نبودند \\
+\textbf{تأثیر میراثی} & پروتکل تونل‌سازی \lr{\mbox{GTP}} که در اینجا ابداع شد تا \lr{\mbox{5G}} باقی می‌ماند \\
+\textbf{اصل کلیدی} & \textbf{«تحول به‌جای انقلاب وقتی پایگاه نصب‌شده عظیم است»} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.2}{\lr{GPRS \ensuremath{\to} UMTS}: رادیو جدید، حفظ هسته}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{درس} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{راهبرد} & وقتی رادیو گلوگاه است، رادیو را تغییر دهید اما هسته اثبات‌شده را حفظ کنید \\
+\textbf{معماری} & \lr{\mbox{WCDMA}} جایگزین \lr{\mbox{TDMA}} شد، اما \lr{SGSN/\allowbreak{}GGSN/\allowbreak{}HLR} عمدتاً بدون تغییر ماندند \\
+\textbf{مدیریت ریسک} & اپراتورها می‌توانستند \lr{\mbox{2G}} و \lr{\mbox{3G}} را همزمان با هسته مشترک اجرا کنند \\
+\textbf{مبادله} & طیف جدید لازم بود (باند \lr{\mbox{2100~MHz}}) \lr{—} هزینه‌های مجوز عظیم \\
+\textbf{تأثیر میراثی} & معماری \lr{\mbox{RNC}} یک گلوگاه جدید ایجاد کرد که یک دهه طول کشید تا حذف شود \\
+\textbf{اصل کلیدی} & \textbf{«هر بار یک زیرسیستم اصلی را تغییر دهید تا ریسک مدیریت شود»} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.3}{\lr{UMTS \ensuremath{\to} LTE}: مسطح‌سازی، تمام-\lr{\mbox{IP}}، حذف \lr{\mbox{RNC}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{درس} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{راهبرد} & گاهی باید سازگاری رو به عقب را برای بهبود بنیادی شکست \\
+\textbf{معماری} & \lr{\mbox{RNC}} حذف شد (توابع به \lr{\mbox{eNodeB}} توزیع شد)، تمام-\lr{\mbox{IP}} (سوییچینگ مدار حذف شد) \\
+\textbf{مدیریت ریسک} & \lr{\mbox{VoLTE}} سال‌ها طول کشید تا بالغ شود \lr{—} \lr{\mbox{CSFB}} موقت به \lr{2G/\allowbreak{}3G} برای صدا \\
+\textbf{مبادله} & طراحی از پایه نیازمند شبکه‌های موازی برای سال‌های متمادی بود \\
+\textbf{تأثیر میراثی} & معماری مسطح بسیار مقیاس‌پذیرتر و مقرون‌به‌صرفه‌تر ثابت شد \\
+\textbf{اصل کلیدی} & \textbf{«سلسله‌مراتب را مسطح کنید \lr{—} هوش را به لبه برانید، هسته را ساده کنید»} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.4}{\lr{LTE \ensuremath{\to} LTE-Advanced}: تجمیع حامل، \lr{\mbox{MIMO}} بیشتر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{درس} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{راهبرد} & منابع موجود را هوشمندانه‌تر ترکیب کنید پیش از جستجوی منابع جدید \\
+\textbf{معماری} & \lr{\mbox{CA}} طیف قطعه‌قطعه را پیوند می‌زند؛ \lr{\mbox{MIMO}} ظرفیت مکانی را چند برابر می‌کند \\
+\textbf{مدیریت ریسک} & سازگار رو به عقب \lr{—} دستگاه‌های \lr{\mbox{LTE}} در کنار \lr{\mbox{LTE-A}} کار می‌کنند \\
+\textbf{مبادله} & پیچیدگی در زمان‌بند و \lr{\mbox{UE}} به‌طور قابل توجهی افزایش می‌یابد \\
+\textbf{تأثیر میراثی} & تثبیت کرد که تجمیع طیف کلید مقیاس‌دهی ظرفیت است \\
+\textbf{اصل کلیدی} & \textbf{«آنچه دارید را از طریق ترکیب هوشمندانه حداکثر کنید پیش از ساخت جدید»} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.5}{\lr{\mbox{LTE \ensuremath{\to} 5G}}: رادیو جدید + هسته جدید، شبکه‌بندی، \lr{\mbox{SBA}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{درس} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{راهبرد} & وقتی نیازمندی‌ها واگرا می‌شوند (\lr{\mbox{eMBB}} در برابر \lr{\mbox{URLLC}} در برابر \lr{\mbox{mMTC}})، یک پیکربندی نمی‌تواند به همه خدمت دهد \\
+\textbf{معماری} & \lr{\mbox{NR}} عددشناسی انعطاف‌پذیر فراهم می‌کند؛ \lr{\mbox{SBA}} در \lr{\mbox{5GC}} سفارشی‌سازی در هر برش را ممکن می‌سازد \\
+\textbf{مدیریت ریسک} & استقرار \lr{\mbox{NSA}} (گزینه \lr{\mbox{3x}}) به‌عنوان سنگ پله پیش از \lr{\mbox{SA}} \\
+\textbf{مبادله} & پیچیدگی عظیم؛ اپراتورها باید \lr{\mbox{ROI}} را برای صنایع متنوع توجیه کنند \\
+\textbf{تأثیر میراثی} & \lr{\mbox{SBA}} و اصول بومی-ابر برای تحول پیوسته نرم‌افزار آماده می‌کنند \\
+\textbf{اصل کلیدی} & \textbf{«برای تنوع طراحی کنید \lr{—} شبکه‌بندی به یک شبکه فیزیکی اجازه می‌دهد به اهداف بسیاری خدمت کند»} \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.6}{\lr{\mbox{5G \ensuremath{\to} 6G}}: بومی-\lr{\mbox{AI}}، سنجش، \lr{\mbox{Sub-THz}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{درس} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{راهبرد} & خود شبکه هوشمند می‌شود \lr{—} \lr{\mbox{AI}} یک افزودنی نیست بلکه یک اصل طراحی بنیادی است \\
+\textbf{معماری} & دوقلوی دیجیتال شبکه، مدیریت منابع پیش‌بینانه، ارتباطات معنایی \\
+\textbf{مدیریت ریسک} & مرحله پژوهش امکان بررسی امکان‌سنجی را پیش از استانداردسازی می‌دهد \\
+\textbf{مبادله} & برد \lr{\mbox{Sub-THz}} به‌شدت محدود است؛ هزینه استقرار فوق-متراکم ناشناخته است \\
+\textbf{تأثیر میراثی} & ممکن است معنای «ارتباط» را بازتعریف کند (سنجش + رایانش + ارتباط) \\
+\textbf{اصل کلیدی} & \textbf{«ارتباط، محاسبه و سنجش را در یک بافت هوشمند یکپارچه همگرا کنید»} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{17\baselineskip}
+
+\CNsection{8}{خلاصه الگوهای تحولی}
+
+\CNchained\CNsubsection{}{الگو 1: نوآوری متناوب رادیو و هسته}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}cccccccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسل} & \CNth{\lr{\mbox{2G}}} & \CNth{\lr{\mbox{2.5G}}} & \CNth{\lr{\mbox{3G}}} & \CNth{\lr{\mbox{3.5G}}} & \CNth{\lr{\mbox{4G}}} & \CNth{\lr{\mbox{4G+}}} & \CNth{\lr{\mbox{5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+تمرکز & رادیو & هسته & رادیو & رادیو & هر دو & رادیو & هر دو \\
+نوآوری کلیدی & \lr{\mbox{TDMA}} & \lr{\mbox{SGSN}} & \lr{\mbox{WCDMA}} & \lr{\mbox{HSPA}} & \lr{\mbox{OFDMA}} & \lr{\mbox{CA}} & \lr{\mbox{NR + SBA}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m25-complexity-cycle}{3}
+
+\CNsubsection{}{الگو 2: چرخه پیچیدگی}
+
+\CNfigure{m25-complexity-cycle}{چرخه پیچیدگی در معماری شبکه‌های موبایل}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{الگو 3: خط زمانی جداسازی کنترل/\allowbreak{}صفحه کاربر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسل} & \CNth{آرایش صفحه کنترل/\allowbreak{}کاربر} & \CNth{نتیجه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{2G}} & \lr{\mbox{MSC}} هر دو را انجام می‌دهد & ناکارآمد \\
+\lr{\mbox{3G}} & تفکیک \lr{MSC-Server + MGW (Rel-4)} & \lr{\mbox{CUPS}} جزیی \\
+\lr{\mbox{4G}} & \lr{MME (CP) + S-GW/\allowbreak{}P-GW (UP)} & \lr{\mbox{CUPS}} معماری \\
+\lr{\mbox{5G}} & \lr{AMF/\allowbreak{}SMF (CP) + UPF (UP)} & \lr{\mbox{CUPS}} کامل \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{الگو 4: محل قرارگیری هوش}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسل} & \CNth{محل استقرار هوشمندی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{2G}} & \lr{BSC/\allowbreak{}MSC} (متمرکز) \\
+\lr{\mbox{3G}} & \lr{\mbox{RNC}} (متمرکز) \\
+\lr{\mbox{4G}} & \lr{\mbox{eNodeB}} (توزیع‌شده تا لبه) \\
+\lr{\mbox{5G}} & \lr{\mbox{gNB}} + رایانش لبه (توزیع‌شده + ابر لبه) \\
+\lr{\mbox{6G}} & همه‌جا (هوش مصنوعی در هر لایه) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{31\baselineskip}
+
+\CNsection{9}{مرجع سریع آماده‌سازی امتحان}
+
+\CNchained\CNsubsection{}{حقایق ضروری در هر نسل}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.2632}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.7368}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نسل} & \CNth{این را به خاطر بسپارید} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{GSM}} & \lr{\mbox{TDMA}}، حامل \lr{\mbox{200 kHz}}، 8 شکاف زمانی، مدار-گزارشی، \lr{MAP/\allowbreak{}SS7}، \lr{HLR/\allowbreak{}VLR/\allowbreak{}MSC} \\
+\lr{\mbox{GPRS}} & \lr{\mbox{SGSN+GGSN}} اضافه شد، زمینه \lr{\mbox{PDP}}، تونل \lr{\mbox{GTP}}، لایه بسته روی \lr{\mbox{CS}} \\
+\lr{\mbox{EDGE}} & مدولاسیون \lr{\mbox{8PSK}} (3 بیت/\allowbreak{}نماد در برابر 1)، 9 طرح \lr{\mbox{MCS}}، ارتقای نرم‌افزاری \\
+\lr{\mbox{UMTS}} & \lr{\mbox{WCDMA}}، \lr{\mbox{5 MHz}}، کدهای گسترش، \lr{\mbox{RNC}}، تحویل نرم، گیرنده \lr{\mbox{Rake}} \\
+\lr{\mbox{HSPA}} & کانال مشترک، \lr{\mbox{TTI 2ms}}، \lr{\mbox{AMC}}، \lr{\mbox{HARQ}}، زمان‌بندی سریع در \lr{\mbox{Node B}} \\
+\lr{\mbox{LTE}} & \lr{\mbox{OFDMA}}، مسطح (بدون \lr{\mbox{RNC}})، تمام-\lr{\mbox{IP}}، \lr{EPC (MME/\allowbreak{}SGW/\allowbreak{}PGW)}، واسط \lr{\mbox{X2}} \\
+\lr{\mbox{LTE-A}} & \lr{CA (5\ensuremath{\times}20 MHz)}، \lr{\mbox{MIMO 8\ensuremath{\times}8}}، \lr{\mbox{CoMP}}، \lr{\mbox{HetNet}}ها، رله \\
+\lr{\mbox{5G NSA}} & \lr{\mbox{EN-DC}}، لنگر \lr{\mbox{LTE}}، \lr{\mbox{NR}} ثانویه، گزینه \lr{\mbox{3x}}، هسته \lr{\mbox{EPC}} \\
+\lr{\mbox{5G SA}} & \lr{AMF/\allowbreak{}SMF/\allowbreak{}UPF}، \lr{\mbox{NGAP}}، شبکه‌بندی، \lr{\mbox{URLLC}}، \lr{\mbox{mMTC}} \\
+\lr{\mbox{5GC}} & \lr{\mbox{SBA}}، \lr{HTTP/\allowbreak{}2}، کشف \lr{\mbox{NRF}}، \lr{\mbox{NSSF}}، \lr{\mbox{NF}}های بدون حالت، بومی-ابر \\
+\lr{\mbox{6G}} & \lr{\mbox{Sub-THz}}، \lr{\mbox{RIS}}، بومی-\lr{\mbox{AI}}، \lr{\mbox{ISAC}}، ارتباطات معنایی، \lr{\mbox{1~Tbps}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m25-stacks}{3}
+
+\CNsubsection{}{تحول پشته پروتکل کلیدی}
+
+\CNfigure{m25-stacks}{پشته پروتکل صفحه کاربر در هر نسل}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{}{مقایسه حیاتی: \lr{\mbox{EPC}} در \lr{\mbox{4G}} در برابر هسته \lr{\mbox{5G}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{\lr{\mbox{EPC}} در \lr{\mbox{4G}}} & \CNth{هسته \lr{\mbox{5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نوع واسط & نقطه-به-نقطه (\lr{\mbox{GTP-C}}، \lr{\mbox{Diameter}}) & خدمات‌محور \lr{(HTTP/\allowbreak{}2 REST)} \\
+کشف & پیکربندی ایستا & کشف پویا \lr{\mbox{NRF}} \\
+مقیاس‌دهی & عمودی (جعبه‌های بزرگ‌تر) & افقی (نمونه‌های بیشتر) \\
+استقرار & مبتنی بر تجهیز & بومی-ابر (کانتینرها، \lr{\mbox{K8s}}) \\
+شبکه‌بندی & پشتیبانی نمی‌شود & بومی (\lr{\mbox{NSSF}}، \lr{\mbox{NF}}های در هر برش) \\
+حالت & گره‌های حالت‌دار & \lr{\mbox{NF}}های بدون حالت + حالت خارجی \lr{\mbox{(UDSF)}} \\
+لنگر تحرک & تونل \lr{GTP (S-GW)} & \lr{\mbox{UPF}} (قابل توزیع) \\
+سیاست & \lr{PCRF (Diameter)} & \lr{PCF (SBI)} \\
+داده مشترک & \lr{HSS (Diameter)} & \lr{UDM/\allowbreak{}UDR (SBI)} \\
+احراز هویت & \lr{MME + HSS (EAP-AKA)} & \lr{AUSF + UDM} (\lr{\mbox{5G-AKA}}، \lr{\mbox{EAP}}) \\
+\end{longtable}
+}
+
+\CNsection{10}{نتیجه‌گیری}
+
+تحول از \lr{\mbox{GSM}} به \lr{\mbox{6G}} یکی از قابل توجه‌ترین سفرهای مهندسی در تاریخ را نمایندگی می‌کند \lr{—} از تماس‌های صوتی \lr{\mbox{9.6~kbps}} تا شبکه‌های هوشمند ترابیت-در-ثانیه در چهار دهه. هر نسل محدودیت‌های نسل قبلی را حل کرد در حالی که پیچیدگی جدیدی معرفی کرد که تحول بعدی را طلب می‌نمود.
+
+\textbf{سه ثابت در تمام نسل‌ها:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{تقاضا همیشه از عرضه پیشی می‌گیرد} \lr{—} کاربران همیشه راه‌هایی برای مصرف ظرفیت موجود می‌یابند
+\item
+  \textbf{ساده‌سازی پس از پیچیدگی می‌آید} \lr{—} هر معماری بیش‌ازحد پیچیده در نهایت مسطح می‌شود
+\item
+  \textbf{مرز بین شبکه و رایانش محو می‌شود} \lr{—} از لوله‌های ساده تا پلتفرم‌های هوشمند
+\end{enumerate}
+
+درک این تحول فقط دانش تاریخی نیست \lr{—} به ما می‌آموزد چگونه فناوری‌های آینده را ارزیابی کنیم، تصمیمات معماری را پیش‌بینی کنیم و سیستم‌هایی طراحی کنیم که بتوانند به‌صورت تدریجی تحول یابند.
+
+\emph{ماژول 25 \lr{—} ترکیب جامع تحول شبکه}\CNbr{}\emph{درس شبکه‌های ارتباطی پیشرفته}\CNbr{}\emph{آخرین به‌روزرسانی: اوت 2026}

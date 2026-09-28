@@ -1,0 +1,11 @@
+% Module 26 — integrated sensing and communication with one waveform
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNhl] (w) at (0,0) {ISAC \CNL{waveform}{شکل موج}};
+\node[CNran] (tx) at (3.2,0) {\CNL{Transmit}{ارسال}};
+\node[CNbox] (t) at (6.2,0) {[\CNL{Target}{هدف}]};
+\node[CNran] (echo) at (9.4,0) {\CNL{Echo return}{بازگشت پژواک}};
+\draw[CNlink, ->] (w) -- (tx); \draw[CNlink, ->] (tx) -- (t); \draw[CNlink, ->] (t) -- (echo);
+\node[CNup, text width=3cm] (c) at (3.2,-2.0) {\CNL{Communication}{ارتباط}\\{\scriptsize (\CNL{data to the UE}{داده به \lr{UE}})}};
+\node[CNok, text width=3.4cm] (s) at (9.4,-2.0) {\CNL{Sensing}{حسگری}\\{\scriptsize (\CNL{range, velocity, angle}{برد، سرعت، زاویه})}};
+\draw[CNlink, ->] (tx) -- (c); \draw[CNlink, ->] (echo) -- (s);
+\end{tikzpicture}

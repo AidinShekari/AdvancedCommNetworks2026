@@ -1,0 +1,18 @@
+% Module 22 — end-to-end 5G QoS mapping: SDF → QoS flow → DRB
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNtitle, anchor=west] at (-0.2,0.6) {\CNL{APPLICATION LAYER}{لایه کاربرد}};
+\node[CNext, minimum width=12cm, anchor=west] (app) at (0,0) {\CNL{IP packets (SDF = service data flow):}{بسته‌های \lr{IP} (\lr{SDF} = جریان داده خدمت):}\ \CNL{voice | video | web | IoT}{صدا | ویدئو | وب | \lr{IoT}}};
+\node[CNtitle, anchor=west] at (-0.2,-1.0) {\CNL{QoS CLASSIFICATION (SDF $\rightarrow$ QoS flow)}{طبقه‌بندی \lr{QoS} (\lr{SDF} $\rightarrow$ جریان \lr{QoS})}};
+\node[CNhl, minimum width=12cm, anchor=west, text width=11.6cm, align=left] (cls) at (0,-1.8) {\CNL{QoS rules / SDF templates}{قواعد \lr{QoS} / الگوهای \lr{SDF}}\\{\scriptsize \CNL{match: 5-tuple (src/dst IP, src/dst port, protocol) — action: assign QFI}{تطبیق: پنج‌تایی (\lr{IP}/درگاه مبدأ/مقصد، پروتکل) — اقدام: تخصیص \lr{QFI}}}};
+\node[CNtitle, anchor=west] at (-0.2,-3.05) {\CNL{QoS FLOW LAYER}{لایه جریان \lr{QoS}}};
+\foreach \f/\t [count=\k from 0] in {1/{\CNL{voice}{صدا}}, 2/{\CNL{video}{ویدئو}}, 9/{\CNL{web}{وب}}, 82/URLLC}{
+  \node[CNup, minimum width=2.8cm] (f\k) at ({1.5+\k*3.05},-3.8) {Flow (5QI=\f)\\{\scriptsize \t}};
+  \draw[CNlink, ->] ({1.5+\k*3.05},-0.35) -- ({1.5+\k*3.05},-1.35);
+  \draw[CNlink, ->] ({1.5+\k*3.05},-2.25) -- node[CNelab, right=1pt, fill=none] {QFI=\the\numexpr\k+1\relax} (f\k.north);}
+\node[CNtitle, anchor=west] at (-0.2,-5.0) {\CNL{DRB MAPPING (the gNB decides)}{نگاشت \lr{DRB} (تصمیم با \lr{gNB})}};
+\node[CNran, minimum width=2.8cm] (d1) at (1.5,-5.8) {DRB 1 (GBR)\\{\scriptsize QFI=1}};
+\node[CNran, minimum width=2.8cm] (d2) at (4.55,-5.8) {DRB 2 (GBR)\\{\scriptsize QFI=2}};
+\node[CNran, minimum width=5.85cm] (d3) at (9.13,-5.8) {DRB 3 (Non-GBR)\\{\scriptsize QFI=3, QFI=4}};
+\draw[CNlink, ->] (f0) -- (d1); \draw[CNlink, ->] (f1) -- (d2); \draw[CNlink, ->] (f2) -- (f2 |- d3.north); \draw[CNlink, ->] (f3) -- (f3 |- d3.north);
+\node[CNnote, anchor=north, text width=11.6cm] at (6,-6.6) {\CNLP{NOTE: several non-GBR flows CAN share one DRB; GBR flows typically get dedicated DRBs.}{نکته: چند جریان \lr{Non-GBR} می‌توانند یک \lr{DRB} را به اشتراک بگذارند؛ جریان‌های \lr{GBR} معمولاً \lr{DRB} اختصاصی می‌گیرند.}};
+\end{tikzpicture}

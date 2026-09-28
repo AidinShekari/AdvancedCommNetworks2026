@@ -1,0 +1,706 @@
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{1}{Why QoS?}
+
+\CNchained\CNsubsection{}{The Problem: Not All Traffic Is Equal}
+
+Different applications have fundamentally different network requirements:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1475}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2623}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2623}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1803}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1475}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Service} & \CNth{Delay Tolerance} & \CNth{Loss Tolerance} & \CNth{Bandwidth} & \CNth{Pattern} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Voice (VoLTE) & Very Low (\textless{}150ms) & Low (\textless{}1\%) & Low (64~kbps) & Constant \\
+Video Call & Low (\textless{}300ms) & Low (\textless{}1\%) & Medium (1-5~Mbps) & Variable \\
+Video Streaming & Medium (\textless{}5s buffer) & Very Low & High (5-25~Mbps) & Bursty \\
+IoT Sensor & High (seconds) & Very Low & Very Low (kbps) & Periodic \\
+Web Browsing & Medium (\textless{}1s) & None (TCP retx) & Variable & Bursty \\
+Email & High (seconds) & None (TCP retx) & Low & Bursty \\
+Autonomous Driving & Ultra-Low (\textless{}10ms) & Ultra-Low & Medium & Constant \\
+\end{longtable}
+}
+
+\CNsubsection{}{Without QoS:}
+
+\begin{itemize}
+\tightlist
+\item
+  Voice calls get choppy during congestion
+\item
+  Video freezes while background downloads continue
+\item
+  Emergency services compete with social media
+\item
+  Industrial control packets delayed by bulk transfers
+\end{itemize}
+
+\CNsubsection{}{QoS Goal:}
+
+\textbf{Differentiate traffic and provide appropriate treatment to each service based on its requirements.}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{QoS Evolution Across Generations}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{2G} & \CNth{3G} & \CNth{LTE (4G)} & \CNth{5G NR} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{No QoS} (all circuit-switched) & \textbf{4 traffic classes} & \textbf{Bearer-based QoS} (QCI + bearer) & \textbf{Flow-based QoS} (5QI + QoS flow) \\
+Same quality for all & Conversational, streaming, interactive, background & 9 standard QCIs; GBR /\allowbreak{} non-GBR; default + dedicated bearers & 90 standard 5QIs; GBR /\allowbreak{} non-GBR /\allowbreak{} DC-GBR; reflective QoS; fine granularity \\
+\end{longtable}
+}
+
+\CNsubsection{}{2G (GSM): No Real QoS}
+
+\begin{itemize}
+\tightlist
+\item
+  All services are \textbf{circuit-switched}
+\item
+  Each call gets a dedicated timeslot \ensuremath{\to} same quality for everyone
+\item
+  No differentiation needed (only voice + SMS)
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{3G (UMTS): Four Traffic Classes}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Class} & \CNth{Delay} & \CNth{Example} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Conversational & Strict (\textless{} 150ms) & Voice, video call \\
+Streaming & Moderate (\textless{} 1s) & Video streaming \\
+Interactive & Variable & Web browsing \\
+Background & Best-effort & Email, downloads \\
+\end{longtable}
+}
+
+\CNsubsection{}{LTE (4G): Bearer-Based QoS}
+
+\begin{itemize}
+\tightlist
+\item
+  Introduced \textbf{EPS bearers} with specific QoS parameters
+\item
+  \textbf{QCI} (QoS Class Identifier): standardized classes
+\item
+  \textbf{ARP} (Allocation and Retention Priority)
+\item
+  \textbf{GBR} (Guaranteed Bit Rate) vs \textbf{Non-GBR} bearers
+\end{itemize}
+
+\CNsubsection{}{5G NR: Flow-Based QoS}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{QoS Flows} identified by \textbf{QFI} (QoS Flow Identifier)
+\item
+  \textbf{5QI} replaces QCI with more values
+\item
+  \textbf{Reflective QoS} for simplified UL treatment
+\item
+  Finer granularity: multiple flows per PDU session
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-eps-bearer}{8}
+
+\CNsection{3}{LTE Bearer-Based QoS}
+
+\CNchained\CNsubsection{}{Bearer Concept}
+
+\CNfigure{m22-eps-bearer}{The EPS bearer is a chain of radio, S1 and S5/\allowbreak{}S8 bearers}
+
+\textbf{Bearer = GTP-U tunnel with specific QoS parameters (QCI + ARP + bit rates)}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{Default vs Dedicated Bearers}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{Default Bearer} & \CNth{Dedicated Bearer} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Creation & At PDU connectivity (attach) & On-demand (triggered) \\
+Lifetime & Always on (until detach) & Temporary (can be released) \\
+QoS & Best-effort (QCI 9) & Specific QoS (any QCI) \\
+Type & Always Non-GBR & GBR or Non-GBR \\
+IP Address & Assigned with bearer & Shares IP of default \\
+Purpose & Internet access & VoLTE, video, gaming \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{QCI Table (Standardized Values)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.0562}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1573}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1124}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2247}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2584}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1910}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{QCI} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Resource Type}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Priority}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Packet Delay Budget}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Packet Error Loss Rate}
+\end{minipage} & \CNth{Example Services} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & GBR & 2 & 100~ms & 10\textsuperscript{-2} & Conversational Voice \\
+2 & GBR & 4 & 150~ms & 10\textsuperscript{-3} & Conversational Video \\
+3 & GBR & 3 & 50~ms & 10\textsuperscript{-3} & Real-Time Gaming \\
+4 & GBR & 5 & 300~ms & 10\textsuperscript{-6} & Non-Conv. Video (Buffered) \\
+5 & Non-GBR & 1 & 100~ms & 10\textsuperscript{-6} & IMS Signaling \\
+6 & Non-GBR & 6 & 300~ms & 10\textsuperscript{-6} & Video (Buffered), TCP web \\
+7 & Non-GBR & 7 & 100~ms & 10\textsuperscript{-3} & Voice, Live Video, Gaming \\
+8 & Non-GBR & 8 & 300~ms & 10\textsuperscript{-6} & Video (Buffered), TCP web \\
+9 & Non-GBR & 9 & 300~ms & 10\textsuperscript{-6} & Video, TCP, Email, Chat \\
+\end{longtable}
+}
+
+\Needspace{23\baselineskip}
+
+\CNsubsubsection{Mission-Critical (MCX) QCI Values (65-82)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}lcccl@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{QCI} & \CNth{Resource Type} & \CNth{Priority} & \CNth{Delay} & \CNth{Example} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+65 & GBR & 0.7 & 75~ms & MC-PTT Voice \\
+66 & GBR & 2 & 100~ms & MC-Video (non-real-time) \\
+67 & GBR & 1.5 & 100~ms & MC-PTT Video \\
+69 & Non-GBR & 0.5 & 60~ms & MC-PTT Signaling \\
+70 & Non-GBR & 5.5 & 200~ms & MC Data \\
+75 & GBR & 2.5 & 50~ms & V2X Messages \\
+79 & Non-GBR & 6.5 & 50~ms & V2X Messages \\
+82 & GBR & 1.9 & 10~ms & Discrete Automation \\
+83 & GBR & 2.2 & 10~ms & Discrete Automation \\
+\end{longtable}
+}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{ARP (Allocation and Retention Priority)}
+
+ARP determines whether a bearer can be established during congestion:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{Values} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Priority Level & 1-15 (1=highest) & Relative importance \\
+Pre-emption Capability & Yes/\allowbreak{}No & Can this bearer preempt others? \\
+Pre-emption Vulnerability & Yes/\allowbreak{}No & Can this bearer be preempted? \\
+\end{longtable}
+}
+
+\textbf{Example Scenario:}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Congestion situation - resources are full:
+
+Bearer A: Priority=5, Pre-emption Capability=Yes
+Bearer B: Priority=10, Pre-emption Vulnerability=Yes
+
+→ Bearer A can preempt (remove) Bearer B to get resources
+→ Emergency calls (Priority=1) can preempt regular calls
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNkeepfig{m22-gbr-nongbr}{3}
+
+\CNsubsection{}{GBR vs Non-GBR Bearers}
+
+\CNfigure{m22-gbr-nongbr}{GBR and non-GBR bearers}
+
+\CNsubsection{}{LTE QoS Limitations}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Coarse granularity}: One QCI per bearer \ensuremath{\to} one bearer per service type
+\item
+  \textbf{Bearer overhead}: Each new QCI requires a new GTP tunnel
+\item
+  \textbf{Signaling heavy}: Dedicated bearer setup requires full NAS/\allowbreak{}S1AP signaling
+\item
+  \textbf{Inflexible}: Cannot mix traffic with different QoS in one bearer
+\item
+  \textbf{Limited QCIs}: Only 9 standard values (extended to \textasciitilde{}20 with MCX)
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-qos-flows}{8}
+
+\CNsection{4}{5G Flow-Based QoS}
+
+\CNchained\CNsubsection{}{Key Concept: QoS Flow}
+
+\CNfigure{m22-qos-flows}{5G QoS flows inside one PDU session share one GTP-U tunnel}
+
+\textbf{Key differences from LTE:}
+
+\begin{itemize}
+\tightlist
+\item
+  Multiple QoS Flows share ONE PDU session (one GTP tunnel)
+\item
+  QFI (6-bit) identifies the flow within the tunnel
+\item
+  No need to create/\allowbreak{}delete bearers \ensuremath{\to} less signaling
+\item
+  Finer granularity with less overhead
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{5QI Table (Key Standardized Values)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.0633}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1772}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1266}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1772}}
+  >{\centering\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2405}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2152}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{5QI} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Resource Type}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Priority}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Packet Delay}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+\CNth{Packet Error Rate}
+\end{minipage} & \CNth{Example Services} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & GBR & 20 & 100~ms & 10\textsuperscript{-2} & Conversational Voice \\
+2 & GBR & 40 & 150~ms & 10\textsuperscript{-3} & Conversational Video \\
+3 & GBR & 30 & 50~ms & 10\textsuperscript{-3} & Real-Time Gaming \\
+4 & GBR & 50 & 300~ms & 10\textsuperscript{-6} & Non-Conv. Video (Buffered) \\
+5 & Non-GBR & 10 & 100~ms & 10\textsuperscript{-6} & IMS Signaling \\
+6 & Non-GBR & 60 & 300~ms & 10\textsuperscript{-6} & Video, TCP (default) \\
+7 & Non-GBR & 70 & 100~ms & 10\textsuperscript{-3} & Voice, Video, Gaming \\
+8 & Non-GBR & 80 & 300~ms & 10\textsuperscript{-6} & Video, TCP web \\
+9 & Non-GBR & 90 & 300~ms & 10\textsuperscript{-6} & Video, TCP, Email (default) \\
+65 & GBR & 7 & 75~ms & 10\textsuperscript{-2} & MC-PTT Voice \\
+66 & GBR & 20 & 100~ms & 10\textsuperscript{-2} & Non-MC-PTT Voice \\
+67 & GBR & 15 & 100~ms & 10\textsuperscript{-3} & MC Video \\
+69 & Non-GBR & 5 & 60~ms & 10\textsuperscript{-6} & MC-PTT Signaling \\
+70 & Non-GBR & 55 & 200~ms & 10\textsuperscript{-6} & MC Data \\
+79 & Non-GBR & 65 & 50~ms & 10\textsuperscript{-2} & V2X Messages \\
+80 & Non-GBR & 68 & 10~ms & 10\textsuperscript{-6} & Low-Latency eMBB \\
+82 & DC-GBR & 19 & 10~ms & 10\textsuperscript{-4} & Discrete Automation (small) \\
+83 & DC-GBR & 22 & 10~ms & 10\textsuperscript{-4} & Discrete Automation (large) \\
+84 & DC-GBR & 24 & 30~ms & 10\textsuperscript{-5} & Intelligent Transport \\
+85 & DC-GBR & 21 & 5~ms & 10\textsuperscript{-5} & Electricity Distribution \\
+86 & GBR & 18 & 5~ms & 10\textsuperscript{-4} & V2X (platooning) \\
+87 & DC-GBR & 25 & 5~ms & 10\textsuperscript{-3} & Interactive Service (motion) \\
+88 & DC-GBR & 23 & 10~ms & 10\textsuperscript{-4} & Interactive Service (steering) \\
+89 & DC-GBR & 26 & 15~ms & 10\textsuperscript{-4} & Visual Content (cloud gaming) \\
+90 & DC-GBR & 27 & 20~ms & 10\textsuperscript{-4} & Visual Content (AR/\allowbreak{}cloud XR) \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{DC-GBR} = Delay-Critical GBR (new in 5G)
+
+\end{CNquote}
+
+\CNkeepfig{m22-qos-rule}{5}
+
+\CNsubsection{}{QoS Rules}
+
+QoS rules tell the UE how to classify uplink traffic:
+
+\CNfigure{m22-qos-rule}{Structure of a QoS rule, with example rules}
+
+\CNsubsection{}{Reflective QoS}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The network sends a DL packet with QFI = X and RQI = 1 (Reflective QoS Indication).
+\item
+  The UE observes the DL packet headers:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    source IP/\allowbreak{}port \ensuremath{\to} becomes the UL destination
+  \item
+    destination IP/\allowbreak{}port \ensuremath{\to} becomes the UL source
+  \item
+    QFI = X \ensuremath{\to} the UE uses the same QFI for its reply
+  \end{itemize}
+\item
+  The UE creates a “derived QoS rule” automatically:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    no explicit QoS-rule signalling is needed
+  \item
+    the rule is timer-based: valid for the RQ timer duration
+  \end{itemize}
+\end{enumerate}
+
+\textbf{Benefit:} less signalling to establish QoS rules. \textbf{Use case:} the UE does not know the server IP in advance.
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-qos-mapping}{8}
+
+\CNsection{5}{QoS Mapping and Enforcement}
+
+\CNchained\CNsubsection{}{End-to-End QoS Mapping Diagram}
+
+\CNfigure{m22-qos-mapping}{End-to-end 5G QoS mapping: SDF \ensuremath{\to} QoS flow \ensuremath{\to} DRB}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Role of Each Network Element}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3214}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3214}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Element} & \CNth{QoS Role} & \CNth{Actions} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{PCF} & Policy Decision & Creates PCC rules, determines 5QI/\allowbreak{}ARP, sends to SMF \\
+\textbf{SMF} & QoS Control & Derives QoS profiles, installs QoS rules, configures UPF \\
+\textbf{UPF} & DL Enforcement & SDF detection, QFI marking, gating, policing, rate limiting \\
+\textbf{gNB} & Radio Scheduling & Maps QoS flows\ensuremath{\to}DRBs, schedules based on 5QI, enforces AMBR \\
+\textbf{UE} & UL Classification & Applies QoS rules, maps UL packets to QoS flows \\
+\end{longtable}
+}
+
+\CNkeepfig{m22-enforcement}{3}
+
+\CNsubsection{}{QoS Enforcement Architecture}
+
+\CNfigure{m22-enforcement}{QoS policy and enforcement architecture}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-bearer-vs-flow}{8}
+
+\CNsection{6}{Bearer vs Flow Comparison}
+
+\CNchained\CNsubsection{}{Side-by-Side Architecture}
+
+\CNfigure{m22-bearer-vs-flow}{LTE bearer-based versus 5G flow-based QoS}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Detailed Comparison Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1818}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4318}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3864}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{LTE (Bearer-Based)} & \CNth{5G (Flow-Based)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+QoS Unit & EPS Bearer & QoS Flow \\
+Identifier & EBI (EPS Bearer ID) & QFI (QoS Flow ID, 6-bit) \\
+QoS Class & QCI (1-9 + MCX) & 5QI (1-90+) \\
+Granularity & Coarse (1 QCI/\allowbreak{}bearer) & Fine (per-flow) \\
+Tunnel & 1 GTP-U per bearer & 1 GTP-U per PDU session \\
+Setup & NAS signaling per bearer & QoS rule install (lighter) \\
+UL Classification & TFT (uplink packet filter) & QoS Rules \\
+DL Classification & TFT at P-GW & SDF template at UPF \\
+New QoS Class & New bearer (heavy signaling) & New flow (lightweight) \\
+Sharing & No sharing between bearers & Flows share tunnel \\
+Reflective QoS & Not supported & Supported (RQI) \\
+Resource Types & GBR, Non-GBR & GBR, Non-GBR, DC-GBR \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-resource-types}{8}
+
+\CNsection{7}{GBR vs Non-GBR vs Delay-Critical GBR}
+
+\CNchained\CNsubsection{}{Three Resource Types in 5G}
+
+\CNfigure{m22-resource-types}{The three 5G QoS resource types}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{}{Parameters by Resource Type}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}lccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{GBR} & \CNth{Non-GBR} & \CNth{DC-GBR} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+5QI & \CNyes{} & \CNyes{} & \CNyes{} \\
+ARP & \CNyes{} & \CNyes{} & \CNyes{} \\
+GFBR (Guaranteed Flow Bit Rate) & \CNyes{} & \CNno{} & \CNyes{} \\
+MFBR (Maximum Flow Bit Rate) & \CNyes{} & \CNno{} & \CNyes{} \\
+Session-AMBR & \CNno{} & \CNyes{} & \CNno{} \\
+Maximum Data Burst Volume & \CNno{} & \CNno{} & \CNyes{} \\
+Packet Delay Budget & \CNyes{} & \CNyes{} & \CNyes{} (strict) \\
+Admission Control & Required & Not needed & Required \\
+Resource Reservation & Yes & No & Yes \\
+\end{longtable}
+}
+
+\CNsubsection{}{Rate Parameters Explained}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{GFBR = Guaranteed Flow Bit Rate}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the network MUST provide at least this rate
+  \item
+    under congestion, GBR flows are protected up to GFBR
+  \end{itemize}
+\item
+  \textbf{MFBR = Maximum Flow Bit Rate}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the network MAY provide up to this rate
+  \item
+    traffic above MFBR is dropped or shaped
+  \end{itemize}
+\end{itemize}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Example} & \CNth{GFBR} & \CNth{MFBR} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+VoLTE & 40~kbps (AMR-NB codec rate) & 80~kbps (with overhead margin) \\
+Video call & 1~Mbps (minimum acceptable quality) & 4~Mbps (HD quality when resources allow) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-ambr}{8}
+
+\CNsection{8}{AMBR (Aggregate Maximum Bit Rate)}
+
+\CNchained\CNsubsection{}{AMBR Hierarchy}
+
+\CNfigure{m22-ambr}{AMBR hierarchy: UE-AMBR above Session-AMBR; GBR flows are exempt}
+
+\Needspace{12\baselineskip}
+
+\CNsubsection{}{AMBR Enforcement Points}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{AMBR Type} & \CNth{Scope} & \CNth{Enforced At} & \CNth{Applies To} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+UE-AMBR & All sessions & gNB (RAN) & All Non-GBR flows, all sessions \\
+Session-AMBR & Per PDU session & UPF & Non-GBR flows in that session \\
+\end{longtable}
+}
+
+\textbf{Key Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  AMBR applies ONLY to Non-GBR flows
+\item
+  GBR flows are limited by their own MFBR, not AMBR
+\item
+  UE-AMBR \ensuremath{\ge} sum of Session-AMBRs (logically)
+\item
+  Enforced separately for UL and DL
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m22-qos-signalling}{8}
+
+\CNsection{9}{QoS Enforcement Architecture}
+
+\CNchained\CNsubsection{}{Complete End-to-End QoS Signaling}
+
+\CNfigure{m22-qos-signalling}{Complete end-to-end QoS signalling and enforcement}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{Summary of Enforcement Actions}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1579}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3947}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4474}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Node} & \CNth{Uplink Actions} & \CNth{Downlink Actions} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{UE} & Classify packets using QoS rules, mark QFI & Receive and process \\
+\textbf{gNB} & Map QoS flows\ensuremath{\to}DRBs, enforce UE-AMBR & Schedule based on 5QI priority, map DRB\ensuremath{\to}flows \\
+\textbf{UPF} & Verify QFI, enforce Session-AMBR & Detect SDF, mark QFI, gate/\allowbreak{}police/\allowbreak{}shape \\
+\textbf{SMF} & Configure UPF (N4), signal gNB (N2), signal UE (N1) & Same \\
+\textbf{PCF} & Generate PCC rules from policy & Same \\
+\end{longtable}
+}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{Summary: Key Takeaways}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Concept} & \CNth{Key Point} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+QoS Purpose & Different services need different network treatment \\
+QCI (LTE) & 9 standard classes, one per bearer \\
+5QI (5G) & 90+ classes, per QoS flow \\
+Bearer (LTE) & 1:1 mapping with QCI, separate GTP tunnel \\
+QoS Flow (5G) & Many flows share one PDU session, lighter signaling \\
+GBR & Guaranteed rate, admission control, resource reserved \\
+Non-GBR & Best effort, limited by AMBR \\
+DC-GBR & GBR + bounded delay (MDBV), for URLLC \\
+AMBR & Aggregate cap on Non-GBR (UE-level and session-level) \\
+Reflective QoS & UE derives UL QoS from DL (reduces signaling) \\
+PCF & Policy brain, creates PCC rules \\
+UPF & DL classifier and enforcer \\
+gNB & Radio scheduler, DRB mapping, UE-AMBR \\
+\end{longtable}
+}
+
+\Needspace{22\baselineskip}
+
+\CNsection{}{QCI vs 5QI Quick Reference}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{QCI (LTE)} & \CNth{5QI (5G)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Values & 1-9 standard + 65-82 MCX & 1-90+ standardized \\
+Resource Types & GBR, Non-GBR & GBR, Non-GBR, DC-GBR \\
+Priority Scale & 1-9 (1=highest) & 1-127 (1=highest) \\
+Associated With & EPS Bearer & QoS Flow \\
+Delay Range & 50-300~ms & 5-300~ms \\
+New Category & — & Delay-Critical GBR \\
+URLLC Support & Limited & Native (5ms delay, 10\textsuperscript{-5} loss) \\
+\end{longtable}
+}
+
+\emph{Module 22 — Quality of Service (QoS) — Advanced Communication Networks}

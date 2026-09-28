@@ -1,0 +1,8 @@
+% Module 6 — S1-MME protocol stack
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\CNstack{s}{0}{0}{2.2cm}{S1AP/CNcpL, SCTP/{}, IP/{}, {L2/L1}/CNphyL}
+\foreach \n/\t in {s-1/{\CNL{application protocol (S1 procedures)}{پروتکل کاربرد (رویه‌های \lr{S1})}},
+    s-2/{\CNL{reliable transport (multi-stream, multi-homing)}{انتقال مطمئن (چندجریانی، چندمیزبانی)}},
+    s-3/{\CNL{network layer}{لایه شبکه}}, s-4/{\CNL{data link / physical}{پیوند داده / فیزیکی}}}{
+  \draw[CNsig, <-] (\n.east) -- ++(0.5,0) node[CNtiny, anchor=west, align=left] {\t};}
+\end{tikzpicture}

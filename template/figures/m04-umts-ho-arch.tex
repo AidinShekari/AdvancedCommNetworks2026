@@ -1,0 +1,10 @@
+% Module 4 — UMTS: the RNC takes the handover decision and combines the macro-diversity legs
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ue) at (0,0) {UE}; \node[CNran] (nb) at (3.2,0) {Node B};
+\node[CNran, line width=1.4pt] (rnc) at (6.4,0) {RNC}; \node[CNcp] (cn) at (9.4,0) {CN};
+\draw[CNdata, ->] (ue) -- node[CNelab, above=1pt, fill=none] {radio} (nb);
+\draw[CNlink, ->] (nb) -- node[CNelab, above=1pt, fill=none] {Iub} (rnc);
+\draw[CNlink, ->] (rnc) -- node[CNelab, above=1pt, fill=none] {Iu} (cn);
+\node[CNnote, anchor=north] (n) at (6.4,-1.15) {\CNL{HO decision here}{تصمیم تحویل اینجا}\\+ \CNL{macro-diversity combining}{ترکیب ماکرو-تنوع}};
+\draw[CNsig, ->, line width=0.9pt] (n.north) -- (rnc.south);
+\end{tikzpicture}

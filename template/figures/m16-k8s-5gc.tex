@@ -1,0 +1,8 @@
+% Module 16 — 5G core network functions as CNFs on a Kubernetes cluster
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNcyan, line width=0.9pt, fill=CNcyan!5, rounded corners=5pt] (-1.2,-2.7) rectangle (11.2,1.1);
+\node[font=\sffamily\small\bfseries, text=CNcyanD] at (5,0.75) {\CNL{Kubernetes cluster}{خوشه \lr{Kubernetes}}};
+\foreach \f [count=\k from 0] in {AMF, SMF, UPF, NRF, PCF, UDM}{
+  \node[CNcp, minimum width=1.6cm] at ({\k*2},-0.3) {\textbf{\f}\\{\scriptsize (CNF)}};}
+\node[CNhl, minimum width=11.6cm] at (5,-1.9) {\CNL{Service mesh (Istio/Envoy) + observability}{مش خدمات (\lr{Istio/Envoy}) + مشاهده‌پذیری}};
+\end{tikzpicture}

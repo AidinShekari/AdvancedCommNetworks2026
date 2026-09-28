@@ -1,0 +1,11 @@
+% Module 26 — OFDM radar processing on the resource grid
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \i in {0,...,15}{\foreach \j in {0,...,7}{\draw[CNline, fill=white] ({\i*0.42},{-\j*0.42}) rectangle ++(0.42,0.42);}}
+\foreach \i/\j in {0/0,4/0,8/0,12/0,2/4,6/4,10/4,14/4}{\fill[CNsig!45] ({\i*0.42},{-\j*0.42}) rectangle ++(0.42,0.42);}
+\foreach \i/\j in {1/1,5/2,9/3,13/5,3/6,7/7,11/1,15/6,2/2,6/1,10/6,14/3}{\fill[CNcyan!35] ({\i*0.42},{-\j*0.42}) rectangle ++(0.42,0.42);}
+\draw[CNlink, ->] (0,0.75) -- node[above, CNtiny] {\CNL{subcarrier index (frequency)}{اندیس زیرحامل (فرکانس)}} (6.7,0.75);
+\draw[CNlink, ->] (-0.35,0.42) -- node[left, CNtiny, align=right] {\CNL{symbol}{نماد}\\(\CNL{time}{زمان})} (-0.35,-3.0);
+\node[CNtiny, anchor=west, align=left, text width=5.6cm] at (7.1,-0.2) {\textbf{\CNL{OFDM resource grid used for BOTH:}{شبکه منابع \lr{OFDM} برای هر دو:}}\\\textcolor{CNcyanD}{\rule{0.6em}{0.6em}} \CNL{communication (data symbols)}{ارتباط (نمادهای داده)}\\\textcolor{CNsig}{\rule{0.6em}{0.6em}} \CNL{sensing (reference for the echo)}{حسگری (مرجع برای پژواک)}};
+\node[CNtiny, anchor=west, align=left] at (7.1,-2.0) {\CNL{range resolution}{تفکیک‌پذیری برد}: $\Delta r = c/(2\,BW)$\\\CNL{velocity resolution}{تفکیک‌پذیری سرعت}: $\Delta v = \lambda/(2\,T_{\mathrm{obs}})$};
+\node[CNbox, text width=9cm, anchor=north, align=left] at (5.3,-3.7) {$\downarrow$ FFT \CNL{along delay (range)}{در راستای تأخیر (برد)}\quad $\downarrow$ FFT \CNL{along Doppler (velocity)}{در راستای داپلر (سرعت)}\quad $\rightarrow$ \CNL{range–Doppler map}{نقشه برد–داپلر}};
+\end{tikzpicture}

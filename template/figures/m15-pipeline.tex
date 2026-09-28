@@ -1,0 +1,14 @@
+% Module 15 — OpenFlow packet-processing pipeline
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNext] (in) at (0,0) {\CNL{Packet in}{ورود بسته}};
+\node[CNran] (t0) at (2.6,0) {Table 0};
+\node[CNhl, diamond, aspect=1.8, inner sep=1pt] (m) at (5.2,0) {\CNL{Match?}{تطبیق؟}};
+\node[CNcp, text width=2.2cm] (ex) at (8.2,0) {\CNL{Execute instructions}{اجرای دستورها}};
+\node[CNran] (t1) at (11.0,0) {Table 1};
+\node (dots) at (12.6,0) {$\cdots$};
+\node[CNext] (out) at (14.0,0) {\CNL{Output}{خروجی}};
+\foreach \a/\b in {in/t0, t0/m, ex/t1, t1/dots, dots/out}{\draw[CNlink, ->] (\a) -- (\b);}
+\draw[CNlink, ->] (m) -- node[CNelab, above=1pt, fill=none] {\CNL{yes}{بله}} (ex);
+\node[CNbad, text width=5.4cm] (miss) at (5.2,-2.1) {\CNL{Table-miss entry $\rightarrow$ send to the controller (Packet-In)}{ورودی عدم‌تطبیق $\rightarrow$ ارسال به کنترل‌گر (\lr{Packet-In})}};
+\draw[CNlink, ->] (m) -- node[CNelab, right=1pt, fill=none] {\CNL{no match}{عدم تطبیق}} (miss);
+\end{tikzpicture}

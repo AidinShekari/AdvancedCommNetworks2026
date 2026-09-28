@@ -1,0 +1,14 @@
+% Module 19 — control plane (SBI) above, user plane below
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNsig!60, line width=0.9pt, fill=CNsig!4, rounded corners=5pt] (-0.8,-0.8) rectangle (12.2,1.35);
+\node[font=\sffamily\small\bfseries, text=CNsig] at (5.7,1.0) {\CNL{CONTROL PLANE (SBI)}{صفحه کنترل (\lr{SBI})}};
+\foreach \n [count=\k from 0] in {AMF, SMF, PCF, UDM, AUSF, NRF, NSSF}{\node[CNcp, minimum width=1.4cm] (c\k) at ({\k*1.9},0) {\n};}
+\draw[CNcyan!70, line width=0.9pt, fill=CNcyan!4, rounded corners=5pt] (-0.8,-3.9) rectangle (12.2,-1.1);
+\node[font=\sffamily\small\bfseries, text=CNcyanD] at (5.7,-1.45) {\CNL{USER PLANE}{صفحه کاربر}};
+\node[CNran, minimum width=1.4cm] (g) at (0,-2.85) {gNB}; \node[CNup, minimum width=1.4cm] (u) at (1.9,-2.85) {UPF};
+\node[CNext, minimum width=1.6cm] (dn) at (8.6,-2.85) {DN};
+\draw[CNsigl] (c0) -- node[CNelab, right=1pt, fill=none, pos=0.35] {N2} (g);
+\draw[CNsigl] (c1) -- node[CNelab, right=1pt, fill=none, pos=0.35] {N4 (PFCP)} (u);
+\draw[CNdata] (g) -- node[CNelab, below=2pt, fill=none] {N3} (u);
+\draw[CNdata, ->] (u) -- node[CNelab, above=1pt, fill=none] {N6} (dn);
+\end{tikzpicture}

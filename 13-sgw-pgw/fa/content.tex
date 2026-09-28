@@ -1,0 +1,619 @@
+\Needspace{19\baselineskip}
+
+\CNsection{1}{چرا \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} جدا هستند؟}
+
+\lr{\mbox{LTE}} به‌طور آگاهانه دروازه صفحه کاربر را به دو گره متمایز تقسیم می‌کند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نقش} & \CNth{\lr{\mbox{S-GW}}} & \CNth{\lr{\mbox{P-GW}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{لنگرگذاری} & لنگر تحرک محلی (درون-\lr{\mbox{LTE}}) & لنگر \lr{PDN/\allowbreak{}IP} (بین-\lr{\mbox{RAT}}، جهانی) \\
+\textbf{دامنه} & در هر ناحیه استخر \lr{\mbox{MME}} & در هر اتصال \lr{\mbox{PDN}} (ممکن است نواحی \lr{\mbox{MME}} را در بر گیرد) \\
+\textbf{تحرک} & در حین تحویل بین-\lr{\mbox{MME}} تغییر می‌کند & برای کل نشست \lr{\mbox{PDN}} ثابت می‌ماند \\
+\textbf{مکان استقرار} & نزدیک \lr{\mbox{RAN}} (تأخیر کم) & متمرکز (سیاست، صورت‌حساب) \\
+\end{longtable}
+}
+
+\textbf{منطق طراحی:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{طول عمر متفاوت}: \lr{\mbox{S-GW}} می‌تواند در حین تحرک جابه‌جا شود؛ \lr{\mbox{P-GW}} برای تداوم \lr{\mbox{IP}} ثابت می‌ماند
+\item
+  \textbf{مقیاس‌پذیری مستقل}: \lr{\mbox{S-GW}} با ترافیک محلی مقیاس می‌یابد؛ \lr{\mbox{P-GW}} با مشترکین/\allowbreak{}سیاست‌ها
+\item
+  \textbf{آماده‌سازی \lr{\mbox{CUPS}}}: این تقسیم، جداسازی کنترل/\allowbreak{}صفحه کاربر را ممکن می‌سازد \lr{—} می‌توانید \lr{\mbox{S-GW-U}} را در لبه توزیع کنید در حالی که \lr{\mbox{S-GW-C}} متمرکز می‌ماند
+\item
+  \textbf{رومینگ}: در رومینگ با مسیریابی خانگی، \lr{\mbox{S-GW}} در \lr{\mbox{PLMN}} بازدیدشده است؛ \lr{\mbox{P-GW}} در \lr{\mbox{PLMN}} خانگی (واسط \lr{\mbox{S8}})
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{\lr{\mbox{S-GW}} (دروازه خدمات‌دهنده)}
+
+\CNchained\CNsubsection{2.1}{ارسال صفحه کاربر}
+
+\lr{\mbox{S-GW}} اساساً یک \textbf{سوییچ تونل \lr{\mbox{GTP-U}}} است:
+
+\begin{itemize}
+\tightlist
+\item
+  بسته‌های \lr{\mbox{DL}} را از \lr{\mbox{P-GW}} روی تونل \lr{\mbox{GTP-U}} در \lr{S5/\allowbreak{}S8} دریافت می‌کند
+\item
+  آن‌ها را به \lr{eNodeB (eNB)} روی تونل \lr{\mbox{GTP-U}} در \lr{\mbox{S1-U}} ارسال می‌کند
+\item
+  بسته‌های \lr{\mbox{UL}} را از \lr{\mbox{eNB}} روی \lr{\mbox{S1-U}} دریافت و به \lr{\mbox{P-GW}} روی \lr{S5/\allowbreak{}S8} ارسال می‌کند
+\end{itemize}
+
+هر حامل \textbf{تونل‌های \lr{\mbox{GTP-U}} جداگانه} روی هر واسط دارد (شناسایی‌شده با \lr{\mbox{TEID}}).
+
+\CNsubsection{2.2}{لنگر تحرک محلی}
+
+در حین \textbf{تحویل \lr{\mbox{X2}}} (مستقیم \lr{\mbox{eNB}}-به-\lr{\mbox{eNB}}):
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{S-GW}} تغییر \textbf{نمی‌کند}
+\item
+  \lr{\mbox{eNB}} مبدأ بسته‌های بافر‌شده/\allowbreak{}در حال عبور را از طریق \lr{\mbox{X2}} به \lr{\mbox{eNB}} مقصد ارسال می‌کند
+\item
+  پس از تحویل، \lr{\mbox{MME}} یک \lr{\textbf{\lr{Modify Bearer Request}}} با آدرس/\allowbreak{}\lr{\mbox{TEID}} جدید \lr{\mbox{eNB}} به \lr{\mbox{S-GW}} می‌فرستد
+\item
+  \lr{\mbox{S-GW}} نقطه انتهایی تونل \lr{\mbox{S1-U}} را از \lr{\mbox{eNB}} مبدأ به \lr{\mbox{eNB}} مقصد تغییر می‌دهد (\textbf{تغییر مسیر})
+\end{itemize}
+
+این کار از تخریب تونل \lr{\mbox{S5}} به \lr{\mbox{P-GW}} جلوگیری می‌کند \lr{—} فقط بخش \lr{\mbox{S1-U}} تغییر می‌کند.
+
+\CNsubsection{2.3}{بافرینگ داده پیوند پایین‌سو}
+
+وقتی \lr{\mbox{UE}} در \lr{\mbox{\textbf{\lr{\mbox{ECM-IDLE}}}}} است (هیچ تونل \lr{\mbox{S1-U}} وجود ندارد):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  بسته‌های \lr{\mbox{DL}} از \lr{\mbox{P-GW}} روی تونل \lr{\mbox{S5}} می‌رسند
+\item
+  \lr{\mbox{S-GW}} نقطه انتهایی \lr{\mbox{S1-U}} ندارد \ensuremath{\leftarrow} \textbf{بسته‌ها را بافر می‌کند}
+\item
+  \lr{\mbox{S-GW}} یک \lr{\textbf{\lr{Downlink Data Notification}}} به \lr{\mbox{MME}} می‌فرستد (از طریق \lr{\mbox{S11}})
+\item
+  \lr{\mbox{MME}} صفحه‌بندی را آغاز می‌کند
+\item
+  پس از پاسخ \lr{\mbox{UE}} (درخواست خدمات)، \lr{\mbox{MME}} یک \lr{Modify Bearer Request} با \lr{\mbox{TEID}} جدید \lr{\mbox{eNB}} می‌فرستد
+\item
+  \lr{\mbox{S-GW}} بسته‌های بافر‌شده را به \lr{\mbox{eNB}} تخلیه می‌کند
+\end{enumerate}
+
+\textbf{محدودیت‌های بافر}: قابل پیکربندی در هر اپراتور؛ معمولاً \CNnum{1-10} بسته در هر حامل. مازاد دور ریخته می‌شود.
+
+\CNsubsection{2.4}{صورت‌حساب در هر \lr{\mbox{UE}}/\allowbreak{}هر حامل}
+
+\lr{\mbox{S-GW}} \textbf{\lr{\mbox{CDR}}ها (رکوردهای داده صورت‌حساب)} را با موارد زیر تولید می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  حجم \lr{UL/\allowbreak{}DL} در هر حامل
+\item
+  مدت
+\item
+  اطلاعات \lr{\mbox{QoS}} (\lr{\mbox{QCI}}، \lr{\mbox{ARP}}، \lr{GBR/\allowbreak{}MBR})
+\item
+  علت بسته‌شدن رکورد (تحویل، محدودیت زمان، محدودیت حجم)
+\end{itemize}
+
+از طریق واسط \lr{Rf/\allowbreak{}Gz} به \textbf{سیستم صورت‌حساب آفلاین \lr{\mbox{(CDF)}}} فرستاده می‌شود.
+
+\CNsubsection{2.5}{رهگیری قانونی}
+
+\lr{\mbox{S-GW}} می‌تواند ترافیک صفحه کاربر را برای رهگیری قانونی \lr{\mbox{(LI)}} آینه کند:
+
+\begin{itemize}
+\tightlist
+\item
+  واسط \lr{\mbox{X2}} (استاندارد \lr{\mbox{ETSI}}) به تسهیلات پایش اجرای قانون \lr{\mbox{(LEMF)}}
+\item
+  با حکم قضایی فعال می‌شود، از طریق واسط \lr{\mbox{X1}} از مدیریت \lr{\mbox{LI}} فعال می‌گردد
+\item
+  بسته‌ها را بدون تأثیر بر سرویس \lr{\mbox{UE}} تکثیر می‌کند
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{2.6}{واسط‌های \lr{\mbox{S-GW}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2973}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1622}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2703}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2703}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{همتا} & \CNth{پروتکل} & \CNth{عملکرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{S1-U}}}}} & \lr{\mbox{eNB}} & \lr{GTP-U (UDP)} & صفحه کاربر به/\allowbreak{}از \lr{\mbox{RAN}} \\
+\lr{\mbox{\textbf{\lr{\mbox{S5}}}}} & \lr{\mbox{P-GW}} (همان \lr{\mbox{PLMN}}) & \lr{GTP-U + GTPv2-C} & ارسال \lr{\mbox{UP}} + مدیریت نشست \lr{\mbox{CP}} \\
+\lr{\mbox{\textbf{\lr{\mbox{S8}}}}} & \lr{\mbox{P-GW}} (رومینگ) & \lr{GTP-U + GTPv2-C} & همان \lr{\mbox{S5}} اما بین-\lr{\mbox{PLMN}} \\
+\lr{\mbox{\textbf{\lr{\mbox{S11}}}}} & \lr{\mbox{MME}} & \lr{\mbox{GTPv2-C}} & \lr{\mbox{CP}}: مدیریت حامل/\allowbreak{}نشست \\
+\lr{\mbox{\textbf{\lr{\mbox{S12}}}}} & \lr{UTRAN (3G)} & \lr{\mbox{GTP-U}} & تونل مستقیم برای هم‌کنش‌گری \lr{\mbox{3G}} \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{\lr{\mbox{P-GW}} (دروازه \lr{\mbox{PDN}})}
+
+\CNchained\CNsubsection{3.1}{اتصال \lr{\mbox{PDN}} و تخصیص آدرس \lr{\mbox{IP}}}
+
+\lr{\mbox{P-GW}} \textbf{دروازه \lr{\mbox{UE}} به اینترنت/\allowbreak{}\lr{\mbox{PDN}}} است \lr{—} آدرس \lr{\mbox{IP}} را به \lr{\mbox{UE}} تخصیص می‌دهد:
+
+\textbf{روش‌های تخصیص \lr{\mbox{IPv4}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ایستا}: پیش‌پیکربندی‌شده در داده اشتراک \lr{\mbox{HSS}}
+\item
+  \textbf{پویا \lr{\mbox{(DHCPv4)}}}: \lr{\mbox{P-GW}} به‌عنوان کارساز \lr{\mbox{DHCP}} عمل می‌کند یا به \lr{\mbox{DHCP}} خارجی رله می‌کند
+\item
+  \textbf{پویا (استخر داخلی)}: \lr{\mbox{P-GW}} از استخر آدرس محلی تخصیص می‌دهد (رایج‌ترین)
+\end{itemize}
+
+\textbf{تخصیص \lr{\mbox{IPv6}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{P-GW}} یک پیشوند /\allowbreak{}\lr{\mbox{64}} از طریق \textbf{اعلام مسیریاب \lr{\mbox{(SLAAC)}}} تخصیص می‌دهد
+\item
+  \lr{\mbox{UE}} شناسه واسط را تولید می‌کند (\lr{\mbox{EUI-64}} یا افزونه‌های حریم خصوصی)
+\item
+  پیشوند در \lr{\mbox{PCO}} (گزینه‌های پیکربندی پروتکل) در حین فعال‌سازی حامل تحویل می‌شود
+\end{itemize}
+
+\textbf{دو-پشته \lr{\mbox{(IPv4v6)}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  هم آدرس \lr{\mbox{IPv4}} و هم پیشوند \lr{\mbox{IPv6}} به‌طور همزمان تخصیص می‌یابند
+\item
+  نیازمند نوع \lr{PDN = IPv4v6} در اشتراک است
+\end{itemize}
+
+\CNsubsection{3.2}{اجرای سیاست}
+
+\lr{\mbox{P-GW}} سیاست‌های دریافتی از \lr{\mbox{\textbf{\lr{\mbox{PCRF}}}}} را از طریق \textbf{واسط \lr{\mbox{Gx}}} اجرا می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{قواعد \lr{\mbox{PCC}} (کنترل سیاست و صورت‌حساب):}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    فیلترهای \lr{\mbox{SDF}} (جریان داده خدمات) \lr{—} تطبیق 5-گانه
+  \item
+    پارامترهای \lr{\mbox{QoS}} (\lr{\mbox{QCI}}، \lr{\mbox{GBR}}، \lr{\mbox{MBR}}، \lr{\mbox{ARP}})
+  \item
+    کلیدهای صورت‌حساب و گروه‌های نرخ‌گذاری
+  \item
+    وضعیت دروازه (باز/\allowbreak{}بسته کردن جریان‌های مشخص)
+  \end{itemize}
+\item
+  \textbf{\lr{\mbox{TFT}} (قالب جریان ترافیک):}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{\lr{\mbox{TFT}} پیوند پایین‌سو}: در \lr{\mbox{P-GW}} \lr{—} بسته‌های \lr{\mbox{DL}} ورودی را به حامل صحیح نگاشت می‌کند
+  \item
+    \textbf{\lr{\mbox{TFT}} پیوند بالاسو}: به \lr{\mbox{UE}} فرستاده می‌شود \lr{—} \lr{\mbox{UE}} بسته‌های \lr{\mbox{UL}} را به حامل صحیح نگاشت می‌کند
+  \item
+    فیلترهای بسته: \lr{\mbox{IP}} مبدأ/\allowbreak{}مقصد، محدوده پورت، پروتکل، \lr{ToS/\allowbreak{}DSCP}
+  \end{itemize}
+\end{itemize}
+
+\Needspace{12\baselineskip}
+
+\CNsubsection{3.3}{صورت‌حساب}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1818}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1818}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3030}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{واسط} & \CNth{گره} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{آنلاین \lr{\mbox{(OCS)}}} & \lr{Gy (Diameter)} & \lr{\mbox{OCS}} & پیش‌پرداخت؛ کنترل اعتبار بلادرنگ \\
+\textbf{آفلاین \lr{\mbox{(OFCS)}}} & \lr{Gz (GTP’)} & \lr{CDF/\allowbreak{}CGF} & پس‌پرداخت؛ تولید \lr{\mbox{CDR}} \\
+\end{longtable}
+}
+
+\textbf{محرک‌های صورت‌حساب:}
+
+\begin{itemize}
+\tightlist
+\item
+  آستانه حجم (مثلاً هر \lr{\mbox{1~MB}})
+\item
+  آستانه زمان (مثلاً هر 60 ثانیه)
+\item
+  تغییر \lr{\mbox{QoS}}، اصلاح حامل
+\item
+  مجوزدهی مجدد از \lr{\mbox{OCS}}
+\end{itemize}
+
+\CNsubsection{3.4}{فیلترکردن و مسیریابی بسته}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{DL}}}}}: اینترنت \ensuremath{\leftarrow} \lr{\mbox{P-GW}}: \lr{\mbox{IP}} مقصد را با نشست \lr{\mbox{UE}} تطبیق می‌دهد، فیلتر \lr{\mbox{SDF}} را برای انتخاب حامل اعمال می‌کند، در \lr{\mbox{GTP-U}} به‌سمت \lr{\mbox{S-GW}} کپسوله می‌کند
+\item
+  \lr{\textbf{\lr{\mbox{UL}}}: UE \ensuremath{\to} P-GW}: \lr{\mbox{GTP-U}} را واکپسوله می‌کند، \lr{\mbox{NAT}} را اعمال می‌کند (در صورت آدرس‌دهی خصوصی)، به اینترنت مسیریابی می‌کند
+\item
+  \lr{\textbf{\lr{NAT/\allowbreak{}NAPT}}: P-GW} اغلب \lr{\mbox{NAT}} را برای \lr{\mbox{IPv4}} انجام می‌دهد (آدرس‌های خصوصی \lr{\mbox{UE}} \ensuremath{\leftarrow} عمومی)
+\item
+  \textbf{فشرده‌سازی سرآیند}: در \lr{\mbox{P-GW}} نیست (در لایه \lr{\mbox{PDCP}} در \lr{\mbox{RAN}} انجام می‌شود)
+\end{itemize}
+
+\CNsubsection{3.5}{واسط \lr{\mbox{SGi}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{SGi P-GW}} را به \textbf{\lr{\mbox{PDN}}های خارجی} متصل می‌کند (اینترنت، \lr{\mbox{IMS}}، \lr{\mbox{VPN}}های سازمانی)
+\item
+  واسط مبتنی بر \lr{\mbox{IP}} (بدون \lr{\mbox{GTP}})
+\item
+  معادل \lr{\mbox{Gi}} در \lr{\mbox{3G}} (\lr{\mbox{GGSN}} \ensuremath{\leftarrow} اینترنت)
+\item
+  چندین \lr{\mbox{PDN}} پشتیبانی می‌شود (هر یک با یک \lr{\mbox{APN}} شناسایی می‌شود)
+\item
+  ممکن است به موارد زیر متصل شود:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    اینترنت (\lr{\mbox{APN}} عمومی)
+  \item
+    هسته \lr{\mbox{IMS}} (\lr{\mbox{APN}} مربوط به \lr{\mbox{ims}})
+  \item
+    \lr{\mbox{VPN}} سازمانی (\lr{\mbox{APN}} خصوصی)
+  \item
+    پلتفرم‌های محتوا/\allowbreak{}\lr{\mbox{CDN}}
+  \end{itemize}
+\end{itemize}
+
+\CNkeepfig{m13-tft-mapping}{3}
+
+\CNsubsection{3.6}{\lr{\mbox{TFT}} پیوند بالاسو/\allowbreak{}پایین‌سو \lr{—} نگاشت بسته‌ها به حامل‌ها}
+
+\CNfigure{m13-tft-mapping}{چند حامل در هر اتصال \lr{\mbox{PDN}} و نحوه نگاشت بسته‌ها به آن‌ها}
+
+\Needspace{14\baselineskip}
+
+\Needspace{31\baselineskip}
+
+\CNsection{4}{پروتکل \lr{\mbox{GTP}}}
+
+\CNchained\CNsubsection{4.1}{\lr{\mbox{GTP-C}} (صفحه کنترل \lr{\mbox{GTP}}) \lr{—} \lr{\mbox{GTPv2-C}}}
+
+\lr{\mbox{GTP-C}} چرخه عمر تونل/\allowbreak{}نشست را روی واسط‌های \lr{\mbox{S11}}، \lr{S5/\allowbreak{}S8}، \lr{\mbox{S10}}، \lr{\mbox{S3}} مدیریت می‌کند.
+
+\textbf{پیام‌های کلیدی:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3793}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پیام} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Create Session Request/\allowbreak{}Response} & \lr{MME\ensuremath{\to}S-GW\ensuremath{\to}P-GW} & برقراری اتصال \lr{\mbox{PDN}} + حامل پیش‌فرض \\
+\lr{Modify Bearer Request/\allowbreak{}Response} & \lr{\mbox{MME\ensuremath{\to}S-GW}} & به‌روزرسانی نقاط انتهایی تونل (تحویل، درخواست خدمات) \\
+\lr{Delete Session Request/\allowbreak{}Response} & \lr{MME\ensuremath{\to}S-GW\ensuremath{\to}P-GW} & تخریب اتصال \lr{\mbox{PDN}} \\
+\lr{Create Bearer Request/\allowbreak{}Response} & \lr{P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME} & فعال‌سازی حامل اختصاصی \\
+\lr{Update Bearer Request/\allowbreak{}Response} & \lr{P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME} & اصلاح \lr{\mbox{QoS}} \\
+\lr{Delete Bearer Request/\allowbreak{}Response} & \lr{P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME} & غیرفعال‌سازی حامل اختصاصی \\
+\lr{Downlink Data Notification} & \lr{\mbox{S-GW\ensuremath{\to}MME}} & فعال‌سازی صفحه‌بندی برای \lr{\mbox{UE}} بیکار \\
+\lr{Release Access Bearers} & \lr{\mbox{MME\ensuremath{\to}S-GW}} & \lr{\mbox{UE}} بیکار می‌شود، آزادسازی \lr{\mbox{S1-U}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m13-gtpv2c-header}{2}
+
+\textbf{سرآیند \lr{\mbox{GTPv2-C}}:}
+
+\CNfigure{m13-gtpv2c-header}{سرآیند \lr{\mbox{GTPv2-C}}}
+
+\textbf{\lr{\mbox{TEID}} (شناسه نقطه انتهایی تونل):}
+
+\begin{itemize}
+\tightlist
+\item
+  شناسه 32 بیتی، یکتا به‌صورت محلی در هر گره
+\item
+  هر طرف \lr{\mbox{TEID}} خود را تخصیص می‌دهد و به همتا اطلاع می‌دهد
+\item
+  چندگانه‌سازی چندین تونل روی همان \lr{\mbox{IP:port}} را ممکن می‌سازد
+\end{itemize}
+
+\CNkeepfig{m13-gtpu-header}{7}
+
+\CNsubsection{4.2}{\lr{\mbox{GTP-U}} (صفحه کاربر \lr{\mbox{GTP}})}
+
+\lr{\mbox{GTP-U}} بسته‌های \lr{\mbox{IP}} کاربر را برای انتقال بین گره‌های \lr{\mbox{EPC}} کپسوله می‌کند.
+
+\textbf{سرآیند \lr{\mbox{GTP-U}}:}
+
+\CNfigure{m13-gtpu-header}{سرآیند \lr{\mbox{GTP-U}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{نوع پیام \lr{0xFF (255)}}: \lr{\mbox{T-PDU}} \lr{—} شامل داده کاربر (رایج‌ترین)
+\item
+  \textbf{انتقال}: پورت \lr{\mbox{UDP 2152}}
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{T-PDU}}}}}: بسته \lr{\mbox{IP}} کاربر کپسوله‌شده
+\item
+  \textbf{شماره ترتیب}: اختیاری، برای بازترتیبی در حین تغییر مسیر/\allowbreak{}تحویل استفاده می‌شود
+\end{itemize}
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{4.3}{مقایسه \lr{\mbox{GTP-C}} با \lr{\mbox{GTP-U}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1860}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3953}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4186}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{GTP-C (GTPv2-C)}} & \CNth{\lr{GTP-U (GTPv1-U)}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{هدف} & مدیریت نشست/\allowbreak{}تونل & انتقال داده کاربر \\
+\textbf{نسخه} & \lr{\mbox{v2}} (در \lr{\mbox{LTE}}) & \lr{\mbox{v1}} (بدون تغییر از \lr{\mbox{3G}}) \\
+\textbf{انتقال} & پورت \lr{\mbox{UDP 2123}} & پورت \lr{\mbox{UDP 2152}} \\
+\textbf{قابلیت اطمینان} & درخواست/\allowbreak{}پاسخ + بازارسال & بدون \lr{\mbox{ACK}} (به لایه‌های بالاتر تکیه می‌کند) \\
+\lr{\mbox{\textbf{\lr{\mbox{TEID}}}}} & نشست کنترل را شناسایی می‌کند & تونل داده کاربر را شناسایی می‌کند (در هر حامل) \\
+\textbf{پیام‌ها} & \lr{Create/\allowbreak{}Modify/\allowbreak{}Delete Session} و غیره & \lr{T-PDU (0xFF)}، \lr{\mbox{Echo}}، \lr{Error Indication} \\
+\textbf{واسط‌ها} & \lr{\mbox{S11}}، \lr{S5/\allowbreak{}S8}، \lr{\mbox{S10}}، \lr{\mbox{S3}} & \lr{\mbox{S1-U}}، \lr{S5/\allowbreak{}S8} (صفحه کاربر) \\
+\textbf{بار} & \lr{\mbox{IE}} (عناصر اطلاعات) ساخت‌یافته & بسته \lr{\mbox{IP}} خام \lr{\mbox{(T-PDU)}} \\
+\textbf{اندازه سرآیند} & 12 بایت (حداقل) & 8 بایت (حداقل)، 12 با گزینه‌ها \\
+\textbf{حالت‌داری} & حالت‌دار (نشست‌ها) & بدون حالت (ارسال در هر بسته) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m13-downlink-trace}{8}
+
+\CNsection{5}{ردیابی مسیر بسته (سرتاسری با کپسوله‌سازی)}
+
+\CNchained\CNsubsection{5.1}{پیوند پایین‌سو: اینترنت \ensuremath{\leftarrow} \lr{\mbox{UE}}}
+
+\CNfigure{m13-downlink-trace}{ردیابی بسته پیوند پایین‌سو از اینترنت تا \lr{\mbox{UE}} با هر کپسوله‌سازی}
+
+\CNkeepfig{m13-headers}{3}
+
+\CNsubsection{5.2}{سرآیندها در هر نقطه}
+
+\CNfigure{m13-headers}{سرآیندهای یک بسته پیوند پایین‌سو در هر بخش مسیر}
+
+\CNkeepfig{m13-gtp-tunnels}{3}
+
+\CNsubsection{5.3}{نمودار ساختار تونل \lr{\mbox{GTP}}}
+
+\CNfigure{m13-gtp-tunnels}{نقاط پایانی تونل \lr{\mbox{GTP}} و \lr{\mbox{TEID}}ها در طول مسیر صفحه کاربر}
+
+\textbf{یادداشت:} هر بخش تونل \lr{\mbox{GTP-U}} \textbf{دو \lr{\mbox{TEID}}} دارد \lr{—} یکی برای هر جهت:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UL}} در \lr{\mbox{S1-U}}: \lr{\mbox{eNB\ensuremath{\to}S-GW}} از \lr{\mbox{TEID}} مربوط به \lr{\mbox{S-GW}} استفاده می‌کند \lr{\mbox{(0x5678)}}
+\item
+  \lr{\mbox{DL}} در \lr{\mbox{S1-U}}: \lr{\mbox{S-GW\ensuremath{\to}eNB}} از \lr{\mbox{TEID}} مربوط به \lr{\mbox{eNB}} استفاده می‌کند \lr{\mbox{(0x1234)}}
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m13-cups-split}{10}
+
+\CNsection{6}{\lr{\mbox{CUPS}}: جداسازی صفحه کنترل و صفحه کاربر}
+
+\CNchained\CNsubsection{6.1}{مفهوم (نسخه \lr{\mbox{14}}+ گروه \lr{\mbox{3GPP}})}
+
+\lr{\mbox{CUPS}} هر یک از \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} را به مؤلفه‌های صفحه کنترل و صفحه کاربر تقسیم می‌کند:
+
+\CNfigure{m13-cups-split}{\lr{\mbox{CUPS}} هر یک از \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} را به بخش صفحه کنترل و صفحه کاربر تفکیک می‌کند}
+
+\CNsubsection{6.2}{واسط \lr{\mbox{Sx}} و پروتکل \lr{\mbox{PFCP}}}
+
+\textbf{\lr{\mbox{PFCP}} (پروتکل کنترل ارسال بسته)} \lr{—} \lr{3GPP TS 29.244}:
+
+\begin{itemize}
+\tightlist
+\item
+  بین مؤلفه‌های \lr{\mbox{CP}} و \lr{\mbox{UP}} اجرا می‌شود (\lr{\mbox{Sxa}} برای \lr{\mbox{S-GW}}، \lr{\mbox{Sxb}} برای \lr{\mbox{P-GW}}، \lr{\mbox{Sxc}} برای \lr{\mbox{TDF}})
+\item
+  \textbf{برقراری نشست}: \lr{\mbox{CP}} به \lr{\mbox{UP}} می‌گوید قواعد ارسال را ایجاد کند
+\item
+  \textbf{اصلاح نشست}: \lr{\mbox{CP}} قواعد را به‌روزرسانی می‌کند (مثلاً \lr{\mbox{TEID}} جدید پس از تحویل)
+\item
+  \textbf{حذف نشست}: \lr{\mbox{CP}} به \lr{\mbox{UP}} دستور می‌دهد وضعیت ارسال را حذف کند
+\end{itemize}
+
+\textbf{مفاهیم کلیدی \lr{\mbox{PFCP}}:}\CNbr{}\lr{\textbar{}} عنصر \lr{\textbar{}} هدف \lr{\textbar{}}\CNbr{}\lr{\mbox{\textbar{}———\textbar{}———\textbar{}}}\CNbr{}\lr{\textbar{}} \lr{\mbox{PDR}} (قاعده تشخیص بسته) \lr{\textbar{}} معیارهای تطبیق (\lr{\mbox{TEID}}، \lr{\mbox{IP}}، پورت) \lr{\textbar{}}\CNbr{}\lr{\textbar{}} \lr{\mbox{FAR}} (قاعده اقدام ارسال) \lr{\textbar{}} چه کاری انجام شود (ارسال، بافر، دور ریختن) \lr{\textbar{}}\CNbr{}\lr{\textbar{}} \lr{\mbox{QER}} (قاعده اجرای \lr{\mbox{QoS}}) \lr{\textbar{}} محدودسازی نرخ \lr{(GBR/\allowbreak{}MBR)} \lr{\textbar{}}\CNbr{}\lr{\textbar{}} \lr{\mbox{URR}} (قاعده گزارش‌دهی مصرف) \lr{\textbar{}} اندازه‌گیری حجم/\allowbreak{}زمان برای صورت‌حساب \lr{\textbar{}}\CNbr{}\lr{\textbar{}} \lr{\mbox{BAR}} (قاعده اقدام بافرینگ) \lr{\textbar{}} رفتار بافرینگ برای \lr{\mbox{UE}} بیکار \lr{\textbar{}}
+
+\CNsubsection{6.3}{مزایای \lr{\mbox{CUPS}}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{صفحه کاربر توزیع‌شده}: استقرار \lr{S-GW-U /\allowbreak{} P-GW-U} در لبه (تأخیر کم برای \lr{\mbox{MEC}})
+\item
+  \textbf{کنترل متمرکز}: نگه‌داشتن \lr{S-GW-C /\allowbreak{} P-GW-C} در \lr{\mbox{DC}} مرکزی (مدیریت ساده‌تر)
+\item
+  \textbf{مقیاس‌پذیری مستقل}: مقیاس‌دهی \lr{\mbox{UP}} با حجم ترافیک، \lr{\mbox{CP}} با بار سیگنالینگ
+\item
+  \textbf{استقرار انعطاف‌پذیر}: چندین نمونه \lr{\mbox{UP}} در هر \lr{\mbox{CP}}، یا برعکس
+\item
+  \textbf{آمادگی \lr{\mbox{5G}}}: معماری \lr{\mbox{CUPS}} مستقیماً به تقسیم \lr{SMF (CP) + UPF (UP)} در \lr{\mbox{5G}} نگاشت می‌شود
+\end{enumerate}
+
+\CNkeepfig{m13-cups}{3}
+
+\CNsubsection{6.4}{نمودار معماری \lr{\mbox{CUPS}}}
+
+\CNfigure{m13-cups}{\lr{\mbox{CUPS}}: تفکیک \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} به صفحه کنترل و صفحه کاربر}
+
+\textbf{آبی = صفحه کنترل} \lr{\textbar{}} \textbf{سبز = صفحه کاربر}
+
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{7}{تحول: \lr{S-GW + P-GW \ensuremath{\to} UPF (5G)}}
+
+\CNchained\CNsubsection{7.1}{چرا در \lr{\mbox{UPF}} ادغام شدند؟}
+
+در \lr{\mbox{5G}}، توابع صفحه کاربر \lr{\mbox{S-GW}} و \lr{\mbox{P-GW}} در \textbf{یک \lr{\mbox{UPF}} واحد (تابع صفحه کاربر) ادغام می‌شوند}:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{LTE (S-GW + P-GW)}} & \CNth{\lr{\mbox{5G (UPF)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+گره‌ها & 2 جداگانه (\lr{\mbox{S-GW}}، \lr{\mbox{P-GW}}) & 1 یکپارچه \lr{\mbox{(UPF)}} \\
+گام‌های \lr{\mbox{GTP}} & \lr{2 (S1-U + S5)} & 1 (فقط \lr{\mbox{N3}}، یا \lr{\mbox{N3+N9}} برای زنجیره‌سازی) \\
+کنترل & \lr{S-GW-C + P-GW-C} & \lr{\mbox{SMF}} (\lr{\mbox{CP}} واحد برای \lr{\mbox{UP}}) \\
+پروتکل \lr{\mbox{CP-UP}} & \lr{Sxa/\allowbreak{}Sxb PFCP} & \lr{\mbox{N4 PFCP}} (همان پروتکل، تکامل‌یافته) \\
+استقرار & معمولاً متمرکز & توزیع‌شده (\lr{\mbox{UPF}} لبه، \lr{\mbox{UPF}} لنگر) \\
+لنگر تحرک & \lr{\mbox{P-GW}} ثابت & انعطاف‌پذیر (حالت‌های \lr{SSC 1/\allowbreak{}2/\allowbreak{}3}) \\
+شبکه‌بندی & \lr{N/\allowbreak{}A} & \lr{\mbox{UPF}} در هر برش \\
+\end{longtable}
+}
+
+\CNsubsection{7.2}{چرا ادغام منطقی است}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{حذف یک گام \lr{\mbox{GTP-U}}}: \lr{S1-U + S5} \ensuremath{\leftarrow} فقط \lr{\mbox{N3}} (+ \lr{\mbox{N9}} اختیاری بین \lr{\mbox{UPF}}ها)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    تأخیر کمتر، عملیات کپسوله/\allowbreak{}واکپسوله کمتر
+  \end{itemize}
+\item
+  \textbf{ارسال ساده‌شده}: یک گره هم تحرک محلی و هم لنگرگذاری \lr{\mbox{PDN}} را انجام می‌دهد
+\item
+  \textbf{استقرار در لبه}: \lr{\mbox{UPF}} نزدیک کاربر برای \lr{MEC/\allowbreak{}URLLC} قرار می‌گیرد \lr{—} نیازی به \lr{\mbox{S-GW-U}} جداگانه در لبه نیست
+\item
+  \textbf{لنگرگذاری انعطاف‌پذیر (حالت‌های \lr{\mbox{SSC}})}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \lr{\mbox{SSC 1}}: \lr{\mbox{UPF}} ثابت (مانند \lr{\mbox{P-GW}} در \lr{\mbox{LTE}}) \lr{—} تداوم \lr{\mbox{IP}}
+  \item
+    \lr{\mbox{SSC 2}}: \lr{\mbox{UPF}} می‌تواند تغییر کند \lr{—} آدرس \lr{\mbox{IP}} جدید (برای نشست‌های غیرماندگار)
+  \item
+    \lr{\mbox{SSC 3}}: چند-میزبانی \lr{—} \lr{\mbox{UPF}} قدیمی + جدید به‌طور همزمان در حین انتقال فعال
+  \end{itemize}
+\item
+  \textbf{زنجیره‌سازی \lr{\mbox{UPF}}}: چندین \lr{\mbox{UPF}} به‌صورت سری (\lr{\mbox{I-UPF}} به‌عنوان واسط، \lr{\mbox{PSA-UPF}} به‌عنوان لنگر) زنجیره \lr{S-GW\ensuremath{\to}P-GW} را با توپولوژی انعطاف‌پذیرتر جایگزین می‌کند
+\end{enumerate}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{7.3}{نگاشت واسط‌ها}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{LTE}}} & \CNth{\lr{\mbox{5G}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{S1-U (eNB \ensuremath{\leftrightarrow} S-GW)} & \lr{N3 (gNB \ensuremath{\leftrightarrow} UPF)} \\
+\lr{S5/\allowbreak{}S8 (S-GW \ensuremath{\leftrightarrow} P-GW)} & \lr{\mbox{N9}} (\lr{UPF \ensuremath{\leftrightarrow} UPF}، در صورت زنجیره‌شدن) \\
+\lr{\mbox{SGi}} (\lr{\mbox{P-GW}} \ensuremath{\leftrightarrow} اینترنت) & \lr{N6 (UPF \ensuremath{\leftrightarrow} DN)} \\
+\lr{S11 (MME \ensuremath{\leftrightarrow} S-GW)} & \lr{N4 (SMF \ensuremath{\leftrightarrow} UPF) [PFCP]} \\
+\lr{Gx (PCRF \ensuremath{\leftrightarrow} P-GW)} & \lr{N7 (PCF \ensuremath{\leftrightarrow} SMF) [SBI]} \\
+\end{longtable}
+}
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{خلاصه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عملکرد} & \CNth{\lr{\mbox{S-GW}}} & \CNth{\lr{\mbox{P-GW}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ارسال صفحه کاربر & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNyes{}}} \\
+پایان‌دهی \lr{\mbox{GTP-U}} & \lr{S1-U + S5} & \lr{\mbox{S5 + SGi}} \\
+تخصیص آدرس \lr{\mbox{IP}} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} \\
+اجرای سیاست \lr{\mbox{(PCC)}} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} \\
+صورت‌حساب (آنلاین) & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{} (Gy)}} \\
+صورت‌حساب (آفلاین) & \lr{\mbox{\CNyes{}}} (\lr{\mbox{CDR}}ها) & \lr{\mbox{\CNyes{} (Gz)}} \\
+بافرینگ \lr{\mbox{DL}} + محرک صفحه‌بندی & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNno{}}} \\
+لنگر تحرک محلی & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNno{}}} \\
+لنگر \lr{PDN/\allowbreak{}IP} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} \\
+رهگیری قانونی & \lr{\mbox{\CNyes{}}} & \lr{\mbox{\CNyes{}}} \\
+\lr{\mbox{NAT}} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} \\
+اجرای \lr{TFT/\allowbreak{}SDF} & \lr{\mbox{\CNno{}}} & \lr{\mbox{\CNyes{}}} \\
+\end{longtable}
+}

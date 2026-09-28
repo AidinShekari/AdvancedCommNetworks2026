@@ -1,0 +1,727 @@
+\Needspace{14\baselineskip}
+
+\CNsection{1}{Circuit Switching Fundamentals}
+
+\CNchained\CNsubsection{}{Concept: Dedicated Path}
+
+In circuit switching, a \textbf{dedicated communication path} is established between two endpoints for the entire duration of the call. This path is reserved exclusively — no other user can use those resources until the call is released.
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{How It Works in GSM}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4286}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5714}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Step} & \CNth{Action} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Caller initiates a call \\
+2 & Network allocates a dedicated timeslot on the air interface (TDMA) \\
+3 & A fixed path is reserved through BTS \ensuremath{\to} BSC \ensuremath{\to} MSC \ensuremath{\to} trunk to destination \\
+4 & Resources remain allocated for the entire call duration \\
+5 & Upon hangup, all resources are released \\
+\end{longtable}
+}
+
+\CNsubsection{}{Resource Reservation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Air Interface}: A dedicated TDMA timeslot (one of 8 per carrier frequency) is assigned
+\item
+  \textbf{Abis Interface} (BTS\ensuremath{\leftrightarrow}BSC): A 16~kbps or 64~kbps channel on E1/\allowbreak{}T1 links
+\item
+  \textbf{A Interface} (BSC\ensuremath{\leftrightarrow}MSC): A 64~kbps timeslot on E1/\allowbreak{}T1 links
+\item
+  \textbf{Trunk} (MSC\ensuremath{\leftrightarrow}PSTN/\allowbreak{}other MSC): A 64~kbps circuit on PCM links
+\end{itemize}
+
+\CNsubsection{}{Key Characteristics}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Connection-oriented}: Path established before data flows
+\item
+  \textbf{Guaranteed bandwidth}: Fixed 64~kbps per direction once connected
+\item
+  \textbf{Constant delay}: Predictable latency (\textasciitilde{}150ms end-to-end target)
+\item
+  \textbf{Inefficient for bursty data}: Resources wasted during silence periods
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{SS7 Signaling Concepts}
+
+\CNchained\CNsubsection{}{What is SS7?}
+
+\textbf{Signaling System 7 (SS7)} is the out-of-band signaling protocol stack used by telecom networks to:
+
+\begin{itemize}
+\tightlist
+\item
+  Set up and tear down calls
+\item
+  Manage subscriber databases
+\item
+  Enable roaming and handovers
+\item
+  Provide supplementary services (call forwarding, SMS, etc.)
+\end{itemize}
+
+SS7 signaling is \textbf{separate} from the voice path — this is called \textbf{Common Channel Signaling (CCS)}.
+
+\CNkeepfig{m02-ss7-stack}{3}
+
+\CNsubsection{}{SS7 Protocol Stack (Simplified)}
+
+\CNfigure{m02-ss7-stack}{Simplified SS7 protocol stack}
+
+\Needspace{11\baselineskip}
+
+\CNsubsection{}{Key Protocols}
+
+\CNchained\CNsubsubsection{ISUP (ISDN User Part)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Purpose}: Call setup, management, and release between exchanges (MSCs)
+\item
+  \textbf{Messages}: IAM (Initial Address Message), ACM (Address Complete), ANM (Answer), REL (Release), RLC (Release Complete)
+\item
+  \textbf{Used for}: Establishing the voice circuit between switches
+\end{itemize}
+
+\CNsubsubsection{MAP (Mobile Application Part)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Purpose}: Communication between GSM network elements (MSC, HLR, VLR, AuC)
+\item
+  \textbf{Operations}: Location updates, authentication data retrieval, subscriber info queries, SMS routing
+\item
+  \textbf{Used for}: Mobility management, roaming, subscriber data exchange
+\end{itemize}
+
+\CNsubsubsection{TCAP (Transaction Capabilities Application Part)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Purpose}: Provides a framework for MAP and other applications to exchange structured data
+\item
+  \textbf{Model}: Request-response transactions (invoke, result, error)
+\item
+  \textbf{Used for}: Carrying MAP operations over the SS7 network
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{Signaling Points}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Element} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{SSP} (Service Switching Point) & MSC/\allowbreak{}GMSC — originates/\allowbreak{}terminates signaling \\
+\textbf{STP} (Signal Transfer Point) & Routes signaling messages between SSPs \\
+\textbf{SCP} (Service Control Point) & Database nodes (HLR, AuC) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{Call Setup Process}
+
+\CNchained\CNsubsection{3.1}{Mobile-Originated Call (MOC)}
+
+A Mobile-Originated Call is initiated by the mobile subscriber.
+
+\CNsubsubsection{Sequence of Events}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{UE dials number} \ensuremath{\to} sends CHANNEL REQUEST on RACH
+\item
+  \textbf{BTS} forwards to BSC
+\item
+  \textbf{BSC} assigns a dedicated channel (SDCCH) \ensuremath{\to} IMMEDIATE ASSIGNMENT
+\item
+  \textbf{UE} sends CM SERVICE REQUEST (service type = MOC) to MSC via BSC
+\item
+  \textbf{MSC} authenticates the subscriber (see Section 6)
+\item
+  \textbf{MSC} activates ciphering
+\item
+  \textbf{UE} sends SETUP message with called party number
+\item
+  \textbf{MSC} sends CALL PROCEEDING to UE
+\item
+  \textbf{MSC} analyzes digits, determines routing
+\item
+  \textbf{MSC} sends IAM (ISUP) toward GMSC/\allowbreak{}PSTN
+\item
+  \textbf{GMSC/\allowbreak{}PSTN} returns ACM (Address Complete) \ensuremath{\to} ringback
+\item
+  \textbf{MSC} sends ALERTING to UE
+\item
+  \textbf{Called party answers} \ensuremath{\to} ANM (Answer Message) returned
+\item
+  \textbf{MSC} sends CONNECT to UE
+\item
+  \textbf{BSC} assigns a TCH (Traffic Channel) for voice
+\item
+  \textbf{Voice path established} — conversation begins
+\end{enumerate}
+
+\CNkeepfig{m02-moc-1}{2}
+
+\CNsubsubsection{MOC Sequence Diagram}
+
+\CNfigure{m02-moc-1}{Mobile-originated call (MOC) set-up\CNpart{1}{2}}
+
+\CNfigure{m02-moc-2}{Mobile-originated call (MOC) set-up\CNpart{2}{2}}
+
+\CNsubsection{3.2}{Mobile-Terminated Call (MTC)}
+
+A Mobile-Terminated Call is a call arriving for a mobile subscriber.
+
+\CNsubsubsection{Sequence of Events}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{PSTN/\allowbreak{}calling party} sends IAM to GMSC with called MSISDN
+\item
+  \textbf{GMSC} queries HLR: ``Where is this subscriber?'' (MAP: Send Routing Info)
+\item
+  \textbf{HLR} returns MSRN (Mobile Station Roaming Number) pointing to serving MSC
+\item
+  \textbf{GMSC} routes call to serving MSC using MSRN (IAM)
+\item
+  \textbf{MSC} queries VLR for subscriber state and location area
+\item
+  \textbf{MSC} pages the UE in the Location Area
+\item
+  \textbf{UE} responds to paging on RACH
+\item
+  \textbf{BSC} assigns SDCCH \ensuremath{\to} authentication \& ciphering
+\item
+  \textbf{MSC} sends SETUP to UE
+\item
+  \textbf{UE} sends CALL CONFIRMED
+\item
+  \textbf{UE} alerts user (ringtone)
+\item
+  \textbf{User answers} \ensuremath{\to} UE sends CONNECT
+\item
+  \textbf{MSC} sends ANM back toward GMSC/\allowbreak{}PSTN
+\item
+  \textbf{Traffic channel assigned} — voice path active
+\end{enumerate}
+
+\CNkeepfig{m02-mtc-1}{2}
+
+\CNsubsubsection{MTC Sequence Diagram}
+
+\CNfigure{m02-mtc-1}{Mobile-terminated call (MTC) set-up\CNpart{1}{2}}
+
+\CNfigure{m02-mtc-2}{Mobile-terminated call (MTC) set-up\CNpart{2}{2}}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{Call Routing}
+
+\CNchained\CNsubsection{}{How MSC/\allowbreak{}GMSC Route Calls Using HLR}
+
+The HLR is the \textbf{master database} of all subscribers. It knows which MSC/\allowbreak{}VLR currently serves each subscriber.
+
+\CNsubsection{}{Routing a Mobile-Terminated Call}
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Step 1: PSTN delivers call to GMSC (based on MSISDN number plan)
+Step 2: GMSC sends MAP "Send Routing Information" to HLR
+Step 3: HLR identifies the serving MSC/VLR for that subscriber
+Step 4: HLR asks serving VLR to allocate an MSRN (temporary routing number)
+Step 5: VLR returns MSRN to HLR
+Step 6: HLR returns MSRN to GMSC
+Step 7: GMSC uses MSRN to route the ISUP IAM to the correct MSC
+\end{Verbatim}
+\end{CNplaincode}
+
+\CNsubsection{}{MSRN (Mobile Station Roaming Number)}
+
+\begin{itemize}
+\tightlist
+\item
+  Temporary number in E.164 format
+\item
+  Looks like a regular phone number in the serving network’s numbering plan
+\item
+  Allows GMSC to route the call using standard ISUP without knowing GSM internals
+\item
+  Allocated per call, released after routing
+\end{itemize}
+
+\CNsubsection{}{Routing a Mobile-Originated Call}
+
+For MOC, routing is simpler:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  MSC receives the dialed digits from the UE
+\item
+  MSC performs digit analysis (number plan, prefixes, supplementary services)
+\item
+  MSC routes the call via ISUP toward the appropriate trunk/\allowbreak{}GMSC/\allowbreak{}PSTN gateway
+\item
+  If calling another mobile on same network \ensuremath{\to} MSC may query HLR for MSRN
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{Location Update Procedure}
+
+\CNchained\CNsubsection{}{Why Location Updates Are Needed}
+
+The network must know \textbf{where a subscriber is} to deliver calls and messages. Without location tracking:
+
+\begin{itemize}
+\tightlist
+\item
+  The network would have to page every cell in the entire country
+\item
+  This would overwhelm the paging channel capacity
+\item
+  Call setup time would be unacceptable
+\end{itemize}
+
+Location updates allow the network to \textbf{narrow paging to a specific Location Area} (group of cells).
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{Types of Location Updates}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Type} & \CNth{Trigger} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{IMSI Attach} & Phone powers on — informs network subscriber is reachable \\
+\textbf{Normal LU} & UE moves to a new Location Area (detects new LAI on BCCH) \\
+\textbf{Periodic LU} & Timer-based update to confirm UE is still reachable \\
+\textbf{IMSI Detach} & Phone powers off gracefully — informs network \\
+\end{longtable}
+}
+
+\CNkeepfig{m02-location-update}{3}
+
+\CNsubsection{}{Location Update Sequence Diagram}
+
+\CNfigure{m02-location-update}{Location update with a change of MSC/\allowbreak{}VLR}
+
+\CNsubsection{}{IMSI Attach}
+
+When a phone powers on:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE reads BCCH to get LAI and network information
+\item
+  UE sends LOCATION UPDATING REQUEST with attach flag
+\item
+  Same procedure as normal LU follows
+\item
+  VLR marks subscriber as ``attached'' (reachable)
+\end{enumerate}
+
+\CNsubsection{}{Periodic Location Update}
+
+\begin{itemize}
+\tightlist
+\item
+  Network broadcasts a timer value (T3212) on BCCH
+\item
+  UE must send a LU before the timer expires, even if it hasn’t moved
+\item
+  If the timer expires without an LU, VLR marks subscriber as ``implicitly detached''
+\item
+  Purpose: detect phones that powered off without IMSI Detach (battery died, etc.)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{Authentication Procedure}
+
+\CNchained\CNsubsection{}{Purpose}
+
+Authentication ensures that the subscriber is who they claim to be, preventing:
+
+\begin{itemize}
+\tightlist
+\item
+  Unauthorized network access
+\item
+  Cloned SIM fraud
+\item
+  Eavesdropping (when combined with ciphering)
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{The Authentication Triplet}
+
+The AuC (Authentication Center, co-located with HLR) generates \textbf{authentication triplets}:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Element} & \CNth{Size} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{RAND} & 128~bits & Random challenge sent to UE \\
+\textbf{SRES} & 32~bits & Expected response (computed from RAND + Ki) \\
+\textbf{Kc} & 64~bits & Cipher key for encrypting the air interface \\
+\end{longtable}
+}
+
+\CNkeepfig{m02-triplets}{3}
+
+\CNsubsection{}{How Triplets Are Generated}
+
+\CNfigure{m02-triplets}{Generation of an authentication triplet (RAND, SRES, Kc)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Ki} never leaves the SIM card or the AuC
+\item
+  The same computation happens independently on both sides
+\item
+  If SRES from UE matches SRES from triplet \ensuremath{\to} subscriber is authenticated
+\end{itemize}
+
+\CNkeepfig{m02-authentication}{3}
+
+\CNsubsection{}{Authentication Sequence Diagram}
+
+\CNfigure{m02-authentication}{GSM authentication and ciphering}
+
+\CNsubsection{}{Key Points}
+
+\begin{itemize}
+\tightlist
+\item
+  VLR stores \textbf{multiple triplets} (typically 5) to avoid querying HLR for every transaction
+\item
+  Authentication is performed at: call setup, location update, SMS, supplementary service activation
+\item
+  GSM authentication is \textbf{one-way} — network authenticates the UE, but UE does not authenticate the network (vulnerability fixed in 3G/\allowbreak{}UMTS)
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{7}{Roaming}
+
+\CNchained\CNsubsection{}{Concepts}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6667}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Term} & \CNth{Definition} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{HPLMN} & Home PLMN — the network where the subscriber has their subscription \\
+\textbf{VPLMN} & Visited PLMN — a foreign network the subscriber is using while roaming \\
+\textbf{Roaming Agreement} & Commercial + technical agreement between two operators \\
+\textbf{GRX/\allowbreak{}IPX} & Interconnect network for signaling between PLMNs \\
+\end{longtable}
+}
+
+\CNsubsection{}{How Roaming Works}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{UE powers on in foreign country} \ensuremath{\to} selects VPLMN (based on SIM’s preferred PLMN list)
+\item
+  \textbf{UE performs Location Update} to VPLMN’s MSC/\allowbreak{}VLR
+\item
+  \textbf{VPLMN’s VLR} contacts \textbf{HPLMN’s HLR} via SS7/\allowbreak{}MAP (through international signaling links)
+\item
+  \textbf{HLR} authenticates subscriber (sends triplets to VPLMN)
+\item
+  \textbf{HLR} sends subscriber profile to VPLMN’s VLR
+\item
+  \textbf{HLR} records the VPLMN’s VLR address as the subscriber’s current location
+\item
+  \textbf{Subscriber can now make/\allowbreak{}receive calls} through VPLMN
+\end{enumerate}
+
+\CNkeepfig{m02-roaming}{3}
+
+\CNsubsection{}{Signaling Path for Roaming}
+
+\CNfigure{m02-roaming}{Signalling path for roaming: visited MSC/\allowbreak{}VLR to home HLR/\allowbreak{}AuC over SS7/\allowbreak{}MAP}
+
+\CNsubsection{}{Incoming Call to a Roaming Subscriber}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Call arrives at HPLMN’s GMSC
+\item
+  GMSC queries HLR \ensuremath{\to} learns subscriber is in VPLMN
+\item
+  HLR requests MSRN from VPLMN’s VLR
+\item
+  VPLMN’s VLR returns MSRN
+\item
+  HLR gives MSRN to GMSC
+\item
+  GMSC routes call to VPLMN’s MSC using MSRN (via international trunks)
+\item
+  VPLMN’s MSC pages and connects the subscriber
+\end{enumerate}
+
+\CNsubsection{}{Outgoing Call from Roaming Subscriber}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  UE initiates call in VPLMN
+\item
+  VPLMN’s MSC handles the call locally
+\item
+  Call is routed from VPLMN to destination (may transit through HPLMN or go direct)
+\item
+  CAMEL/\allowbreak{}CAP protocol may be used for prepaid control from HPLMN
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{Call Release}
+
+\CNchained\CNsubsection{}{Normal Call Release (Mobile-Initiated)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{UE} sends DISCONNECT to MSC
+\item
+  \textbf{MSC} sends REL (Release) via ISUP toward the far end
+\item
+  \textbf{Far end} responds with RLC (Release Complete)
+\item
+  \textbf{MSC} sends RELEASE to UE
+\item
+  \textbf{UE} sends RELEASE COMPLETE
+\item
+  \textbf{BSC} deallocates the TCH (traffic channel)
+\item
+  \textbf{All resources freed}: timeslots, trunks, circuit references
+\end{enumerate}
+
+\CNsubsection{}{Network-Initiated Release}
+
+Can be triggered by:
+
+\begin{itemize}
+\tightlist
+\item
+  Far-end hangup
+\item
+  Radio link failure (UE out of coverage)
+\item
+  BSC/\allowbreak{}MSC timer expiry
+\item
+  Administrative disconnect
+\end{itemize}
+
+\CNkeepfig{m02-isup-release}{3}
+
+\CNsubsection{}{ISUP Release Messages}
+
+\CNfigure{m02-isup-release}{ISUP call release}
+
+\Needspace{16\baselineskip}
+
+\CNsection{9}{Why Circuit Switching?}
+
+\CNchained\CNsubsection{}{Why Circuit Switching Was Used for Voice}
+
+\CNchained\CNsubsubsection{Voice Requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Constant bit rate}: 13~kbps (full rate) or 6.5~kbps (half rate) — continuous stream
+\item
+  \textbf{Low and predictable delay}: \textless{} 150ms one-way for acceptable conversation quality
+\item
+  \textbf{No jitter tolerance}: Human ear is very sensitive to variable delay
+\item
+  \textbf{Symmetric traffic}: Both parties speak roughly equally
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\CNsubsubsection{Why Circuit Switching Fits Voice}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Requirement} & \CNth{How CS Addresses It} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Low delay & Dedicated path = no queuing delay \\
+No jitter & Fixed timeslot allocation = constant delay \\
+Guaranteed bandwidth & Reserved resources = no congestion drops \\
+Simple processing & Once path is set up, switching is trivial \\
+Real-time & No store-and-forward delays \\
+\end{longtable}
+}
+
+\CNsubsubsection{Historical Context (1980s-90s)}
+
+\begin{itemize}
+\tightlist
+\item
+  Processing power was expensive — simple switching was preferred
+\item
+  Memory was expensive — no buffering/\allowbreak{}packetization
+\item
+  Existing PSTN was circuit-switched — natural integration
+\item
+  Voice was the \textbf{only} service expected from mobile phones
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{Why Circuit Switching Became a Limitation}
+
+\CNchained\CNsubsubsection{The Problem with Data}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Issue} & \CNth{Explanation} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Resource waste} & A 64~kbps circuit is held even during silence (50-60\% of a voice call) \\
+\textbf{No statistical multiplexing} & Cannot share resources among multiple users dynamically \\
+\textbf{Fixed bandwidth} & Cannot burst above 64~kbps even when network is idle \\
+\textbf{Call setup delay} & 3-7 seconds to establish a circuit — unacceptable for web browsing \\
+\textbf{Per-minute charging} & Inefficient for checking email (30 seconds of data, charged 1 minute) \\
+\textbf{Scalability} & Each data session consumes a full voice circuit \\
+\end{longtable}
+}
+
+\CNkeepfig{m02-traffic-patterns}{2}
+
+\CNsubsubsection{Data Traffic Characteristics vs. Voice}
+
+\CNfigure{m02-traffic-patterns}{Occupancy of a reserved circuit: continuous voice versus bursty data}
+
+Circuit switching \textbf{cannot efficiently handle bursty traffic} because resources are reserved but unused most of the time.
+
+\CNkeepfig{m02-evolution}{2}
+
+\CNsubsubsection{The Evolution Path}
+
+\CNfigure{m02-evolution}{From circuit switching to fully packet-switched networks}
+
+\CNsubsection{}{Summary}
+
+Circuit switching was the \textbf{right choice} for voice in the 1990s — it provided the quality guarantees that voice communication demands with the technology available at that time. However, as mobile usage shifted from voice-only to data-centric services, the inefficiency of holding dedicated circuits for bursty, asymmetric data traffic made packet switching the inevitable successor.
+
+\Needspace{28\baselineskip}
+
+\CNsection{}{Key Terms Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6667}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Term} & \CNth{Definition} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{MOC} & Mobile-Originated Call \\
+\textbf{MTC} & Mobile-Terminated Call \\
+\textbf{MSRN} & Mobile Station Roaming Number — temporary number for call routing \\
+\textbf{IAM} & Initial Address Message — ISUP message to initiate a call \\
+\textbf{ACM} & Address Complete Message — called party is being alerted \\
+\textbf{ANM} & Answer Message — called party has answered \\
+\textbf{REL/\allowbreak{}RLC} & Release /\allowbreak{} Release Complete — call teardown \\
+\textbf{LAI} & Location Area Identity — identifies a group of cells \\
+\textbf{TMSI} & Temporary Mobile Subscriber Identity — privacy protection \\
+\textbf{Ki} & Secret key shared between SIM and AuC \\
+\textbf{SRES} & Signed Response — authentication proof \\
+\textbf{Kc} & Cipher key derived during authentication \\
+\textbf{VPLMN} & Visited PLMN — foreign network during roaming \\
+\textbf{HPLMN} & Home PLMN — subscriber’s home network \\
+\end{longtable}
+}
+
+\emph{Next Module: {Module 3 — GPRS and Packet Switching}}

@@ -1,0 +1,14 @@
+% Module 23 — packet headers on each segment of the LTE user plane
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\newcommand{\seg}[2]{\node[CNtitle, anchor=west, font=\sffamily\small\bfseries] at (0,#1) {#2};}
+\seg{0.75}{\CNL{Segment 1: UE $\rightarrow$ eNB (radio interface / Uu)}{بخش ۱: \lr{UE} $\rightarrow$ \lr{eNB} (واسط رادیویی / \lr{Uu})}}
+\CNpacket{0}{PDCP header/2.6/CNamber!18, {\CNL{IP packet (user data)}{بسته \lr{IP} (داده کاربر)}}/5.0/CNcyan!14}
+\node[CNtiny, anchor=west] at (7.8,0) {\CNL{over radio: RLC $\rightarrow$ MAC $\rightarrow$ PHY}{روی رادیو: \lr{RLC} $\rightarrow$ \lr{MAC} $\rightarrow$ \lr{PHY}}};
+\seg{-1.05}{\CNL{Segment 2: eNB $\rightarrow$ S-GW (S1-U)}{بخش ۲: \lr{eNB} $\rightarrow$ \lr{S-GW (S1-U)}}}
+\CNpacket{-1.8}{Outer IP (eNB$\rightarrow$SGW)/3.1/CNsig!12, UDP:2152/1.9/CNsig!7, GTP-U (TEID-S1)/2.8/CNsig!18, {\CNL{IP packet (user data)}{بسته \lr{IP} (داده کاربر)}}/4.1/CNcyan!14}
+\seg{-2.85}{\CNL{Segment 3: S-GW $\rightarrow$ P-GW (S5/S8)}{بخش ۳: \lr{S-GW} $\rightarrow$ \lr{P-GW (S5/S8)}}}
+\CNpacket{-3.6}{Outer IP (SGW$\rightarrow$PGW)/3.1/CNsig!12, UDP:2152/1.9/CNsig!7, GTP-U (TEID-S5)/2.8/CNsig!18, {\CNL{IP packet (user data)}{بسته \lr{IP} (داده کاربر)}}/4.1/CNcyan!14}
+\seg{-4.65}{\CNL{Segment 4: P-GW $\rightarrow$ Internet}{بخش ۴: \lr{P-GW} $\rightarrow$ اینترنت}}
+\CNpacket{-5.4}{{\CNL{IP packet (user data)}{بسته \lr{IP} (داده کاربر)}}/4.1/CNcyan!14}
+\node[CNtiny, anchor=west] at (4.3,-5.4) {$\leftarrow$ \CNL{native IP, no tunnelling}{\lr{IP} بومی، بدون تونل}};
+\end{tikzpicture}

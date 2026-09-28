@@ -1,0 +1,12 @@
+% Module 3 — the operator network ran two parallel core domains
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNline, line width=0.9pt, fill=CNpaper, rounded corners=5pt] (-0.5,-5.2) rectangle (12.5,1.1);
+\node[CNgrouplabel, font=\sffamily\small\bfseries, text=CNink] at (6,0.75) {\CNL{OPERATOR NETWORK}{شبکه اپراتور}};
+\node[CNcp, text width=4.4cm, align=left, anchor=north] (cs) at (2.8,0.2)
+  {\textbf{CS Domain}\\[1pt]{\scriptsize MSC/VLR\\GMSC\\MGW\\SS7 network\\TDM trunks}};
+\node[CNup, text width=4.4cm, align=left, anchor=north] (ps) at (9.2,0.2)
+  {\textbf{PS Domain}\\[1pt]{\scriptsize SGSN\\GGSN\\[1pt]GTP tunnels\\IP routers\\\phantom{x}}};
+\node[CNbox, anchor=north, text width=4.4cm] (v) at (2.8,-3.35) {\CNL{Voice/video calls}{تماس‌های صوتی/تصویری}\\{\scriptsize (64 kbps circuits)}};
+\node[CNbox, anchor=north, text width=4.4cm] (d) at (9.2,-3.35) {\CNL{Data services}{خدمات داده}\\{\scriptsize (\CNL{variable-rate IP}{\lr{IP} با نرخ متغیر})}};
+\draw[CNlink, <->] (cs) -- (v); \draw[CNlink, <->] (ps) -- (d);
+\end{tikzpicture}

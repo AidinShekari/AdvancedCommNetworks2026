@@ -1,0 +1,55 @@
+% ============================================================
+%  AdvancedCommNetworks — English (LTR) preamble
+%  Compile with XeLaTeX (or tectonic).  \CNroot must point to template/
+% ============================================================
+\input{\CNroot/acn-packages}
+\usepackage{fontspec}
+\setmainfont{IBMPlexSans}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-SemiBold,
+  ItalicFont=*-Italic, BoldItalicFont=*-SemiBoldItalic, Scale=0.94]
+\setsansfont{IBMPlexSans}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-SemiBold,
+  ItalicFont=*-Italic, BoldItalicFont=*-SemiBoldItalic, Scale=0.94]
+\setmonofont{IBMPlexMono}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-SemiBold,
+  ItalicFont=*-Italic, BoldItalicFont=*-SemiBoldItalic, Scale=0.88]
+\newfontfamily\CNcond{IBMPlexSansCondensed}[Extension=.otf, UprightFont=*-Medium,
+  BoldFont=*-Bold, ItalicFont=*-MediumItalic, BoldItalicFont=*-BoldItalic]
+\newfontfamily\CNfarsi[Path=\CNroot/fonts/, Extension=.ttf, Script=Arabic, AutoFakeBold=1.3]{Vazirmatn-Regular}
+\newfontfamily\CNfaDisplay[Path=\CNroot/fonts/, Extension=.ttf, Script=Arabic]{Vazirmatn-Black}
+\usepackage{bidi}
+
+\linespread{1.14}
+\newif\ifCNrtl \CNrtlfalse
+% \rl{} for Persian snippets (Persian font + RTL)
+\newcommand{\rl}[1]{\RL{\CNfarsi #1}}
+\providecommand{\lr}[1]{\LR{\normalfont #1}}
+% heading font: condensed IBM Plex
+\newcommand{\CNheadfont}{\CNcond}
+
+% language strings
+\def\CNlangCourse{Advanced Communication Networks}
+\def\CNlangCourseShort{Adv.\ Comm.\ Networks}
+\def\CNlangCourseOther{\rl{شبکه‌های ارتباطی پیشرفته}}
+\def\CNlangTerm{Fall 2026-2027}
+\def\CNyearfa{\LR{۱۴۰۵-۱۴۰۶}}
+\def\CNlangTermOther{\rl{نیمسال پاییز \CNyearfa}}
+\def\CNlangUni{Ferdowsi University of Mashhad}
+\def\CNlangUniOther{\rl{دانشگاه فردوسی مشهد}}
+\def\CNlangNotes{Lecture Notes}
+\def\CNlangModule{Module}
+\def\CNlangFigure{Figure}
+\def\CNlangPage{Page}
+\def\CNlangContents{Contents}
+\def\CNlangModuleContents{In This Module}
+\def\CNlangSyllabus{Course Syllabus}
+\def\CNlangDescription{Course Description}
+\def\CNlangPrereq{Prerequisites Review}
+\def\CNlangSolution{Answer}
+\def\CNlangInstructorLabel{Instructor:}
+\def\CNlangInstructor{Amin Azari}
+\def\CNlangInstructorOther{\rl{استاد: امین آذری}}
+\def\CNinstructorURL{https://github.com/AminAzari}
+\def\CNlangCompiler{Compiled by Aidin Shekari}
+\def\CNcompilerURL{https://shekari.me}
+\def\CNlangGenerations{2G \textbullet\ 3G \textbullet\ 4G \textbullet\ 5G \textbullet\ 6G}
+
+\newcommand{\CNpart}[2]{\ (part #1 of #2)}
+\input{\CNroot/acn-style}

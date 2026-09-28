@@ -1,0 +1,11 @@
+% Module 23 — headers of a downlink packet at each hop (from the Mermaid sketch in the source)
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \y/\t in {0/{\CNL{Internet $\rightarrow$ UPF (N6)}{اینترنت $\rightarrow$ \lr{UPF (N6)}}}, -1.75/{\CNL{UPF $\rightarrow$ gNB (N3)}{\lr{UPF} $\rightarrow$ \lr{gNB (N3)}}}, -3.5/{\CNL{gNB $\rightarrow$ UE (radio)}{\lr{gNB} $\rightarrow$ \lr{UE} (رادیو)}}, -5.25/{\CNL{at the UE}{در \lr{UE}}}}{
+  \node[CNtitle, anchor=west, font=\sffamily\small\bfseries] at (0,\y+0.72) {\t};}
+\CNpacket{0}{IP/1.4/CNcyan!14, TCP/1.4/CNcyan!7, Data/2.2/white}
+\CNpacket{-1.75}{Outer IP/2.0/CNsig!12, UDP:2152/1.9/CNsig!7, GTP-U+TEID/2.3/CNsig!18, IP/1.4/CNcyan!14, TCP/1.4/CNcyan!7, Data/2.2/white}
+\CNpacket{-3.5}{SDAP/1.5/CNamber!18, PDCP/1.5/CNamber!10, IP/1.4/CNcyan!14, TCP/1.4/CNcyan!7, Data/2.2/white}
+\CNpacket{-5.25}{IP/1.4/CNcyan!14, TCP/1.4/CNcyan!7, Data/2.2/white}
+\foreach \y/\t in {-0.875/{\CNL{UPF encapsulates}{\lr{UPF} کپسوله می‌کند}}, -2.625/{\CNL{gNB decapsulates GTP, adds radio headers}{\lr{gNB} کپسول \lr{GTP} را برمی‌دارد و سرآیندهای رادیویی را می‌افزاید}}, -4.375/{\CNL{UE strips the radio headers}{\lr{UE} سرآیندهای رادیویی را حذف می‌کند}}}{
+  \draw[CNlink, ->] (11.4,\y+0.55) -- (11.4,\y-0.55); \node[CNtiny, anchor=west] at (11.55,\y) {\t};}
+\end{tikzpicture}

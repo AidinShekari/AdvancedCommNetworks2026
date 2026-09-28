@@ -1,0 +1,1175 @@
+\begin{CNbox}[unbreakable]{obj}{Learning Objectives}
+
+By the end of this module, you will be able to:
+
+\begin{itemize}
+\tightlist
+\item
+  Explain the complete GSM architecture and the role of each network element
+\item
+  Describe how GSM handles mobility, location management, and authentication
+\item
+  Articulate \textbf{why} GPRS was introduced and what limitations of GSM it addressed
+\item
+  Explain the GPRS packet-switched overlay architecture
+\item
+  Describe PDP context activation and GPRS mobility management
+\item
+  Explain how EDGE improved data rates through modulation changes
+\item
+  Trace the evolution path from GSM through EDGE to 3G
+\end{itemize}
+
+\end{CNbox}
+
+\Needspace{14\baselineskip}
+
+\CNsection{1}{GSM Architecture}
+
+\CNchained\CNsubsection{1.1}{WHY GSM?}
+
+Before GSM (Global System for Mobile Communications), Europe had multiple incompatible analog cellular systems (NMT, TACS, C-Netz). A subscriber in France could not roam to Germany. GSM was created to solve three fundamental problems:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Interoperability} — One standard across all of Europe (and eventually the world)
+\item
+  \textbf{Security} — Analog systems had no encryption; anyone with a scanner could listen
+\item
+  \textbf{Capacity} — Digital modulation serves more users per MHz of spectrum
+\end{enumerate}
+
+\CNkeepfig{m01-gsm-architecture}{3}
+
+\CNsubsection{1.2}{GSM Network Architecture Diagram}
+
+\CNfigure{m01-gsm-architecture}{GSM network architecture: MS, BSS, NSS and external networks with their interfaces}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{1.3}{Understanding the Architecture Layers}
+
+The GSM architecture is organized into three logical subsystems, each solving a distinct problem:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2750}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4750}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Subsystem} & \CNth{Problem It Solves} & \CNth{Elements} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{BSS} (Base Station Subsystem) & Radio access — how does the phone talk to the network? & BTS, BSC \\
+\textbf{NSS} (Network Switching Subsystem) & Call routing — how do calls get connected? & MSC, GMSC, HLR, VLR, AuC, EIR \\
+\textbf{OSS} (Operation Support Subsystem) & Management — how do operators monitor and configure the network? & OMC, NMC \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{2}{GSM Network Elements — Detailed Explanation}
+
+\CNchained\CNsubsection{2.1}{Mobile Station (MS)}
+
+\textbf{What it is:} The subscriber’s device, consisting of two parts:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ME (Mobile Equipment):} The physical handset hardware, identified by its IMEI
+\item
+  \textbf{SIM (Subscriber Identity Module):} A smart card carrying the subscriber’s identity (IMSI), authentication key (Ki), and algorithms
+\end{itemize}
+
+\textbf{Why it’s split into ME + SIM:} This separation means you can swap your SIM into any phone and keep your number, or an operator can block a stolen phone (by IMEI) without affecting the subscriber’s account.
+
+\CNsubsection{2.2}{Base Transceiver Station (BTS)}
+
+\textbf{What it is:} The radio equipment (antennas, transceivers, amplifiers) at a cell site.
+
+\textbf{Why it exists:} Someone has to convert between the wired network and radio waves. The BTS handles:
+
+\begin{itemize}
+\tightlist
+\item
+  Transmission and reception of radio signals
+\item
+  Channel coding and encryption at the air interface
+\item
+  Frequency hopping (if configured)
+\item
+  Timing advance measurements (to compensate for propagation delay)
+\end{itemize}
+
+\begin{CNinsight}
+
+\textbf{Key insight:} The BTS is intentionally ``dumb'' — it has minimal intelligence. This is a deliberate design choice so that expensive radio sites don’t need software upgrades for new features.
+
+\end{CNinsight}
+
+\CNsubsection{2.3}{Base Station Controller (BSC)}
+
+\textbf{What it is:} The intelligence behind multiple BTSs. One BSC typically controls dozens to hundreds of BTSs.
+
+\textbf{Why it exists:} The BSC solves the \textbf{resource management} problem:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Handover decisions:} When should a call be moved from one BTS to another? The BSC collects measurements from the MS and neighboring BTSs to decide.
+\item
+  \textbf{Radio resource allocation:} Which frequency and timeslot should be assigned to a new call?
+\item
+  \textbf{Power control:} Instructs the MS and BTS to adjust power (saves battery, reduces interference)
+\item
+  \textbf{Transcoding:} Converts between the compressed speech codec on the air interface (13~kbps) and standard 64~kbps PCM used in the core network
+\end{itemize}
+
+\CNsubsection{2.4}{Mobile Switching Center (MSC)}
+
+\textbf{What it is:} A telephone exchange specifically designed for mobile subscribers.
+
+\textbf{Why it exists:} The MSC solves the \textbf{call routing for mobile users} problem. Unlike a fixed-line exchange, the MSC must handle:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Call setup and teardown} for users who may be moving
+\item
+  \textbf{Handover between BSCs} (inter-BSC handover)
+\item
+  \textbf{Interface to external networks} (PSTN, ISDN, other mobile networks)
+\item
+  \textbf{Supplementary services} (call forwarding, call waiting, conference calls)
+\item
+  \textbf{Coordination with VLR} for subscriber validation
+\end{itemize}
+
+\CNsubsection{2.5}{Gateway MSC (GMSC)}
+
+\textbf{What it is:} A specialized MSC that acts as the entry point for calls coming FROM external networks.
+
+\textbf{Why it exists:} When someone on a landline calls a mobile subscriber, the call arrives at the GMSC. The GMSC’s job is to \textbf{find the subscriber} — it queries the HLR to determine which MSC/\allowbreak{}VLR area the subscriber is currently in, then routes the call there. Without the GMSC, external networks would need to know the internal structure of the mobile network.
+
+\CNsubsection{2.6}{Home Location Register (HLR)}
+
+\textbf{What it is:} The central database containing ALL permanent subscriber information.
+
+\textbf{Why it exists:} The HLR solves the \textbf{``where is this subscriber?''} problem. It stores:
+
+\begin{itemize}
+\tightlist
+\item
+  Subscriber identity (IMSI, MSISDN)
+\item
+  Subscription information (which services are allowed)
+\item
+  \textbf{Current location} (which VLR/\allowbreak{}MSC area the subscriber is registered in)
+\item
+  Call forwarding settings
+\item
+  Supplementary service data
+\end{itemize}
+
+\begin{CNinsight}
+
+\textbf{Key insight:} There is logically ONE HLR per network (though physically it may be distributed). It is the single source of truth about every subscriber.
+
+\end{CNinsight}
+
+\CNsubsection{2.7}{Visitor Location Register (VLR)}
+
+\textbf{What it is:} A temporary database associated with each MSC, holding information about subscribers currently in that MSC’s area.
+
+\textbf{Why it exists:} The VLR solves the \textbf{performance} problem. Without it, every single call setup would require a query to the HLR (which could be far away). Instead:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  When a subscriber enters an MSC area, the VLR fetches their profile from the HLR
+\item
+  Subsequent operations use the local VLR copy
+\item
+  This reduces signaling load on the HLR and reduces call setup latency
+\end{enumerate}
+
+The VLR also stores temporary data: the TMSI (temporary identity), location area, and authentication triplets.
+
+\CNsubsection{2.8}{Authentication Center (AuC)}
+
+\textbf{What it is:} A protected database storing the secret authentication keys (Ki) for every subscriber.
+
+\textbf{Why it exists:} The AuC solves the \textbf{``how do we prove this subscriber is genuine?''} problem. It:
+
+\begin{itemize}
+\tightlist
+\item
+  Stores each subscriber’s Ki (which never leaves the AuC or SIM)
+\item
+  Generates authentication triplets (RAND, SRES, Kc) on request
+\item
+  Protects against cloning and unauthorized access
+\end{itemize}
+
+\textbf{Why it’s separate from the HLR:} Security isolation. The Ki values are extremely sensitive. By placing them in a physically secured, separate element, a compromise of the HLR doesn’t expose authentication keys.
+
+\CNsubsection{2.9}{Equipment Identity Register (EIR)}
+
+\textbf{What it is:} A database of mobile equipment identities (IMEIs) classified into three lists:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{White list:} Approved equipment
+\item
+  \textbf{Grey list:} Equipment under observation (perhaps reported lost but not confirmed)
+\item
+  \textbf{Black list:} Stolen or non-type-approved equipment — service denied
+\end{itemize}
+
+\textbf{Why it exists:} The EIR solves the \textbf{stolen phone} problem. Even if a thief puts a new SIM in a stolen phone, the network can identify and block the hardware by its IMEI.
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{GSM Interfaces}
+
+\CNchained\CNsubsection{}{WHY standardized interfaces matter}
+
+GSM’s genius was defining \textbf{open interfaces} between elements. This means a BTS from Ericsson can connect to a BSC from Nokia. Without standardized interfaces, operators would be locked to a single vendor for everything.
+
+\Needspace{25\baselineskip}
+
+\CNsubsection{3.1}{Interface Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2045}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3409}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2045}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Between} & \CNth{Protocol Stack} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Um} & MS \ensuremath{\leftrightarrow} BTS & LAPDm /\allowbreak{} RR /\allowbreak{} MM /\allowbreak{} CC & Air interface — the radio link \\
+\textbf{Abis} & BTS \ensuremath{\leftrightarrow} BSC & LAPD over PCM (E1/\allowbreak{}T1) & Carries traffic + signaling from radio sites to controller \\
+\textbf{A} & BSC \ensuremath{\leftrightarrow} MSC & MTP /\allowbreak{} SCCP /\allowbreak{} BSSAP & Connects radio subsystem to switching subsystem \\
+\textbf{B} & MSC \ensuremath{\leftrightarrow} VLR & MAP & MSC queries local VLR for subscriber data \\
+\textbf{C} & GMSC \ensuremath{\leftrightarrow} HLR & MAP & GMSC asks HLR where to route incoming calls \\
+\textbf{D} & VLR \ensuremath{\leftrightarrow} HLR & MAP & Location updates, subscriber data transfer \\
+\textbf{E} & MSC \ensuremath{\leftrightarrow} MSC & MAP /\allowbreak{} ISUP & Inter-MSC handover \\
+\textbf{F} & MSC \ensuremath{\leftrightarrow} EIR & MAP & IMEI checking \\
+\textbf{G} & VLR \ensuremath{\leftrightarrow} VLR & MAP & Subscriber info transfer during inter-VLR moves \\
+\textbf{H} & HLR \ensuremath{\leftrightarrow} AuC & Proprietary & Authentication vector requests \\
+\end{longtable}
+}
+
+\CNsubsection{3.2}{The Um Interface (Air Interface) — In Depth}
+
+The Um interface is the most complex because it must deal with the hostile radio environment:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Multiple access:} TDMA with 8 timeslots per 200~kHz carrier (FDMA/\allowbreak{}TDMA hybrid)
+\item
+  \textbf{Modulation:} GMSK (Gaussian Minimum Shift Keying) — chosen for constant envelope (efficient power amplifiers) and spectral efficiency
+\item
+  \textbf{Frame structure:} Hyperframe \ensuremath{\to} Superframe \ensuremath{\to} Multiframe \ensuremath{\to} Frame \ensuremath{\to} Timeslot \ensuremath{\to} Burst
+\item
+  \textbf{Logical channels:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{TCH (Traffic Channel):} Carries user speech/\allowbreak{}data
+  \item
+    \textbf{BCCH (Broadcast Control Channel):} System info broadcast to all phones
+  \item
+    \textbf{RACH (Random Access Channel):} MS requests access (slotted ALOHA)
+  \item
+    \textbf{PCH (Paging Channel):} Network pages MS for incoming call
+  \item
+    \textbf{SDCCH (Standalone Dedicated Control Channel):} Signaling (SMS, location update)
+  \item
+    \textbf{SACCH/\allowbreak{}FACCH:} Associated control for measurements and handover commands
+  \end{itemize}
+\end{itemize}
+
+\CNsubsection{3.3}{The Abis Interface}
+
+\textbf{Why it exists:} BTS sites are remote (mountain tops, rooftops). The Abis interface lets them connect back to the BSC over standard 2~Mbps E1 lines (or microwave links). It carries:
+
+\begin{itemize}
+\tightlist
+\item
+  16~kbps traffic channels (compressed speech)
+\item
+  Signaling messages (LAPD protocol, similar to ISDN)
+\item
+  Operation \& Maintenance messages
+\end{itemize}
+
+\CNsubsection{3.4}{The A Interface}
+
+\textbf{Why it exists:} This is where the radio world meets the telephony world. The A interface carries:
+
+\begin{itemize}
+\tightlist
+\item
+  64~kbps PCM speech (after transcoding from 13~kbps)
+\item
+  BSSAP signaling (BSS Application Part) over SS7
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{GSM Mobility \& Location Management}
+
+\CNchained\CNsubsection{4.1}{WHY Location Management Is Needed}
+
+The fundamental challenge of mobile networks: \textbf{how do you deliver a call to someone whose location is unknown?}
+
+Naive solution: Page every cell in the network. Problem: This doesn’t scale — millions of subscribers would require constant paging on every cell.
+
+GSM’s solution: \textbf{Location Areas (LA)}
+
+\CNsubsection{4.2}{Location Area Concept}
+
+\begin{itemize}
+\tightlist
+\item
+  The network is divided into \textbf{Location Areas}, each containing multiple cells (BTSs)
+\item
+  Each LA has a unique \textbf{LAI} (Location Area Identity) = MCC + MNC + LAC
+\item
+  The network only knows a subscriber’s location to the \textbf{LA granularity}
+\item
+  When a call arrives, the subscriber is paged in ALL cells of their current LA
+\end{itemize}
+
+\textbf{Trade-off:}
+
+\begin{itemize}
+\tightlist
+\item
+  Smaller LAs \ensuremath{\to} less paging load, but more location updates (signaling)
+\item
+  Larger LAs \ensuremath{\to} fewer location updates, but more paging traffic
+\item
+  Operators tune LA sizes based on traffic patterns
+\end{itemize}
+
+\CNsubsection{4.3}{Location Update Procedure}
+
+A mobile performs a \textbf{location update} when:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Normal location update:} MS detects it has entered a new LA (different LAI on BCCH)
+\item
+  \textbf{Periodic location update:} Timer expires — proves the MS is still reachable
+\item
+  \textbf{IMSI attach:} MS is powered on and registers with the network
+\end{enumerate}
+
+\textbf{Location Update Flow:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  MS sends LOCATION UPDATING REQUEST to new MSC/\allowbreak{}VLR
+\item
+  New VLR contacts HLR: ``Subscriber X is now here''
+\item
+  HLR sends subscriber profile to new VLR
+\item
+  HLR tells OLD VLR to delete the subscriber record
+\item
+  New VLR confirms to MS: LOCATION UPDATING ACCEPT
+\item
+  MS stores new TMSI (if reassigned)
+\end{enumerate}
+
+\CNsubsection{4.4}{TMSI — Temporary Mobile Subscriber Identity}
+
+\textbf{Why:} Broadcasting the IMSI over the air interface would let eavesdroppers track subscribers. The TMSI:
+
+\begin{itemize}
+\tightlist
+\item
+  Is assigned by the VLR and has only local significance
+\item
+  Is changed frequently (at each location update or call)
+\item
+  Means the permanent identity (IMSI) rarely travels over the air
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{GSM Authentication \& Security}
+
+\CNchained\CNsubsection{5.1}{WHY Authentication Is Critical}
+
+Without authentication:
+
+\begin{itemize}
+\tightlist
+\item
+  Cloned SIMs could make calls billed to someone else
+\item
+  Unauthorized users could access the network
+\item
+  Eavesdroppers could intercept calls
+\end{itemize}
+
+\CNsubsection{5.2}{The Authentication Triplet Mechanism}
+
+GSM uses a \textbf{challenge-response} protocol based on shared secret cryptography.
+
+\textbf{The players:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Ki:} A 128-bit secret key, stored ONLY on the SIM and in the AuC. It \textbf{never} travels over any interface.
+\item
+  \textbf{RAND:} A 128-bit random number generated by the AuC (the challenge)
+\item
+  \textbf{SRES:} A 32-bit Signed Response (the expected answer)
+\item
+  \textbf{Kc:} A 64-bit cipher key for encrypting the air interface
+\end{itemize}
+
+\CNkeepfig{m01-a3-a8}{2}
+
+\textbf{How it works:}
+
+\CNfigure{m01-a3-a8}{A3 and A8 run on both sides: the AuC and the SIM derive the same SRES and Kc from Ki and RAND}
+
+\textbf{Step-by-step:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  AuC generates RAND, computes SRES = A3(Ki, RAND) and Kc = A8(Ki, RAND)
+\item
+  The triplet (RAND, SRES, Kc) is sent to the VLR (pre-computed, stored for later use)
+\item
+  When authentication is needed, VLR sends RAND to the MS
+\item
+  SIM computes SRES = A3(Ki, RAND) using its stored Ki
+\item
+  MS sends SRES back to the network
+\item
+  VLR compares received SRES with stored SRES — if they match, subscriber is authentic
+\item
+  Both sides now have Kc — used with algorithm A5 to encrypt the air interface
+\end{enumerate}
+
+\textbf{Why triplets are pre-computed:} The AuC may be geographically distant. Pre-computing multiple triplets and caching them at the VLR means authentication can happen locally without real-time AuC access.
+
+\CNsubsection{5.3}{Encryption (A5 Algorithm)}
+
+After authentication, both the MS and BTS share Kc. The A5 algorithm generates a keystream that XORs with the traffic. This provides:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Confidentiality} on the air interface (Um only — not end-to-end)
+\item
+  Protection against casual eavesdropping
+\end{itemize}
+
+\textbf{Known weakness:} A5/\allowbreak{}1 has been broken. Modern networks use A5/\allowbreak{}3 (KASUMI-based) or have moved to 3G/\allowbreak{}4G with stronger security.
+
+\Needspace{14\baselineskip}
+
+\Needspace{19\baselineskip}
+
+\CNsection{6}{WHY GPRS Was Needed}
+
+\CNchained\CNsubsection{6.1}{The GSM Data Problem}
+
+GSM was designed for \textbf{voice}. Data was an afterthought:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5152}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2121}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2727}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{GSM Data Service} & \CNth{Speed} & \CNth{Problem} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CSD (Circuit-Switched Data) & 9.6~kbps & Occupies a full timeslot for entire session \\
+HSCSD (High-Speed CSD) & Up to 57.6~kbps & Occupies MULTIPLE timeslots — extremely expensive \\
+\end{longtable}
+}
+
+\textbf{The fundamental issue: Circuit switching is wrong for data.}
+
+Why? Consider web browsing:
+
+\begin{itemize}
+\tightlist
+\item
+  You request a page (1 second of activity)
+\item
+  You read it (30 seconds of inactivity)
+\item
+  You click a link (1 second of activity)
+\item
+  You read again (30 seconds of inactivity)
+\end{itemize}
+
+With circuit switching, you’re \textbf{paying for and consuming a timeslot during those 30 seconds of reading}. The channel is allocated but idle 95\% of the time.
+
+\CNsubsection{6.2}{What GPRS Provides}
+
+\textbf{GPRS (General Packet Radio Service)} introduces \textbf{packet switching} to GSM:
+
+\begin{itemize}
+\tightlist
+\item
+  Resources are allocated \textbf{only when data is actually being sent}
+\item
+  Multiple users \textbf{share} timeslots statistically
+\item
+  Billing can be \textbf{per-megabyte} instead of per-minute
+\item
+  ``Always-on'' connectivity — no dial-up delay
+\item
+  Theoretical speeds: 8 timeslots \ensuremath{\times} 21.4~kbps = \textbf{171.2~kbps} (theoretical max)
+\item
+  Practical speeds: 30–80~kbps
+\end{itemize}
+
+\CNsubsection{6.3}{GPRS Design Philosophy}
+
+GPRS was designed as an \textbf{overlay} on existing GSM infrastructure. Operators didn’t need to replace their entire network — they added new packet-switching nodes alongside the existing circuit-switched core. This was critical for business adoption.
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{GPRS Architecture}
+
+\CNchained\CNsubsection{7.1}{New Network Elements}
+
+GPRS introduces three key new elements:
+
+\CNsubsubsection{SGSN — Serving GPRS Support Node}
+
+\textbf{What it is:} The packet-switched equivalent of the MSC/\allowbreak{}VLR combination.
+
+\textbf{Why it exists:} Someone needs to handle packet-switched sessions the way the MSC handles voice calls. The SGSN:
+
+\begin{itemize}
+\tightlist
+\item
+  Tracks the location of GPRS-attached mobiles (at Routing Area granularity)
+\item
+  Performs authentication and ciphering for packet sessions
+\item
+  Handles mobility management for packet data
+\item
+  Routes packets between the MS and the GGSN
+\item
+  Collects charging information
+\end{itemize}
+
+\CNsubsubsection{GGSN — Gateway GPRS Support Node}
+
+\textbf{What it is:} The packet-switched equivalent of the GMSC — the gateway to external data networks.
+
+\textbf{Why it exists:} The mobile network must connect to the Internet (and corporate intranets). The GGSN:
+
+\begin{itemize}
+\tightlist
+\item
+  Acts as the \textbf{IP router} between the GPRS network and external packet data networks (PDNs)
+\item
+  Assigns IP addresses to mobile devices (or relays from DHCP/\allowbreak{}RADIUS)
+\item
+  Performs \textbf{encapsulation/\allowbreak{}de-encapsulation} of user data using GTP (GPRS Tunneling Protocol)
+\item
+  Enforces policy and charging rules
+\item
+  From the external network’s perspective, the GGSN looks like a normal IP router
+\end{itemize}
+
+\CNsubsubsection{PCU — Packet Control Unit}
+
+\textbf{What it is:} An addition to the BSC that handles packet-switched radio resource management.
+
+\textbf{Why it exists:} The original BSC only understood circuit-switched resource allocation. The PCU adds:
+
+\begin{itemize}
+\tightlist
+\item
+  Packet scheduling on shared radio channels (PDCH — Packet Data Channels)
+\item
+  Segmentation and reassembly of LLC frames into radio blocks
+\item
+  Dynamic allocation of timeslots between voice (TCH) and data (PDCH)
+\item
+  Uplink state flag management and acknowledgment
+\end{itemize}
+
+\CNkeepfig{m01-gprs-data-path}{3}
+
+\CNsubsection{7.2}{GPRS Packet Data Path}
+
+\CNfigure{m01-gprs-data-path}{GPRS packet data path from the MS to the external packet network}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{7.3}{GPRS Protocol Stack}
+
+The GPRS protocol stack introduces new layers:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2692}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3846}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3462}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Layer} & \CNth{Protocol} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Application & HTTP, SMTP, etc. & User application \\
+Transport & TCP /\allowbreak{} UDP & End-to-end reliability \\
+Network & IP & Addressing and routing \\
+Tunneling & GTP (GPRS Tunneling Protocol) & Encapsulates IP packets between SGSN and GGSN \\
+Link & LLC (Logical Link Control) & Reliable link between MS and SGSN \\
+Link & SNDCP (SubNetwork Dependent Convergence Protocol) & Header compression, segmentation \\
+Radio & RLC/\allowbreak{}MAC & Radio block transmission, ARQ \\
+Physical & GMSK modulation on PDCH & Bits on the air \\
+\end{longtable}
+}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{7.4}{GPRS Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2750}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2250}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2750}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2250}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Between} & \CNth{Transport} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Gb} & PCU/\allowbreak{}BSS \ensuremath{\leftrightarrow} SGSN & Frame Relay or IP & Packet data from radio to core \\
+\textbf{Gn} & SGSN \ensuremath{\leftrightarrow} GGSN (same PLMN) & GTP/\allowbreak{}UDP/\allowbreak{}IP & User data tunneling within network \\
+\textbf{Gp} & SGSN \ensuremath{\leftrightarrow} GGSN (different PLMN) & GTP + security & Roaming data \\
+\textbf{Gi} & GGSN \ensuremath{\leftrightarrow} External PDN & IP & Connection to Internet \\
+\textbf{Gr} & SGSN \ensuremath{\leftrightarrow} HLR & MAP & Subscriber data for GPRS \\
+\textbf{Gs} & SGSN \ensuremath{\leftrightarrow} MSC/\allowbreak{}VLR & BSSAP+ & Coordination of CS and PS \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{PDP Context}
+
+\CNchained\CNsubsection{8.1}{WHAT Is a PDP Context?}
+
+A \textbf{PDP Context (Packet Data Protocol Context)} is the ``session'' that must exist before a mobile can send or receive packet data. Think of it as the GPRS equivalent of ``dialing in'' — but without wasting resources when idle.
+
+A PDP context defines:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PDP Type:} Usually IPv4 or IPv6
+\item
+  \textbf{PDP Address:} The IP address assigned to the MS
+\item
+  \textbf{Access Point Name (APN):} Which external network to connect to (e.g., ``internet'', ``corporate.vpn'')
+\item
+  \textbf{QoS Profile:} Requested quality of service (priority, throughput, delay class)
+\item
+  \textbf{GGSN Address:} Which GGSN serves this context
+\end{itemize}
+
+\CNsubsection{8.2}{WHY PDP Context Exists}
+
+Without some form of session establishment:
+
+\begin{itemize}
+\tightlist
+\item
+  The GGSN wouldn’t know where to send downlink packets for a given IP address
+\item
+  The network couldn’t enforce QoS or charging policies
+\item
+  There would be no tunnel established between SGSN and GGSN
+\end{itemize}
+
+\CNkeepfig{m01-pdp-activation}{3}
+
+\CNsubsection{8.3}{PDP Context Activation Procedure}
+
+\CNfigure{m01-pdp-activation}{PDP context activation and the first IP packets through the GTP tunnel}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{8.4}{PDP Context States}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2258}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2903}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4839}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{State} & \CNth{Meaning} & \CNth{Resources Used} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{INACTIVE} & No PDP context — cannot send data & None \\
+\textbf{ACTIVE} & Full context exists, data can flow & SGSN/\allowbreak{}GGSN tunnel, IP address allocated \\
+\textbf{STANDBY} (optional) & Context exists but radio resources released & Tunnel maintained, no radio allocation \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{9}{GPRS Mobility Management}
+
+\CNchained\CNsubsection{9.1}{WHY GPRS Needs Its Own Mobility Management}
+
+GSM already has location management (Location Areas, location updates). Why does GPRS need a separate system?
+
+\textbf{Because packet-switched and circuit-switched traffic have different needs:}
+
+\begin{itemize}
+\tightlist
+\item
+  For a \textbf{voice call}, the network needs to find you immediately (paging must be fast)
+\item
+  For \textbf{packet data}, there’s more tolerance for delay — but the network needs to know which SGSN to route your downlink packets to
+\end{itemize}
+
+GPRS introduces the \textbf{Routing Area (RA)} — a subdivision of the Location Area.
+
+\CNkeepfig{m01-la-ra}{3}
+
+\CNsubsection{9.2}{Routing Area vs. Location Area}
+
+\CNfigure{m01-la-ra}{A Location Area is subdivided into Routing Areas}
+
+\begin{itemize}
+\tightlist
+\item
+  A \textbf{Routing Area} is always a subset of (or equal to) a Location Area
+\item
+  RA is identified by \textbf{RAI} = LAI + RAC (Routing Area Code)
+\item
+  Finer granularity than LA \ensuremath{\to} more precise location for packet routing
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{9.3}{GPRS Mobility Management States}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.6286}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1714}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{State} & \CNth{What the network knows} & \CNth{When} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{IDLE} & Nothing — MS is not GPRS-attached & Power off or GPRS detached \\
+\textbf{STANDBY} & Current Routing Area & Attached but no active data transfer \\
+\textbf{READY} & Current Cell (exact) & Actively sending/\allowbreak{}receiving data \\
+\end{longtable}
+}
+
+\textbf{State transitions:}
+
+\begin{itemize}
+\tightlist
+\item
+  IDLE \ensuremath{\to} STANDBY: GPRS Attach
+\item
+  STANDBY \ensuremath{\to} READY: Data transfer begins (or signaling)
+\item
+  READY \ensuremath{\to} STANDBY: READY timer expires (no data for \textasciitilde{}44 seconds)
+\item
+  STANDBY \ensuremath{\to} IDLE: GPRS Detach
+\end{itemize}
+
+\CNsubsection{9.4}{Routing Area Update (RAU)}
+
+Similar to GSM’s location update, but for the packet domain:
+
+\textbf{When triggered:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  MS moves to a new Routing Area (different RAI on BCCH)
+\item
+  Periodic RAU timer expires
+\item
+  Combined RA/\allowbreak{}LA update (if CS and PS are coordinated)
+\end{enumerate}
+
+\textbf{Types:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Intra-SGSN RAU:} New RA served by same SGSN — local procedure, no GTP tunnel modification needed
+\item
+  \textbf{Inter-SGSN RAU:} New RA served by different SGSN — requires:
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    New SGSN contacts old SGSN to get PDP contexts
+  \item
+    New SGSN informs GGSN to update tunnel endpoints
+  \item
+    New SGSN updates HLR with new location
+  \item
+    Old SGSN releases resources
+  \end{enumerate}
+\end{itemize}
+
+\CNsubsection{9.5}{GPRS Attach Procedure}
+
+Before any PDP context can be activated, the MS must \textbf{attach} to the GPRS network:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  MS sends \textbf{Attach Request} (with IMSI or P-TMSI)
+\item
+  SGSN authenticates the subscriber (same Ki-based mechanism as GSM)
+\item
+  SGSN updates HLR with subscriber’s new SGSN location
+\item
+  SGSN assigns a \textbf{P-TMSI} (Packet-TMSI — equivalent of TMSI for packet domain)
+\item
+  SGSN sends \textbf{Attach Accept} to MS
+\end{enumerate}
+
+After attach, the MS is ``registered'' for packet service but has no active data session yet — that requires PDP context activation.
+
+\Needspace{14\baselineskip}
+
+\CNsection{10}{EDGE — Enhanced Data Rates for GSM Evolution}
+
+\CNchained\CNsubsection{10.1}{WHY EDGE Was Needed}
+
+GPRS improved efficiency (packet switching) but was still limited by \textbf{GSM’s modulation scheme}:
+
+\begin{itemize}
+\tightlist
+\item
+  GSM/\allowbreak{}GPRS uses \textbf{GMSK} (Gaussian Minimum Shift Keying)
+\item
+  GMSK encodes \textbf{1~bit per symbol}
+\item
+  Maximum raw data rate per timeslot: \textasciitilde{}21.4~kbps (after coding)
+\item
+  Maximum practical throughput: \textasciitilde{}40-60~kbps with 4 timeslots
+\end{itemize}
+
+For emerging applications (email attachments, early mobile web), this wasn’t enough. But operators couldn’t yet afford to deploy entirely new 3G networks.
+
+\textbf{EDGE’s value proposition:} Significantly more speed using the \textbf{same spectrum, same cell sites, same network} — just upgraded software and transceivers.
+
+\Needspace{11\baselineskip}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{10.2}{WHAT EDGE Changes}
+
+\CNchained\CNsubsubsection{Modulation: GMSK \ensuremath{\to} 8PSK}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Parameter} & \CNth{GPRS (GMSK)} & \CNth{EDGE (8PSK)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Modulation & GMSK & 8PSK (8-Phase Shift Keying) \\
+Bits per symbol & 1 & 3 \\
+Raw bit rate per timeslot & 22.8~kbps & 69.2~kbps (3\ensuremath{\times} faster) \\
+Symbol rate & 270.833 ksps & 270.833 ksps (unchanged!) \\
+Carrier bandwidth & 200~kHz & 200~kHz (unchanged!) \\
+Peak data rate (8 TS) & 171.2~kbps & 473.6~kbps \\
+Practical peak & \textasciitilde{}80~kbps & \textasciitilde{}200-236~kbps \\
+\end{longtable}
+}
+
+\begin{CNinsight}
+
+\textbf{Key insight:} EDGE achieves 3\ensuremath{\times} the raw bit rate because 8PSK encodes 3~bits in every symbol instead of 1. The symbol rate and carrier bandwidth don’t change — it’s purely a modulation efficiency gain.
+
+\end{CNinsight}
+
+\CNsubsubsection{Trade-off: Why Not Always Use 8PSK?}
+
+8PSK has \textbf{less distance between constellation points} than GMSK. This means:
+
+\begin{itemize}
+\tightlist
+\item
+  More susceptible to noise and interference
+\item
+  Higher bit error rate at cell edges
+\item
+  Not as robust in poor radio conditions
+\end{itemize}
+
+\textbf{EDGE’s solution: Link Adaptation}
+
+\begin{itemize}
+\tightlist
+\item
+  The system measures channel quality in real-time
+\item
+  Near the BTS (good signal): Use 8PSK with light coding (MCS-9: 59.2 kbps/\allowbreak{}slot)
+\item
+  Far from BTS (weak signal): Fall back to GMSK with heavy coding (MCS-1: 8.8 kbps/\allowbreak{}slot)
+\item
+  9 different Modulation and Coding Schemes (MCS-1 through MCS-9)
+\end{itemize}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{10.3}{EDGE Coding Schemes}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}ccccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{MCS} & \CNth{Modulation} & \CNth{Code Rate} & \CNth{Data Rate per Slot} & \CNth{When Used} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MCS-1 & GMSK & \textasciitilde{}0.53 & 8.8~kbps & Very poor channel \\
+MCS-2 & GMSK & \textasciitilde{}0.66 & 11.2~kbps & Poor channel \\
+MCS-3 & GMSK & \textasciitilde{}0.80 & 14.8~kbps & Below average \\
+MCS-4 & GMSK & \textasciitilde{}1.0 & 17.6~kbps & Average (no redundancy) \\
+MCS-5 & 8PSK & \textasciitilde{}0.37 & 22.4~kbps & Average channel \\
+MCS-6 & 8PSK & \textasciitilde{}0.49 & 29.6~kbps & Good channel \\
+MCS-7 & 8PSK & \textasciitilde{}0.76 & 44.8~kbps & Very good channel \\
+MCS-8 & 8PSK & \textasciitilde{}0.92 & 54.4~kbps & Excellent channel \\
+MCS-9 & 8PSK & \textasciitilde{}1.0 & 59.2~kbps & Best conditions \\
+\end{longtable}
+}
+
+\CNsubsection{10.4}{EGPRS: EDGE Applied to Packet Data}
+
+When EDGE modulation is applied to GPRS, the result is called \textbf{EGPRS (Enhanced GPRS)}:
+
+\begin{itemize}
+\tightlist
+\item
+  Same GPRS architecture (SGSN, GGSN, PDP contexts)
+\item
+  Same protocol stack
+\item
+  Only the physical layer and RLC layer are enhanced
+\item
+  Adds \textbf{Incremental Redundancy (IR):} If a block fails, retransmit with different puncturing; receiver combines attempts for better decoding probability
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{10.5}{Network Changes Required for EDGE}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2963}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4815}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2222}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Change} & \CNth{Description} & \CNth{Cost} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+New transceivers & BTS needs 8PSK-capable transmitters (linear amplifiers) & Moderate \\
+Software upgrade & BSC, SGSN need new coding scheme support & Low \\
+No new spectrum & Uses existing GSM frequencies & Zero \\
+No new sites & Uses existing cell sites & Zero \\
+No new core nodes & Same SGSN/\allowbreak{}GGSN infrastructure & Zero \\
+\end{longtable}
+}
+
+This made EDGE extremely attractive as a ``2.5G+'' stepping stone.
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m01-evolution}{8}
+
+\CNsection{11}{Evolution Path: GSM \ensuremath{\to} GPRS \ensuremath{\to} EDGE \ensuremath{\to} 3G}
+
+\CNchained\CNsubsection{11.1}{The Evolution Timeline}
+
+\CNfigure{m01-evolution}{Evolution timeline from GSM to UMTS}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{11.2}{What Each Step Added}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1746}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2381}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2540}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Generation} & \CNth{Key Innovation} & \CNth{Problem Solved} & \CNth{What Stayed the Same} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{GSM} & Digital cellular, roaming & Incompatible analog systems & — \\
+\textbf{GPRS} & Packet switching overlay & Data was too expensive (circuit-switched) & GSM radio, BSS, spectrum \\
+\textbf{EDGE} & 8PSK modulation + link adaptation & GPRS was too slow for emerging apps & GPRS architecture, spectrum, sites \\
+\textbf{UMTS (3G)} & New air interface (WCDMA), 5~MHz carriers & EDGE still couldn’t support video/\allowbreak{}rich media & Core network concepts (SGSN \ensuremath{\to} modernized) \\
+\end{longtable}
+}
+
+\CNsubsection{11.3}{WHY This Evolution Path Matters}
+
+The GSM \ensuremath{\to} GPRS \ensuremath{\to} EDGE progression demonstrates a key principle in telecom engineering:
+
+\begin{CNquote}
+
+\textbf{Maximize return from existing infrastructure before deploying new generations.}
+
+\end{CNquote}
+
+Each step was designed to:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Reuse} existing investments (spectrum, sites, core network)
+\item
+  \textbf{Add} capability incrementally
+\item
+  \textbf{Allow} operators to upgrade gradually (not ``big bang'')
+\end{enumerate}
+
+This philosophy continues today: 4G \ensuremath{\to} 4G-Advanced \ensuremath{\to} 5G NSA \ensuremath{\to} 5G SA.
+
+\Needspace{24\baselineskip}
+
+\CNsection{}{Summary Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2917}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2083}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Topic} & \CNth{GSM} & \CNth{GPRS} & \CNth{EDGE} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Switching} & Circuit & Packet & Packet \\
+\textbf{Modulation} & GMSK & GMSK & GMSK + 8PSK \\
+\textbf{Peak Data Rate} & 9.6~kbps (14.4 CSD) & 171.2~kbps (theoretical) & 473.6~kbps (theoretical) \\
+\textbf{Practical Data} & 9.6~kbps & 30–80~kbps & 120–236~kbps \\
+\textbf{Billing} & Per minute & Per MB & Per MB \\
+\textbf{Always-on?} & No (dial-up) & Yes & Yes \\
+\textbf{New Infrastructure} & Complete network & + SGSN, GGSN, PCU & + 8PSK transceivers \\
+\textbf{New Spectrum?} & Yes (900/\allowbreak{}1800~MHz) & No & No \\
+\end{longtable}
+}
+
+\CNboxsection{Review Questions}
+
+\begin{CNbox}[unbreakable]{q}{Review Questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Explain why the BSS is designed with ``dumb'' BTSs and an intelligent BSC. What are the advantages of this split?
+\item
+  Why does the VLR exist? What would happen if every operation required a query to the HLR?
+\item
+  In the GSM authentication process, why does the Ki never leave the SIM or AuC? What would be the consequence if it did?
+\item
+  Explain why circuit switching is fundamentally inefficient for bursty data traffic like web browsing.
+\item
+  What is the role of GTP tunneling between SGSN and GGSN? Why can’t packets just be routed normally?
+\item
+  Why does EDGE fall back to GMSK in poor radio conditions instead of always using 8PSK?
+\item
+  If EDGE can achieve \textasciitilde{}236~kbps, why was 3G (UMTS) still needed?
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{References}
+
+\begin{itemize}
+\tightlist
+\item
+  3GPP TS 03.02: Network Architecture (GSM)
+\item
+  3GPP TS 23.060: GPRS Service Description (Stage 2)
+\item
+  3GPP TS 43.064: GERAN Overall Description (EDGE)
+\item
+  3GPP TS 45.001: Physical Layer on the Radio Path
+\item
+  Halonen, Romero, Melero: ``GSM, GPRS and EDGE Performance'' (Wiley, 2003)
+\item
+  Eberspächer, Vögel, Bettstetter: ``GSM – Architecture, Protocols and Services'' (Wiley, 2009)
+\end{itemize}

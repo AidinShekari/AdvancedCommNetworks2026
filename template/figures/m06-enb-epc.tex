@@ -1,0 +1,10 @@
+% Module 6 — every eNB connects to the MME (S1-MME) and to the S-GW (S1-U); eNBs meet over X2
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \k/\y in {1/0, 2/-3.0}{
+  \node[CNran, minimum width=2.2cm, minimum height=1.9cm] (e\k) at (0,\y) {eNB \k};
+  \node[CNcp, minimum width=2.0cm, minimum height=0.8cm, anchor=south] (m\k) at (5.6,\y) {MME};
+  \node[CNup, minimum width=2.0cm, minimum height=0.8cm, anchor=north] (s\k) at (5.6,\y) {S-GW};
+  \draw[CNsigl, ->] ([yshift=4mm]e\k.east) -- node[CNelab, above=1pt, fill=none] {S1-MME} (m\k.west);
+  \draw[CNdata, ->] ([yshift=-4mm]e\k.east) -- node[CNelab, below=1pt, fill=none] {S1-U} (s\k.west);}
+\draw[CNlink, <->, line width=1pt] (e1) -- node[CNelab, right=2pt, fill=none] {X2} (e2);
+\end{tikzpicture}

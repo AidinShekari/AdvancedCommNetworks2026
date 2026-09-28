@@ -1,0 +1,11 @@
+% Module 23 — how the PFCP rules work together in the UPF
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNext] (in) at (4.95,1.6) {\CNL{Incoming packet}{بسته ورودی}};
+\node[CNcp, minimum width=2.6cm] (pdr) at (4.95,0) {\textbf{PDR}\\{\scriptsize (\CNL{detect}{تشخیص})}};
+\node[CNtiny, anchor=west, align=left] at (6.5,0) {$\leftarrow$ \CNL{match: outer header (TEID, IP), inner header, QFI}{تطبیق: سرآیند بیرونی (\lr{TEID}، \lr{IP})، سرآیند درونی، \lr{QFI}}};
+\draw[CNlink, ->] (in) -- (pdr);
+\foreach \r/\d [count=\k from 0] in {FAR/{\CNL{forward}{ارسال}}, QER/{\CNL{QoS enforce}{اعمال \lr{QoS}}}, URR/{\CNL{report}{گزارش}}, BAR/{\CNL{buffer}{بافر}}}{
+  \node[CNup, minimum width=2.4cm] (r\k) at ({\k*3.3},-2.3) {\textbf{\r}\\{\scriptsize (\d)}};
+  \draw[CNlink, ->] (pdr.south) -- ++(0,-0.55) -| (r\k.north);}
+\node[CNtiny, anchor=west] at (5.1,-0.85) {\CNL{matched $\rightarrow$ associated rules}{تطبیق $\rightarrow$ قواعد مرتبط}};
+\end{tikzpicture}

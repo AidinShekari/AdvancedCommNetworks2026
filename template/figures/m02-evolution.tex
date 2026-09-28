@@ -1,0 +1,12 @@
+% Module 2 — from circuit switching to fully packet-switched networks
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \k/\g/\t/\st in {0/2G CS/{\CNL{voice only}{فقط صدا}}/CNbox,
+    1/2.5G GPRS/{\CNL{packet data overlay, CS voice remains}{لایه داده بسته‌ای، صدای \lr{CS} باقی می‌ماند}}/CNbox,
+    2/3G UMTS/{\CNL{CS voice + PS data on the same carrier}{صدای \lr{CS +} داده \lr{PS} روی همان حامل}}/CNran,
+    3/4G LTE/{\CNL{all-IP, packet-switched voice via VoLTE}{تمام-\lr{IP}، صدای بسته‌ای با \lr{VoLTE}}}/CNcp,
+    4/5G NR/{\CNL{fully packet-switched, network slicing}{کاملاً بسته‌ای، برش‌دهی شبکه}}/CNup}{
+  \node[\st, anchor=west, minimum width=2.1cm] (g\k) at (\k*1.25,-\k*1.05) {\textbf{\g}};
+  \node[CNtiny, anchor=west] at ([xshift=0.25cm]g\k.east) {\t};
+}
+\foreach \a/\b in {0/1,1/2,2/3,3/4}{\draw[CNlink, ->] ([xshift=0.45cm]g\a.south west) |- (g\b.west);}
+\end{tikzpicture}

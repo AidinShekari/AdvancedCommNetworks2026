@@ -1,0 +1,12 @@
+% Module 5 — user-plane protocol stack of an LTE packet (radio part and backhaul part)
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\CNstack{a}{0}{0}{3.4cm}{\CNL{Application data}{داده کاربرد}/CNphyL, IP/CNupL, PDCP/{}, RLC/{}, MAC/{}, PHY/{}}
+\CNstack{b}{0}{-4.75}{3.4cm}{GTP-U \CNL{header}{سرآیند}/CNupL, {UDP/IP}/{}, {L2/L1}/{}}
+\node[CNtiny, font=\sffamily\scriptsize\itshape] at (0,-4.1) {[\CNL{air interface}{واسط رادیویی}]};
+\draw[CNline, dash pattern=on 3pt off 2pt] (-2.4,-4.1) -- (-0.95,-4.1) (0.95,-4.1) -- (2.4,-4.1);
+\foreach \n/\t in {a-2/{\CNL{the UE's IP packet}{بسته \lr{IP} کاربر}}, a-3/{\CNL{encryption, header compression (Uu)}{رمزنگاری، فشرده‌سازی سرآیند (\lr{Uu})}},
+    a-4/{\CNL{segmentation, ARQ (Uu)}{قطعه‌بندی، \lr{ARQ (Uu)}}}, a-5/{\CNL{scheduling, HARQ (Uu)}{زمان‌بندی، \lr{HARQ (Uu)}}},
+    a-6/{OFDMA / SC-FDMA (Uu)}, b-1/{\CNL{tunnel encapsulation (S1-U, S5)}{کپسوله‌سازی تونل (\lr{S1-U}، \lr{S5})}},
+    b-2/{\CNL{transport network}{شبکه انتقال}}, b-3/{\CNL{physical transport (fibre, microwave)}{انتقال فیزیکی (فیبر، مایکروویو)}}}{
+  \draw[CNsig, <-] (\n.east) -- ++(0.5,0) node[CNtiny, anchor=west, align=left] {\t};}
+\end{tikzpicture}

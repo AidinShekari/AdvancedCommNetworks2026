@@ -1,0 +1,14 @@
+% Module 4 — classification of handovers
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNdark, minimum width=3.4cm] (root) at (0,0) {\CNL{Handover types}{انواع تحویل}};
+\foreach \k/\x/\t/\a/\b in {f/-5.2/{\CNL{By frequency}{بر اساس فرکانس}}/Intra-freq/Inter-freq,
+                             t/0/{\CNL{By technology}{بر اساس فناوری}}/Intra-RAT/Inter-RAT,
+                             m/5.2/{\CNL{By method}{بر اساس روش}}/Hard/Soft}{
+  \node[CNcp, minimum width=3.2cm] (\k) at (\x,-1.8) {\t};
+  \node[CNbox, minimum width=2.1cm] (\k1) at (\x-1.25,-3.6) {\a};
+  \node[CNbox, minimum width=2.1cm] (\k2) at (\x+1.25,-3.6) {\b};
+  \draw[CNlink, ->] (root.south) -- ++(0,-0.4) -| (\k.north);
+  \draw[CNlink, ->] (\k.south) -- ++(0,-0.4) -| (\k1.north);
+  \draw[CNlink, ->] (\k.south) -- ++(0,-0.4) -| (\k2.north);
+}
+\end{tikzpicture}

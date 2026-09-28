@@ -1,0 +1,886 @@
+\CNsection{1}{چرا زمان‌بندی اهمیت دارد}
+
+در \lr{\mbox{LTE}}، کانال رادیویی یک \textbf{منبع مشترک} است. چندین کاربر برای منابع محدود زمان-فرکانس روی همان حامل رقابت می‌کنند. زمان‌بند، هوش مرکزی در \lr{\mbox{eNodeB}} است که تصمیم می‌گیرد:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{چه کسی} اجازه ارسال/\allowbreak{}دریافت دارد
+\item
+  \textbf{چه زمانی} (کدام زیرفریم)
+\item
+  \textbf{کجا} (کدام بلوک‌های منبع)
+\item
+  \textbf{چگونه} (کدام طرح مدولاسیون و کدگذاری)
+\end{itemize}
+
+بدون زمان‌بندی، کاربران با هم برخورد می‌کردند، منابع هدر می‌رفت و تضمین \lr{\mbox{QoS}} غیرممکن بود. زمان‌بند باید توازن برقرار کند بین:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{بیشینه‌سازی توان عملیاتی} \lr{—} استفاده کارآمد از منابع
+\item
+  \textbf{انصاف} \lr{—} گرسنه نگذاشتن کاربران لبه سلول
+\item
+  \textbf{تأخیر} \lr{—} برآورده‌کردن بودجه تأخیر برای خدمات بلادرنگ
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{QoS}}}}} \lr{—} احترام به حامل‌های \lr{\mbox{GBR}} (نرخ بیت تضمین‌شده)
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsection{2}{شبکه منابع \lr{\mbox{LTE}}}
+
+شبکه منابع ساختار دو-بعدی بنیادی است که تمام ارسال‌های \lr{\mbox{LTE}} را در زمان و فرکانس سازماندهی می‌کند.
+
+\CNsubsection{}{سلسله‌مراتب دامنه زمان}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ساختار} & \CNth{مدت} & \CNth{ترکیب} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+فریم رادیویی & \lr{\mbox{10~ms}} & 10 زیرفریم \\
+زیرفریم & \lr{\mbox{1~ms}} & 2 شکاف \\
+شکاف & \lr{\mbox{0.5~ms}} & 7 نماد \lr{\mbox{OFDM}} (\lr{\mbox{CP}} معمولی) \\
+نماد \lr{\mbox{OFDM}} & حدود \lr{\mbox{71.4 \ensuremath{\mu}s}} & 1 دوره نماد + پیشوند چرخه‌ای \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{سلسله‌مراتب دامنه فرکانس}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ساختار} & \CNth{پهنای باند} & \CNth{ترکیب} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+زیرحامل & \lr{\mbox{15~kHz}} & کوچک‌ترین واحد فرکانسی \\
+بلوک منبع \lr{\mbox{(RB)}} & \lr{\mbox{180~kHz}} & 12 زیرحامل \\
+پهنای باند سیستم & \lr{1.4–20~MHz} & \lr{\mbox{6–100 RB}} \\
+\end{longtable}
+}
+
+\CNsubsection{}{تعاریف کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{عنصر منبع \lr{\mbox{(RE)}}:} 1 زیرحامل \ensuremath{\times} 1 نماد \lr{\mbox{OFDM}} \lr{—} کوچک‌ترین واحد قابل تخصیص
+\item
+  \textbf{بلوک منبع \lr{\mbox{(RB)}}:} 12 زیرحامل \ensuremath{\times} 7 نماد = \lr{\mbox{\textbf{\lr{\mbox{84 RE}}}}} (یک شکاف)
+\item
+  \textbf{جفت بلوک منبع:} 12 زیرحامل \ensuremath{\times} 14 نماد = \lr{\mbox{\textbf{\lr{\mbox{168 RE}}}}} (یک زیرفریم /\allowbreak{} \lr{\mbox{TTI}})
+\end{itemize}
+
+\CNkeepfig{m07-frame-hierarchy}{3}
+
+\CNsubsection{}{تجسم شبکه منابع}
+
+\CNfigure{m07-frame-hierarchy}{ساختار زمانی \lr{\mbox{LTE}}: قاب، زیرقاب، شکاف و نمادهای \lr{\mbox{OFDM}}}
+
+\CNfigure{m07-rb-pair}{عناصر منبع یک بلوک منبع (۱۲ زیرحامل \ensuremath{\times} ۷ نماد)}
+
+\Needspace{19\baselineskip}
+
+\CNsection{3}{دانه‌بندی زمان‌بندی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{مقدار} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{دانه‌بندی زمان} & 1 زیرفریم = \lr{\mbox{1~ms}} (فاصله زمانی انتقال، \lr{\mbox{TTI}}) \\
+\textbf{دانه‌بندی فرکانس} & 1 بلوک منبع = \lr{\mbox{180~kHz}} (12 زیرحامل) \\
+\textbf{حداقل تخصیص} & 1 جفت \lr{\mbox{RB}} در هر \lr{\mbox{TTI}} برای هر کاربر \\
+\textbf{حداکثر تخصیص} & تمام \lr{\mbox{RB}}ها در یک \lr{\mbox{TTI}} به یک کاربر \\
+\textbf{نرخ تصمیم زمان‌بندی} & 1000 تصمیم در ثانیه \\
+\end{longtable}
+}
+
+زمان‌بند در هر \lr{TTI (1~ms)} تصمیم تازه‌ای می‌گیرد و \lr{\mbox{RB}}ها را به \lr{\mbox{UE}}ها بر اساس شرایط کانال، وضعیت بافر، نیازمندی‌های \lr{\mbox{QoS}} و متریک‌های انصاف تخصیص می‌دهد.
+
+\Needspace{14\baselineskip}
+
+\CNsection{4}{زمان‌بندی پیوند پایین‌سو}
+
+\CNchained\CNsubsection{}{مرور}
+
+زمان‌بند \lr{\mbox{eNodeB}} تمام تخصیص‌های منابع پیوند پایین‌سو را کنترل می‌کند. \lr{\mbox{UE}}ها را از تخصیص‌های خود از طریق پیام‌های \textbf{\lr{\mbox{DCI}} (اطلاعات کنترل پیوند پایین‌سو)} که روی \textbf{\lr{\mbox{PDCCH}} (کانال کنترل فیزیکی پیوند پایین‌سو)} حمل می‌شوند مطلع می‌کند.
+
+\CNsubsection{}{محتوای \lr{\mbox{DCI}}}
+
+پیام \lr{\mbox{DCI}} به \lr{\mbox{UE}} می‌گوید:
+
+\begin{itemize}
+\tightlist
+\item
+  کدام \lr{\mbox{RB}}ها تخصیص یافته‌اند (تخصیص منابع)
+\item
+  از کدام \lr{\mbox{MCS}} برای رمزگشایی استفاده کند
+\item
+  شماره فرآیند \lr{\mbox{HARQ}} و نسخه افزونگی
+\item
+  فرمان‌های کنترل توان
+\item
+  پارامترهای مرتبط با \lr{\mbox{MIMO}} (پیش‌کدگذاری، لایه‌ها)
+\end{itemize}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{انواع تخصیص منابع}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1622}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2162}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3514}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2703}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{روش} & \CNth{انعطاف‌پذیری} & \CNth{سربار} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{نوع 0} & نگاشت بیتی گروه‌های \lr{\mbox{RB}} (\lr{\mbox{RBG}}ها) & توزیع‌شده، غیرپیوسته & متوسط \\
+\textbf{نوع 1} & زیرمجموعه + شیفت + نگاشت بیتی & توزیع‌شده درون زیرمجموعه & بالاتر \\
+\textbf{نوع 2} & \lr{\mbox{RB}} شروع + طول \lr{\mbox{(RIV)}} & فقط پیوسته & کمترین \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\textbf{اندازه \lr{\mbox{RBG}}} به پهنای باند سیستم بستگی دارد:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{BW}} سیستم \lr{\mbox{(RB)}}} & \CNth{اندازه \lr{\mbox{RBG (RB)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+6 & 1 \\
+15 & 2 \\
+25 & 2 \\
+50 & 3 \\
+75 & 4 \\
+100 & 4 \\
+\end{longtable}
+}
+
+\CNsubsection{}{انتخاب \lr{\mbox{MCS}}}
+
+زمان‌بند \lr{\mbox{MCS}} را بر اساس موارد زیر انتخاب می‌کند:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE}} مقدار \lr{\mbox{\textbf{\lr{\mbox{CQI}}}}} (نشانگر کیفیت کانال) را گزارش می‌دهد
+\item
+  زمان‌بند \lr{\mbox{CQI}} را به شاخص \lr{\mbox{MCS}} مناسب نگاشت می‌کند
+\item
+  تنظیمات حلقه بیرونی را بر اساس تاریخچه \lr{ACK/\allowbreak{}NACK} اعمال می‌کند
+\item
+  \lr{\mbox{DCI}} را با \lr{\mbox{MCS}} انتخاب‌شده کدگذاری می‌کند تا \lr{\mbox{UE}} بتواند \lr{\mbox{PDSCH}} را رمزگشایی کند
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{زمان‌بندی پیوند بالاسو}
+
+\CNchained\CNsubsection{}{تفاوت‌های کلیدی با پیوند پایین‌سو}
+
+برخلاف پیوند پایین‌سو، زمان‌بندی پیوند بالاسو باید موارد زیر را در نظر بگیرد:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{محدودیت \lr{\mbox{SC-FDMA}}:} \lr{\mbox{UE}}ها باید \lr{\mbox{RB}}های \textbf{پیوسته} تخصیص یابند (خاصیت تک-حامله)
+\item
+  \textbf{محدودیت‌های توان \lr{\mbox{UE}}:} فاصله از \lr{\mbox{eNodeB}} بر نرخ قابل دستیابی تأثیر می‌گذارد
+\item
+  \textbf{آگاهی از بافر:} \lr{\mbox{eNodeB}} به‌طور مستقیم وضعیت بافر \lr{\mbox{UE}} را نمی‌داند
+\end{itemize}
+
+\CNsubsection{}{اعطای زمان‌بندی}
+
+\lr{\mbox{eNodeB}} یک \textbf{اعطای پیوند بالاسو} از طریق \lr{\mbox{DCI}} (قالب \lr{0/\allowbreak{}4}) روی \lr{\mbox{PDCCH}} می‌فرستد که شامل موارد زیر است:
+
+\begin{itemize}
+\tightlist
+\item
+  تخصیص \lr{\mbox{RB}} (پیوسته)
+\item
+  شاخص \lr{\mbox{MCS}}
+\item
+  فرمان کنترل توان
+\item
+  اطلاعات \lr{\mbox{HARQ}}
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{گزارش‌های وضعیت بافر \lr{\mbox{(BSR)}}}
+
+\lr{\mbox{UE}}ها از طریق \lr{\mbox{BSR}} به \lr{\mbox{eNodeB}} درباره داده در صف اطلاع می‌دهند:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5263}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4737}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع \lr{\mbox{BSR}}} & \CNth{محرک} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{\lr{\mbox{BSR}} عادی} & داده جدید در یک گروه کانال منطقی با اولویت بالاتر از گزارش‌شده فعلی می‌رسد \\
+\textbf{\lr{\mbox{BSR}} دوره‌ای} & گزارش‌دهی دوره‌ای مبتنی بر تایمر \\
+\textbf{\lr{\mbox{BSR}} حاشیه‌ای} & هنگام وجود ظرفیت اضافی در اعطای \lr{\mbox{UL}} ارسال می‌شود \\
+\end{longtable}
+}
+
+\lr{\mbox{BSR}} حجم داده را در هر \textbf{گروه کانال منطقی \lr{\mbox{(LCG)}}} گزارش می‌دهد و زمان‌بندی آگاه به اولویت را ممکن می‌سازد.
+
+\CNsubsection{}{گزارش حاشیه توان \lr{\mbox{(PHR)}}}
+
+\lr{\mbox{PHR}} به \lr{\mbox{eNodeB}} می‌گوید \lr{\mbox{UE}} چقدر \textbf{توان ارسال اضافی} در دسترس دارد:
+
+\CNdisplay{PH = P_{MAX} - P_{PUSCH}}
+
+\begin{itemize}
+\tightlist
+\item
+  اگر \lr{\mbox{PH \textgreater{} 0}}: \lr{\mbox{UE}} می‌تواند \lr{\mbox{MCS}} بالاتر یا \lr{\mbox{RB}}های بیشتر را پشتیبانی کند
+\item
+  اگر \lr{\mbox{PH \ensuremath{\le} 0}}: \lr{\mbox{UE}} محدود به توان است، زمان‌بند باید تخصیص را کاهش دهد
+\end{itemize}
+
+\CNkeepfig{m07-scfdma-alloc}{3}
+
+\CNsubsection{}{تخصیص پیوسته \lr{\mbox{SC-FDMA}}}
+
+\CNfigure{m07-scfdma-alloc}{تخصیص‌های پیوند بالاسو در \lr{\mbox{SC-FDMA}} باید در فرکانس پیوسته باشند}
+
+\Needspace{14\baselineskip}
+
+\CNsection{6}{نشانگر کیفیت کانال \lr{\mbox{(CQI)}}}
+
+\CNchained\CNsubsection{}{\lr{\mbox{CQI}} چه چیزی را نمایندگی می‌کند}
+
+\lr{\mbox{CQI}} یک \textbf{شاخص 4 بیتی} \lr{\mbox{(1–15)}} است که توسط \lr{\mbox{UE}} گزارش می‌شود و بالاترین \lr{\mbox{MCS}} قابل دریافت با نرخ خطای بلوک انتقال \lr{(BLER) \ensuremath{\le} \textbf{10\%}} را نشان می‌دهد.
+
+\lr{\mbox{CQI = 0}} به معنای «خارج از محدوده» است (کانال برای هر ارسالی بسیار ضعیف است).
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{جدول \lr{\mbox{CQI}} (\lr{3GPP TS 36.213}، جدول \CNnum{7.2.3-1)}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1528}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1667}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2639}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.4167}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شاخص \lr{\mbox{CQI}}} & \CNth{مدولاسیون} & \CNth{نرخ کد \ensuremath{\times} 1024} & \CNth{کارایی طیفی \lr{(bps/\allowbreak{}Hz)}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \lr{\mbox{QPSK}} & 78 & \CNnum{0.1523} \\
+2 & \lr{\mbox{QPSK}} & 120 & \CNnum{0.2344} \\
+3 & \lr{\mbox{QPSK}} & 193 & \CNnum{0.3770} \\
+4 & \lr{\mbox{QPSK}} & 308 & \CNnum{0.6016} \\
+5 & \lr{\mbox{QPSK}} & 449 & \CNnum{0.8770} \\
+6 & \lr{\mbox{QPSK}} & 602 & \CNnum{1.1758} \\
+7 & \lr{\mbox{16QAM}} & 378 & \CNnum{1.4766} \\
+8 & \lr{\mbox{16QAM}} & 490 & \CNnum{1.9141} \\
+9 & \lr{\mbox{16QAM}} & 616 & \CNnum{2.4063} \\
+10 & \lr{\mbox{64QAM}} & 466 & \CNnum{2.7305} \\
+11 & \lr{\mbox{64QAM}} & 567 & \CNnum{3.3223} \\
+12 & \lr{\mbox{64QAM}} & 666 & \CNnum{3.9023} \\
+13 & \lr{\mbox{64QAM}} & 772 & \CNnum{4.5234} \\
+14 & \lr{\mbox{64QAM}} & 873 & \CNnum{5.1152} \\
+15 & \lr{\mbox{64QAM}} & 948 & \CNnum{5.5547} \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{CQI}} پهن‌باند در برابر زیرباند}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3947}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3421}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2632}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{حالت گزارش‌دهی} & \CNth{توضیح} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{\lr{\mbox{CQI}} پهن‌باند} & یک \lr{\mbox{CQI}} برای کل پهنای باند & سربار پایین، تطبیق درشت \\
+\textbf{\lr{\mbox{CQI}} زیرباند} & \lr{\mbox{CQI}} در هر گروه \lr{\mbox{RB}} & زمان‌بندی انتخاب-فرکانسی، بهره بالاتر \\
+\textbf{زیرباند انتخاب‌شده توسط \lr{\mbox{UE}}} & \lr{\mbox{UE}} بهترین \lr{\mbox{M}} زیرباند را گزارش می‌دهد & سازش بین سربار و بهره \\
+\end{longtable}
+}
+
+\lr{\mbox{CQI}} زیرباند \textbf{زمان‌بندی انتخاب-فرکانسی} را ممکن می‌سازد، که در آن زمان‌بند به هر \lr{\mbox{UE RB}}هایی را تخصیص می‌دهد که کانال‌شان در آن‌ها بهترین است.
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{تطبیق پیوند}
+
+\CNchained\CNsubsection{}{مدولاسیون و کدگذاری تطبیقی \lr{\mbox{(AMC)}}}
+
+\lr{\mbox{AMC}} به‌صورت پویا مرتبه مدولاسیون و نرخ کد را برای تطبیق با شرایط لحظه‌ای کانال تنظیم می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{کانال خوب} \ensuremath{\leftarrow} مدولاسیون مرتبه بالاتر + نرخ کد بالاتر \ensuremath{\leftarrow} بیت بیشتر در هر \lr{\mbox{RE}}
+\item
+  \textbf{کانال ضعیف} \ensuremath{\leftarrow} مدولاسیون مرتبه پایین‌تر + نرخ کد پایین‌تر \ensuremath{\leftarrow} بیت کمتر در هر \lr{\mbox{RE}} اما مقاوم
+\end{itemize}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{}{طرح‌های مدولاسیون}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مدولاسیون} & \CNth{بیت در هر نماد} & \CNth{\lr{\mbox{SNR}} مورد نیاز (تقریبی)} & \CNth{کاربرد} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{QPSK}} & 2 & \lr{\mbox{\textless{} 10~dB}} & کاربران لبه سلول \\
+\lr{\mbox{16QAM}} & 4 & \lr{\mbox{10–17~dB}} & کاربران میانه \\
+\lr{\mbox{64QAM}} & 6 & \lr{\mbox{17–25~dB}} & کاربران نزدیک سلول \\
+\lr{\mbox{256QAM}} & 8 & \lr{\mbox{\textgreater{} 25~dB}} & \lr{Cat-11+ (Rel-12)}، بهترین شرایط \\
+\end{longtable}
+}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{جدول شاخص \lr{\mbox{MCS}} (\lr{3GPP TS 36.213}، جدول \CNnum{7.1.7.1-1)}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شاخص \lr{\mbox{MCS}}} & \CNth{مرتبه مدولاسیون} & \CNth{شاخص \lr{\mbox{TBS}}} & \CNth{یادداشت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & \lr{\mbox{2 (QPSK)}} & 0 & کمترین نرخ \\
+1 & \lr{\mbox{2 (QPSK)}} & 1 & \\
+2 & \lr{\mbox{2 (QPSK)}} & 2 & \\
+3 & \lr{\mbox{2 (QPSK)}} & 3 & \\
+4 & \lr{\mbox{2 (QPSK)}} & 4 & \\
+5 & \lr{\mbox{2 (QPSK)}} & 5 & \\
+6 & \lr{\mbox{2 (QPSK)}} & 6 & \\
+7 & \lr{\mbox{2 (QPSK)}} & 7 & \\
+8 & \lr{\mbox{2 (QPSK)}} & 8 & \\
+9 & \lr{\mbox{2 (QPSK)}} & 9 & \\
+10 & \lr{4 (16QAM)} & 9 & گذار مدولاسیون \\
+11 & \lr{4 (16QAM)} & 10 & \\
+12 & \lr{4 (16QAM)} & 11 & \\
+13 & \lr{4 (16QAM)} & 12 & \\
+14 & \lr{4 (16QAM)} & 13 & \\
+15 & \lr{4 (16QAM)} & 14 & \\
+16 & \lr{4 (16QAM)} & 15 & \\
+17 & \lr{6 (64QAM)} & 15 & گذار مدولاسیون \\
+18 & \lr{6 (64QAM)} & 16 & \\
+19 & \lr{6 (64QAM)} & 17 & \\
+20 & \lr{6 (64QAM)} & 18 & \\
+21 & \lr{6 (64QAM)} & 19 & \\
+22 & \lr{6 (64QAM)} & 20 & \\
+23 & \lr{6 (64QAM)} & 21 & \\
+24 & \lr{6 (64QAM)} & 22 & \\
+25 & \lr{6 (64QAM)} & 23 & \\
+26 & \lr{6 (64QAM)} & 24 & \\
+27 & \lr{6 (64QAM)} & 25 & \\
+28 & \lr{6 (64QAM)} & 26 & بالاترین نرخ \\
+29 & \lr{\mbox{2 (QPSK)}} & \lr{\mbox{—}} & رزروشده (بازارسال) \\
+30 & \lr{4 (16QAM)} & \lr{\mbox{—}} & رزروشده (بازارسال) \\
+31 & \lr{6 (64QAM)} & \lr{\mbox{—}} & رزروشده (بازارسال) \\
+\end{longtable}
+}
+
+\CNsubsection{}{تطبیق پیوند حلقه بیرونی \lr{\mbox{(OLLA)}}}
+
+حلقه داخلی \lr{(CQI \ensuremath{\to} MCS)} ممکن است به دلایل زیر نادقیق باشد:
+
+\begin{itemize}
+\tightlist
+\item
+  تأخیر گزارش‌دهی \lr{\mbox{CQI}}
+\item
+  خطاهای اندازه‌گیری \lr{\mbox{UE}}
+\item
+  تغییرپذیری تداخل
+\end{itemize}
+
+\lr{\mbox{\textbf{\lr{\mbox{OLLA}}} CQI}} مؤثر را با یک آفست تنظیم می‌کند:
+
+\CNdisplay{MCS_{effective} = f(CQI + \Delta_{OLLA})}
+
+آفست بر اساس بازخورد \lr{\mbox{HARQ}} به‌روزرسانی می‌شود:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{ACK}} دریافت شد:} \lr{$\Delta_{\mathrm{OLLA}} \mathrel{+}= \mathrm{step\_up}$} (مثلاً \lr{\mbox{+0.1~dB}}) \ensuremath{\leftarrow} امتحان \lr{\mbox{MCS}} بالاتر
+\item
+  \textbf{\lr{\mbox{NACK}} دریافت شد:} \lr{$\Delta_{\mathrm{OLLA}} \mathrel{-}= \mathrm{step\_down}$} (مثلاً \lr{\mbox{-1.0~dB}}) \ensuremath{\leftarrow} بازگشت به \lr{\mbox{MCS}} پایین‌تر
+\end{itemize}
+
+هدف: حفظ \lr{\textbf{\lr{BLER 10\%}}} در اولین ارسال (نسبت \lr{$\mathrm{step\_down}/\mathrm{step\_up}$} حدود \lr{$9{:}1$}).
+
+\Needspace{14\baselineskip}
+
+\CNsection{8}{\lr{\mbox{HARQ}} (درخواست تکرار خودکار ترکیبی)}
+
+\CNchained\CNsubsection{}{مرور}
+
+\lr{\mbox{HARQ}} \textbf{\lr{\mbox{FEC}} (تصحیح خطای پیشرو)} را با \textbf{\lr{\mbox{ARQ}} (بازارسال)} برای تحویل قابل اعتماد با تأخیر کم ترکیب می‌کند.
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{پارامترهای \lr{\mbox{HARQ}} در \lr{\mbox{LTE}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پارامتر} & \CNth{پیوند پایین‌سو} & \CNth{پیوند بالاسو} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+نوع & ناهمگام & همگام \\
+تعداد فرآیندها & 8 & 8 \\
+زمان‌بندی & زیرفریم بازارسال انعطاف‌پذیر & ثابت: بازارسال در \lr{\mbox{n+8}} \\
+بازخورد & \lr{ACK/\allowbreak{}NACK} روی \lr{PUCCH/\allowbreak{}PUSCH} & \lr{PHICH (ACK/\allowbreak{}NACK)} \\
+\lr{\mbox{RTT}} & \lr{\mbox{8~ms}} & \lr{\mbox{8~ms}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m07-harq-processes}{5}
+
+\CNsubsection{}{توقف-و-انتظار با 8 فرآیند}
+
+هر فرآیند در هر زمان یک بلوک انتقال را مدیریت می‌کند (توقف-و-انتظار). با \textbf{8 فرآیند موازی}، خط لوله پر می‌ماند:
+
+\CNfigure{m07-harq-processes}{هشت فرایند موازی توقف-و-انتظار \lr{\mbox{HARQ}}}
+
+\lr{\textbf{\lr{RTT = 8~ms:}} UE} در زمان \lr{$t$} دریافت می‌کند \ensuremath{\leftarrow} رمزگشایی \ensuremath{\leftarrow} ارسال \lr{ACK/\allowbreak{}NACK} در \lr{$t+4$ \ensuremath{\leftarrow} eNB} دریافت می‌کند \ensuremath{\leftarrow} بازارسال در \lr{$t+8$}.
+
+\Needspace{12\baselineskip}
+
+\CNsubsection{}{روش‌های ترکیب}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4062}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3438}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{روش} & \CNth{توضیح} & \CNth{مزیت} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{ترکیب \lr{Chase (CC)}} & ارسال مجدد بیت‌های یکسان، ترکیب نرم در گیرنده & ساده، بهره حدود \lr{\mbox{3~dB}} \\
+\textbf{افزونگی افزایشی \lr{\mbox{(IR)}}} & ارسال مجدد نسخه افزونگی متفاوت (بیت‌های توازن جدید) & بهره کدگذاری بالاتر، عملکرد بهتر \\
+\end{longtable}
+}
+
+\lr{\mbox{LTE}} به‌طور پیش‌فرض از \textbf{افزونگی افزایشی} با 4 نسخه افزونگی استفاده می‌کند (\lr{\mbox{RV 0}}، 2، 3، 1).
+
+\Needspace{14\baselineskip}
+
+\Needspace{24\baselineskip}
+
+\CNsection{9}{الگوریتم‌های زمان‌بندی}
+
+\CNchained\CNsubsection{}{\lr{Round Robin (RR)}}
+
+\textbf{اصل:} تخصیص منابع برابر به همه کاربران به‌نوبت.
+
+\CNdisplay{\CNmtext{User}_{selected}(t) = (t \mod N_{users})}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مزایا} & \CNth{معایب} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ساده برای پیاده‌سازی & شرایط کانال را نادیده می‌گیرد \\
+کاملاً منصفانه در منابع & ناعادلانه در توان عملیاتی (کاربران لبه کمتر می‌گیرند) \\
+بدون نیاز به بازخورد & کارایی طیفی ضعیف \\
+هزینه محاسباتی پایین & بدون تمایز \lr{\mbox{QoS}} \\
+\end{longtable}
+}
+
+\CNsubsection{}{\lr{Proportional Fair (PF)}}
+
+\textbf{اصل:} بیشینه‌سازی نسبت نرخ لحظه‌ای به توان عملیاتی میانگین.
+
+\CNdisplay{\CNmtext{User}_{selected} = \arg\max_k \frac{R_k^{inst}(t)}{\bar{R}_k(t)}}
+
+که در آن:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{$R_k^{inst}(t)$} = نرخ قابل دستیابی لحظه‌ای برای کاربر \lr{\mbox{k}} (از \lr{\mbox{CQI}})
+\item
+  \lr{$\bar{R}_k(t)$} = میانگین متحرک نمایی توان عملیاتی کاربر \lr{\mbox{k}}
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+به‌روزرسانی میانگین:\CNdisplay{\bar{R}_k(t+1) = (1-\frac{1}{t_c})\bar{R}_k(t) + \frac{1}{t_c} \cdot r_k(t)}
+
+که در آن \lr{$t_c$} پنجره میانگین‌گیری است (معمولاً \lr{100–1000 TTI}).
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مزایا} & \CNth{معایب} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+بهره‌گیری از تنوع چند-کاربری & پیچیده‌تر \\
+توازن خوب توان عملیاتی-انصاف & نیازمند بازخورد \lr{\mbox{CQI}} \\
+زمان‌بندی کاربران در اوج‌هایشان & تنظیم \lr{\mbox{tc}} بر رفتار تأثیر می‌گذارد \\
+بیشینه‌سازی مجموع \lr{log(\rl{توان عملیاتی})} & برای تأخیر سخت بهینه نیست \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{حداکثر \lr{C/\allowbreak{}I} (حداکثر توان عملیاتی)}
+
+\textbf{اصل:} همیشه کاربری با بهترین کانال را زمان‌بندی کن.
+
+\CNdisplay{\CNmtext{User}_{selected} = \arg\max_k R_k^{inst}(t)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مزایا} & \CNth{معایب} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+بیشینه‌سازی توان عملیاتی سلول & کاربران لبه سلول را گرسنه می‌گذارد \\
+بهترین کارایی طیفی & بسیار ناعادلانه \\
+تصمیم ساده & نقض \lr{\mbox{QoS}} برای کاربران ضعیف \\
+\end{longtable}
+}
+
+\CNsubsection{}{زمان‌بندی آگاه به \lr{\mbox{QoS}}}
+
+\textbf{اصل:} تضمین نرخ‌های حداقلی برای حامل‌های \lr{\mbox{GBR}}، اولویت‌بندی بر اساس \lr{\mbox{QCI}}.
+
+گام‌ها:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{ابتدا حامل‌های \lr{\mbox{GBR}} را برآورده کن} \lr{—} \lr{\mbox{RB}}های حداقل مورد نیاز را تخصیص بده
+\item
+  \textbf{ترتیب اولویت} \lr{—} رتبه‌بندی بر اساس سطح اولویت \lr{\mbox{QCI}}
+\item
+  \textbf{منابع باقیمانده} \lr{—} توزیع از طریق \lr{\mbox{PF}} بین حامل‌های غیر-\lr{\mbox{GBR}}
+\item
+  \textbf{بررسی بودجه تأخیر} \lr{—} افزایش اولویت برای بسته‌های نزدیک به مهلت
+\end{enumerate}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m07-trilemma}{8}
+
+\CNsection{10}{مبادلات مهندسی}
+
+\CNchained\CNsubsection{}{سه‌گانه زمان‌بندی}
+
+\CNfigure{m07-trilemma}{سه‌گانه زمان‌بندی و جایگاه هر الگوریتم}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2075}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2075}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1887}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1698}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2264}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{الگوریتم} & \CNth{توان عملیاتی} & \CNth{انصاف} & \CNth{تأخیر} & \CNth{پیچیدگی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Round Robin} & پایین & بالا (منبع) & متوسط & بسیار پایین \\
+\lr{Proportional Fair} & بالا & متوسط & متوسط & متوسط \\
+\lr{Max C/\allowbreak{}I} & بالاترین & بسیار پایین & پایین (برای بهترین کاربران) & پایین \\
+آگاه به \lr{\mbox{QoS}} & متوسط-بالا & قابل پیکربندی & تضمین‌شده & بالا \\
+\end{longtable}
+}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{ملاحظات طراحی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.2759}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.7241}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{عامل} & \CNth{تأثیر بر زمان‌بندی} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{تراکم کاربر} & کاربران بیشتر \ensuremath{\leftarrow} تنوع چند-کاربری بیشتر \ensuremath{\leftarrow} بهره‌های \lr{\mbox{PF}} افزایش می‌یابد \\
+\textbf{نوع ترافیک} & \lr{\mbox{VoLTE}} نیازمند تأخیر سخت است؛ \lr{\mbox{FTP}} تأخیر را تحمل می‌کند \\
+\textbf{اندازه سلول} & سلول‌های بزرگ \ensuremath{\leftarrow} پراکندگی \lr{\mbox{CQI}} زیاد \ensuremath{\leftarrow} انصاف حیاتی‌تر \\
+\textbf{باند فرکانسی} & باندهای بالاتر \ensuremath{\leftarrow} تغییرپذیری افت مسیر بیشتر \ensuremath{\leftarrow} بهره زمان‌بندی بیشتر \\
+\textbf{حالت \lr{\mbox{MIMO}}} & \lr{\mbox{MU-MIMO}} زمان‌بندی همزمان کاربران روی \lr{\mbox{RB}}های یکسان را ممکن می‌سازد \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{11}{مثال عددی}
+
+\CNchained\CNsubsection{}{پارامترهای سیستم}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{پهنای باند:} \lr{10~MHz \ensuremath{\to} \textbf{\lr{\mbox{50 RB}}}} در دسترس در هر \lr{\mbox{TTI}}
+\item
+  \textbf{کاربران:} \lr{\mbox{5 UE}} با شرایط کانال متفاوت
+\item
+  \textbf{سربار:} فرض 10 نماد داده در هر زیرفریم (پس از سیگنال‌های کنترل/\allowbreak{}مرجع)
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{}{\lr{\mbox{CQI}} و کارایی طیفی کاربران}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.0811}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.0676}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.1622}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.4054}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 8\tabcolsep) * \real{0.2838}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کاربر} & \CNth{\lr{\mbox{CQI}}} & \CNth{مدولاسیون} & \CNth{کارایی طیفی \lr{(bps/\allowbreak{}Hz)}} & \CNth{بیت در هر \lr{\mbox{RB}} در هر \lr{\mbox{TTI}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE1}} & 4 & \lr{\mbox{QPSK}} & \CNnum{0.6016} & \lr{0.6016 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 108} \\
+\lr{\mbox{UE2}} & 7 & \lr{\mbox{16QAM}} & \CNnum{1.4766} & \lr{1.4766 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 266} \\
+\lr{\mbox{UE3}} & 10 & \lr{\mbox{64QAM}} & \CNnum{2.7305} & \lr{2.7305 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 491} \\
+\lr{\mbox{UE4}} & 13 & \lr{\mbox{64QAM}} & \CNnum{4.5234} & \lr{4.5234 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 814} \\
+\lr{\mbox{UE5}} & 15 & \lr{\mbox{64QAM}} & \CNnum{5.5547} & \lr{5.5547 \ensuremath{\times} 180kHz \ensuremath{\times} 1ms = 1000} \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{یادداشت:} بیت در هر \lr{\mbox{RB}} در هر \lr{\mbox{TTI \ensuremath{\approx}}} کارایی طیفی \ensuremath{\times} 12 زیرحامل \ensuremath{\times} فاصله \lr{15~kHz \ensuremath{\times} 1~ms \ensuremath{\approx} SE \ensuremath{\times} 180} (ساده‌شده؛ جستجوی واقعی \lr{\mbox{TBS}} مقادیر گسسته می‌دهد).
+
+\end{CNquote}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{تخصیص \lr{Round Robin}}
+
+هر کاربر \lr{\mbox{RB}}های برابر می‌گیرد: \textbf{\lr{50 RB \ensuremath{\div} 5} کاربر = \lr{\mbox{10 RB}} برای هر کاربر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کاربر} & \CNth{\lr{\mbox{RB}}} & \CNth{توان عملیاتی در هر \lr{\mbox{TTI}}} & \CNth{توان عملیاتی \lr{\mbox{(Mbps)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE1}} & 10 & \lr{10 \ensuremath{\times} 108 = 1,080} بیت & \CNnum{1.08} \\
+\lr{\mbox{UE2}} & 10 & \lr{10 \ensuremath{\times} 266 = 2,660} بیت & \CNnum{2.66} \\
+\lr{\mbox{UE3}} & 10 & \lr{10 \ensuremath{\times} 491 = 4,910} بیت & \CNnum{4.91} \\
+\lr{\mbox{UE4}} & 10 & \lr{10 \ensuremath{\times} 814 = 8,140} بیت & \CNnum{8.14} \\
+\lr{\mbox{UE5}} & 10 & \lr{10 \ensuremath{\times} 1,000 = 10,000} بیت & \CNnum{10.00} \\
+\textbf{مجموع} & \textbf{50} & \textbf{\CNnum{26,790} بیت} & \textbf{\CNnum{26.79}} \\
+\end{longtable}
+}
+
+\textbf{شاخص انصاف \lr{\mbox{Jain}} (منبع):} \CNnum{1.0} (کاملاً منصفانه در \lr{\mbox{RB}}ها)\CNbr{}\textbf{شاخص انصاف \lr{\mbox{Jain}} (توان عملیاتی):} حدود \CNnum{0.69}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{}{تخصیص حداکثر \lr{C/\allowbreak{}I}}
+
+تمام \lr{\mbox{50 RB}} به \lr{\mbox{UE5}} (بهترین کانال) می‌رسد:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کاربر} & \CNth{\lr{\mbox{RB}}} & \CNth{توان عملیاتی \lr{\mbox{(Mbps)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE1}} & 0 & 0 \\
+\lr{\mbox{UE2}} & 0 & 0 \\
+\lr{\mbox{UE3}} & 0 & 0 \\
+\lr{\mbox{UE4}} & 0 & 0 \\
+\lr{\mbox{UE5}} & 50 & \CNnum{50.00} \\
+\textbf{مجموع} & \textbf{50} & \textbf{\CNnum{50.00}} \\
+\end{longtable}
+}
+
+\textbf{توان عملیاتی سلول:} \lr{\mbox{50~Mbps}} (حداکثر ممکن)\CNbr{}\textbf{شاخص انصاف \lr{\mbox{Jain}}:} \CNnum{0.20} (بدترین حالت برای 5 کاربر)
+
+\CNsubsection{}{تخصیص \lr{Proportional Fair}}
+
+با فرض شروع همه کاربران با توان عملیاتی میانگین برابر، \lr{\mbox{PF}} در ابتدا مانند \lr{Max C/\allowbreak{}I} رفتار می‌کند. پس از همگرایی، با زمان‌بندی کاربران در اوج‌های نسبی‌شان توازن برقرار می‌کند.
+
+\Needspace{19\baselineskip}
+
+\textbf{تقریب حالت پایدار} (\lr{\mbox{PF}} به سمت توان عملیاتی برابر در دامنه لگاریتمی گرایش دارد):
+
+زمان‌بند \lr{\mbox{PF}} تقریباً \lr{$\log(\bar{R}_k)$} را برابر می‌کند که به توزیع توان عملیاتی بین \lr{\mbox{RR}} و \lr{Max C/\allowbreak{}I} منجر می‌شود:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{کاربر} & \CNth{\lr{\mbox{RB}} تقریبی} & \CNth{توان عملیاتی \lr{\mbox{(Mbps)}}} & \CNth{متریک \lr{(\ensuremath{R_{\mathrm{inst}}}/\allowbreak{}\ensuremath{R_{\mathrm{avg}}})}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{UE1}} & 15 & \CNnum{1.62} & افزایش‌یافته (\lr{\mbox{\ensuremath{R_{\mathrm{avg}}}}} پایین) \\
+\lr{\mbox{UE2}} & 12 & \CNnum{3.19} & متوسط \\
+\lr{\mbox{UE3}} & 10 & \CNnum{4.91} & پایه \\
+\lr{\mbox{UE4}} & 8 & \CNnum{6.51} & کمی کاهش‌یافته \\
+\lr{\mbox{UE5}} & 5 & \CNnum{5.00} & کاهش‌یافته (\lr{\mbox{\ensuremath{R_{\mathrm{avg}}}}} بالا) \\
+\textbf{مجموع} & \textbf{50} & \textbf{\CNnum{21.23}} & \lr{\mbox{—}} \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\textbf{یادداشت:} تخصیص دقیق \lr{\mbox{PF}} به دینامیک محو شدن و پنجره \lr{\mbox{tc}} بستگی دارد. در محو شدن مسطح (بدون انتخاب‌پذیری فرکانسی)، \lr{\mbox{PF}} در طول زمان منابع بیشتری به کاربران ضعیف‌تر می‌دهد. با محو شدن انتخاب-فرکانسی، همه کاربران از زمان‌بندی روی بهترین زیرباندهایشان بهره می‌برند.
+
+\end{CNquote}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{خلاصه مقایسه}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{متریک} & \CNth{\lr{Round Robin}} & \CNth{\lr{Max C/\allowbreak{}I}} & \CNth{\lr{Proportional Fair}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+توان عملیاتی سلول \lr{\mbox{(Mbps)}} & \CNnum{26.79} & \CNnum{50.00} & حدود \lr{\mbox{21–35}} \\
+توان عملیاتی \lr{UE1 (Mbps)} & \CNnum{1.08} & 0 & حدود \CNnum{1.6} \\
+توان عملیاتی \lr{UE5 (Mbps)} & \CNnum{10.00} & \CNnum{50.00} & حدود \CNnum{5.0} \\
+انصاف (\lr{\mbox{Jain}}، منبع) & \CNnum{1.0} & \CNnum{0.20} & حدود \CNnum{0.75} \\
+کارایی طیفی & پایین & حداکثر & بالا \\
+گرسنگی؟ & خیر & بله (4 کاربر) & خیر \\
+\end{longtable}
+}
+
+\CNboxsection{نکات کلیدی}
+
+\begin{CNbox}[unbreakable]{sum}{نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{شبکه منابع} یک ماتریس زمان-فرکانس است \lr{—} زمان‌بندی در دانه‌بندی \lr{\mbox{RB}} در هر \lr{\mbox{TTI 1~ms}} عمل می‌کند
+\item
+  \textbf{بازخورد \lr{\mbox{CQI}}} چشمان زمان‌بند است \lr{—} انتخاب \lr{\mbox{MCS}} و تخصیص منابع را هدایت می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{HARQ}}}}} قابلیت اطمینان را با 8 فرآیند موازی و \lr{\mbox{RTT 8~ms}} فراهم می‌کند
+\item
+  \textbf{تطبیق پیوند \lr{(AMC + OLLA)}} به‌طور پیوسته نرخ را با شرایط کانال تطبیق می‌دهد
+\item
+  \textbf{هیچ الگوریتم واحدی برنده نیست} \lr{—} انتخاب به سناریوی استقرار، ترکیب ترافیک و اولویت‌های اپراتور بستگی دارد
+\item
+  \lr{\textbf{\lr{Proportional Fair}}} استاندارد عملی در شبکه‌های تجاری است زیرا سازش خوبی بین توان عملیاتی و انصاف فراهم می‌کند
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{SC-FDMA}}}}} پیوند بالاسو را به تخصیص پیوسته محدود می‌کند و انعطاف زمان‌بندی را نسبت به \lr{\mbox{OFDMA}} پیوند پایین‌سو کاهش می‌دهد
+\end{enumerate}
+
+\end{CNbox}
+
+\CNsection{}{مراجع}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{3GPP TS 36.213: Physical layer procedures (CQI/\allowbreak{}MCS tables)}
+\item
+  \lr{3GPP TS 36.321: MAC protocol (BSR, PHR, HARQ)}
+\item
+  \lr{3GPP TS 36.212: Multiplexing and channel coding (TBS tables)}
+\item
+  \lr{Sesia, Toufik, Baker: ``LTE – The UMTS Long Term Evolution'' (Wiley)}
+\end{itemize}

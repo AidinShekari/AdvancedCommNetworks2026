@@ -1,0 +1,11 @@
+% Module 2 — how a GSM authentication triplet is generated from Ki and RAND
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNdb, text width=5.4cm] (ki) at (0,0) {\CNLP{\textbf{Ki} (128-bit secret key, stored in SIM and AuC)}{\textbf{\lr{Ki}} (کلید مخفی ۱۲۸ بیتی، ذخیره‌شده در \lr{SIM} و \lr{AuC})}};
+\node[CNcp, minimum width=3.6cm] (a3) at (-2.9,-2.1) {\textbf{A3} {\scriptsize (RAND + Ki)}};
+\node[CNcp, minimum width=3.6cm] (a8) at (2.9,-2.1) {\textbf{A8} {\scriptsize (RAND + Ki)}};
+\node[CNhl, minimum width=3.0cm] (sres) at (-2.9,-4.0) {\textbf{SRES} {\scriptsize (32 bits)}};
+\node[CNhl, minimum width=3.0cm] (kc) at (2.9,-4.0) {\textbf{Kc} {\scriptsize (64 bits)}};
+\draw[CNlink, ->] (ki.south) -- ++(0,-0.45) -| (a3.north);
+\draw[CNlink, ->] (ki.south) -- ++(0,-0.45) -| (a8.north);
+\draw[CNlink, ->] (a3) -- (sres); \draw[CNlink, ->] (a8) -- (kc);
+\end{tikzpicture}

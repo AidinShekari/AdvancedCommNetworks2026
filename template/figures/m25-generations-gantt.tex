@@ -1,0 +1,20 @@
+% Module 25 — mobile network generations on a timeline (Gantt chart)
+\begin{tikzpicture}[CNfig, x=0.3cm, y=1cm]
+\def\X#1{(#1-1990)}
+\foreach \yr in {1990,1995,...,2040}{
+  \draw[CNline] ({\yr-1990},0.3) -- ({\yr-1990},-16.3);
+  \node[CNtiny] at ({\yr-1990},0.55) {\yr};}
+\foreach \sec/\c/\rows [count=\s from 0] in {
+  2G/CNinkL/{{GSM (Circuit Voice)}/1991/2025, {GPRS (Packet Overlay)}/2000/2025, {EDGE (Enhanced Data)}/2003/2020},
+  3G/CNcyan/{{UMTS R99 (WCDMA)}/2001/2025, {HSDPA (Rel-5)}/2005/2025, {HSPA+ (Rel-7/8)}/2008/2025},
+  4G/CNsig/{{LTE (Rel-8)}/2009/2035, {LTE-Advanced (Rel-10)}/2011/2035, {LTE-A Pro (Rel-13)}/2015/2035},
+  5G/CNgreen/{{5G NSA (Rel-15)}/2018/2035, {5G SA (Rel-15/16)}/2020/2040, {5G-Advanced (Rel-18)}/2024/2040},
+  6G/CNviolet/{{6G Research}/2025/2030, {6G Standardization}/2028/2032, {6G Commercial}/2030/2040}}{
+  \node[font=\sffamily\small\bfseries, text=\c, anchor=east] at (-0.6,{-0.25-\s*3.2}) {\sec};
+  \foreach \lab/\a/\b [count=\r from 0] in \rows {
+    \pgfmathsetmacro{\yy}{-0.25-\s*3.2-\r*0.9-0.55}
+    \fill[\c!75, rounded corners=1.5pt] ({\a-1990},\yy-0.3) rectangle ({\b-1990},\yy+0.3);
+    \pgfmathtruncatemacro{\len}{\b-\a}
+    \ifnum\len<9 \node[CNtiny, anchor=west, text=\c, font=\sffamily\scriptsize\bfseries] at ({\b-1990+0.3},\yy) {\lab};
+    \else \node[CNtiny, anchor=west, text=white, font=\sffamily\scriptsize\bfseries] at ({\a-1990+0.3},\yy) {\lab};\fi}}
+\end{tikzpicture}

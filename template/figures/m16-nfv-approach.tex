@@ -1,0 +1,7 @@
+% Module 16 — NFV approach: virtual functions on a shared virtualisation layer and COTS server
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \f [count=\k from 0] in {vFirewall, vLB, vDPI}{
+  \node[CNok, text width=3.0cm, minimum height=1.2cm] at ({\k*3.7},0) {\textbf{\f}\\{\scriptsize (VM/Container)}};}
+\node[CNhl, minimum width=10.4cm, minimum height=0.8cm] at (3.7,-1.25) {\CNL{Virtualisation layer (hypervisor / K8s)}{لایه مجازی‌سازی (\lr{Hypervisor / K8s})}};
+\node[CNdark, minimum width=10.4cm, minimum height=0.8cm] at (3.7,-2.2) {\CNL{COTS server (x86 / ARM)}{سرور تجاری آماده \lr{COTS (x86 / ARM)}}};
+\end{tikzpicture}

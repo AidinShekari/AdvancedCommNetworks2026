@@ -1,0 +1,11 @@
+% Module 22 — the EPS bearer is a chain of radio, S1 and S5/S8 bearers
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNue] (ue) at (0,0) {UE}; \node[CNran] (enb) at (3.6,0) {eNB}; \node[CNup] (sgw) at (7.2,0) {S-GW}; \node[CNup] (pgw) at (10.8,0) {P-GW};
+\draw[CNdata] (ue) -- node[CNelab, above=1pt, fill=none] {\CNL{radio bearer}{حامل رادیویی}} (enb);
+\draw[CNdata] (enb) -- node[CNelab, above=1pt, fill=none] {\CNL{S1-U bearer}{حامل \lr{S1-U}}} (sgw);
+\draw[CNdata] (sgw) -- node[CNelab, above=1pt, fill=none] {\CNL{S5/S8 bearer}{حامل \lr{S5/S8}}} (pgw);
+\foreach \a/\b/\y/\t/\c in {ue/enb/-0.95/{\CNL{Radio bearer}{حامل رادیویی}}/CNcyan, ue/sgw/-1.6/{\CNL{S1 bearer}{حامل \lr{S1}}}/CNcyan, ue/pgw/-2.25/{\CNL{S5/S8 bearer}{حامل \lr{S5/S8}}}/CNcyan}{
+  \draw[\c, <->, line width=0.9pt] (\a |- 0,\y) -- node[CNelab, fill=white] {\t} (\b |- 0,\y);}
+\draw[CNsig, <->, line width=2pt] (ue |- 0,-3.0) -- node[CNelab, fill=white, text=CNsig, font=\sffamily\scriptsize\bfseries] {\CNL{EPS bearer (end-to-end)}{حامل \lr{EPS} (سرتاسری)}} (pgw |- 0,-3.0);
+\node[CNnote, anchor=north] at (5.4,-3.5) {\CNL{Each EPS bearer = ONE QCI + ONE ARP}{هر حامل \lr{EPS} = یک \lr{QCI +} یک \lr{ARP}}};
+\end{tikzpicture}

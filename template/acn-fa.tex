@@ -1,0 +1,78 @@
+% ============================================================
+%  AdvancedCommNetworks — Persian (RTL) preamble
+%  Compile with XeLaTeX (or tectonic).  \CNroot must point to template/
+% ============================================================
+\input{\CNroot/acn-packages}
+\usepackage{xepersian}
+
+\settextfont[Path=\CNroot/fonts/, Extension=.ttf, AutoFakeBold=1.3, Scale=0.96]{Vazirmatn-Regular}
+\setlatintextfont{IBMPlexSans}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-SemiBold,
+  ItalicFont=*-Italic, BoldItalicFont=*-SemiBoldItalic, Scale=0.94]
+\setlatinsansfont{IBMPlexSans}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-SemiBold,
+  ItalicFont=*-Italic, BoldItalicFont=*-SemiBoldItalic, Scale=0.94]
+\setlatinmonofont{IBMPlexMono}[Extension=.otf, UprightFont=*-Regular, BoldFont=*-SemiBold,
+  ItalicFont=*-Italic, BoldItalicFont=*-SemiBoldItalic, Scale=0.88]
+\defpersianfont\CNfaDisplay[Path=\CNroot/fonts/, Extension=.ttf]{Vazirmatn-Black}
+\newfontfamily\CNcond{IBMPlexSansCondensed}[Extension=.otf, UprightFont=*-Medium,
+  BoldFont=*-Bold, ItalicFont=*-MediumItalic, BoldItalicFont=*-BoldItalic]
+
+\linespread{1.3}
+% inline formulas inside right-to-left text: avoid splitting them across lines
+\relpenalty=9999 \binoppenalty=9999
+\newif\ifCNrtl \CNrtltrue
+% heading font: Vazirmatn (Latin words inside headings use the condensed Plex)
+\newcommand{\CNheadfont}{\relax}
+
+% language strings
+\def\CNlangCourse{شبکه‌های ارتباطی پیشرفته}
+\def\CNlangCourseShort{شبکه‌های ارتباطی پیشرفته}
+\def\CNlangCourseOther{Advanced Communication Networks}
+\def\CNyearfa{\lr{\persianfont 1405-1406}}
+\def\CNlangTerm{نیمسال پاییز \CNyearfa}
+\def\CNlangTermOther{Fall 2026-2027}
+\def\CNlangUni{دانشگاه فردوسی مشهد}
+\def\CNlangUniOther{Ferdowsi University of Mashhad}
+\def\CNlangNotes{جزوه درسی}
+\def\CNlangModule{ماژول}
+\def\CNlangFigure{شکل}
+\def\CNlangPage{صفحه}
+\def\CNlangContents{فهرست مطالب}
+\def\CNlangModuleContents{در این ماژول}
+\def\CNlangSyllabus{طرح درس}
+\def\CNlangDescription{توصیف درس}
+\def\CNlangPrereq{مرور پیش‌نیازها}
+\def\CNlangSolution{پاسخ}
+\def\CNlangInstructorLabel{استاد:}
+\def\CNlangInstructor{امین آذری}
+\def\CNlangInstructorOther{Instructor: Amin Azari}
+\def\CNinstructorURL{https://github.com/AminAzari}
+\def\CNlangCompiler{گردآوری شده توسط آیدین شکاری}
+\def\CNcompilerURL{https://shekari.me}
+\def\CNlangGenerations{\lr{2G \textbullet\ 3G \textbullet\ 4G \textbullet\ 5G \textbullet\ 6G}}
+
+\newcommand{\CNpart}[2]{\ (بخش \CNnum{#1} از \CNnum{#2})}
+
+% bidi reverses the columns of a right-to-left longtable by setting the whole
+% page gathered so far inside \hbox{\beginR\vbox{...}}, which mirrors every
+% line of it: text above the table on the same page loses its list indents.
+% Before the table starts, the page so far is taken off and put back inside a
+% left-to-right box, which bidi's mirror leaves untouched; the rows still flip.
+\makeatletter
+\newbox\CN@ltpre
+\let\CN@LTstart\LT@start
+\def\LT@start{%
+  \if@RTLtab
+    \endgraf
+    \global\setbox\CN@ltpre\box\voidb@x
+    \begingroup
+      \output{\global\setbox\CN@ltpre\vbox{\unvbox\@cclv\unskip}}%
+      \penalty-\@M
+    \endgroup
+    \ifvoid\CN@ltpre\else
+      \hbox{\beginL\box\CN@ltpre\endL}%
+    \fi
+  \fi
+  \CN@LTstart}
+\makeatother
+
+\input{\CNroot/acn-style}

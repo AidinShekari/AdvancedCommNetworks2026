@@ -1,0 +1,14 @@
+% Module 1 — evolution timeline GSM → GPRS → EDGE → UMTS
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \i/\x/\yr/\g/\gen/\st in {1/0/1991/GSM/2G/CNbox, 2/4.2/1997--2000/GPRS/2.5G/CNbox,
+    3/8.4/2003--2005/EDGE/2.75G/CNbox, 4/12.6/2004+/UMTS/WCDMA 3G/CNran}{
+  \node[\st, minimum width=2.7cm, minimum height=1.15cm] (g\i) at (\x,0) {\textbf{\g}\\[-1pt]{\scriptsize \gen}};
+  \node[font=\sffamily\small\bfseries, text=CNsig] (y\i) at (\x,1.35) {\yr};
+  \draw[CNline, line width=0.8pt] (y\i.south) -- (g\i.north);
+}
+\foreach \a/\b in {1/2, 2/3, 3/4}{\draw[CNlink, ->, line width=1.1pt] (g\a) -- (g\b);}
+\node[CNtiny, anchor=north, text width=3.1cm] at ([yshift=-0.2cm]g1.south) {\CNL{Circuit-switched}{فقط صدای}\\\CNL{voice only}{سوئیچینگ مداری}\\\CNL{\textbf{9.6 kbps} data}{داده \lr{\textbf{9.6 kbps}}}};
+\node[CNtiny, anchor=north, text width=3.1cm] at ([yshift=-0.2cm]g2.south) {+ \CNL{Packet-switched}{لایه}\\\CNL{overlay}{سوئیچینگ بسته‌ای}\\\textbf{$\sim$40--80 kbps}};
+\node[CNtiny, anchor=north, text width=3.1cm] at ([yshift=-0.2cm]g3.south) {+ \CNL{Better}{مدولاسیون}\\\CNL{modulation (8PSK)}{بهتر (\lr{8PSK})}\\\textbf{$\sim$200--236 kbps}};
+\node[CNtiny, anchor=north, text width=3.1cm] at ([yshift=-0.2cm]g4.south) {\CNL{New air}{واسط رادیویی}\\\CNL{interface}{جدید}\\\textbf{$\sim$2 Mbps+}\\(HSPA: 14+ Mbps)};
+\end{tikzpicture}

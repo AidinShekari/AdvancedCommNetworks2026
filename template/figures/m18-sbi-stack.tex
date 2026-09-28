@@ -1,0 +1,10 @@
+% Module 18 — SBI protocol stack
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm, L/.style={CNlayer, minimum width=7.6cm, minimum height=0.78cm, align=center}]
+\node[L, fill=CNsig!12] (a) at (0,0) {\textbf{5G NF \CNL{service layer}{لایه خدمات}}\\{\scriptsize (Namf, Nsmf, Npcf, Nudm, \dots)}};
+\node[L, anchor=north, fill=CNsig!6] (b) at (a.south) {REST API (OpenAPI 3.0)};
+\node[L, anchor=north] (c) at (b.south) {\CNL{Serialisation: JSON}{سریال‌سازی: \lr{JSON}}};
+\node[L, anchor=north, fill=CNamber!14] (d) at (c.south) {\CNL{Authorisation: OAuth 2.0}{مجوزدهی: \lr{OAuth 2.0}}\\{\scriptsize (\CNL{NRF as the authorisation server}{\lr{NRF} به‌عنوان سرور مجوزدهی})}};
+\node[L, anchor=north, fill=CNcyan!10] (e) at (d.south) {\CNL{Transport: HTTP/2}{انتقال: \lr{HTTP/2}}};
+\node[L, anchor=north, fill=CNamber!14] (f) at (e.south) {\CNL{Security: TLS 1.2+ (mutual TLS)}{امنیت: \lr{TLS 1.2+} (\lr{TLS} دوطرفه)}};
+\node[L, anchor=north, fill=CNpaper] (g) at (f.south) {TCP/IP};
+\end{tikzpicture}

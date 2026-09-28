@@ -1,0 +1,13 @@
+% Module 2 — simplified SS7 protocol stack
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\foreach \t/\x in {ISUP/0, MAP/2.5, CAP/5}{\node[CNcp, minimum width=2.1cm] (\t) at (\x,0) {\textbf{\t}};}
+\node[CNlayer, minimum width=7.1cm, fill=CNsig!4] (tcap) at (2.5,-1.5) {\textbf{TCAP}};
+\node[CNlayer, minimum width=7.1cm, fill=CNsig!4] (sccp) at (2.5,-2.45) {\textbf{SCCP}};
+\node[CNlayer, minimum width=7.1cm, fill=CNsig!4] (mtp) at (2.5,-3.4) {\textbf{MTP} (levels 1, 2, 3)};
+\foreach \t in {ISUP, MAP, CAP}{\draw[CNlink] (\t.south) -- (\t.south |- tcap.north);}
+\draw[CNlink] (tcap.south) -- (sccp.north); \draw[CNlink] (sccp.south) -- (mtp.north);
+\draw[decorate, decoration={brace, amplitude=5pt}, CNmuted, line width=0.8pt] (6.3,0.5) -- (6.3,-0.5)
+  node[midway, right=7pt, CNtiny, align=left] {\CNL{Application}{لایه}\\\CNL{layer}{کاربرد}};
+\draw[decorate, decoration={brace, amplitude=5pt}, CNmuted, line width=0.8pt] (6.3,-1.1) -- (6.3,-3.8)
+  node[midway, right=7pt, CNtiny, align=left] {\CNL{Transport and}{لایه‌های انتقال}\\\CNL{transaction layers}{و تراکنش}};
+\end{tikzpicture}

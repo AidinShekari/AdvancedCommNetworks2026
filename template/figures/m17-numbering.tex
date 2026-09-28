@@ -1,0 +1,8 @@
+% Module 17 — anatomy of a specification number
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[font=\sffamily\LARGE\bfseries, text=CNsig] (xx) at (0,0) {xx};
+\node[font=\sffamily\LARGE\bfseries, text=CNink] at (0.75,0) {.};
+\node[font=\sffamily\LARGE\bfseries, text=CNcyanD] (yy) at (1.6,0) {yyy};
+\draw[CNcyan, line width=0.8pt] (yy.south) |- (2.4,-0.95) node[CNtiny, anchor=west] {\CNL{specification number within the series (001–999)}{شماره مشخصه در سری (\lr{001}–\lr{999})}};
+\draw[CNsig, line width=0.8pt] (xx.south) |- (2.4,-1.6) node[CNtiny, anchor=west] {\CNL{series number (defines the subject area)}{شماره سری (حوزه موضوعی را تعیین می‌کند)}};
+\end{tikzpicture}

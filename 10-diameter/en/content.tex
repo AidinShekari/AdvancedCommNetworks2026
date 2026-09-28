@@ -1,0 +1,792 @@
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{1}{Why Diameter Was Introduced}
+
+\CNchained\CNsubsection{}{RADIUS Limitations}
+
+RADIUS (Remote Authentication Dial-In User Service) was designed in the 1990s for dial-up access. As networks evolved toward 3G/\allowbreak{}4G, RADIUS could not meet modern requirements:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5789}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4211}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Limitation} & \CNth{Impact} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{UDP transport (unreliable)} & Messages can be lost silently; no built-in retransmission \\
+\textbf{No server-initiated messages} & Server cannot push policy changes or disconnect users proactively \\
+\textbf{Limited AVP space} & 8-bit attribute type field = max 255 attribute types \\
+\textbf{No application-layer ACK} & Cannot confirm message delivery at application level \\
+\textbf{Weak security model} & Shared secret + MD5 only; no hop-by-hop TLS built-in \\
+\textbf{No capability negotiation} & Peers cannot discover supported features \\
+\textbf{Client-server only} & No peer-to-peer; no agent/\allowbreak{}relay architecture \\
+\end{longtable}
+}
+
+\CNsubsection{}{Diameter’s Answer}
+
+Diameter (the name implies ``twice the RADIUS'') was defined in \textbf{RFC 6733} to address all these limitations:
+
+\begin{itemize}
+\tightlist
+\item
+  Reliable transport (TCP/\allowbreak{}SCTP)
+\item
+  Server-initiated messages (push model)
+\item
+  32-bit AVP code space (4+ billion attribute types)
+\item
+  Built-in capability exchange and error handling
+\item
+  Agent architecture for scalable routing
+\item
+  Native TLS/\allowbreak{}DTLS support
+\end{itemize}
+
+\begin{CNquote}
+
+\CNwarn{} \textbf{Key Concept}: Diameter is a \textbf{CONTROL PLANE} protocol only. It carries signaling (authentication, authorization, accounting, policy) — never user data traffic.
+
+\end{CNquote}
+
+\Needspace{28\baselineskip}
+
+\CNsection{2}{Diameter vs RADIUS Comparison}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2963}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3704}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Feature} & \CNth{RADIUS} & \CNth{Diameter} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{RFC} & RFC 2865/\allowbreak{}2866 & RFC 6733 \\
+\textbf{Transport} & UDP (unreliable) & TCP/\allowbreak{}SCTP (reliable) \\
+\textbf{Port} & 1812/\allowbreak{}1813 & 3868 \\
+\textbf{Connection} & Per-request & Persistent peer connections \\
+\textbf{Direction} & Client\ensuremath{\to}Server only & Peer-to-peer (both can initiate) \\
+\textbf{AVP code space} & 8-bit (255 max) & 32-bit (4 billion+) \\
+\textbf{Security} & Shared secret + MD5 & TLS/\allowbreak{}DTLS, IPsec \\
+\textbf{Max message size} & 4096~bytes & 16~MB (24-bit length) \\
+\textbf{Failover} & Application-dependent & Built-in (transport-level detection) \\
+\textbf{Capability negotiation} & None & CER/\allowbreak{}CEA exchange \\
+\textbf{Server-initiated} & No & Yes (e.g., RAR, ASR) \\
+\textbf{Agent support} & Limited (proxy) & Relay, Proxy, Redirect, Translation \\
+\textbf{Accounting} & Interim updates only & Real-time with guaranteed delivery \\
+\textbf{Vendor AVPs} & Limited & Native vendor-ID support \\
+\textbf{Used in} & Wi-Fi, VPN, ISP & LTE/\allowbreak{}4G core, IMS, VoLTE \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{18\baselineskip}
+
+\CNsection{3}{Diameter Architecture}
+
+\CNchained\CNsubsection{3.1}{Diameter Nodes}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6471}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3529}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Node Type} & \CNth{Role} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Diameter Client} & Generates requests (e.g., MME, P-GW) \\
+\textbf{Diameter Server} & Processes requests, returns answers (e.g., HSS, PCRF, OCS) \\
+\textbf{Diameter Agent} & Intermediary that routes/\allowbreak{}processes messages \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{Agent Types}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4118}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5882}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Agent} & \CNth{Function} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Relay} & Routes messages based on realm; does NOT modify AVPs \\
+\textbf{Proxy} & Routes messages AND may modify AVPs (policy enforcement) \\
+\textbf{Redirect} & Returns routing information to sender (does not forward) \\
+\textbf{Translation} & Translates between Diameter and other protocols (e.g., RADIUS\ensuremath{\leftrightarrow}Diameter) \\
+\end{longtable}
+}
+
+\CNsubsection{3.2}{Peer Connections}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Transport}: TCP (default) or SCTP (preferred for multi-homing)
+\item
+  \textbf{Port}: 3868 (plaintext) or 5868 (TLS)
+\item
+  \textbf{Persistent}: Connection stays up; monitored by watchdog (DWR/\allowbreak{}DWA)
+\item
+  \textbf{Peer-to-peer}: Both endpoints can initiate messages
+\item
+  \textbf{Capability Exchange}: CER/\allowbreak{}CEA must succeed before application messages
+\end{itemize}
+
+\CNsubsection{3.3}{Realm-Based Routing}
+
+Diameter routes messages based on \textbf{realms} (domain-like identifiers):
+
+\begin{itemize}
+\tightlist
+\item
+  Each node is configured with a realm (e.g., \CNcode{epc.}\allowbreak{}\CNcode{mnc001.}\allowbreak{}\CNcode{mcc208.}\allowbreak{}\CNcode{3gppnetwork.}\allowbreak{}\CNcode{org})
+\item
+  Routing table maps realms \ensuremath{\to} peer connections
+\item
+  Agents use \CNcode{Destination-Realm} AVP to determine next hop
+\item
+  Enables multi-operator and roaming scenarios
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m10-header}{8}
+
+\CNsection{4}{Diameter Message Structure}
+
+\CNchained\CNsubsection{4.1}{Message Header (20~bytes fixed)}
+
+\CNfigure{m10-header}{Diameter message header (20~bytes)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2692}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Field} & \CNth{Size} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Version} & 1~byte & Always \CNcode{1} \\
+\textbf{Message Length} & 3~bytes & Total message length including header \\
+\textbf{Flags} & 1~byte & R=Request, P=Proxiable, E=Error, T=Retransmit \\
+\textbf{Command Code} & 3~bytes & Identifies the command (e.g., 318 = AIR) \\
+\textbf{Application-ID} & 4~bytes & Identifies the application (e.g., 16777251 = S6a) \\
+\textbf{Hop-by-Hop ID} & 4~bytes & Matches request/\allowbreak{}answer on a single hop (unique per connection) \\
+\textbf{End-to-End ID} & 4~bytes & Matches request/\allowbreak{}answer end-to-end (unique globally) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsubsubsection{Header Flags}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Flag} & \CNth{Bit} & \CNth{Meaning} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{R} & 0 & Request (1) or Answer (0) \\
+\textbf{P} & 1 & Proxiable — can be relayed/\allowbreak{}proxied \\
+\textbf{E} & 2 & Error — answer contains error \\
+\textbf{T} & 3 & Retransmitted message \\
+\end{longtable}
+}
+
+\CNkeepfig{m10-avp}{3}
+
+\CNsubsection{4.2}{AVP (Attribute-Value Pair) Structure}
+
+\CNfigure{m10-avp}{Diameter AVP structure}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}cc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Field} & \CNth{Description} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{AVP Code} & 32-bit identifier for the attribute \\
+\textbf{V flag} & Vendor-specific — Vendor-ID field is present \\
+\textbf{M flag} & Mandatory — receiver MUST understand this AVP \\
+\textbf{P flag} & Protected — end-to-end encryption needed \\
+\textbf{AVP Length} & Total AVP length (header + data) \\
+\textbf{Vendor-ID} & 32-bit vendor identifier (present only if V=1) \\
+\textbf{Data} & The actual value (various types) \\
+\end{longtable}
+}
+
+\Needspace{21\baselineskip}
+
+\CNsubsubsection{AVP Data Types}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Type} & \CNth{Description} & \CNth{Example} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+OctetString & Raw bytes & RAND, AUTN \\
+UTF8String & Text string & User-Name \\
+Unsigned32 & 32-bit unsigned integer & Result-Code \\
+Unsigned64 & 64-bit unsigned integer & Accounting counters \\
+Address & IP address (IPv4/\allowbreak{}IPv6) & Framed-IP-Address \\
+Time & Seconds since Jan 1, 1900 & Event-Timestamp \\
+Enumerated & Named integer values & Auth-Session-State \\
+Grouped & Contains other AVPs & Subscription-Data \\
+\end{longtable}
+}
+
+\CNsubsection{4.3}{Grouped AVPs}
+
+Grouped AVPs contain other AVPs as their data — enabling hierarchical structures:
+
+\tcbset{CNcodemode/.style={unbreakable}}\def\CNcodelang{}
+
+\begin{CNplaincode}
+\begin{Verbatim}
+Subscription-Data (Grouped AVP)
+├── MSISDN: +33612345678
+├── Access-Restriction-Data: 0x00000000
+├── Subscriber-Status: SERVICE_GRANTED
+├── APN-Configuration-Profile (Grouped)
+│   ├── Context-Identifier: 1
+│   ├── APN-Configuration (Grouped)
+│   │   ├── Service-Selection: "internet"
+│   │   ├── PDN-Type: IPv4v6
+│   │   └── EPS-Subscribed-QoS-Profile (Grouped)
+│   │       ├── QoS-Class-Identifier: 9
+│   │       └── Allocation-Retention-Priority (Grouped)
+│   │           ├── Priority-Level: 15
+│   │           └── Pre-emption-Capability: NOT_PRE_EMPT
+\end{Verbatim}
+\end{CNplaincode}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{}{Key AVPs Table}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{AVP Name} & \CNth{Code} & \CNth{Type} & \CNth{Used In} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Session-Id & 263 & UTF8String & All messages \\
+Origin-Host & 264 & DiameterIdentity & All messages \\
+Origin-Realm & 296 & DiameterIdentity & All messages \\
+Destination-Host & 293 & DiameterIdentity & Requests \\
+Destination-Realm & 283 & DiameterIdentity & Requests \\
+Result-Code & 268 & Unsigned32 & All answers \\
+Auth-Session-State & 277 & Enumerated & Auth messages \\
+User-Name & 1 & UTF8String & User identification (IMSI) \\
+Visited-PLMN-Id & 1407 & OctetString & S6a messages \\
+Subscription-Data & 1400 & Grouped & S6a (ULA) \\
+Charging-Rule-Install & 1001 & Grouped & Gx (CCA) \\
+CC-Request-Type & 416 & Enumerated & Gy/\allowbreak{}Gx (CCR) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{5}{Diameter Commands}
+
+\CNchained\CNsubsection{5.1}{Naming Convention}
+
+All Diameter commands follow the pattern:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Request}: \CNcode{X-Request} (abbreviated \CNcode{XR}) — R flag = 1
+\item
+  \textbf{Answer}: \CNcode{X-Answer} (abbreviated \CNcode{XA}) — R flag = 0
+\end{itemize}
+
+Every request MUST receive exactly one answer.
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{5.2}{Base Protocol Commands (Application-ID = 0)}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2368}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1579}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3684}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2368}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Command} & \CNth{Code} & \CNth{Abbreviation} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Capabilities-Exchange-Request & 257 & CER & Initiate peer connection, exchange capabilities \\
+Capabilities-Exchange-Answer & 257 & CEA & Respond with own capabilities \\
+Device-Watchdog-Request & 280 & DWR & Heartbeat — verify peer is alive \\
+Device-Watchdog-Answer & 280 & DWA & Confirm alive status \\
+Disconnect-Peer-Request & 282 & DPR & Gracefully close connection \\
+Disconnect-Peer-Answer & 282 & DPA & Acknowledge disconnection \\
+Accounting-Request & 271 & ACR & Send accounting record \\
+Accounting-Answer & 271 & ACA & Acknowledge accounting record \\
+Abort-Session-Request & 274 & ASR & Server requests session termination \\
+Abort-Session-Answer & 274 & ASA & Client acknowledges termination \\
+Re-Auth-Request & 258 & RAR & Server requests re-authentication \\
+Re-Auth-Answer & 258 & RAA & Client acknowledges re-auth \\
+\end{longtable}
+}
+
+\CNkeepfig{m10-peer-lifecycle}{3}
+
+\CNsubsection{5.3}{Diameter Message Exchange Flow}
+
+\CNfigure{m10-peer-lifecycle}{Diameter peer life cycle: capability exchange, application messages, watchdog and disconnect}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{5.4}{Result Codes}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4286}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Code} & \CNth{Name} & \CNth{Meaning} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2001 & DIAMETER\_\allowbreak{}SUCCESS & Request processed successfully \\
+3xxx & Protocol Errors & Redirect, unable to deliver \\
+4xxx & Transient Failures & Retry may succeed (e.g., 4012 = DIAMETER\_\allowbreak{}UNABLE\_\allowbreak{}TO\_\allowbreak{}COMPLY) \\
+5xxx & Permanent Failures & Do not retry (e.g., 5001 = DIAMETER\_\allowbreak{}AVP\_\allowbreak{}UNSUPPORTED) \\
+5004 & DIAMETER\_\allowbreak{}UNKNOWN\_\allowbreak{}SESSION\_\allowbreak{}ID & Session not found \\
+5012 & DIAMETER\_\allowbreak{}UNABLE\_\allowbreak{}TO\_\allowbreak{}COMPLY & General permanent failure \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{27\baselineskip}
+
+\CNsection{6}{Important Diameter Applications in LTE}
+
+\CNchained\CNsubsection{6.1}{Overview of LTE Diameter Interfaces}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2340}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2340}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3404}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1915}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Interface} & \CNth{Endpoints} & \CNth{Application-ID} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{S6a} & MME \ensuremath{\leftrightarrow} HSS & 16777251 & Authentication, subscriber data \\
+\textbf{Gx} & PCRF \ensuremath{\leftrightarrow} P-GW & 16777238 & Policy and Charging Control (PCC) \\
+\textbf{Gy} & OCS \ensuremath{\leftrightarrow} P-GW & 4 (Credit-Control) & Online charging \\
+\textbf{Rx} & AF \ensuremath{\leftrightarrow} PCRF & 16777236 & Application-level QoS/\allowbreak{}media authorization \\
+\textbf{S13} & MME \ensuremath{\leftrightarrow} EIR & 16777252 & Equipment identity check (IMEI) \\
+\textbf{S6d} & SGSN \ensuremath{\leftrightarrow} HSS & 16777251 & 2G/\allowbreak{}3G authentication via Diameter \\
+\textbf{SWx} & 3GPP AAA \ensuremath{\leftrightarrow} HSS & 16777265 & Non-3GPP access authentication \\
+\textbf{Sh} & AS \ensuremath{\leftrightarrow} HSS & 16777217 & IMS service data \\
+\end{longtable}
+}
+
+\Needspace{27\baselineskip}
+
+\CNsubsection{6.2}{S6a Interface (MME \ensuremath{\leftrightarrow} HSS)}
+
+The most critical Diameter interface in LTE — handles all subscriber authentication and data management.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Command} & \CNth{Code} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Authentication-Information-Request & 318 & MME\ensuremath{\to}HSS & Request authentication vectors \\
+Authentication-Information-Answer & 318 & HSS\ensuremath{\to}MME & Return auth vectors (RAND, AUTN, XRES, \ensuremath{K_{\mathrm{ASME}}}) \\
+Update-Location-Request & 316 & MME\ensuremath{\to}HSS & Register UE location at MME \\
+Update-Location-Answer & 316 & HSS\ensuremath{\to}MME & Return subscription data \\
+Purge-UE-Request & 321 & MME\ensuremath{\to}HSS & Inform HSS that UE data purged \\
+Purge-UE-Answer & 321 & HSS\ensuremath{\to}MME & Acknowledge purge \\
+Cancel-Location-Request & 317 & HSS\ensuremath{\to}MME & HSS tells MME to detach UE \\
+Cancel-Location-Answer & 317 & MME\ensuremath{\to}HSS & Acknowledge cancel \\
+Notify-Request & 323 & MME\ensuremath{\to}HSS & Notify HSS of terminal info \\
+Notify-Answer & 323 & HSS\ensuremath{\to}MME & Acknowledge notification \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{6.3}{Gx Interface (PCRF \ensuremath{\leftrightarrow} P-GW)}
+
+Controls \textbf{Policy and Charging Control (PCC)} — decides what QoS and charging rules apply to each session.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Command} & \CNth{Code} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CC-Request (Initial) & 272 & P-GW\ensuremath{\to}PCRF & New IP-CAN session — request PCC rules \\
+CC-Answer (Initial) & 272 & PCRF\ensuremath{\to}P-GW & Install PCC rules (QoS, gates, charging) \\
+CC-Request (Update) & 272 & P-GW\ensuremath{\to}PCRF & Session modification (e.g., new bearer) \\
+CC-Answer (Update) & 272 & PCRF\ensuremath{\to}P-GW & Updated PCC rules \\
+CC-Request (Termination) & 272 & P-GW\ensuremath{\to}PCRF & Session ended \\
+CC-Answer (Termination) & 272 & PCRF\ensuremath{\to}P-GW & Acknowledge termination \\
+Re-Auth-Request & 258 & PCRF\ensuremath{\to}P-GW & Push new PCC rules mid-session \\
+Re-Auth-Answer & 258 & P-GW\ensuremath{\to}PCRF & Acknowledge rule update \\
+\end{longtable}
+}
+
+\textbf{CC-Request-Type values}: INITIAL(1), UPDATE(2), TERMINATION(3), EVENT(4)
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{6.4}{Gy Interface (OCS \ensuremath{\leftrightarrow} P-GW)}
+
+Handles \textbf{online charging} — credit reservation and debit in real-time.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Command} & \CNth{Code} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CC-Request (Initial) & 272 & P-GW\ensuremath{\to}OCS & Reserve initial credit quota \\
+CC-Answer (Initial) & 272 & OCS\ensuremath{\to}P-GW & Grant credit (units/\allowbreak{}time/\allowbreak{}volume) \\
+CC-Request (Update) & 272 & P-GW\ensuremath{\to}OCS & Report usage, request more credit \\
+CC-Answer (Update) & 272 & OCS\ensuremath{\to}P-GW & Grant additional credit or deny \\
+CC-Request (Termination) & 272 & P-GW\ensuremath{\to}OCS & Final report, release reservation \\
+CC-Answer (Termination) & 272 & OCS\ensuremath{\to}P-GW & Acknowledge final \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+Gx vs Gy: \textbf{Gx} = policy rules (what QoS to apply), \textbf{Gy} = charging (how much credit remains)
+
+\end{CNquote}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{6.5}{Rx Interface (AF \ensuremath{\leftrightarrow} PCRF)}
+
+Allows application functions (e.g., IMS P-CSCF for VoLTE) to request specific QoS from the network.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Command} & \CNth{Code} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+AA-Request & 265 & AF\ensuremath{\to}PCRF & Request media authorization (SDP info) \\
+AA-Answer & 265 & PCRF\ensuremath{\to}AF & Confirm media session authorized \\
+Session-Termination-Request & 275 & AF\ensuremath{\to}PCRF & Media session ended \\
+Session-Termination-Answer & 275 & PCRF\ensuremath{\to}AF & Acknowledge \\
+Re-Auth-Request & 258 & PCRF\ensuremath{\to}AF & Notify AF of bearer changes \\
+Abort-Session-Request & 274 & PCRF\ensuremath{\to}AF & PCRF aborts media session \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsubsection{6.6}{S13 Interface (MME \ensuremath{\leftrightarrow} EIR)}
+
+Equipment identity check — validates IMEI against blacklist/\allowbreak{}greylist.
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1714}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3143}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2571}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Command} & \CNth{Code} & \CNth{Direction} & \CNth{Purpose} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ME-Identity-Check-Request & 324 & MME\ensuremath{\to}EIR & Send IMEI for validation \\
+ME-Identity-Check-Answer & 324 & EIR\ensuremath{\to}MME & Return equipment status (white/\allowbreak{}grey/\allowbreak{}black) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{Diameter in LTE Authentication (S6a Deep Dive)}
+
+\CNchained\CNsubsection{7.1}{Authentication Flow}
+
+When a UE attaches to the LTE network, the MME uses S6a to:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Obtain authentication vectors} from the HSS (AIR/\allowbreak{}AIA)
+\item
+  \textbf{Register UE location} at the MME (ULR/\allowbreak{}ULA)
+\end{enumerate}
+
+\CNfigure{m10-s6a-attach-1}{S6a messages and their AVPs during attach\CNpart{1}{2}}
+
+\CNfigure{m10-s6a-attach-2}{S6a messages and their AVPs during attach\CNpart{2}{2}}
+
+\CNsubsection{7.2}{AIR (Authentication-Information-Request) Details}
+
+\textbf{Purpose}: MME requests fresh authentication vectors from HSS
+
+\textbf{Key AVPs in AIR}:\CNbr{}\textbar{} AVP \textbar{} Purpose \textbar{}\CNbr{}\textbar{}—–\textbar{}———\textbar{}\CNbr{}\textbar{} User-Name \textbar{} IMSI of the subscriber \textbar{}\CNbr{}\textbar{} Visited-PLMN-Id \textbar{} 3-byte MCC+MNC of visited network \textbar{}\CNbr{}\textbar{} Requested-EUTRAN-Authentication-Info \textbar{} Specifies how many vectors needed \textbar{}\CNbr{}\textbar{} Number-Of-Requested-Vectors \textbar{} Typically 1-5 \textbar{}\CNbr{}\textbar{} Re-Synchronization-Info \textbar{} Sent if previous auth failed (SQN sync) \textbar{}
+
+\CNsubsection{7.3}{AIA (Authentication-Information-Answer) Details}
+
+\textbf{Purpose}: HSS returns E-UTRAN authentication vectors
+
+\textbf{Key AVPs in AIA}:\CNbr{}\textbar{} AVP \textbar{} Purpose \textbar{}\CNbr{}\textbar{}—–\textbar{}———\textbar{}\CNbr{}\textbar{} Result-Code \textbar{} 2001=success, 5001=user unknown \textbar{}\CNbr{}\textbar{} Authentication-Info (Grouped) \textbar{} Contains the vectors \textbar{}\CNbr{}\textbar{} E-UTRAN-Vector (Grouped) \textbar{} One complete auth vector \textbar{}\CNbr{}\textbar{} ├─ RAND \textbar{} 128-bit random challenge \textbar{}\CNbr{}\textbar{} ├─ XRES \textbar{} Expected Response (for verification) \textbar{}\CNbr{}\textbar{} ├─ AUTN \textbar{} Authentication Token (for mutual auth) \textbar{}\CNbr{}\textbar{} └─ \ensuremath{K_{\mathrm{ASME}}} \textbar{} Key for NAS/\allowbreak{}AS security derivation \textbar{}
+
+\CNsubsection{7.4}{ULR (Update-Location-Request) Details}
+
+\textbf{Purpose}: MME registers itself as serving MME for this subscriber
+
+\textbf{Key AVPs in ULR}:\CNbr{}\textbar{} AVP \textbar{} Purpose \textbar{}\CNbr{}\textbar{}—–\textbar{}———\textbar{}\CNbr{}\textbar{} User-Name \textbar{} IMSI \textbar{}\CNbr{}\textbar{} Visited-PLMN-Id \textbar{} Serving network identity \textbar{}\CNbr{}\textbar{} RAT-Type \textbar{} E-UTRAN (LTE) \textbar{}\CNbr{}\textbar{} ULR-Flags \textbar{} Indicates initial attach vs TAU \textbar{}
+
+\CNsubsection{7.5}{ULA (Update-Location-Answer) Details}
+
+\textbf{Purpose}: HSS acknowledges and returns complete subscription profile
+
+\textbf{Key AVPs in ULA}:\CNbr{}\textbar{} AVP \textbar{} Purpose \textbar{}\CNbr{}\textbar{}—–\textbar{}———\textbar{}\CNbr{}\textbar{} Result-Code \textbar{} Success or failure \textbar{}\CNbr{}\textbar{} Subscription-Data (Grouped) \textbar{} Complete subscriber profile \textbar{}\CNbr{}\textbar{} ├─ MSISDN \textbar{} Phone number \textbar{}\CNbr{}\textbar{} ├─ AMBR \textbar{} Aggregate Max Bit Rate (UL + DL) \textbar{}\CNbr{}\textbar{} ├─ APN-Configuration-Profile \textbar{} All configured APNs \textbar{}\CNbr{}\textbar{} └─ Subscriber-Status \textbar{} SERVICE\_\allowbreak{}GRANTED or BARRED \textbar{}
+
+\CNkeepfig{m10-gx-rx-1}{5}
+
+\CNsection{}{Gx Policy Flow (CCR-I/\allowbreak{}CCA-I at Session Start)}
+
+\CNfigure{m10-gx-rx-1}{Gx and Rx policy flow for a default bearer and a VoLTE call\CNpart{1}{2}}
+
+\CNfigure{m10-gx-rx-2}{Gx and Rx policy flow for a default bearer and a VoLTE call\CNpart{2}{2}}
+
+\Needspace{14\baselineskip}
+
+\Needspace{30\baselineskip}
+
+\CNsection{8}{Diameter vs HTTP/\allowbreak{}2 in 5G}
+
+\CNchained\CNsubsection{8.1}{The Transition}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{21\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.1818}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3409}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4773}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Aspect} & \CNth{4G (Diameter)} & \CNth{5G (HTTP/\allowbreak{}2 + JSON)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Protocol} & Diameter (binary, TCP/\allowbreak{}SCTP) & HTTP/\allowbreak{}2 (text-based headers, binary framing) \\
+\textbf{Data format} & AVPs (binary TLV) & JSON (human-readable) \\
+\textbf{Architecture} & Point-to-point peers & Service-Based Interface (SBI) \\
+\textbf{Discovery} & Static peer config /\allowbreak{} DRA & NRF (Network Repository Function) \\
+\textbf{Interface naming} & S6a, Gx, Gy, Rx & Nausf, Npcf, Nchf, Naf \\
+\textbf{Session state} & Stateful (session-id maintained) & Stateless (REST-like) \\
+\textbf{Connection model} & Persistent peer connections & HTTP request/\allowbreak{}response \\
+\textbf{Scaling} & Vertical (bigger peers) & Horizontal (cloud-native, k8s) \\
+\textbf{Message routing} & Diameter Routing Agents (DRA) & Service Mesh /\allowbreak{} API Gateway \\
+\textbf{Standard} & IETF RFC 6733 + 3GPP & 3GPP + IETF HTTP/\allowbreak{}2 (RFC 7540) \\
+\end{longtable}
+}
+
+\CNsubsection{8.2}{Why 5G Moved Away from Diameter}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Simpler tooling}: HTTP/\allowbreak{}2 + JSON leverages existing web infrastructure (proxies, load balancers, API gateways)
+\item
+  \textbf{Web-native}: Standard REST APIs — easier for developers, standard debugging tools
+\item
+  \textbf{Stateless design}: Enables cloud-native microservices, horizontal scaling, Kubernetes orchestration
+\item
+  \textbf{Cloud-friendly}: No persistent peer connections; standard load balancing works
+\item
+  \textbf{Flexibility}: JSON schema evolution is easier than binary AVP definitions
+\item
+  \textbf{Ecosystem}: Massive HTTP/\allowbreak{}2 ecosystem (libraries, tools, monitoring)
+\end{enumerate}
+
+\Needspace{15\baselineskip}
+
+\CNsubsection{8.3}{Diameter Equivalent Functions in 5G}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{4G Diameter Interface} & \CNth{5G SBI Equivalent} & \CNth{NF Involved} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S6a (MME\ensuremath{\leftrightarrow}HSS) & Nudm (UDM services) & AMF \ensuremath{\leftrightarrow} UDM/\allowbreak{}AUSF \\
+Gx (PCRF\ensuremath{\leftrightarrow}P-GW) & Npcf (Policy services) & SMF \ensuremath{\leftrightarrow} PCF \\
+Gy (OCS\ensuremath{\leftrightarrow}P-GW) & Nchf (Charging services) & SMF \ensuremath{\leftrightarrow} CHF \\
+Rx (AF\ensuremath{\leftrightarrow}PCRF) & Npcf + Naf & AF \ensuremath{\leftrightarrow} PCF (via NEF) \\
+\end{longtable}
+}
+
+\CNsubsection{8.4}{Migration: 4G/\allowbreak{}5G Interworking}
+
+Diameter is NOT gone — it persists at interworking boundaries:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Diameter Routing Agent (DRA)} still used in 4G
+\item
+  \textbf{Interworking Function (IWF)} translates Diameter \ensuremath{\leftrightarrow} HTTP/\allowbreak{}2 at 4G/\allowbreak{}5G border
+\item
+  NSA (Non-Standalone) 5G still uses EPC with Diameter
+\item
+  Full migration to SA (Standalone) 5G eliminates Diameter within the core
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNkeepfig{m10-planes}{8}
+
+\CNsection{9}{Diameter = Control Plane Only}
+
+\CNchained\CNsubsection{}{Critical Distinction}
+
+\CNfigure{m10-planes}{Diameter belongs to the control plane only}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{}{What Diameter Controls vs What Carries Data}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Function} & \CNth{Protocol} & \CNth{Plane} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Authenticate subscriber & Diameter S6a & Control \\
+Authorize QoS policy & Diameter Gx & Control \\
+Check credit balance & Diameter Gy & Control \\
+Authorize media session & Diameter Rx & Control \\
+Validate IMEI & Diameter S13 & Control \\
+Carry YouTube video & GTP-U & User \\
+Carry VoLTE voice (RTP) & GTP-U & User \\
+Carry web browsing & GTP-U & User \\
+\end{longtable}
+}
+
+\begin{CNquote}
+
+\CNstar{} \textbf{Remember}: Diameter tells the network \emph{what to do}. GTP-U \emph{does it}.
+
+\end{CNquote}
+
+\Needspace{26\baselineskip}
+
+\CNsection{}{Summary}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{20\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.3500}}
+  >{\raggedright\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.6500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{Topic} & \CNth{Key Takeaway} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Why Diameter & RADIUS too limited for mobile core (no reliable transport, no push, limited AVPs) \\
+Architecture & Client/\allowbreak{}Server/\allowbreak{}Agent model with persistent TCP/\allowbreak{}SCTP peers and realm routing \\
+Messages & 20-byte header + AVPs; every Request gets exactly one Answer \\
+S6a & Authentication (AIR/\allowbreak{}AIA) + Location Update (ULR/\allowbreak{}ULA) — the backbone of LTE mobility \\
+Gx & Policy control — installs QoS rules on bearers (CCR/\allowbreak{}CCA + RAR/\allowbreak{}RAA) \\
+Gy & Online charging — real-time credit control \\
+Rx & Application QoS — IMS/\allowbreak{}VoLTE media authorization \\
+5G transition & HTTP/\allowbreak{}2 + JSON replaces Diameter; IWF for interworking \\
+Scope & Control plane ONLY — never carries user data \\
+\end{longtable}
+}
+
+\emph{Module 10 — Diameter Protocol \textbar{} Advanced Communication Networks}

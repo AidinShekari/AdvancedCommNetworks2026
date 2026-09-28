@@ -1,0 +1,9 @@
+% Module 23 — uplink classifier (UL CL) for edge breakout
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\node[CNran] (g) at (0,0) {gNB}; \node[CNup] (i) at (3.2,0) {UL CL (I-UPF)}; \node[CNup] (p) at (7.0,0) {PSA-UPF}; \node[CNext] (dn) at (10.4,0) {Central DN};
+\node[CNext] (e) at (7.0,-1.6) {Local DN (Edge/MEC)};
+\draw[CNdata, ->] (g) -- node[CNelab, above=1pt, fill=none] {N3} (i);
+\draw[CNdata, ->] (i) -- node[CNelab, above=1pt, fill=none] {N9} (p);
+\draw[CNdata, ->] (p) -- node[CNelab, above=1pt, fill=none] {N6} (dn);
+\draw[CNdata, ->] (i) |- node[pos=0.75, CNelab, above=1pt, fill=none] {N6} (e);
+\end{tikzpicture}

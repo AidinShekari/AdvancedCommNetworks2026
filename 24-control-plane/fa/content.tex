@@ -1,0 +1,681 @@
+\CNsection{1}{مفهوم صفحه کنترل}
+
+\textbf{صفحه کنترل} (صفحه-\lr{\mbox{C}}) تمام \textbf{سیگنالینگ} در شبکه موبایل را مدیریت می‌کند \lr{—} پیام‌هایی که اتصالات را برقرار، مدیریت، اصلاح و تخریب می‌کنند. این صفحه داده کاربر را حمل \textbf{نمی‌کند}.
+
+\textbf{مسیولیت‌های صفحه کنترل:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{احراز هویت و امنیت}: تأیید هویت مشترک، برقراری رمزنگاری
+\item
+  \textbf{ثبت‌نام و تحرک}: اتصال، جداسازی، به‌روزرسانی نواحی ردیابی، تحویل‌ها
+\item
+  \textbf{مدیریت نشست}: برقراری/\allowbreak{}اصلاح/\allowbreak{}آزادسازی نشست‌های \lr{\mbox{PDU}} یا حامل‌ها
+\item
+  \textbf{مذاکره \lr{\mbox{QoS}}}: توافق بر پارامترهای کیفیت برای جریان‌های داده
+\item
+  \textbf{صفحه‌بندی}: یافتن \lr{\mbox{UE}}های بیکار برای داده/\allowbreak{}تماس‌های ورودی
+\item
+  \textbf{سیاست و صورت‌حساب}: اعمال قواعد اپراتور بر نشست‌ها
+\end{itemize}
+
+\textbf{اصل کلیدی:} صفحه کنترل صفحه کاربر را «برنامه‌ریزی» می‌کند \lr{—} تونل‌ها، قواعد و مسیریابی را برقرار می‌کند که صفحه کاربر سپس برای ارسال داده از آن‌ها استفاده می‌کند.
+
+\Needspace{28\baselineskip}
+
+\CNsection{2}{پروتکل‌های صفحه کنترل \lr{—} جدول مرجع اصلی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1887}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.2075}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1321}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1321}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1698}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 10\tabcolsep) * \real{0.1698}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پروتکل} & \CNth{نسل} & \CNth{لایه} & \CNth{صفحه} & \CNth{بین} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{MAP}}}}} (بخش کاربرد موبایل) & \lr{2G/\allowbreak{}3G} & کاربرد & کنترل & \lr{\mbox{MSC\ensuremath{\leftrightarrow}HLR}}، \lr{\mbox{VLR\ensuremath{\leftrightarrow}HLR}} & داده مشترک، احراز هویت، مسیریابی \lr{\mbox{SMS}}، تحویل \\
+\lr{\mbox{\textbf{\lr{\mbox{ISUP}}}}} (بخش کاربر \lr{\mbox{ISDN}}) & \lr{2G/\allowbreak{}3G} & کاربرد & کنترل & \lr{\mbox{MSC\ensuremath{\leftrightarrow}MSC}}، \lr{\mbox{MSC\ensuremath{\leftrightarrow}PSTN}} & برقراری/\allowbreak{}آزادسازی تماس مدار-گزارشی \\
+\lr{\mbox{\textbf{\lr{\mbox{RANAP}}}}} (پروتکل کاربرد \lr{\mbox{RAN}}) & \lr{\mbox{3G}} & کاربرد & کنترل & \lr{RNC\ensuremath{\leftrightarrow}CN (MSC/\allowbreak{}SGSN)} & سیگنالینگ \lr{\mbox{RAN}}-هسته (واسط \lr{\mbox{Iu}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{S1AP}}}}} (پروتکل کاربرد \lr{\mbox{S1}}) & \lr{\mbox{4G}} & کاربرد & کنترل & \lr{\mbox{eNB\ensuremath{\leftrightarrow}MME}} & سیگنالینگ \lr{\mbox{RAN}}-هسته \lr{\mbox{(S1-MME)}} \\
+\lr{\mbox{\textbf{\lr{\mbox{NGAP}}}}} (پروتکل کاربرد \lr{\mbox{NG}}) & \lr{\mbox{5G}} & کاربرد & کنترل & \lr{\mbox{gNB\ensuremath{\leftrightarrow}AMF}} & سیگنالینگ \lr{\mbox{RAN}}-هسته \lr{\mbox{(N2)}} \\
+\lr{\mbox{\textbf{\lr{\mbox{GTP-C v1}}}}} & \lr{\mbox{3G}} & کنترل تونل & کنترل & \lr{SGSN\ensuremath{\leftrightarrow}GGSN} & ایجاد/\allowbreak{}اصلاح/\allowbreak{}حذف زمینه \lr{\mbox{PDP}} \\
+\lr{\mbox{\textbf{\lr{\mbox{GTP-C v2}}}}} & \lr{4G/\allowbreak{}5G} & کنترل تونل & کنترل & \lr{MME\ensuremath{\leftrightarrow}S-GW\ensuremath{\leftrightarrow}P-GW} & ایجاد/\allowbreak{}اصلاح/\allowbreak{}حذف نشست و حامل \\
+\lr{\mbox{\textbf{\lr{\mbox{Diameter}}}}} & \lr{\mbox{4G}} & \lr{\mbox{AAA}}/\allowbreak{}سیاست & کنترل & \lr{\mbox{MME\ensuremath{\leftrightarrow}HSS}}، \lr{PCRF\ensuremath{\leftrightarrow}P-GW} & احراز هویت \lr{\mbox{(S6a)}}، سیاست \lr{\mbox{(Gx)}}، صورت‌حساب \lr{\mbox{(Gy)}} \\
+\lr{\textbf{\lr{HTTP/\allowbreak{}2 SBI}}} & \lr{\mbox{5G}} & خدمات‌محور & کنترل & \lr{\mbox{NF\ensuremath{\leftrightarrow}NF}} (تمام \lr{\mbox{NF}}های \lr{\mbox{5GC}}) & کشف خدمات، ثبت‌نام، مدیریت نشست \\
+\lr{\mbox{\textbf{\lr{\mbox{NAS EMM}}}}} & \lr{\mbox{4G}} & لایه غیر-دسترسی & کنترل & \lr{\mbox{UE\ensuremath{\leftrightarrow}MME}} & اتصال، \lr{\mbox{TAU}}، احراز هویت، امنیت \\
+\lr{\mbox{\textbf{\lr{\mbox{NAS ESM}}}}} & \lr{\mbox{4G}} & لایه غیر-دسترسی & کنترل & \lr{UE\ensuremath{\leftrightarrow}MME (\ensuremath{\to}P-GW)} & راه‌اندازی/\allowbreak{}اصلاح/\allowbreak{}آزادسازی حامل \\
+\lr{\mbox{\textbf{\lr{\mbox{NAS 5GMM}}}}} & \lr{\mbox{5G}} & لایه غیر-دسترسی & کنترل & \lr{\mbox{UE\ensuremath{\leftrightarrow}AMF}} & ثبت‌نام، احراز هویت، درخواست خدمات \\
+\lr{\mbox{\textbf{\lr{\mbox{NAS 5GSM}}}}} & \lr{\mbox{5G}} & لایه غیر-دسترسی & کنترل & \lr{\mbox{UE\ensuremath{\leftrightarrow}SMF}} (از طریق \lr{\mbox{AMF}}) & برقراری/\allowbreak{}اصلاح/\allowbreak{}آزادسازی نشست \lr{\mbox{PDU}} \\
+\lr{\textbf{\lr{RRC (LTE)}}} & \lr{\mbox{4G}} & لایه دسترسی & کنترل & \lr{\mbox{UE\ensuremath{\leftrightarrow}eNB}} & راه‌اندازی اتصال، پیکربندی اندازه‌گیری، تحویل، \lr{\mbox{SIB}}ها \\
+\lr{\mbox{\textbf{\lr{\mbox{RRC (NR)}}}}} & \lr{\mbox{5G}} & لایه دسترسی & کنترل & \lr{\mbox{UE\ensuremath{\leftrightarrow}gNB}} & همان + پیکربندی \lr{\mbox{BWP}}، مدیریت پرتو، \lr{\mbox{CHO}} \\
+\lr{\mbox{\textbf{\lr{\mbox{SCTP}}}}} & \lr{4G/\allowbreak{}5G} & انتقال & کنترل & \lr{\mbox{eNB\ensuremath{\leftrightarrow}MME}}، \lr{\mbox{gNB\ensuremath{\leftrightarrow}AMF}} & انتقال سیگنالینگ قابل اعتماد (چند-جریانی) \\
+\lr{\mbox{\textbf{\lr{\mbox{SIP}}}}} (پروتکل آغاز نشست) & \lr{4G/\allowbreak{}5G (IMS)} & کاربرد & کنترل & \lr{UE\ensuremath{\leftrightarrow}P-CSCF\ensuremath{\leftrightarrow}S-CSCF} & برقراری تماس \lr{VoLTE/\allowbreak{}VoNR}، ثبت‌نام \lr{\mbox{IMS}} \\
+\lr{\mbox{\textbf{\lr{\mbox{PFCP}}}}} & \lr{\mbox{5G}} (\lr{\mbox{CUPS}} در \lr{\mbox{4G}}) & کنترل & کنترل & \lr{\mbox{SMF\ensuremath{\leftrightarrow}UPF}} & برنامه‌ریزی قواعد صفحه کاربر \lr{\mbox{(N4)}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-stack-relations}{3}
+
+\CNsubsection{}{روابط پشته پروتکل}
+
+\CNfigure{m24-stack-relations}{چینش پروتکل‌های سیگنالینگ روی پروتکل‌های انتقال}
+
+\Needspace{31\baselineskip}
+
+\CNsection{3}{\lr{\mbox{NAS}} (لایه غیر-دسترسی)}
+
+پروتکل‌های \lr{\mbox{NAS}} \textbf{بین \lr{\mbox{UE}} و شبکه هسته} عمل می‌کنند \lr{—} آن‌ها به‌صورت شفاف از \lr{\mbox{RAN}} عبور می‌کنند (\lr{eNB/\allowbreak{}gNB} محتوای \lr{\mbox{NAS}} را تفسیر نمی‌کند، فقط آن را رله می‌کند).
+
+\CNsubsection{3.1}{\lr{\mbox{NAS}} در \lr{LTE (TS 24.301)}}
+
+\lr{\mbox{NAS}} در \lr{\mbox{LTE}} دو زیرلایه دارد:
+
+\textbf{\lr{\mbox{EMM}} (مدیریت تحرک \lr{\mbox{EPS}}):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{پیام‌ها} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{Attach}} & \lr{Attach Request/\allowbreak{}Accept/\allowbreak{}Complete} & ثبت \lr{\mbox{UE}} در شبکه \\
+\lr{\mbox{Detach}} & \lr{Detach Request/\allowbreak{}Accept} & لغو ثبت \lr{\mbox{UE}} \\
+\lr{\mbox{TAU}} & \lr{TAU Request/\allowbreak{}Accept} & به‌روزرسانی ناحیه ردیابی \\
+احراز هویت & \lr{Auth Request/\allowbreak{}Response} & احراز هویت متقابل \lr{\mbox{(AKA)}} \\
+حالت امنیتی & \lr{SMC Command/\allowbreak{}Complete} & فعال‌سازی رمزگذاری/\allowbreak{}یکپارچگی \lr{\mbox{NAS}} \\
+درخواست خدمات & \lr{Service Request/\allowbreak{}Accept} & گذار \lr{IDLE\ensuremath{\to}CONNECTED} \\
+هویت & \lr{Identity Request/\allowbreak{}Response} & درخواست \lr{\mbox{IMSI}} در صورت نبود \lr{\mbox{GUTI}} \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\textbf{\lr{\mbox{ESM}} (مدیریت نشست \lr{\mbox{EPS}}):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3667}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{پیام‌ها} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+اتصال \lr{\mbox{PDN}} & \lr{PDN Conn Request/\allowbreak{}Activate Default Bearer} & برقراری اتصال \lr{\mbox{PDN}} \\
+تخصیص منبع حامل & \lr{Bearer Resource Alloc Req} & حامل اختصاصی با محرک \lr{\mbox{UE}} \\
+فعال‌سازی حامل اختصاصی & \lr{Act Ded Bearer Req/\allowbreak{}Accept} & حامل \lr{\mbox{QoS}} با محرک شبکه \\
+اصلاح حامل & \lr{Modify Bearer Req/\allowbreak{}Accept} & تغییر \lr{\mbox{QoS}} حامل \\
+غیرفعال‌سازی حامل & \lr{Deact Bearer Req/\allowbreak{}Accept} & آزادسازی حامل \\
+\end{longtable}
+}
+
+\Needspace{24\baselineskip}
+
+\CNsubsection{3.2}{\lr{\mbox{NAS}} در \lr{5G (TS 24.501)}}
+
+\lr{\mbox{NAS}} در \lr{\mbox{5G}} نیز دو زیرلایه دارد اما با قابلیت‌های بهبودیافته:
+
+\textbf{\lr{\mbox{5GMM}} (مدیریت تحرک \lr{\mbox{5G}}):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3667}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{پیام‌ها} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ثبت‌نام & \lr{Registration Req/\allowbreak{}Accept/\allowbreak{}Complete} & اولیه، تحرک، ثبت‌نام دوره‌ای \\
+لغو ثبت‌نام & \lr{Dereg Request/\allowbreak{}Accept} & با محرک \lr{\mbox{UE}} یا شبکه \\
+احراز هویت & \lr{Auth Request/\allowbreak{}Response/\allowbreak{}Failure} & \lr{\mbox{5G-AKA}} یا \lr{\mbox{EAP-AKA’}} \\
+حالت امنیتی & \lr{SMC Command/\allowbreak{}Complete} & فعال‌سازی امنیت \lr{\mbox{NAS}} \\
+درخواست خدمات & \lr{Service Request/\allowbreak{}Accept} & بازگشت از \lr{IDLE/\allowbreak{}INACTIVE} \\
+به‌روزرسانی پیکربندی & \lr{Config Update Command/\allowbreak{}Complete} & تخصیص مجدد \lr{\mbox{GUTI}}، \lr{\mbox{NSSAI}} \\
+اعلان & \lr{Notification/\allowbreak{}Response} & محرک‌های شبکه (\lr{\mbox{SOR}}، \lr{\mbox{UPU}}) \\
+\end{longtable}
+}
+
+\Needspace{12\baselineskip}
+
+\textbf{\lr{\mbox{5GSM}} (مدیریت نشست \lr{\mbox{5G}}):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{پیام‌ها} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+برقراری نشست \lr{\mbox{PDU}} & \lr{PDU Session Est Req/\allowbreak{}Accept} & ایجاد نشست \lr{\mbox{PDU}} \\
+اصلاح نشست \lr{\mbox{PDU}} & \lr{PDU Session Mod Req/\allowbreak{}Accept} & اصلاح جریان‌های \lr{\mbox{QoS}} \\
+آزادسازی نشست \lr{\mbox{PDU}} & \lr{PDU Session Rel Req/\allowbreak{}Accept} & تخریب نشست \\
+\end{longtable}
+}
+
+\textbf{بهبودهای کلیدی \lr{\mbox{NAS}} در \lr{\mbox{5G}} نسبت به \lr{\mbox{4G}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  ثبت‌نام جایگزین \lr{Attach + TAU} می‌شود (رویه یکپارچه)
+\item
+  از شبکه‌بندی پشتیبانی می‌کند (\lr{\mbox{NSSAI}} درخواستی در ثبت‌نام)
+\item
+  انواع نشست \lr{\mbox{PDU}}: \lr{\mbox{IPv4}}، \lr{\mbox{IPv6}}، \lr{\mbox{IPv4v6}}، \lr{\mbox{Ethernet}}، \lr{\mbox{Unstructured}}
+\item
+  پیام‌های \lr{\mbox{NAS}} از طریق \lr{\mbox{AMF}} به \lr{\mbox{SMF}} برای مدیریت نشست مسیریابی می‌شوند
+\end{itemize}
+
+\CNkeepfig{m24-nas-transparency}{3}
+
+\CNsubsection{3.3}{شفافیت \lr{\mbox{NAS}} از طریق \lr{\mbox{RAN}}}
+
+\CNfigure{m24-nas-transparency}{\lr{\mbox{NAS}} به‌طور شفاف از \lr{\mbox{gNB}} عبور می‌کند}
+
+\begin{itemize}
+\tightlist
+\item
+  پیام‌های \lr{\mbox{NAS}} درون پیام‌های \lr{\mbox{RRC}} روی واسط رادیویی حمل می‌شوند
+\item
+  \lr{\mbox{RRC}} آن‌ها را درون \lr{NGAP (5G)} یا \lr{S1AP (4G)} به هسته حمل می‌کند
+\item
+  گره \lr{\mbox{RAN}} محتوای \lr{\mbox{NAS}} را رمزگشایی یا تفسیر \textbf{نمی‌کند}
+\item
+  زمینه امنیتی \lr{\mbox{NAS}} جدا (رمزگذاری/\allowbreak{}یکپارچگی \lr{\mbox{NAS}}) از امنیت \lr{AS (RRC/\allowbreak{}UP)}
+\end{itemize}
+
+\Needspace{29\baselineskip}
+
+\CNsection{4}{\lr{\mbox{RRC}} (کنترل منابع رادیویی)}
+
+\lr{\mbox{RRC}} \textbf{بین \lr{\mbox{UE}} و ایستگاه پایه} (لایه دسترسی) عمل می‌کند و اتصال رادیویی را کنترل می‌کند.
+
+\CNsubsection{4.1}{\lr{\mbox{RRC}} در \lr{LTE (TS 36.331)}}
+
+\textbf{رویه‌های کلیدی:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3667}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{رویه} & \CNth{پیام‌ها} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+راه‌اندازی اتصال & \lr{RRC Conn Setup Req/\allowbreak{}Setup/\allowbreak{}Complete} & برقراری \lr{\mbox{SRB1}} \\
+پیکربندی مجدد اتصال & \lr{RRC Conn Reconfig} & افزودن/\allowbreak{}اصلاح حامل‌ها، تحویل \\
+آزادسازی اتصال & \lr{RRC Conn Release} & آزادسازی منابع رادیویی \\
+پیکربندی اندازه‌گیری & (در \lr{\mbox{Reconfig}}) & پیکربندی رویدادهای اندازه‌گیری (\lr{\mbox{A1-A6}}، \lr{\mbox{B1-B2}}) \\
+تحویل & \lr{RRC Conn Reconfig (mobilityCtrlInfo)} & اجرای تحویل \\
+حالت امنیتی & \lr{Security Mode Command/\allowbreak{}Complete} & فعال‌سازی رمزگذاری/\allowbreak{}یکپارچگی \lr{\mbox{AS}} \\
+اطلاعات سیستم & \lr{\mbox{MIB}}، \lr{SIB1-SIB19} & پخش پارامترهای سلول \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-lte-rrc}{2}
+
+\textbf{حالت‌های \lr{\mbox{RRC}} در \lr{\mbox{LTE}}:}
+
+\CNfigure{m24-lte-rrc}{حالت‌های \lr{\mbox{RRC}} در \lr{\mbox{LTE}}}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{4.2}{\lr{\mbox{RRC}} در \lr{NR (TS 38.331)}}
+
+\lr{\mbox{RRC}} در \lr{\mbox{NR}} شامل تمام توابع \lr{\mbox{RRC}} در \lr{\mbox{LTE}} \textbf{به‌علاوه}:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.4091}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5909}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{پیکربندی \lr{\mbox{BWP}}} & پیکربندی بخش‌های پهنای باند (تغییر \lr{\mbox{BWP}} فعال) \\
+\textbf{مدیریت پرتو} & نشانگر پرتو \lr{\mbox{SSB}}، بازیابی شکست پرتو، گزارش \lr{\mbox{L1-RSRP}} \\
+\textbf{تحویل شرطی \lr{\mbox{(CHO)}}} & پیش‌پیکربندی شرایط تحویل \lr{—} هنگام برآورده شدن اجرا (بدون تأخیر فرمان تحویل) \\
+\textbf{پیکربندی گروه سلول} & \lr{MCG + SCG} برای اتصال دوگانه \\
+\textbf{بهبودهای \lr{\mbox{MeasConfig}}} & رویدادهای \lr{\mbox{NR}} (مشابه + بین-\lr{RAT NR\ensuremath{\leftrightarrow}LTE})، فیلترکردن \lr{\mbox{L3}} در هر پرتو \\
+\textbf{بهبودهای \lr{\mbox{SIB}}} & \lr{\mbox{SIB}}های در صورت تقاضا، \lr{\mbox{SIB}} برای \lr{\mbox{RedCap}}، \lr{\mbox{NTN}}، سایدلینک \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-nr-rrc}{3}
+
+\CNsubsection{4.3}{حالت‌های \lr{\mbox{RRC}} در \lr{\mbox{5G}} (سه حالت)}
+
+\CNfigure{m24-nr-rrc}{سه حالت \lr{\mbox{RRC}} در \lr{\mbox{NR}} و گذارهای آن‌ها}
+
+\textbf{مزایای \lr{RRC\_\allowbreak{}INACTIVE}:}
+
+\begin{itemize}
+\tightlist
+\item
+  زمینه \lr{\mbox{UE}} در \lr{\mbox{gNB}} خدمات‌دهنده آخر حفظ می‌شود \ensuremath{\leftarrow} بازگشت سریع (حدود \lr{\mbox{10~ms}} در برابر حدود \lr{\mbox{50~ms}})
+\item
+  نیازی به راه‌اندازی کامل اتصال نیست \lr{—} فقط \lr{RRC Resume}
+\item
+  \lr{\mbox{RNA}} (ناحیه اعلان مبتنی بر \lr{\mbox{RAN}}) برای تحرک بدون اطلاع هسته
+\item
+  ایده‌آل برای دستگاه‌های \lr{\mbox{IoT}} با داده کوچک و کم‌تکرار
+\end{itemize}
+
+\CNkeepfig{m24-ngap-transport}{10}
+
+\CNsection{5}{\lr{\mbox{NGAP}} (پروتکل کاربرد \lr{\mbox{NG}}) \lr{—} \lr{TS 38.413}}
+
+\lr{\mbox{NGAP}} \textbf{معادل \lr{\mbox{S1AP}} در \lr{\mbox{5G}}} است (متعلق به \lr{\mbox{LTE}}) \lr{—} بین \textbf{\lr{\mbox{gNB}} و \lr{\mbox{AMF}}} روی \textbf{واسط \lr{\mbox{N2}}} اجرا می‌شود.
+
+\CNsubsection{5.1}{انتقال}
+
+\CNfigure{m24-ngap-transport}{پشته انتقال \lr{\mbox{NGAP}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{SCTP}} تحویل قابل اعتماد و به‌ترتیب با چندین جریان فراهم می‌کند
+\item
+  جریان 0: سیگنالینگ غیرمرتبط با \lr{\mbox{UE}} (راه‌اندازی، بازتنظیم)
+\item
+  سایر جریان‌ها: سیگنالینگ مرتبط با \lr{\mbox{UE}} (یک جریان در هر گروه-\lr{\mbox{UE}})
+\end{itemize}
+
+\Needspace{26\baselineskip}
+
+\CNsubsection{5.2}{رویه‌های کلیدی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2941}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3235}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3824}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{دسته} & \CNth{رویه} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{مدیریت واسط} & \lr{\mbox{NG Setup}} & \lr{\mbox{gNB}} در \lr{\mbox{AMF}} ثبت‌نام می‌کند (قابلیت‌ها، سلول‌های خدمات‌داده‌شده) \\
+& \lr{AMF Configuration Update} & \lr{\mbox{AMF}} به \lr{\mbox{gNB}} تغییرات را اطلاع می‌دهد \\
+& \lr{\mbox{NG Reset}} & بازیابی خطا \\
+\textbf{زمینه \lr{\mbox{UE}}} & \lr{Initial Context Setup} & \lr{\mbox{AMF\ensuremath{\to}gNB}}: ایجاد زمینه \lr{\mbox{UE}}، امنیت، نشست‌های \lr{\mbox{PDU}} \\
+& \lr{UE Context Release} & آزادسازی منابع \lr{\mbox{UE}} در \lr{\mbox{gNB}} \\
+& \lr{UE Context Modification} & اصلاح زمینه موجود \\
+\textbf{تحرک} & \lr{Handover Required} & \lr{\mbox{gNB\ensuremath{\to}AMF}}: درخواست تحویل بین-\lr{\mbox{gNB}} \\
+& \lr{Handover Request} & \lr{\mbox{AMF\ensuremath{\to}gNB}} مقصد: آماده‌سازی تحویل \\
+& \lr{Handover Notify} & \lr{\mbox{gNB}} مقصد تکمیل تحویل را تأیید می‌کند \\
+& \lr{Path Switch Request} & درون-\lr{\mbox{AMF}}، اعلان تحویل مبتنی بر \lr{\mbox{X2}} \\
+\textbf{انتقال \lr{\mbox{NAS}}} & \lr{Initial UE Message} & اولین پیام \lr{\mbox{NAS}} از \lr{UE (gNB\ensuremath{\to}AMF)} \\
+& \lr{Downlink NAS Transport} & \lr{AMF\ensuremath{\to}gNB\ensuremath{\to}UE}: حمل پیام \lr{\mbox{NAS}} \\
+& \lr{Uplink NAS Transport} & \lr{UE\ensuremath{\to}gNB\ensuremath{\to}AMF}: حمل پیام \lr{\mbox{NAS}} \\
+\textbf{صفحه‌بندی} & \lr{\mbox{Paging}} & \lr{\mbox{AMF\ensuremath{\to}gNB}}: صفحه‌بندی \lr{\mbox{UE}} در سلول‌های \lr{\mbox{TA}} \\
+\textbf{نشست \lr{\mbox{PDU}}} & \lr{PDU Session Resource Setup} & برقراری منابع صفحه کاربر \\
+& \lr{PDU Session Resource Modify} & اصلاح \lr{\mbox{QoS}}/\allowbreak{}منابع \\
+& \lr{PDU Session Resource Release} & آزادسازی منابع \lr{\mbox{UP}} \\
+\end{longtable}
+}
+
+\Needspace{20\baselineskip}
+
+\CNsubsection{5.3}{مقایسه \lr{\mbox{NGAP}} با \lr{\mbox{S1AP}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{ویژگی} & \CNth{\lr{S1AP (4G)}} & \CNth{\lr{NGAP (5G)}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+واسط & \lr{\mbox{S1-MME}} & \lr{\mbox{N2}} \\
+گره‌ها & \lr{eNB \ensuremath{\leftrightarrow} MME} & \lr{gNB \ensuremath{\leftrightarrow} AMF} \\
+انتقال & \lr{\mbox{SCTP}} & \lr{\mbox{SCTP}} \\
+مفهوم نشست & \lr{\mbox{E-RAB}} (حامل) & نشست \lr{\mbox{PDU}} + جریان‌های \lr{\mbox{QoS}} \\
+پشتیبانی برش & خیر & بله (\lr{\mbox{S-NSSAI}} در رویه‌ها) \\
+حالت‌های \lr{\mbox{UE}} & \lr{\mbox{IDLE}}، \lr{\mbox{CONNECTED}} & \lr{\mbox{IDLE}}، \lr{\mbox{INACTIVE}}، \lr{\mbox{CONNECTED}} \\
+چند-اتصالی & خیر & بله (\lr{\mbox{RAT}} ثانویه) \\
+\end{longtable}
+}
+
+\Needspace{14\baselineskip}
+
+\Needspace{15\baselineskip}
+
+\CNsection{6}{\lr{\mbox{GTP-C}} (صفحه کنترل \lr{\mbox{GTP}})}
+
+\CNchained\CNsubsection{6.1}{\lr{GTP-C v1 (3G — TS 29.060)}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{6\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{بین} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Gn/\allowbreak{}Gp} & \lr{SGSN \ensuremath{\leftrightarrow} GGSN} & مدیریت زمینه \lr{\mbox{PDP}} \\
+\end{longtable}
+}
+
+\textbf{پیام‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{Create PDP Context Request/\allowbreak{}Response}
+\item
+  \lr{Update PDP Context Request/\allowbreak{}Response}
+\item
+  \lr{Delete PDP Context Request/\allowbreak{}Response}
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\CNsubsection{6.2}{\lr{GTP-C v2 (4G — TS 29.274)}}
+
+\lr{\mbox{GTPv2-C}} یک بازطراحی کامل با کارایی بهبودیافته است:
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{بین} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{S11}} & \lr{MME \ensuremath{\leftrightarrow} S-GW} & مدیریت نشست/\allowbreak{}حامل \\
+\lr{S5/\allowbreak{}S8} & \lr{S-GW \ensuremath{\leftrightarrow} P-GW} & مدیریت نشست/\allowbreak{}حامل \\
+\lr{\mbox{S10}} & \lr{MME \ensuremath{\leftrightarrow} MME} & تحویل بین-\lr{\mbox{MME}} \\
+\lr{\mbox{S3}} & \lr{MME \ensuremath{\leftrightarrow} SGSN} & تحرک \lr{\mbox{3G\ensuremath{\leftrightarrow}4G}} \\
+\end{longtable}
+}
+
+\Needspace{19\baselineskip}
+
+\textbf{پیام‌های کلیدی \lr{\mbox{GTPv2-C}}:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{16\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3793}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3103}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{پیام} & \CNth{جهت} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{Create Session Request/\allowbreak{}Response} & \lr{MME\ensuremath{\to}S-GW\ensuremath{\to}P-GW} & برقراری اتصال \lr{\mbox{PDN}} \\
+\lr{Modify Bearer Request/\allowbreak{}Response} & \lr{\mbox{MME\ensuremath{\to}S-GW}} & به‌روزرسانی پس از تحویل (\lr{\mbox{TEID}} جدید \lr{\mbox{eNB}}) \\
+\lr{Delete Session Request/\allowbreak{}Response} & \lr{MME\ensuremath{\to}S-GW\ensuremath{\to}P-GW} & آزادسازی اتصال \lr{\mbox{PDN}} \\
+\lr{Create Bearer Request/\allowbreak{}Response} & \lr{P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME} & راه‌اندازی حامل اختصاصی \\
+\lr{Delete Bearer Request/\allowbreak{}Response} & \lr{P-GW\ensuremath{\to}S-GW\ensuremath{\to}MME} & آزادسازی حامل اختصاصی \\
+\lr{Release Access Bearers} & \lr{\mbox{MME\ensuremath{\to}S-GW}} & \lr{\mbox{UE}} بیکار می‌شود (آزادسازی \lr{\mbox{S1-U}}) \\
+\lr{Downlink Data Notification} & \lr{\mbox{S-GW\ensuremath{\to}MME}} & داده \lr{\mbox{DL}} برای \lr{\mbox{UE}} بیکار رسید \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-gtpv2c-header}{2}
+
+\textbf{سرآیند \lr{\mbox{GTPv2-C}}:}
+
+\CNfigure{m24-gtpv2c-header}{سرآیند \lr{\mbox{GTPv2-C}}}
+
+\CNsubsection{6.3}{در \lr{\mbox{5G}}: از \lr{\mbox{GTP-C}} به \lr{PFCP + HTTP/\allowbreak{}2}}
+
+در \lr{\mbox{5G}}، نقش سنتی \lr{\mbox{GTP-C}} تقسیم می‌شود:
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{SMF \ensuremath{\leftrightarrow} UPF}}}: از \lr{\textbf{\lr{\mbox{PFCP}}} (N4)} استفاده می‌کند \lr{—} نه \lr{\mbox{GTP-C}}
+\item
+  \textbf{سیگنالینگ بین-\lr{\mbox{NF}}}: از \lr{\textbf{\lr{HTTP/\allowbreak{}2 SBI}}} استفاده می‌کند \lr{—} نه \lr{\mbox{GTP-C}}
+\item
+  \lr{\mbox{GTPv2-C}} برای هم‌کنش‌گری با \lr{\mbox{4G}} باقی می‌ماند (واسط \lr{\mbox{N26}}: \lr{\mbox{AMF\ensuremath{\leftrightarrow}MME}})
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\CNsection{7}{\lr{HTTP/\allowbreak{}2 SBI} (واسط خدمات‌محور)}
+
+\CNchained\CNsubsection{7.1}{مفهوم}
+
+هسته \lr{\mbox{5G}} واسط‌های نقطه-به-نقطه را با یک \textbf{معماری خدمات‌محور \lr{\mbox{(SBA)}}} جایگزین می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  هر \lr{\mbox{NF}} \textbf{خدمات} را از طریق \lr{\mbox{API}}های \lr{\mbox{RESTful}} ارایه می‌دهد
+\item
+  ارتباط از \lr{\textbf{\lr{HTTP/\allowbreak{}2}}} روی \lr{\mbox{\textbf{\lr{\mbox{TLS 1.3}}}}} روی \lr{\mbox{\textbf{\lr{\mbox{TCP}}}}} استفاده می‌کند
+\item
+  قالب داده: \lr{\mbox{\textbf{\lr{\mbox{JSON}}}}} (مشخصات \lr{OpenAPI 3.0})
+\end{itemize}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{7.2}{خدمات کلیدی \lr{\mbox{NF}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1212}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2727}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2727}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{NF}}} & \CNth{خدمت} & \CNth{عملیات} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{AMF}}}}} & \lr{Namf\_\allowbreak{}Communication} & \lr{N1N2MessageTransfer}، \lr{UEContextTransfer} & رله \lr{\mbox{NAS}}، زمینه \\
+\lr{\mbox{\textbf{\lr{\mbox{SMF}}}}} & \lr{Nsmf\_\allowbreak{}PDUSession} & \lr{\mbox{Create}}، \lr{\mbox{Update}}، \lr{\mbox{Release}} & چرخه عمر نشست \lr{\mbox{PDU}} \\
+\lr{\mbox{\textbf{\lr{\mbox{UDM}}}}} & \lr{Nudm\_\allowbreak{}SubscriberDataMgmt} & \lr{\mbox{Get}}، \lr{\mbox{Subscribe}}، \lr{\mbox{Unsubscribe}} & داده مشترک \\
+\lr{\mbox{\textbf{\lr{\mbox{AUSF}}}}} & \lr{Nausf\_\allowbreak{}UEAuthentication} & \lr{\mbox{Authenticate}} & \lr{\mbox{5G-AKA}}، \lr{\mbox{EAP-AKA’}} \\
+\lr{\mbox{\textbf{\lr{\mbox{PCF}}}}} & \lr{Npcf\_\allowbreak{}SMPolicyControl} & \lr{\mbox{Create}}، \lr{\mbox{Update}}، \lr{\mbox{Delete}} & سیاست \lr{\mbox{QoS}}/\allowbreak{}صورت‌حساب \\
+\lr{\mbox{\textbf{\lr{\mbox{NRF}}}}} & \lr{Nnrf\_\allowbreak{}NFDiscovery} & \lr{\mbox{Discover}} & یافتن نمونه‌های \lr{\mbox{NF}} \\
+\lr{\mbox{\textbf{\lr{\mbox{NSSF}}}}} & \lr{Nnssf\_\allowbreak{}NSSelection} & \lr{\mbox{Get}} & انتخاب برش شبکه \\
+\lr{\mbox{\textbf{\lr{\mbox{NEF}}}}} & \lr{Nnef\_\allowbreak{}EventExposure} & \lr{\mbox{Subscribe}}، \lr{\mbox{Unsubscribe}} & گزارش رویداد به \lr{\mbox{AF}} \\
+\end{longtable}
+}
+
+\Needspace{13\baselineskip}
+
+\CNsubsection{7.3}{الگوهای ارتباطی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2903}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4194}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2903}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{الگو} & \CNth{توضیح} & \CNth{مثال} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{درخواست-پاسخ} & فراخوانی \lr{\mbox{API}} همگام & \lr{\mbox{SMF}} از \lr{\mbox{UDM}} برای اشتراک پرس‌وجو می‌کند \\
+\textbf{اشتراک-اعلان} & رویداد ناهمگام & \lr{\mbox{PCF}} در \lr{\mbox{AMF}} برای مکان \lr{\mbox{UE}} اشتراک می‌کند \\
+\textbf{کشف خدمات} & پرس‌وجوی \lr{\mbox{NRF}} برای نقطه انتهایی \lr{\mbox{NF}} & \lr{\mbox{AMF}} از طریق \lr{\mbox{NRF SMF}} را کشف می‌کند \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-sbi-stack}{3}
+
+\CNsubsection{7.4}{پشته پروتکل \lr{\mbox{SBI}}}
+
+\CNfigure{m24-sbi-stack}{پشته پروتکل \lr{\mbox{SBI}}}
+
+\Needspace{14\baselineskip}
+
+\Needspace{20\baselineskip}
+
+\CNsection{8}{تحول پروتکل سیگنالینگ: \lr{SS7 \ensuremath{\to} Diameter \ensuremath{\to} HTTP/\allowbreak{}2}}
+
+\CNchained\CNsubsection{8.1}{خط زمانی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2200}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3400}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3400}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{دوره} & \CNth{فناوری} & \CNth{پشته سیگنالینگ} & \CNth{ویژگی‌ها} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\textbf{\lr{1G/\allowbreak{}2G}}} (دهه \CNnum{1980-90)} & \lr{\mbox{GSM}} & \lr{\mbox{SS7}} (\lr{\mbox{MAP}}، \lr{\mbox{ISUP}}، \lr{\mbox{SCCP}}، \lr{\mbox{MTP}}) & مدار-گزارشی، مبتنی بر \lr{\mbox{TDM}}، کدگذاری دودویی \\
+\lr{\mbox{\textbf{\lr{\mbox{3G}}}}} (دهه 2000) & \lr{\mbox{UMTS}} & \lr{SS7 + RANAP + GTP-C v1} & انتقال \lr{\mbox{IP}} اضافه شد \lr{\mbox{(SIGTRAN)}}، همچنان لایه کاربرد \lr{\mbox{SS7}} \\
+\lr{\mbox{\textbf{\lr{\mbox{4G}}}}} (دهه 2010) & \lr{\mbox{LTE}} & \lr{Diameter + S1AP + GTP-C v2} & تمام-\lr{\mbox{IP}}، کدگذاری مبتنی بر \lr{\mbox{AVP}}، نقطه-به-نقطه \\
+\lr{\mbox{\textbf{\lr{\mbox{5G}}}}} (دهه 2020) & \lr{\mbox{NR}} & \lr{HTTP/\allowbreak{}2 SBI + NGAP + PFCP} & بومی-ابر، \lr{\mbox{RESTful}}، \lr{service-mesh}، \lr{\mbox{JSON}} \\
+\end{longtable}
+}
+
+\Needspace{22\baselineskip}
+
+\CNsubsection{8.2}{محرک‌های کلیدی تحولی}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}ccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{\lr{\mbox{SS7}} (دهه ۱۹۸۰)} & \CNth{\lr{\mbox{Diameter}} (دهه ۲۰۱۰)} & \CNth{\lr{HTTP/\allowbreak{}2 SBI} (دهه ۲۰۲۰)} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+انتقال \lr{\mbox{TDM}} & انتقال \lr{\mbox{IP}} & انتقال \lr{\mbox{IP}} \\
+کدگذاری دودویی & کدگذاری دودویی \lr{\mbox{AVP}} & کدگذاری متنی \lr{\mbox{JSON}} \\
+گره‌های ثابت & گره‌های ثابت & ریزخدمات (\lr{\mbox{NF}}ها) \\
+نقطه‌به‌نقطه & نقطه‌به‌نقطه & مش خدمات \\
+متمرکز \lr{\mbox{(STP)}} & عامل‌های \lr{Diameter (DRA)} & کشف خدمات \lr{\mbox{(NRF)}} \\
+واسط‌های انعطاف‌ناپذیر & واسط‌های تعریف‌شده & مبتنی بر \lr{\mbox{API}}، توسعه‌پذیر \\
+مقیاس‌پذیری دشوار & مقیاس‌پذیری متوسط & بومی ابر، مقیاس‌دهی خودکار \\
+فقط مخابراتی & ویژه مخابرات & استاندارد \lr{\mbox{IT}}/\allowbreak{}ابر \\
+\end{longtable}
+}
+
+\CNkeepfig{m24-signalling-timeline}{3}
+
+\CNsubsection{8.3}{نمودار خط زمانی تحول سیگنالینگ}
+
+\CNfigure{m24-signalling-timeline}{تحول پروتکل‌های سیگنالینگ موبایل}
+
+\CNkeepfig{m24-auth-ss7}{5}
+
+\CNsubsection{8.4}{مقایسه پروتکل: مثال جریان احراز هویت}
+
+\lr{\textbf{\lr{2G/\allowbreak{}3G (SS7/\allowbreak{}MAP):}}}
+
+\CNfigure{m24-auth-ss7}{احراز هویت \lr{2G/\allowbreak{}3G} روی \lr{SS7/\allowbreak{}MAP}}
+
+\CNkeepfig{m24-auth-diameter}{2}
+
+\lr{\textbf{\lr{4G (Diameter):}}}
+
+\CNfigure{m24-auth-diameter}{احراز هویت \lr{\mbox{4G}} روی \lr{Diameter (S6a)}}
+
+\CNkeepfig{m24-auth-http2}{2}
+
+\lr{\textbf{\lr{5G (HTTP/\allowbreak{}2):}}}
+
+\CNfigure{m24-auth-http2}{احراز هویت \lr{\mbox{5G}} روی \lr{HTTP/\allowbreak{}2 SBI}}
+
+\CNkeepfig{m24-cp-architecture}{5}
+
+\CNsection{}{نمودار معماری کامل صفحه کنترل \lr{\mbox{(5G)}}}
+
+\CNfigure{m24-cp-architecture}{معماری کامل صفحه کنترل \lr{\mbox{5G}}}
+
+\Needspace{24\baselineskip}
+
+\CNsection{}{خلاصه: صفحه کنترل در برابر صفحه کاربر}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{18\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2353}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.4118}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3529}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{صفحه کنترل} & \CNth{صفحه کاربر} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+حمل می‌کند & پیام‌های سیگنالینگ & داده کاربر (\lr{\mbox{IP}}، صدا، ویدیو) \\
+هدف & راه‌اندازی، مدیریت، آزادسازی اتصالات & انتقال داده سرتاسری \\
+تحمل تأخیر & متوسط (صدها \lr{\mbox{ms}} قابل قبول) & حیاتی (تأخیر کم لازم) \\
+حجم & کم (پیام‌های کوچک) & بالا (انتقال انبوه داده) \\
+پروتکل‌ها & \lr{\mbox{NAS}}، \lr{\mbox{RRC}}، \lr{\mbox{NGAP}}، \lr{HTTP/\allowbreak{}2}، \lr{\mbox{Diameter}} & \lr{\mbox{GTP-U}}، \lr{\mbox{SDAP}}، \lr{\mbox{PDCP}} \\
+جداسازی در \lr{\mbox{5G}} & \lr{\mbox{AMF}}، \lr{\mbox{SMF}}، \lr{\mbox{AUSF}} و غیره & \lr{\mbox{UPF}} (کنترل‌شده توسط \lr{\mbox{SMF}} از طریق \lr{\mbox{PFCP}}) \\
+مقیاس‌دهی & مقیاس‌دهی در هر بار سیگنالینگ & مقیاس‌دهی در هر تقاضای توان عملیاتی \\
+حالت & حالت‌دار (زمینه \lr{\mbox{UE}} را ردیابی می‌کند) & ارسال بدون حالت (قواعد از \lr{\mbox{CP}}) \\
+\end{longtable}
+}
+
+\CNboxsection{نکات کلیدی}
+
+\begin{CNbox}[unbreakable]{sum}{نکات کلیدی}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{صفحه کنترل = مغز سیگنالینگ}: تونل‌ها را راه‌اندازی می‌کند، کاربران را احراز هویت می‌کند، تحرک را مدیریت می‌کند
+\item
+  \textbf{\lr{\mbox{NAS}} سرتاسری است (\lr{\mbox{UE}}\ensuremath{\leftrightarrow}هسته)} \lr{—} شفاف نسبت به \lr{\mbox{RAN}}؛ زمینه امنیتی جدا
+\item
+  \textbf{\lr{\mbox{RRC}} رادیو را مدیریت می‌کند} \lr{—} راه‌اندازی اتصال، اندازه‌گیری‌ها، فرمان‌های تحویل
+\item
+  \textbf{\lr{\mbox{5G}} حالت \lr{RRC\_\allowbreak{}INACTIVE} را اضافه می‌کند} برای بازگشت سریع و کارایی \lr{\mbox{IoT}}
+\item
+  \textbf{\lr{\mbox{NGAP}} جایگزین \lr{\mbox{S1AP}} شد} \lr{—} از شبکه‌بندی، جریان‌های \lr{\mbox{QoS}} و سه حالت \lr{\mbox{RRC}} پشتیبانی می‌کند
+\item
+  \textbf{\lr{\mbox{GTP-C}} تحول یافت}: \lr{v1 (3G) \ensuremath{\leftarrow} v2 (4G)} \ensuremath{\leftarrow} جایگزین‌شده با \lr{PFCP+HTTP/\allowbreak{}2} در \lr{\mbox{5G}}
+\item
+  \textbf{\lr{HTTP/\allowbreak{}2 SBI} انقلابی است} \lr{—} ارتباط \lr{\mbox{NF}} بومی-ابر، \lr{\mbox{RESTful}}، خود-مقیاس‌پذیر
+\item
+  \textbf{تحول سیگنالینگ}: \lr{\mbox{SS7}} (دودویی، \lr{\mbox{TDM}}) \ensuremath{\to} \lr{\mbox{Diameter}} (دودویی، \lr{\mbox{IP}}) \ensuremath{\to} \lr{HTTP/\allowbreak{}2} (\lr{\mbox{JSON}}، بومی-ابر)
+\end{enumerate}
+
+\end{CNbox}

@@ -1,0 +1,9 @@
+% Module 11 — what the HSS stores
+\begin{tikzpicture}[CNfig, x=1cm, y=1cm]
+\draw[CNviolet, line width=0.9pt, fill=CNviolet!5, rounded corners=5pt] (-0.3,-3.9) rectangle (9.9,1.0);
+\node[font=\sffamily\small\bfseries, text=CNviolet] at (4.8,0.62) {HSS};
+\node[CNdb, fill=white, text width=3.9cm, anchor=north] at (2.3,0) {\CNL{Permanent identity}{هویت دائمی}\\{\scriptsize (IMSI)}};
+\node[CNdb, fill=white, text width=3.9cm, anchor=north] at (7.3,0) {\CNL{Authentication credentials}{اعتبارنامه‌های احراز هویت}\\{\scriptsize (K, OPc, SQN)}};
+\node[CNdb, fill=white, text width=3.9cm, anchor=north] at (2.3,-1.85) {\CNL{Subscription profiles}{نمایه‌های اشتراک}\\{\scriptsize (APN, QoS)}};
+\node[CNdb, fill=white, text width=3.9cm, anchor=north] at (7.3,-1.85) {\CNL{Location information}{اطلاعات مکان}\\{\scriptsize (\CNL{serving MME}{\lr{MME} خدمت‌دهنده})}};
+\end{tikzpicture}

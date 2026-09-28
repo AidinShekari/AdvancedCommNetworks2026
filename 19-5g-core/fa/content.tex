@@ -1,0 +1,1135 @@
+\CNsection{1}{مرور هسته \lr{\mbox{5G}}}
+
+شبکه هسته \lr{\mbox{5G (5GC)}} در \lr{\textbf{\lr{3GPP TS 23.501}}} تعریف شده است و یک بازطراحی بنیادی شبکه هسته موبایل را نمایندگی می‌کند. برخلاف \lr{\mbox{EPC}} در \lr{\mbox{4G}} که از واسط‌های نقطه-به-نقطه بین عناصر شبکه یکپارچه استفاده می‌کرد، \lr{\mbox{5GC}} یک \textbf{معماری خدمات‌محور \lr{\mbox{(SBA)}}} را در پیش می‌گیرد که در آن توابع شبکه \lr{\mbox{(NF)}} خدمات را از طریق \lr{\mbox{API}}های \lr{\mbox{RESTful}} روی \lr{HTTP/\allowbreak{}2} ارایه می‌دهند.
+
+\CNsubsection{}{اصول طراحی کلیدی}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{معماری خدمات‌محور \lr{\mbox{(SBA)}}:} \lr{\mbox{NF}}ها از طریق واسط‌های خدمات‌محور \lr{\mbox{(SBI)}} با استفاده از \lr{HTTP/\allowbreak{}2} و \lr{\mbox{JSON}} ارتباط برقرار می‌کنند
+\item
+  \textbf{جداسازی کنترل و صفحه کاربر \lr{\mbox{(CUPS)}}:} جداسازی کامل \lr{\mbox{CP}} و \lr{\mbox{UP}}
+\item
+  \textbf{طراحی \lr{\mbox{NF}} بدون حالت:} حالت به‌صورت خارجی ذخیره می‌شود \lr{\mbox{(UDSF)}} و مقیاس‌پذیری افقی را ممکن می‌سازد
+\item
+  \textbf{شبکه‌بندی بومی:} پشتیبانی درون‌ساخت از چندین شبکه منطقی روی زیرساخت مشترک
+\item
+  \textbf{بومی-ابر:} طراحی‌شده برای استقرار کانتینری و مبتنی بر میکروسرویس
+\item
+  \textbf{کشف \lr{\mbox{NF}} مبتنی بر ثبت‌نام:} \lr{\mbox{NF}}ها در \lr{\mbox{NRF}} ثبت‌نام می‌کنند و همتاها را به‌صورت پویا کشف می‌کنند
+\end{itemize}
+
+\CNkeepfig{m19-sbi-view}{12}
+
+\CNsection{2}{معماری مرجع}
+
+معماری \lr{\mbox{5GC}} دو بازنمایی معادل دارد که در \lr{TS 23.501} تعریف شده‌اند:
+
+\CNsubsection{2.1}{بازنمایی واسط خدمات‌محور \lr{\mbox{(SBI)}}}
+
+در این نما، تمام \lr{\mbox{NF}}های صفحه کنترل به یک گذرگاه خدمات مشترک متصل می‌شوند و خدمات را ارایه/\allowbreak{}مصرف می‌کنند.
+
+\CNfigure{m19-sbi-view}{هسته \lr{\mbox{5G}} در نمایش خدمات‌محور}
+
+\CNkeepfig{m19-reference-points}{5}
+
+\CNsubsection{2.2}{بازنمایی نقطه مرجع}
+
+در این نما، نقاط مرجع نقطه-به-نقطه صریح بین \lr{\mbox{NF}}ها نشان داده می‌شوند.
+
+\CNfigure{m19-reference-points}{هسته \lr{\mbox{5G}} در نمایش نقاط مرجع}
+
+\Needspace{14\baselineskip}
+
+\CNsection{3}{توابع شبکه به‌صورت تفصیلی}
+
+\CNchained\CNsubsection{3.1}{تابع مدیریت دسترسی و تحرک \lr{\mbox{(AMF)}}}
+
+\lr{\mbox{AMF}} نقطه تماس واحد برای تمام سیگنالینگ مرتبط با \lr{\mbox{UE}} از \lr{\mbox{RAN}} است. واسط‌های \lr{\mbox{N1 (NAS)}} و \lr{N2 (NGAP)} را پایان می‌دهد.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{پایان‌دهی \lr{\mbox{NAS}}:} تمام پیام‌های \lr{\mbox{NAS}} (ثبت‌نام، درخواست خدمات، برقراری نشست \lr{\mbox{PDU}}) در \lr{\mbox{AMF}} پایان می‌یابند
+\item
+  \textbf{مدیریت ثبت‌نام:} ثبت‌نام، لغو ثبت‌نام و به‌روزرسانی‌های دوره‌ای ثبت‌نام \lr{\mbox{UE}} را مدیریت می‌کند
+\item
+  \textbf{مدیریت اتصال:} زمینه سیگنالینگ \lr{\mbox{RRC}} را از طریق \lr{\mbox{N2}} به‌سمت \lr{\mbox{gNB}} مدیریت می‌کند
+\item
+  \textbf{مدیریت تحرک:} سیگنالینگ تحویل، مدیریت ناحیه ردیابی، هماهنگی صفحه‌بندی
+\item
+  \textbf{امنیت:} احراز هویت را آغاز می‌کند (به \lr{\mbox{AUSF}} واگذار می‌کند)، زمینه امنیتی \lr{\mbox{NAS}} را مدیریت می‌کند (رمزگذاری + یکپارچگی)
+\item
+  \textbf{انتخاب برش:} با \lr{\mbox{NSSF}} برای تعیین برش شبکه مناسب تعامل دارد
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\textbf{شناسه‌های کلیدی:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{شناسه} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{GUAMI}}}}} & شناسه یکتای جهانی \lr{AMF = MCC + MNC + AMF Region ID + AMF Set ID + AMF Pointer} \\
+\lr{\mbox{\textbf{\lr{\mbox{5G-GUTI}}}}} & شناسه موقت یکتای جهانی \lr{5G = GUAMI + 5G-TMSI} (تخصیص‌یافته به \lr{\mbox{UE}} توسط \lr{\mbox{AMF}}) \\
+\lr{\textbf{\lr{AMF Region ID}}} & 8 بیت \lr{—} یک منطقه درون \lr{\mbox{PLMN}} را شناسایی می‌کند \\
+\lr{\textbf{\lr{AMF Set ID}}} & 10 بیت \lr{—} یک مجموعه \lr{\mbox{AMF}} درون یک منطقه را شناسایی می‌کند \\
+\lr{\textbf{\lr{AMF Pointer}}} & 6 بیت \lr{—} یک \lr{\mbox{AMF}} مشخص درون یک مجموعه را شناسایی می‌کند \\
+\end{longtable}
+}
+
+\textbf{واسط‌ها:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\textbf{\lr{\mbox{N1:}}} UE \ensuremath{\leftrightarrow} AMF} (سیگنالینگ \lr{\mbox{NAS}}، حمل‌شده به‌صورت شفاف روی \lr{\mbox{RAN}})
+\item
+  \lr{\textbf{\lr{\mbox{N2:}}} RAN \ensuremath{\leftrightarrow} AMF} (پروتکل \lr{\mbox{NGAP}} روی \lr{\mbox{SCTP}})
+\item
+  \lr{\textbf{\lr{\mbox{N8:}}} AMF \ensuremath{\leftrightarrow} UDM} (بازیابی داده اشتراک)
+\item
+  \lr{\textbf{\lr{\mbox{N11:}}} AMF \ensuremath{\leftrightarrow} SMF} (پیام‌های مدیریت نشست)
+\item
+  \lr{\textbf{\lr{\mbox{N12:}}} AMF \ensuremath{\leftrightarrow} AUSF} (رویه‌های احراز هویت)
+\item
+  \lr{\textbf{\lr{\mbox{N14:}}} AMF \ensuremath{\leftrightarrow} AMF} (تحرک \lr{\mbox{UE}} بین \lr{\mbox{AMF}}ها)
+\item
+  \lr{\textbf{\lr{\mbox{N15:}}} AMF \ensuremath{\leftrightarrow} PCF} (سیاست دسترسی و تحرک)
+\item
+  \lr{\textbf{\lr{\mbox{N22:}}} AMF \ensuremath{\leftrightarrow} NSSF} (انتخاب برش)
+\end{itemize}
+
+\textbf{ناحیه ثبت‌نام:}
+
+\begin{itemize}
+\tightlist
+\item
+  از یک یا چند ناحیه ردیابی \lr{\mbox{(TA)}} تشکیل شده است
+\item
+  \lr{\mbox{UE}} فقط هنگام حرکت به خارج از ناحیه ثبت‌نام خود، به‌روزرسانی ثبت‌نام انجام می‌دهد
+\item
+  نواحی ثبت‌نام بزرگ‌تر \ensuremath{\leftarrow} سیگنالینگ کمتر، بار صفحه‌بندی بیشتر
+\item
+  \lr{\mbox{AMF}} ناحیه ثبت‌نام را بر اساس الگوی تحرک \lr{\mbox{UE}} تخصیص می‌دهد
+\end{itemize}
+
+\CNsubsection{3.2}{تابع مدیریت نشست \lr{\mbox{(SMF)}}}
+
+\lr{\mbox{SMF}} نشست‌های \lr{\mbox{PDU}} را سرتاسری مدیریت می‌کند. \lr{\mbox{UPF(\rl{ها})}}یی را که مسیر صفحه کاربر را تشکیل می‌دهند انتخاب و کنترل می‌کند.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مدیریت نشست \lr{\mbox{PDU}}:} برقراری، اصلاح و آزادسازی نشست‌های \lr{\mbox{PDU}}
+\item
+  \textbf{انتخاب و کنترل \lr{\mbox{UPF}}:} \lr{\mbox{UPF(\rl{های})}} مناسب را انتخاب می‌کند، قواعد ارسال را از طریق \lr{N4/\allowbreak{}PFCP} برنامه‌ریزی می‌کند
+\item
+  \textbf{تخصیص آدرس \lr{\mbox{IP}}:} آدرس‌های \lr{IPv4/\allowbreak{}IPv6} را به \lr{\mbox{UE}}ها تخصیص می‌دهد (یا به \lr{\mbox{DHCP}} خارجی واگذار می‌کند)
+\item
+  \textbf{اجرای \lr{\mbox{QoS}}:} قواعد \lr{\mbox{QoS}} را در \lr{\mbox{UPF}} بر اساس سیاست‌های \lr{\mbox{PCF}} نصب می‌کند
+\item
+  \textbf{رومینگ:} سناریوهای مسیریابی خانگی و شکست محلی را مدیریت می‌کند
+\item
+  \textbf{اعلان داده پیوند پایین‌سو:} هنگام رسیدن داده پیوند پایین‌سو برای \lr{\mbox{UE}} بیکار، صفحه‌بندی را از طریق \lr{\mbox{AMF}} فعال می‌کند
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\textbf{انواع نشست \lr{\mbox{PDU}}:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع} & \CNth{توضیح} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{IPv4}}}}} & اتصال \lr{\mbox{IPv4}} سنتی & دسترسی اینترنت قدیمی \\
+\lr{\mbox{\textbf{\lr{\mbox{IPv6}}}}} & اتصال فقط-\lr{\mbox{IPv6}} & \lr{\mbox{IoT}}، شبکه‌های مدرن \\
+\lr{\mbox{\textbf{\lr{\mbox{IPv4v6}}}}} & دو-پشته \lr{IPv4 + IPv6} & دسترسی پیش‌فرض گوشی هوشمند \\
+\lr{\mbox{\textbf{\lr{\mbox{Ethernet}}}}} & فریم‌های اترنت لایه-2 & گسترش \lr{\mbox{LAN}} صنعتی، \lr{\mbox{TSN}} \\
+\lr{\mbox{\textbf{\lr{\mbox{Unstructured}}}}} & داده \lr{\mbox{IP}} خام یا غیر-\lr{\mbox{IP}} & حسگرهای \lr{\mbox{IoT}}، تونل‌های نقطه-به-نقطه \\
+\end{longtable}
+}
+
+\textbf{واسط \lr{\mbox{N4}} و \lr{\mbox{PFCP}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{N4}}} SMF}} را با استفاده از \textbf{\lr{\mbox{PFCP}} (پروتکل کنترل ارسال بسته)} به \lr{\mbox{UPF}} متصل می‌کند \lr{—} \lr{3GPP TS 29.244}
+\item
+  \lr{\mbox{PFCP}} یک پروتکل مبتنی بر \lr{\mbox{UDP}} است (پورت 8805) با:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{برقراری نشست:} ایجاد زمینه ارسال در \lr{\mbox{UPF}}
+  \item
+    \textbf{اصلاح نشست:} به‌روزرسانی قواعد (مثلاً تحویل، تغییر \lr{\mbox{QoS}})
+  \item
+    \textbf{حذف نشست:} حذف زمینه ارسال
+  \item
+    \textbf{ضربان:} تشخیص شکست \lr{\mbox{UPF}}
+  \end{itemize}
+\end{itemize}
+
+\textbf{لنگر نشست:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{لنگر نشست \lr{PDU (PSA)}} همان \lr{\mbox{UPF}} است که نقطه اتصال پایدار به شبکه داده را حفظ می‌کند
+\item
+  تداوم آدرس \lr{\mbox{IP}} را در حین تحرک \lr{\mbox{UE}} فراهم می‌کند
+\item
+  در حین تحویل تغییر \textbf{نمی‌کند} (برخلاف \lr{\mbox{UPF}}های میانی)
+\item
+  \lr{\mbox{SMF}} می‌تواند \lr{\mbox{UPF}}های میانی \lr{\mbox{(I-UPF)}} را برای مسیریابی محلی وارد کند در حالی که \lr{\mbox{PSA}} پایدار می‌ماند
+\end{itemize}
+
+\CNsubsection{3.3}{تابع صفحه کاربر \lr{\mbox{(UPF)}}}
+
+\lr{\mbox{UPF}} \textbf{تنها \lr{\mbox{NF}} صفحه کاربر} در هسته \lr{\mbox{5G}} است. تمام پردازش بسته، ارسال و اجرای سیاست برای داده کاربر را انجام می‌دهد.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{مسیریابی و ارسال بسته:} بسته‌ها را بین \lr{\mbox{RAN}} و شبکه داده مسیریابی می‌کند
+\item
+  \textbf{تشخیص و گزارش‌دهی ترافیک:} برای شناسایی کاربرد \lr{\mbox{DPI}} انجام می‌دهد
+\item
+  \textbf{مدیریت \lr{\mbox{QoS}}:} \lr{\mbox{QoS}} در هر جریان را اجرا می‌کند (علامت‌گذاری، پلیسینگ، شکل‌دهی)
+\item
+  \textbf{گزارش‌دهی مصرف:} حجم/\allowbreak{}مدت ترافیک را برای صورت‌حساب اندازه‌گیری می‌کند
+\item
+  \textbf{طبقه‌بند پیوند بالاسو \lr{\mbox{(UL-CL)}}:} ترافیک را بر اساس تطبیق ترافیک به شبکه‌های داده مختلف هدایت می‌کند
+\item
+  \textbf{نقطه انشعاب:} از نشست‌های \lr{\mbox{PDU}} چند-میزبانه پشتیبانی می‌کند
+\item
+  \textbf{بافرینگ:} بسته‌های پیوند پایین‌سو را برای \lr{\mbox{UE}}های بیکار بافر می‌کند، \lr{\mbox{DDN}} را به \lr{\mbox{SMF}} فعال می‌کند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\textbf{واسط‌ها:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{واسط} & \CNth{اتصال} & \CNth{پروتکل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{N3}}}}} & \lr{gNB \ensuremath{\leftrightarrow} UPF} & \lr{\mbox{GTP-U}} روی \lr{\mbox{UDP}} & تونل صفحه کاربر از \lr{\mbox{RAN}} \\
+\lr{\mbox{\textbf{\lr{\mbox{N6}}}}} & \lr{\mbox{UPF \ensuremath{\leftrightarrow} DN}} & \lr{IP /\allowbreak{} Ethernet} & نقطه خروج به شبکه داده \\
+\lr{\mbox{\textbf{\lr{\mbox{N9}}}}} & \lr{UPF \ensuremath{\leftrightarrow} UPF} & \lr{\mbox{GTP-U}} روی \lr{\mbox{UDP}} & ارسال بین-\lr{\mbox{UPF}} (زنجیره‌سازی) \\
+\lr{\mbox{\textbf{\lr{\mbox{N4}}}}} & \lr{SMF \ensuremath{\leftrightarrow} UPF} & \lr{\mbox{PFCP}} روی \lr{\mbox{UDP}} & کنترل \lr{\mbox{UPF}} از \lr{\mbox{SMF}} \\
+\end{longtable}
+}
+
+\Needspace{16\baselineskip}
+
+\textbf{قواعد \lr{\mbox{PFCP}} (برنامه‌ریزی‌شده توسط \lr{\mbox{SMF}} از طریق \lr{\mbox{N4}}):}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{قاعده} & \CNth{نام کامل} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{PDR}}}}} & قاعده تشخیص بسته & بسته‌های ورودی را تطبیق می‌دهد (واسط مبدأ، فیلترهای \lr{\mbox{IP}}، \lr{\mbox{TEID}} در \lr{\mbox{GTP}}، \lr{\mbox{QFI}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{FAR}}}}} & قاعده اقدام ارسال & تعریف می‌کند چه کاری انجام شود (ارسال، دور ریختن، بافر، تکثیر)؛ مقصد را مشخص می‌کند \\
+\lr{\mbox{\textbf{\lr{\mbox{QER}}}}} & قاعده اجرای \lr{\mbox{QoS}} & محدودسازی نرخ \lr{(MBR/\allowbreak{}GBR)}، دروازه‌بندی (باز/\allowbreak{}بسته)، \lr{\mbox{QoS}} بازتابی \\
+\lr{\mbox{\textbf{\lr{\mbox{URR}}}}} & قاعده گزارش‌دهی مصرف & محرک‌های اندازه‌گیری مبتنی بر حجم/\allowbreak{}زمان/\allowbreak{}رویداد برای صورت‌حساب \\
+\lr{\mbox{\textbf{\lr{\mbox{BAR}}}}} & قاعده اقدام بافرینگ & رفتار بافرینگ، پارامترهای اعلان را کنترل می‌کند \\
+\end{longtable}
+}
+
+\textbf{روش‌های تشخیص ترافیک:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{فیلتر \lr{\mbox{SDF}}:} فیلتر \lr{\mbox{IP 5}}-گانه (\lr{\mbox{IP}} مبدأ/\allowbreak{}مقصد، پورت مبدأ/\allowbreak{}مقصد، پروتکل)
+\item
+  \textbf{شناسه کاربرد:} پیش‌پیکربندی‌شده یا به‌صورت پویا از طریق \lr{\mbox{DPI}} یادگرفته‌شده
+\item
+  \textbf{\lr{\mbox{TEID}} در \lr{\mbox{GTP-U}}:} تونل‌های \lr{\mbox{GTP}} مشخص را شناسایی می‌کند
+\item
+  \textbf{\lr{\mbox{QFI}} (شناسه جریان \lr{\mbox{QoS}}):} به جریان‌های \lr{\mbox{QoS}} مشخص نگاشت می‌شود
+\end{itemize}
+
+\CNsubsection{3.4}{مدیریت داده یکپارچه \lr{\mbox{(UDM)}}}
+
+\lr{\mbox{UDM}} مدیریت داده مشترک، مدیریت اعتبارنامه احراز هویت و مجوزدهی اشتراک را فراهم می‌کند. این معادل \lr{\mbox{HSS}} در \lr{\mbox{5G}} است.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ذخیره \lr{\mbox{SUPI}}:} شناسه دایمی اشتراک (\lr{\mbox{SUPI}} = قالب \lr{\mbox{IMSI}} یا \lr{\mbox{NAI}}) را ذخیره و مدیریت می‌کند
+\item
+  \textbf{محاسبه اعتبارنامه احراز هویت:} بردارهای احراز هویت \lr{\mbox{(AV)}} را با استفاده از کلید بلندمدت مشترک \lr{\mbox{(K)}} و پارامترهای اپراتور \lr{(OP/\allowbreak{}OPc)} تولید می‌کند
+\item
+  \textbf{مدیریت پروفایل اشتراک:} خدمات اشتراک‌شده، مجوزهای \lr{\mbox{DNN}}، پروفایل‌های \lr{\mbox{QoS}} را نگه می‌دارد
+\item
+  \textbf{مدیریت ثبت‌نام:} \lr{AMF/\allowbreak{}SMF} خدمات‌دهنده را در هر مشترک ردیابی می‌کند (ثبت‌نام \lr{\mbox{NF}})
+\item
+  \textbf{مجوزدهی \lr{\mbox{DNN}}:} تأیید می‌کند که \lr{\mbox{UE}} مجاز به دسترسی به ترکیب \lr{\mbox{DNN}}/\allowbreak{}برش مشخص است
+\item
+  \textbf{رمزگشایی \lr{\mbox{SUCI}}:} \lr{\mbox{SUCI}} را به \lr{\mbox{SUPI}} بازمی‌گرداند (با استفاده از \lr{\mbox{SIDF}} \lr{—} تابع رمزگشایی شناسه اشتراک)
+\end{itemize}
+
+\textbf{داده‌های کلیدی ذخیره‌شده:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{SUPI}}، کلیدهای رمزگشایی \lr{\mbox{SUCI}}
+\item
+  اعتبارنامه‌های احراز هویت مشترک (\lr{\mbox{K}}، \lr{OP/\allowbreak{}OPc}، \lr{\mbox{SQN}})
+\item
+  \lr{\mbox{S-NSSAI}} و فهرست \lr{\mbox{DNN}} اشتراک‌شده
+\item
+  پارامترهای \lr{\mbox{QoS}} پیش‌فرض نشست
+\item
+  ثبت‌نام‌های \lr{\mbox{NF}} خدمات‌دهنده (\lr{\mbox{AMF}}، \lr{\mbox{SMF}})
+\item
+  داده اشتراک دسترسی و تحرک
+\end{itemize}
+
+\textbf{واسط‌ها:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Nudm:}}}}} واسط خدمات‌محور ارایه‌شده توسط \lr{\mbox{UDM}}
+\item
+  \textbf{\lr{\mbox{N8}} (از طریق \lr{\mbox{Nudm}}):} \lr{\mbox{AMF}} داده اشتراک/\allowbreak{}تحرک را بازیابی می‌کند
+\item
+  \textbf{\lr{\mbox{N10}} (از طریق \lr{\mbox{Nudm}}):} \lr{\mbox{SMF}} داده اشتراک مدیریت نشست را بازیابی می‌کند
+\item
+  \textbf{\lr{\mbox{N13}} (از طریق \lr{\mbox{Nudm}}):} \lr{\mbox{AUSF}} اعتبارنامه‌های احراز هویت را بازیابی می‌کند
+\end{itemize}
+
+\textbf{رابطه با \lr{\mbox{UDR}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{UDM}} شامل منطق کاربرد است (محاسبه بردار احراز هویت، رمزگشایی \lr{\mbox{SUCI}})
+\item
+  \lr{\mbox{UDR}} مخزن داده خالص پشتیبان است
+\item
+  \lr{\mbox{UDM}} از طریق واسط \lr{\mbox{\textbf{\lr{\mbox{Nudr}}}}} به \lr{\mbox{UDR}} دسترسی می‌یابد
+\end{itemize}
+
+\CNsubsection{3.5}{تابع سرور احراز هویت \lr{\mbox{(AUSF)}}}
+
+\lr{\mbox{AUSF}} به‌عنوان کارساز احراز هویت برای شبکه \lr{\mbox{5G}} عمل می‌کند. رویه‌های احراز هویت بین \lr{\mbox{UE}} و شبکه خانگی را اجرا می‌کند.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{اجرای احراز هویت:} رویه‌های \lr{\mbox{5G-AKA}} یا \lr{\mbox{EAP-AKA’}} را اجرا می‌کند
+\item
+  \textbf{مشتق‌سازی \lr{\mbox{\ensuremath{K_{\mathrm{AUSF}}}}}:} کلید لنگر \lr{\mbox{(\ensuremath{K_{\mathrm{AUSF}}})}} را مشتق می‌کند که تمام کلیدهای بعدی از آن مشتق می‌شوند
+\item
+  \textbf{ذخیره نتیجه احراز هویت:} وضعیت احراز هویت را برای مراجعه بعدی ذخیره می‌کند
+\item
+  \textbf{اختیار شبکه خانگی:} تضمین می‌کند تصمیم احراز هویت توسط شبکه خانگی گرفته می‌شود (حتی در رومینگ)
+\end{itemize}
+
+\Needspace{11\baselineskip}
+
+\textbf{روش‌های احراز هویت:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{روش} & \CNth{توضیح} & \CNth{مورد استفاده} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{5G-AKA}}}}} & احراز هویت و توافق کلید \lr{\mbox{5G — AKA}} بهبودیافته با تأیید شبکه خانگی & روش اصلی برای \lr{\mbox{UE}}های مبتنی بر \lr{\mbox{USIM}} \\
+\lr{\mbox{\textbf{\lr{\mbox{EAP-AKA’}}}}} & پروتکل احراز هویت قابل توسعه با \lr{AKA prime} \lr{—} مبتنی بر چارچوب \lr{\mbox{EAP}} & رومینگ، دسترسی غیر-\lr{\mbox{3GPP}}، \lr{\mbox{IoT}} \\
+\end{longtable}
+}
+
+\CNkeepfig{m19-key-hierarchy}{2}
+
+\textbf{سلسله‌مراتب کلید از \lr{\mbox{AUSF}}:}
+
+\CNfigure{m19-key-hierarchy}{سلسله‌مراتب کلیدهای \lr{\mbox{5G}} با ریشه در \lr{\mbox{AUSF}}}
+
+\textbf{واسط‌ها:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Nausf:}}}}} واسط خدمات‌محور ارایه‌شده توسط \lr{\mbox{AUSF}}
+\item
+  \textbf{\lr{\mbox{N12}} (از طریق \lr{\mbox{Nausf}}):} \lr{\mbox{AMF}} احراز هویت را آغاز می‌کند
+\item
+  \textbf{\lr{\mbox{N13}} (از طریق \lr{\mbox{Nudm}}):} \lr{\mbox{AUSF}} بردارهای احراز هویت را از \lr{\mbox{UDM}} بازیابی می‌کند
+\end{itemize}
+
+\CNsubsection{3.6}{تابع کنترل سیاست \lr{\mbox{(PCF)}}}
+
+\lr{\mbox{PCF}} موتور سیاست متمرکز \lr{\mbox{5GC}} است. قواعد سیاستی برای کنترل رفتار شبکه در دسترسی، نشست‌ها و سیاست‌های مختص \lr{\mbox{UE}} فراهم می‌کند.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تولید قاعده \lr{\mbox{PCC}}:} قواعد کنترل سیاست و صورت‌حساب برای \lr{\mbox{QoS}} و صورت‌حساب ایجاد می‌کند
+\item
+  \textbf{سیاست \lr{\mbox{AM}}:} سیاست‌های دسترسی و تحرک (شاخص \lr{\mbox{RFSP}}، محدودیت‌های ناحیه خدمات، انتخاب \lr{\mbox{RAT}}/\allowbreak{}فرکانس)
+\item
+  \textbf{سیاست \lr{\mbox{SM}}:} سیاست‌های مدیریت نشست (\lr{\mbox{QoS}}، دروازه‌بندی، صورت‌حساب، هدایت ترافیک)
+\item
+  \textbf{سیاست \lr{\mbox{UE}}:} سیاست‌های تحویل‌شده به \lr{\mbox{UE}} (قواعد \lr{\mbox{URSP}} \lr{—} سیاست انتخاب مسیر \lr{\mbox{UE}}، \lr{\mbox{ANDSP}})
+\item
+  \textbf{تصمیم سیاست:} تصمیمات سیاست بلادرنگ بر اساس اشتراک، شرایط شبکه، درخواست‌های \lr{\mbox{AF}} می‌گیرد
+\end{itemize}
+
+\Needspace{12\baselineskip}
+
+\textbf{انواع سیاست:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{9\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{سیاست} & \CNth{دامنه} & \CNth{تحویل به} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{سیاست \lr{\mbox{AM}}} & دسترسی و تحرک & \lr{AMF (N15)} & ناحیه خدمات، \lr{\mbox{RFSP}}، محدودیت \lr{\mbox{RAT}} \\
+\textbf{سیاست \lr{\mbox{SM}}} & نشست & \lr{\mbox{SMF (N7)}} & جریان‌های \lr{\mbox{QoS}}، قواعد \lr{\mbox{PCC}}، صورت‌حساب \\
+\textbf{سیاست \lr{\mbox{UE}}} & رفتار \lr{\mbox{UE}} & \lr{\mbox{UE}} (از طریق \lr{\mbox{AMF}}) & \lr{\mbox{URSP}}، \lr{\mbox{ANDSP}}، \lr{\mbox{WLANSP}} \\
+\end{longtable}
+}
+
+\textbf{محتوای قاعده \lr{\mbox{PCC}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  شناسه قاعده و تقدم
+\item
+  قالب جریان ترافیک (فیلتر \lr{\mbox{SDF}} یا شناسه کاربرد)
+\item
+  پارامترهای \lr{\mbox{QoS}} (\lr{\mbox{5QI}}، \lr{\mbox{ARP}}، \lr{\mbox{MBR}}، \lr{\mbox{GBR}})
+\item
+  وضعیت دروازه‌بندی (باز/\allowbreak{}بسته برای \lr{UL/\allowbreak{}DL})
+\item
+  روش صورت‌حساب (آنلاین/\allowbreak{}آفلاین) و گروه نرخ‌گذاری
+\item
+  سیاست هدایت ترافیک
+\end{itemize}
+
+\textbf{واسط‌ها:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Npcf:}}}}} واسط خدمات‌محور ارایه‌شده توسط \lr{\mbox{PCF}}
+\item
+  \textbf{\lr{\mbox{N7}} (از طریق \lr{\mbox{Npcf}}):} \lr{\mbox{SMF}} تصمیمات سیاست \lr{\mbox{SM}} را بازیابی می‌کند
+\item
+  \textbf{\lr{\mbox{N15}} (از طریق \lr{\mbox{Npcf}}):} \lr{\mbox{AMF}} تصمیمات سیاست \lr{\mbox{AM}} را بازیابی می‌کند
+\item
+  \textbf{\lr{\mbox{N5}} (از طریق \lr{\mbox{Npcf}}):} \lr{\mbox{AF}} از طریق \lr{\mbox{NEF}} یا مستقیماً بر سیاست تأثیر می‌گذارد
+\end{itemize}
+
+\CNsubsection{3.7}{تابع انتخاب برش شبکه \lr{\mbox{(NSSF)}}}
+
+\lr{\mbox{NSSF}} در انتخاب نمونه برش شبکه و مجموعه \lr{\mbox{AMF}} مناسب برای یک \lr{\mbox{UE}} کمک می‌کند.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تعیین \lr{\mbox{NSSAI}} مجاز:} تعیین می‌کند \lr{\mbox{UE}} مجاز به استفاده از کدام \lr{\mbox{S-NSSAI}}ها در \lr{\mbox{PLMN}} خدمات‌دهنده است
+\item
+  \textbf{نگاشت \lr{\mbox{S-NSSAI}}:} \lr{\mbox{NSSAI}} درخواستی را به \lr{\mbox{NSSAI}} پیکربندی‌شده نگاشت می‌کند (نگاشت \lr{\mbox{PLMN}} خانگی\ensuremath{\leftrightarrow}خدمات‌دهنده در رومینگ)
+\item
+  \textbf{تغییر مسیر \lr{\mbox{AMF}}:} وقتی \lr{\mbox{AMF}} فعلی نمی‌تواند به برش انتخاب‌شده خدمات دهد، \lr{\mbox{NSSF}} مجموعه \lr{\mbox{AMF}} هدفی را شناسایی می‌کند که می‌تواند
+\item
+  \textbf{انتخاب \lr{\mbox{NRF}}:} به انتخاب نمونه \lr{\mbox{NRF}} مناسب برای کشف \lr{\mbox{NF}} مختص برش کمک می‌کند
+\end{itemize}
+
+\Needspace{16\baselineskip}
+
+\textbf{مفاهیم کلیدی:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{13\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{اصطلاح} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{S-NSSAI}}}}} & \lr{\mbox{NSSAI}} واحد = \lr{\mbox{SST}} (نوع برش/\allowbreak{}خدمات 8 بیتی) + \lr{\mbox{SD}} اختیاری (تفکیک‌کننده برش 24 بیتی) \\
+\textbf{\lr{\mbox{NSSAI}} درخواستی} & \lr{\mbox{S-NSSAI}}های فرستاده‌شده توسط \lr{\mbox{UE}} در \lr{Registration Request} \\
+\textbf{\lr{\mbox{NSSAI}} مجاز} & \lr{\mbox{S-NSSAI}}های مجاز توسط شبکه (بازگردانده‌شده در \lr{Registration Accept}) \\
+\textbf{\lr{\mbox{NSSAI}} پیکربندی‌شده} & \lr{\mbox{S-NSSAI}}های تأمین‌شده در \lr{\mbox{UE}} توسط \lr{HPLMN/\allowbreak{}VPLMN} \\
+\textbf{\lr{\mbox{S-NSSAI}} اشتراک‌شده} & اشتراک برش در \lr{\mbox{UDM}} \\
+\end{longtable}
+}
+
+\textbf{مقادیر استاندارد \lr{\mbox{SST}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{SST=1}}: \lr{\mbox{eMBB}} (پهن‌باند موبایل بهبودیافته)
+\item
+  \lr{\mbox{SST=2}}: \lr{\mbox{URLLC}} (ارتباطات فوق‌قابل اعتماد کم-تأخیر)
+\item
+  \lr{\mbox{SST=3}}: \lr{\mbox{MIoT}} (\lr{\mbox{IoT}} انبوه)
+\item
+  \lr{\mbox{SST=4}}: \lr{\mbox{V2X}} (خودرو-به-همه‌چیز)
+\end{itemize}
+
+\CNsubsection{3.8}{تابع مخزن شبکه \lr{\mbox{(NRF)}}}
+
+\lr{\mbox{NRF}} ثبت مرکزی برای تمام نمونه‌های \lr{\mbox{NF}} در \lr{\mbox{5GC}} است. کشف و مجوزدهی خدمات را ممکن می‌سازد.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ثبت‌نام \lr{\mbox{NF}}:} \lr{\mbox{NF}}ها پروفایل خود را ثبت می‌کنند (نوع، ظرفیت، خدمات پشتیبانی‌شده، \lr{\mbox{PLMN}}، برش، مکان)
+\item
+  \textbf{کشف \lr{\mbox{NF}}:} \lr{\mbox{NF}}های مصرف‌کننده از \lr{\mbox{NRF}} پرس‌وجو می‌کنند تا \lr{\mbox{NF}}های تولیدکننده منطبق با معیارها را بیابند
+\item
+  \textbf{اعلان وضعیت \lr{\mbox{NF}}:} \lr{\mbox{NF}}های مشترک‌شده را درباره تغییرات وضعیت \lr{\mbox{NF}} مطلع می‌کند (ثبت‌نام‌شده، لغو ثبت‌نام‌شده، معلق)
+\item
+  \textbf{صدور نشانه \lr{\mbox{OAuth2}}:} نشانه‌های دسترسی برای مجوزدهی واسط خدمات‌محور صادر می‌کند
+\end{itemize}
+
+\textbf{محتوای پروفایل \lr{\mbox{NF}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  شناسه نمونه \lr{NF (UUID)}
+\item
+  نوع \lr{\mbox{NF}} (\lr{\mbox{AMF}}، \lr{\mbox{SMF}}، \lr{\mbox{UPF}} و غیره)
+\item
+  وضعیت \lr{\mbox{NF}} (\lr{\mbox{REGISTERED}}، \lr{\mbox{SUSPENDED}}، \lr{\mbox{UNDISCOVERABLE}})
+\item
+  شناسه(های) \lr{\mbox{PLMN}} خدمات‌داده‌شده
+\item
+  \lr{S-NSSAI(\rl{های})} پشتیبانی‌شده
+\item
+  آدرس‌های \lr{\mbox{FQDN}} یا \lr{\mbox{IP}}
+\item
+  خدمات و نسخه‌های پشتیبانی‌شده
+\item
+  اطلاعات ظرفیت، اولویت، بار
+\item
+  محلیت جغرافیایی
+\end{itemize}
+
+\textbf{پارامترهای پرس‌وجوی کشف:}
+
+\begin{itemize}
+\tightlist
+\item
+  نوع \lr{\mbox{NF}} هدف
+\item
+  نوع \lr{\mbox{NF}} درخواست‌کننده
+\item
+  نام خدمات
+\item
+  \lr{\mbox{PLMN}} هدف، \lr{\mbox{S-NSSAI}}، \lr{\mbox{DNN}}
+\item
+  محلیت ترجیحی
+\end{itemize}
+
+\textbf{\lr{\mbox{OAuth2}} در \lr{\mbox{5GC}}:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{NRF}} به‌عنوان کارساز مجوزدهی \lr{\mbox{OAuth2}} عمل می‌کند
+\item
+  \lr{\mbox{NF}} مصرف‌کننده نشانه را با نوع \lr{\mbox{NF}} هدف و خدمات درخواست می‌کند
+\item
+  نشانه در درخواست‌های \lr{\mbox{SBI}} گنجانده می‌شود (سرآیند \lr{\mbox{Authorization}})
+\item
+  \lr{\mbox{NF}} تولیدکننده پیش از سرویس‌دهی به درخواست، نشانه را اعتبارسنجی می‌کند
+\end{itemize}
+
+\CNsubsection{3.9}{تابع نمایش شبکه \lr{\mbox{(NEF)}}}
+
+\lr{\mbox{NEF}} یک چارچوب ایمن برای نمایش قابلیت‌ها و رویدادهای \lr{\mbox{5GC}} به توابع کاربرد خارجی \lr{\mbox{(AF)}} فراهم می‌کند.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{چارچوب نمایش:} قابلیت‌های شبکه را از طریق \lr{\mbox{API}}های استاندارد به \lr{\mbox{AF}}های شخص سوم نمایش می‌دهد
+\item
+  \textbf{تأثیر ترافیک:} \lr{\mbox{AF}} می‌تواند مسیریابی ترافیک مشخص را درخواست کند (مثلاً مسیریابی ترافیک به کارساز لبه محلی)
+\item
+  \textbf{رویدادهای پایش:} \lr{\mbox{AF}} در رویدادهای \lr{\mbox{UE}} اشتراک می‌کند (دسترسی‌پذیری، مکان، وضعیت اتصال)
+\item
+  \textbf{تأمین پارامتر:} \lr{\mbox{AF}} رفتار مورد انتظار \lr{\mbox{UE}}، سیاست‌های انتقال داده پس‌زمینه را تأمین می‌کند
+\item
+  \textbf{ترجمه:} بین شناسه‌های خارجی (\lr{\mbox{GPSI}}، شناسه گروه خارجی) و شناسه‌های داخلی \lr{\mbox{(SUPI)}} نگاشت می‌کند
+\item
+  \textbf{دروازه امنیتی:} از دسترسی مستقیم \lr{\mbox{AF}} به \lr{\mbox{NF}}های داخلی جلوگیری می‌کند
+\end{itemize}
+
+\Needspace{17\baselineskip}
+
+\textbf{قابلیت‌های کلیدی نمایش:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{قابلیت} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{رویدادهای پایش} & دسترسی‌پذیری \lr{\mbox{UE}}، گزارش مکان، از دست رفتن اتصال، وضعیت رومینگ \\
+\textbf{تأثیر ترافیک} & درخواست مسیریابی ترافیک به شبکه داده محلی (رایانش لبه) \\
+\textbf{نمایش تحلیل} & نمایش تحلیل‌های \lr{\mbox{NWDAF}} به \lr{\mbox{AF}}های خارجی \\
+\textbf{تأمین پارامتر} & رفتار مورد انتظار \lr{\mbox{UE}}، انتقال داده پس‌زمینه \\
+\textbf{محرک‌سازی دستگاه} & فعال‌سازی اقدام مشخص روی دستگاه \lr{\mbox{IoT}} \\
+\lr{\mbox{\textbf{\lr{\mbox{NIDD}}}}} & تحویل داده غیر-\lr{\mbox{IP}} برای \lr{\mbox{IoT}} \\
+\end{longtable}
+}
+
+\CNsubsection{3.10}{مخزن داده یکپارچه \lr{\mbox{(UDR)}}}
+
+\lr{\mbox{UDR}} مخزن داده پشتیبان برای داده مشترک، سیاست و نمایش است. توسط \lr{\mbox{UDM}}، \lr{\mbox{PCF}} و \lr{\mbox{NEF}} دسترسی می‌شود.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ذخیره داده اشتراک:} پروفایل‌های مشترک دسترسی‌شده توسط \lr{\mbox{UDM}} را ذخیره می‌کند
+\item
+  \textbf{ذخیره داده سیاست:} داده سیاست (قواعد \lr{\mbox{PCC}}، سیاست‌های \lr{AM/\allowbreak{}SM}) دسترسی‌شده توسط \lr{\mbox{PCF}} را ذخیره می‌کند
+\item
+  \textbf{ذخیره داده نمایش:} اشتراک‌های نمایش و داده دسترسی‌شده توسط \lr{\mbox{NEF}} را ذخیره می‌کند
+\item
+  \textbf{ذخیره داده کاربرد:} داده ارایه‌شده توسط \lr{\mbox{AF}} (مثلاً \lr{\mbox{PFD}}ها \lr{—} توصیف‌های جریان بسته) را ذخیره می‌کند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\textbf{دسته‌های داده:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نوع داده} & \CNth{\lr{\mbox{NF}} مصرف‌کننده} & \CNth{مثال‌ها} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{داده اشتراک} & \lr{\mbox{UDM}} & اعتبارنامه‌های احراز هویت، \lr{\mbox{S-NSSAI}} اشتراک‌شده، پیکربندی‌های \lr{\mbox{DNN}} \\
+\textbf{داده سیاست} & \lr{\mbox{PCF}} & قالب‌های قاعده \lr{\mbox{PCC}}، سیاست‌های داده حمایت‌شده \\
+\textbf{داده نمایش} & \lr{\mbox{NEF}} & اشتراک‌های پایش، درخواست‌های تأثیر \lr{\mbox{AF}} \\
+\textbf{داده کاربرد} & \lr{NEF/\allowbreak{}PCF} & \lr{\mbox{PFD}}ها، سیاست‌های انتقال داده پس‌زمینه \\
+\end{longtable}
+}
+
+\textbf{واسط:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Nudr:}}}}} واسط خدمات‌محور (تنها واسط \lr{\mbox{UDR}})
+\item
+  دسترسی‌شده توسط \lr{UDM (Nudr\_\allowbreak{}DataManagement)}، \lr{PCF (Nudr\_\allowbreak{}DataManagement)}، \lr{NEF (Nudr\_\allowbreak{}DataManagement)}
+\end{itemize}
+
+\CNsubsection{3.11}{تابع ذخیره‌سازی داده غیرساخت‌یافته \lr{\mbox{(UDSF)}}}
+
+\lr{\mbox{UDSF}} با فراهم کردن ذخیره‌سازی خارجی برای داده زمینه \lr{\mbox{NF}}، طراحی بدون حالت \lr{\mbox{NF}}ها را ممکن می‌سازد.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ذخیره‌سازی داده غیرساخت‌یافته:} زمینه/\allowbreak{}حالت دلخواه \lr{\mbox{NF}} را به‌عنوان بلوک‌های داده مبهم ذخیره می‌کند
+\item
+  \textbf{پشتیبانی \lr{\mbox{NF}} بدون حالت:} \lr{\mbox{NF}}ها می‌توانند پس از راه‌اندازی مجدد حالت را بازیابی کنند یا بار را در بین نمونه‌ها متعادل کنند
+\item
+  \textbf{عملیات \lr{\mbox{CRUD}}:} عملیات ایجاد، خواندن، به‌روزرسانی، حذف روی رکوردهای ذخیره‌شده
+\end{itemize}
+
+\textbf{چرا \lr{\mbox{UDSF}} مهم است:}
+
+\begin{itemize}
+\tightlist
+\item
+  بدون \lr{\mbox{UDSF}}، هر نمونه \lr{\mbox{NF}} وضعیت نشست را در حافظه نگه می‌دارد
+\item
+  با \lr{\mbox{UDSF}}، هر نمونه \lr{\mbox{NF}} می‌تواند با بازیابی حالت از \lr{\mbox{UDSF}} به هر درخواستی خدمات دهد
+\item
+  مقیاس‌پذیری افقی واقعی، تغییر مسیر و استقرار بومی-ابر را ممکن می‌سازد
+\item
+  هر نوع \lr{\mbox{NF}} ممکن است نمونه \lr{\mbox{UDSF}} خود را داشته باشد
+\end{itemize}
+
+\textbf{واسط:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{\textbf{\lr{\mbox{Nudsf:}}}}} واسط خدمات‌محور برای ذخیره/\allowbreak{}بازیابی داده غیرساخت‌یافته
+\end{itemize}
+
+\CNsubsection{3.12}{عامل ارتباط خدمات \lr{\mbox{(SCP)}}}
+
+\lr{\mbox{SCP}} یک عنصر مسیریابی و توازن بار است که در مسیر ارتباط \lr{\mbox{SBI}} بین \lr{\mbox{NF}}ها قرار می‌گیرد. در \lr{TS 23.501} نسخه \lr{\mbox{16}}+ تعریف شده است.
+
+\textbf{مسیولیت‌های کلیدی:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ارتباط غیرمستقیم:} \lr{\mbox{NF}}ها درخواست‌ها را به \lr{\mbox{SCP}} می‌فرستند به‌جای مستقیماً به \lr{\mbox{NF}} هدف
+\item
+  \textbf{توازن بار:} درخواست‌ها را در بین چندین نمونه \lr{\mbox{NF}} توزیع می‌کند
+\item
+  \textbf{مسیریابی پیام:} پیام‌ها را بر اساس پارامترهای کشف مسیریابی می‌کند بدون نیاز \lr{\mbox{NF}} مصرف‌کننده به کشف کامل
+\item
+  \textbf{پنهان‌سازی توپولوژی:} توپولوژی \lr{\mbox{NF}} داخلی را از شبکه‌های خارجی پنهان می‌کند (رومینگ)
+\item
+  \textbf{کنترل اضافه‌بار:} مدیریت ازدحام و محدودسازی درخواست را پیاده‌سازی می‌کند
+\end{itemize}
+
+\Needspace{14\baselineskip}
+
+\textbf{مدل‌های ارتباطی:}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{مدل} & \CNth{توضیح} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{مدل \lr{\mbox{A}} (مستقیم)} & \lr{\mbox{NF}} مصرف‌کننده هدف را از طریق \lr{\mbox{NRF}} کشف می‌کند، مستقیماً ارتباط برقرار می‌کند \\
+\textbf{مدل \lr{\mbox{B}} (غیرمستقیم بدون کشف واگذارشده)} & \lr{\mbox{NF}} هدف را از طریق \lr{\mbox{NRF}} کشف می‌کند، از طریق \lr{\mbox{SCP}} مسیریابی می‌کند \\
+\textbf{مدل \lr{\mbox{C}} (غیرمستقیم با کشف واگذارشده)} & \lr{\mbox{NF}} به \lr{\mbox{SCP}} می‌فرستد، \lr{\mbox{SCP}} کشف و مسیریابی را انجام می‌دهد \\
+\textbf{مدل \lr{\mbox{D}} (غیرمستقیم با کشف واگذارشده + انتخاب)} & \lr{\mbox{SCP}} همه چیز را مدیریت می‌کند: کشف، انتخاب، مسیریابی \\
+\end{longtable}
+}
+
+\textbf{مزایا:}
+
+\begin{itemize}
+\tightlist
+\item
+  پیاده‌سازی \lr{\mbox{NF}} را ساده می‌کند (\lr{\mbox{NF}}ها نیازی به منطق پیچیده کشف/\allowbreak{}تلاش مجدد ندارند)
+\item
+  دیدپذیری و تله‌متری متمرکز
+\item
+  استقرار آسان‌تر دغدغه‌های عرضی (پایان‌دهی \lr{\mbox{mTLS}}، ردیابی)
+\item
+  مقیاس‌دهی بی‌وقفه \lr{\mbox{NF}} بدون پیکربندی مجدد را ممکن می‌سازد
+\end{itemize}
+
+\CNsection{4}{صفحه کنترل در برابر صفحه کاربر در هسته \lr{\mbox{5G}}}
+
+\lr{\mbox{5GC}} جداسازی سختگیرانه‌ای بین صفحه کنترل \lr{\mbox{(CP)}} و صفحه کاربر \lr{\mbox{(UP)}} اعمال می‌کند که به‌عنوان \lr{\mbox{CUPS}} (جداسازی کنترل و صفحه کاربر) شناخته می‌شود.
+
+\CNsubsection{}{صفحه کنترل \lr{\mbox{(CP)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{تمام \lr{\mbox{NF}}ها به‌جز \lr{\mbox{UPF}}} در صفحه کنترل عمل می‌کنند
+\item
+  ارتباط از طریق \textbf{واسط‌های خدمات‌محور \lr{\mbox{(SBI)}}} با استفاده از \lr{HTTP/\allowbreak{}2 + JSON}
+\item
+  پشته پروتکل: \lr{HTTP/\allowbreak{}2 \ensuremath{\to} TCP \ensuremath{\to} IP} (یا از طریق \lr{\mbox{SCP}})
+\item
+  توابع: سیگنالینگ، سیاست، احراز هویت، ثبت‌نام، مدیریت نشست، کشف
+\item
+  بسته به نیازمندی‌های تأخیر، به‌صورت متمرکز یا منطقه‌ای مستقر می‌شود
+\item
+  \lr{\mbox{AMF}} و \lr{\mbox{SMF}} لنگرهای اصلی \lr{\mbox{CP}} برای سیگنالینگ \lr{\mbox{UE}} و مدیریت نشست هستند
+\end{itemize}
+
+\CNsubsection{}{صفحه کاربر \lr{\mbox{(UP)}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{فقط \lr{\mbox{UPF}}} در صفحه کاربر عمل می‌کند
+\item
+  توسط \lr{\mbox{SMF}} از طریق \lr{\textbf{\lr{N4 /\allowbreak{} PFCP}}} (واسط کنترل) برنامه‌ریزی می‌شود
+\item
+  پشته پروتکل داده کاربر: داده کاربرد \ensuremath{\leftarrow} لایه \lr{PDU \ensuremath{\to} GTP-U \ensuremath{\to} UDP \ensuremath{\to} IP}
+\item
+  توابع: ارسال بسته، اجرای \lr{\mbox{QoS}}، تشخیص ترافیک، اندازه‌گیری مصرف، بافرینگ
+\item
+  بسته به نیازهای تأخیر و محلیت داده، می‌تواند در لبه، منطقه‌ای یا مکان‌های مرکزی مستقر شود
+\item
+  چندین \lr{\mbox{UPF}} می‌توانند زنجیره شوند (از طریق \lr{\mbox{N9}}) برای زنجیره‌سازی تابع سرویس یا شکست محلی
+\end{itemize}
+
+\CNkeepfig{m19-cp-up}{3}
+
+\CNsubsection{}{خلاصه تعامل \lr{CP/\allowbreak{}UP}}
+
+\CNfigure{m19-cp-up}{صفحه کنترل \lr{\mbox{(SBI)}} و صفحه کاربر هسته \lr{\mbox{5G}}}
+
+\Needspace{28\baselineskip}
+
+\CNsection{5}{مقایسه عمده: \lr{\mbox{EPC}} در \lr{\mbox{4G}} در برابر هسته \lr{\mbox{5G}}}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 4\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{\lr{\mbox{EPC}} در \lr{\mbox{4G}}} & \CNth{هسته \lr{\mbox{5G (5GC)}}} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{سبک معماری} & واسط‌های نقطه-به-نقطه بین \lr{\mbox{NE}}های یکپارچه & معماری خدمات‌محور \lr{\mbox{(SBA)}}، میکروسرویس‌ها \\
+\textbf{پروتکل سیگنالینگ} & \lr{GTP-C (v2)}، \lr{\mbox{Diameter}} & \lr{HTTP/\allowbreak{}2 + JSON} (\lr{\mbox{API}}های \lr{\mbox{RESTful}}) \\
+\textbf{صفحه کاربر} & \lr{S-GW + P-GW} (ترکیبی یا جدا) & \lr{\mbox{UPF}} (\lr{\mbox{NF}} واحد صفحه کاربر) \\
+\textbf{پایگاه داده مشترکین} & \lr{\mbox{HSS}} (مبتنی بر \lr{\mbox{Diameter}}) & \lr{UDM + UDR} (مبتنی بر \lr{\mbox{SBI}}، منطق/\allowbreak{}ذخیره‌سازی جدا) \\
+\textbf{احراز هویت} & \lr{\mbox{EPS-AKA}} از طریق \lr{\mbox{HSS}} & \lr{5G-AKA /\allowbreak{} EAP-AKA’} از طریق \lr{AUSF + UDM} \\
+\textbf{سیاست} & \lr{\mbox{PCRF}} (واسط‌های \lr{\mbox{Gx}}، \lr{\mbox{Rx}}، \lr{\mbox{Sd}}) & \lr{\mbox{PCF}} (\lr{\mbox{SBI}} مربوط به \lr{\mbox{Npcf}}، سیاست‌های \lr{AM/\allowbreak{}SM/\allowbreak{}UE}) \\
+\textbf{مدیریت نشست} & \lr{MME + S-GW + P-GW} ترکیبی & \lr{\mbox{SMF}} (\lr{\mbox{NF}} اختصاصی، جدا از تحرک) \\
+\textbf{مدیریت تحرک} & \lr{\mbox{MME}} (ترکیب با سیگنالینگ نشست) & \lr{\mbox{AMF}} (تحرک/\allowbreak{}دسترسی خالص، بدون منطق نشست) \\
+\textbf{شبکه‌بندی} & به‌طور بومی پشتیبانی نمی‌شود & پشتیبانی بومی (\lr{\mbox{S-NSSAI}}، \lr{\mbox{NSSF}}، نمونه‌های \lr{\mbox{NF}} در هر برش) \\
+\textbf{سبک واسط} & نقاط مرجع ثابت (\lr{\mbox{S1}}، \lr{\mbox{S5}}، \lr{\mbox{S6a}}، \lr{\mbox{S11}}\lr{…}) & خدمات \lr{\mbox{SBI}} + نقاط مرجع برای \lr{\mbox{UP}} \\
+\textbf{مدیریت حالت} & \lr{\mbox{NE}}های حالت‌دار & \lr{\mbox{NF}}های بدون حالت + \lr{\mbox{UDSF}} برای حالت خارجی \\
+\textbf{استقرار} & مبتنی بر تجهیز، یکپارچه & بومی-ابر، کانتینری، میکروسرویس‌ها \\
+\textbf{کشف} & پیش‌پیکربندی‌شده یا مبتنی بر \lr{\mbox{DNS}} & پویا از طریق \lr{\mbox{NRF}} (ثبت‌نام + کشف + \lr{\mbox{OAuth2}}) \\
+\textbf{رایانش لبه} & دشوار (\lr{LIPA/\allowbreak{}SIPTO} محدود) & بومی (\lr{\mbox{UPF}} توزیع‌شده، \lr{\mbox{LADN}}، یکپارچگی \lr{\mbox{MEC}}) \\
+\end{longtable}
+}
+
+\CNkeepfig{m19-4g-to-5g}{3}
+
+\CNsubsection{}{نگاشت توابع شبکه از \lr{\mbox{4G}} به \lr{\mbox{5G}}}
+
+\CNfigure{m19-4g-to-5g}{نگاشت توابع \lr{\mbox{EPC}} به توابع شبکه هسته \lr{\mbox{5G}}}
+
+\Needspace{33\baselineskip}
+
+\CNsection{6}{نقاط مرجع}
+
+نقاط مرجع واسط‌های بین جفت‌های \lr{\mbox{NF}} مشخص را تعریف می‌کنند. در حالی که \lr{\mbox{SBI}} برای ارتباط \lr{\mbox{CP}}-به-\lr{\mbox{CP}} استفاده می‌شود، نقاط مرجع برای درک جزییات پروتکل مهم باقی می‌مانند.
+
+\CNsubsection{}{جدول کامل نقاط مرجع}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{22\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{نقطه مرجع} & \CNth{اتصال} & \CNth{پروتکل/\allowbreak{}انتقال} & \CNth{هدف} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\lr{\mbox{\textbf{\lr{\mbox{N1}}}}} & \lr{\mbox{UE \ensuremath{\leftrightarrow} AMF}} & \lr{\mbox{NAS}} روی \lr{\mbox{RRC}} (از طریق \lr{\mbox{gNB}}) & سیگنالینگ \lr{\mbox{NAS}} (ثبت‌نام، درخواست‌های مدیریت نشست) \\
+\lr{\mbox{\textbf{\lr{\mbox{N2}}}}} & \lr{RAN \ensuremath{\leftrightarrow} AMF} & \lr{\mbox{NGAP}} روی \lr{\mbox{SCTP}} & سیگنالینگ \lr{\mbox{RAN-CN}} (برقراری زمینه، تحویل، صفحه‌بندی) \\
+\lr{\mbox{\textbf{\lr{\mbox{N3}}}}} & \lr{RAN \ensuremath{\leftrightarrow} UPF} & \lr{\mbox{GTP-U}} روی \lr{UDP/\allowbreak{}IP} & تونل صفحه کاربر حامل داده نشست \lr{\mbox{PDU}} \\
+\lr{\mbox{\textbf{\lr{\mbox{N4}}}}} & \lr{SMF \ensuremath{\leftrightarrow} UPF} & \lr{\mbox{PFCP}} روی \lr{\mbox{UDP}} (پورت 8805) & برنامه‌ریزی \lr{\mbox{UPF}} (قواعد \lr{\mbox{PDR}}، \lr{\mbox{FAR}}، \lr{\mbox{QER}}، \lr{\mbox{URR}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{N6}}}}} & \lr{\mbox{UPF \ensuremath{\leftrightarrow} DN}} & \lr{IP /\allowbreak{} Ethernet} & خروج ترافیک کاربر به شبکه داده \\
+\lr{\mbox{\textbf{\lr{\mbox{N7}}}}} & \lr{SMF \ensuremath{\leftrightarrow} PCF} & \lr{SBI (HTTP/\allowbreak{}2)} & سیاست \lr{\mbox{SM}} (قواعد \lr{\mbox{PCC}}، تصمیمات \lr{\mbox{QoS}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{N8}}}}} & \lr{AMF \ensuremath{\leftrightarrow} UDM} & \lr{SBI (HTTP/\allowbreak{}2)} & داده اشتراک دسترسی/\allowbreak{}تحرک \\
+\lr{\mbox{\textbf{\lr{\mbox{N9}}}}} & \lr{UPF \ensuremath{\leftrightarrow} UPF} & \lr{\mbox{GTP-U}} روی \lr{UDP/\allowbreak{}IP} & ارسال صفحه کاربر بین-\lr{\mbox{UPF}} \\
+\lr{\mbox{\textbf{\lr{\mbox{N10}}}}} & \lr{SMF \ensuremath{\leftrightarrow} UDM} & \lr{SBI (HTTP/\allowbreak{}2)} & داده اشتراک مدیریت نشست \\
+\lr{\mbox{\textbf{\lr{\mbox{N11}}}}} & \lr{AMF \ensuremath{\leftrightarrow} SMF} & \lr{SBI (HTTP/\allowbreak{}2)} & مدیریت چرخه عمر نشست \lr{\mbox{PDU}} \\
+\lr{\mbox{\textbf{\lr{\mbox{N12}}}}} & \lr{AMF \ensuremath{\leftrightarrow} AUSF} & \lr{SBI (HTTP/\allowbreak{}2)} & آغاز احراز هویت \\
+\lr{\mbox{\textbf{\lr{\mbox{N13}}}}} & \lr{AUSF \ensuremath{\leftrightarrow} UDM} & \lr{SBI (HTTP/\allowbreak{}2)} & بازیابی بردار احراز هویت \\
+\lr{\mbox{\textbf{\lr{\mbox{N14}}}}} & \lr{AMF \ensuremath{\leftrightarrow} AMF} & \lr{SBI (HTTP/\allowbreak{}2)} & تحرک بین-\lr{\mbox{AMF}} (انتقال زمینه \lr{\mbox{UE}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{N15}}}}} & \lr{AMF \ensuremath{\leftrightarrow} PCF} & \lr{SBI (HTTP/\allowbreak{}2)} & سیاست \lr{\mbox{AM}} (محدودیت‌های دسترسی/\allowbreak{}تحرک) \\
+\lr{\mbox{\textbf{\lr{\mbox{N22}}}}} & \lr{AMF \ensuremath{\leftrightarrow} NSSF} & \lr{SBI (HTTP/\allowbreak{}2)} & کمک در انتخاب برش \\
+\lr{\mbox{\textbf{\lr{\mbox{N27}}}}} & \lr{NRF \ensuremath{\leftrightarrow} NRF} & \lr{SBI (HTTP/\allowbreak{}2)} & کشف \lr{\mbox{NF}} بین-\lr{\mbox{PLMN}} (از طریق \lr{\mbox{SEPP}}) \\
+\lr{\mbox{\textbf{\lr{\mbox{N32}}}}} & \lr{SEPP \ensuremath{\leftrightarrow} SEPP} & \lr{PRINS /\allowbreak{} TLS} & امنیت بین-\lr{\mbox{PLMN}} (رومینگ) \\
+\end{longtable}
+}
+
+\CNsubsection{}{جزییات نقاط مرجع کلیدی}
+
+\lr{\textbf{\lr{N1 (UE \ensuremath{\leftrightarrow} AMF):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{PDU}}های \lr{\mbox{NAS}} را حمل می‌کند (\lr{Registration Request/\allowbreak{}Accept}، احراز هویت، حالت امنیتی، برقراری نشست \lr{\mbox{PDU}})
+\item
+  پیام‌های \lr{\mbox{NAS}} به‌صورت شفاف توسط \lr{\mbox{gNB}} رله می‌شوند (کپسوله‌شده در \lr{\mbox{NGAP}} روی \lr{\mbox{N2}})
+\item
+  پس از فعال‌سازی امنیت، از امنیت \lr{\mbox{NAS}} (یکپارچگی + رمزگذاری) پشتیبانی می‌کند
+\end{itemize}
+
+\lr{\textbf{\lr{N2 (RAN \ensuremath{\leftrightarrow} AMF):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  پروتکل \lr{\mbox{NGAP}} روی \lr{\mbox{SCTP}}
+\item
+  رویه‌ها: \lr{Initial UE Message}، \lr{PDU Session Resource Setup}، \lr{Handover Required/\allowbreak{}Request}، \lr{\mbox{Paging}}
+\item
+  سیگنالینگ مرتبط با \lr{\mbox{UE}} و غیرمرتبط با \lr{\mbox{UE}} را حمل می‌کند
+\end{itemize}
+
+\lr{\textbf{\lr{N3 (RAN \ensuremath{\leftrightarrow} UPF):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  تونل \lr{\mbox{GTP-U}} شناسایی‌شده با \lr{\mbox{TEID}} (شناسه نقطه انتهایی تونل)
+\item
+  یک تونل \lr{\mbox{GTP-U}} در هر نشست \lr{\mbox{PDU}} در هر جفت \lr{\mbox{gNB-UPF}}
+\item
+  شناسه جریان \lr{QoS (QFI)} در سرآیند افزونه \lr{\mbox{GTP-U}} برای نگاشت جریان‌های \lr{\mbox{QoS}} حمل می‌شود
+\end{itemize}
+
+\lr{\textbf{\lr{N4 (SMF \ensuremath{\leftrightarrow} UPF):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{PFCP}} (پروتکل کنترل ارسال بسته) \lr{—} \lr{3GPP TS 29.244}
+\item
+  مدیریت سطح نشست (برقراری، اصلاح، حذف)
+\item
+  مدیریت سطح گره (برقراری ارتباط، ضربان)
+\item
+  گزارش‌ها: گزارش‌های مصرف، اعلان داده پیوند پایین‌سو، نشانگر پایان
+\end{itemize}
+
+\lr{\textbf{\lr{N9 (UPF \ensuremath{\leftrightarrow} UPF):}}}
+
+\begin{itemize}
+\tightlist
+\item
+  تونل \lr{\mbox{GTP-U}} برای مسیرهای صفحه کاربر چند-گامی
+\item
+  در سناریوهای \lr{\mbox{UL-CL}} (طبقه‌بند پیوند بالاسو) و نقطه انشعاب استفاده می‌شود
+\item
+  زنجیره‌سازی تابع سرویس و استقرار \lr{\mbox{UPF}} توزیع‌شده را ممکن می‌سازد
+\end{itemize}
+
+\CNsection{7}{گزینه‌های استقرار}
+
+معماری پیمانه‌ای \lr{\mbox{5GC}} توپولوژی‌های استقرار انعطاف‌پذیر بر اساس نیازمندی‌های سرویس را ممکن می‌سازد.
+
+\CNsubsection{7.1}{استقرار متمرکز}
+
+تمام \lr{\mbox{NF}}ها (شامل \lr{\mbox{UPF}}) در یک مرکز داده مرکزی مستقر می‌شوند.
+
+\textbf{ویژگی‌ها:}
+
+\begin{itemize}
+\tightlist
+\item
+  عملیات ساده، سایت واحد
+\item
+  تأخیر بالاتر برای صفحه کاربر (تمام ترافیک از سایت مرکزی عبور می‌کند)
+\item
+  مناسب برای پوشش گسترده با نیازمندی‌های تأخیر آسان‌گیر
+\item
+  هزینه زیرساخت کمتر
+\end{itemize}
+
+\CNsubsection{7.2}{استقرار توزیع‌شده}
+
+صفحه کنترل متمرکز، صفحه کاربر توزیع‌شده نزدیک‌تر به کاربران.
+
+\textbf{ویژگی‌ها:}
+
+\begin{itemize}
+\tightlist
+\item
+  \lr{\mbox{NF}}های \lr{\mbox{CP}} (\lr{\mbox{AMF}}، \lr{\mbox{SMF}}، \lr{\mbox{PCF}} و غیره) در \lr{\mbox{DC}} منطقه‌ای/\allowbreak{}مرکزی
+\item
+  \lr{\mbox{UPF}} در نقاط تجمیع منطقه‌ای مستقر می‌شود
+\item
+  تأخیر صفحه کاربر کاهش‌یافته
+\item
+  \lr{\mbox{SMF}} چندین نمونه \lr{\mbox{UPF}} را در مکان‌های مختلف مدیریت می‌کند
+\end{itemize}
+
+\CNsubsection{7.3}{استقرار \lr{\mbox{UPF}} در لبه (یکپارچگی \lr{\mbox{MEC}})}
+
+نمونه‌های \lr{\mbox{UPF}} در لبه شبکه (سایت سلول یا نقطه تجمیع محلی) برای تأخیر فوق‌العاده کم مستقر می‌شوند.
+
+\textbf{ویژگی‌ها:}
+
+\begin{itemize}
+\tightlist
+\item
+  شکست محلی ترافیک در لبه
+\item
+  رایانش لبه چند-دسترسی \lr{\mbox{(MEC)}} را ممکن می‌سازد \lr{—} چارچوب \lr{\mbox{MEC}} سازمان \lr{\mbox{ETSI}}
+\item
+  \lr{\mbox{SMF}} می‌تواند \lr{\mbox{UPF}}های لبه را بر اساس مکان \lr{\mbox{UE}} به‌صورت پویا وارد/\allowbreak{}حذف کند
+\item
+  \textbf{\lr{\mbox{UL-CL}} (طبقه‌بند پیوند بالاسو):} جریان‌های ترافیک مشخص را به \lr{\mbox{UPF}} لبه هدایت می‌کند در حالی که بقیه به \lr{\mbox{UPF}} مرکزی می‌رود
+\item
+  \textbf{شبکه داده ناحیه محلی \lr{\mbox{(LADN)}}:} شبکه داده فقط در ناحیه جغرافیایی مشخص در دسترس است
+\item
+  موارد استفاده معمول: \lr{AR/\allowbreak{}VR}، رانندگی خودران، خودکارسازی صنعتی، بازی ابری
+\end{itemize}
+
+\Needspace{18\baselineskip}
+
+\CNsubsection{}{مقایسه معماری استقرار}
+
+{\def\LTcaptype{none} % do not increment counter
+\Needspace{14\baselineskip}
+\begin{longtable}[c]{@{}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.1860}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2791}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.3023}}
+  >{\raggedleft\arraybackslash\hspace{0pt}}m{(\linewidth - 6\tabcolsep) * \real{0.2326}}@{}}
+\toprule\noalign{}
+\rowcolor{CNink}\CNth{جنبه} & \CNth{متمرکز} & \CNth{توزیع‌شده} & \CNth{\lr{\mbox{UPF}} لبه} \\
+\CNheadrulesep
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{مکان \lr{\mbox{CP}}} & \lr{\mbox{DC}} مرکزی & \lr{\mbox{DC}} مرکزی/\allowbreak{}منطقه‌ای & \lr{\mbox{DC}} مرکزی/\allowbreak{}منطقه‌ای \\
+\textbf{مکان \lr{\mbox{UP}}} & \lr{\mbox{DC}} مرکزی & \lr{\mbox{PoP}} منطقه‌ای & سایت سلول /\allowbreak{} \lr{\mbox{DC}} لبه \\
+\textbf{تأخیر صفحه کاربر} & بالا \lr{(10-50ms)} & متوسط \lr{\mbox{(5-20ms)}} & فوق‌العاده کم \lr{\mbox{(1-5ms)}} \\
+\textbf{پیچیدگی} & کم & متوسط & بالا \\
+\textbf{موارد استفاده} & پهن‌باند عمومی & خدمات منطقه‌ای & \lr{\mbox{URLLC}}، \lr{\mbox{MEC}}، \lr{\mbox{V2X}} \\
+\textbf{تعداد \lr{\mbox{UPF}}} & کم & متوسط & زیاد \\
+\end{longtable}
+}
+
+\CNkeepfig{m19-pdu-path}{3}
+
+\CNsubsection{}{مسیر صفحه کاربر نشست \lr{\mbox{PDU}}}
+
+\CNfigure{m19-pdu-path}{مسیر صفحه کاربر یک نشست \lr{\mbox{PDU}} با \lr{\mbox{UPF}} میانی}
+
+\textbf{جریان برقراری نشست \lr{\mbox{PDU}} (ساده‌شده):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \lr{\mbox{UE \ensuremath{\to} AMF}}: \lr{NAS PDU Session Establishment Request} (از طریق \lr{\mbox{N1}})
+\item
+  \lr{AMF \ensuremath{\to} SMF}: \lr{Nsmf\_\allowbreak{}PDUSession\_\allowbreak{}CreateSMContext} (از طریق \lr{\mbox{N11}})
+\item
+  \lr{\mbox{SMF UPF}} را انتخاب می‌کند، آدرس \lr{\mbox{IP}} تخصیص می‌دهد
+\item
+  \lr{SMF \ensuremath{\to} UPF}: \lr{PFCP Session Establishment} (از طریق \lr{\mbox{N4}}) \lr{—} \lr{PDR/\allowbreak{}FAR/\allowbreak{}QER} را نصب می‌کند
+\item
+  \lr{SMF \ensuremath{\to} AMF}: \lr{N1N2MessageTransfer} (شامل \lr{NAS accept} + اطلاعات \lr{\mbox{N2}})
+\item
+  \lr{AMF \ensuremath{\to} gNB}: \lr{PDU Session Resource Setup Request} (از طریق \lr{\mbox{N2}})
+\item
+  \lr{gNB \ensuremath{\to} UPF}: تونل \lr{\mbox{GTP-U}} برقرار می‌شود \lr{\mbox{(N3)}}
+\item
+  \lr{\mbox{UE}} دریافت \lr{PDU Session Establishment Accept} با قواعد \lr{\mbox{QoS}}
+\end{enumerate}
+
+\CNsection{}{خلاصه}
+
+هسته \lr{\mbox{5G}} یک تغییر پارادایم از \lr{\mbox{EPC}} در \lr{\mbox{4G}} را نمایندگی می‌کند:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\lr{\mbox{SBA}} جایگزین واسط‌های نقطه-به-نقطه می‌شود} \lr{—} انعطاف‌پذیری، قابلیت استفاده مجدد و تحول مستقل \lr{\mbox{NF}} را ممکن می‌سازد
+\item
+  \textbf{\lr{\mbox{CUPS}} کامل} \lr{—} \lr{\mbox{UPF}} تنها موجودیت صفحه کاربر است، قابل برنامه‌ریزی از طریق \lr{\mbox{PFCP}}
+\item
+  \textbf{بومی-ابر از طراحی} \lr{—} \lr{\mbox{NF}}های بدون حالت، \lr{\mbox{UDSF}}، کشف مبتنی بر \lr{\mbox{NRF}}، کانتینری‌سازی
+\item
+  \textbf{شبکه‌بندی بومی} \lr{—} \lr{\mbox{S-NSSAI}}، \lr{\mbox{NSSF}}، انتخاب \lr{\mbox{NF}} در هر برش از پایه
+\item
+  \textbf{امنیت تقویت‌شده} \lr{—} پنهان‌سازی \lr{\mbox{SUCI}}، احراز هویت کنترل‌شده توسط شبکه خانگی، \lr{\mbox{OAuth2}} در \lr{\mbox{SBI}}
+\item
+  \textbf{آماده-لبه} \lr{—} \lr{\mbox{UPF}} توزیع‌شده، \lr{\mbox{UL-CL}}، \lr{\mbox{LADN}} برای خدمات فوق‌کم-تأخیر
+\end{itemize}
+
+\emph{مراجع: \lr{3GPP TS 23.501} (معماری سیستم)، \lr{TS 23.502} (رویه‌ها)، \lr{TS 29.244 (PFCP)}، \lr{TS 33.501} (معماری امنیت)}
